@@ -67,12 +67,23 @@ export const Warehouse: React.FC = () => {
     { date: '2026-07-23', supplier: 'Хімікалії та Тонери Вінниця', item: 'Тонер Canon C-EXV 21', qty: '+5 шт', total: '3,250 ₴', status: 'Проведено' }
   ];
 
-  const categories = [
-    { name: 'Папір', itemsCount: materials.filter(m => getFolderForMaterial(m.type) === 'Папір').length, location: 'Головний склад (Стелаж А)', manager: 'Вікторія' },
-    { name: 'Фарби та Тонери', itemsCount: materials.filter(m => m.name.toLowerCase().includes('тонер')).length || 2, location: 'Склад фарб (Шафа Б)', manager: 'Сергій' },
+  const getFolderForMaterial = (type?: string) => {
+    switch (type) {
+      case 'offset':
+      case 'gazetka':
+      case 'coated':
+        return 'Папір';
+      default:
+        return 'Інші товари';
+    }
+  };
+
+  const categories = useMemo(() => [
+    { name: 'Папір', itemsCount: (materials || []).filter(m => getFolderForMaterial(m?.type) === 'Папір').length, location: 'Головний склад (Стелаж А)', manager: 'Вікторія' },
+    { name: 'Фарби та Тонери', itemsCount: (materials || []).filter(m => (m?.name || '').toLowerCase().includes('тонер')).length || 2, location: 'Склад фарб (Шафа Б)', manager: 'Сергій' },
     { name: 'Форми та Майстер-плівки', itemsCount: 1, location: 'Шафа обладнання цеху', manager: 'Іван' },
-    { name: 'Палітурні матеріали', itemsCount: materials.filter(m => m.name.toLowerCase().includes('пружина') || m.name.toLowerCase().includes('картон')).length || 2, location: 'Зона післядрукарської обробки', manager: 'Іван' }
-  ];
+    { name: 'Палітурні матеріали', itemsCount: (materials || []).filter(m => (m?.name || '').toLowerCase().includes('пружина') || (m?.name || '').toLowerCase().includes('картон')).length || 2, location: 'Зона післядрукарської обробки', manager: 'Іван' }
+  ], [materials]);
 
   // Presets for fast 1-click material creation
   const presets = [
@@ -253,28 +264,20 @@ export const Warehouse: React.FC = () => {
     }
   };
 
-  const getFolderForMaterial = (type: string) => {
-    switch (type) {
-      case 'offset':
-      case 'gazetka':
-      case 'coated':
-        return 'Папір';
-      default:
-        return 'Інші товари';
-    }
-  };
-
   const filteredMaterials = useMemo(() => {
-    return materials.filter(m => {
-      const matchesSearch = m.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                            m.id.toLowerCase().includes(searchQuery.toLowerCase());
+    return (materials || []).filter(m => {
+      const name = m?.name || '';
+      const id = m?.id || '';
+      const matchesSearch = name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+                            id.toLowerCase().includes(searchQuery.toLowerCase());
       
-      const matchesCategory = selectedCategory === 'all' || m.type === selectedCategory;
+      const matchesCategory = selectedCategory === 'all' || m?.type === selectedCategory;
       
-      const minStock = m.minStock || 1000;
+      const minStock = m?.minStock || 1000;
+      const qty = m?.quantity || 0;
       const matchesStock = selectedStockFilter === 'all' || 
-                           (selectedStockFilter === 'instock' && m.quantity > minStock) ||
-                           (selectedStockFilter === 'lowstock' && m.quantity <= minStock);
+                           (selectedStockFilter === 'instock' && qty > minStock) ||
+                           (selectedStockFilter === 'lowstock' && qty <= minStock);
       
       return matchesSearch && matchesCategory && matchesStock;
     });
