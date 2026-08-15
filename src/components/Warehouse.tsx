@@ -8,11 +8,7 @@ import {
   Search,
   CheckSquare,
   Plus,
-  Trash,
-  Info,
-  Package,
-  Sparkles,
-  Building
+  Trash
 } from 'lucide-react';
 import type { Material } from '../types';
 
@@ -300,54 +296,6 @@ export const Warehouse: React.FC = () => {
           <Plus size={14} />
           Додати товар на склад
         </button>
-      </div>
-
-      {/* Informational Guidance Banner explaining metrics for clear understanding */}
-      <div style={{
-        backgroundColor: '#ffffff',
-        padding: '12px 16px',
-        borderRadius: '12px',
-        marginBottom: '16px',
-        border: '0.5px solid var(--border-light)',
-        display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
-        gap: '12px',
-        fontSize: '11px',
-        boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
-        position: 'relative',
-        zIndex: 2
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Package size={16} style={{ color: 'var(--primary)', flexShrink: 0 }} />
-          <div>
-            <strong style={{ color: 'var(--text-dark)' }}>📦 Залишок:</strong>
-            <span style={{ color: 'var(--text-medium)', display: 'block' }}>Фізична кількість на складі</span>
-          </div>
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Info size={16} style={{ color: '#ff9500', flexShrink: 0 }} />
-          <div>
-            <strong style={{ color: 'var(--text-dark)' }}>🔒 Зарезервовано:</strong>
-            <span style={{ color: 'var(--text-medium)', display: 'block' }}>Відкладено під замовлення в роботі</span>
-          </div>
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Sparkles size={16} style={{ color: 'var(--success)', flexShrink: 0 }} />
-          <div>
-            <strong style={{ color: 'var(--text-dark)' }}>✅ Доступно:</strong>
-            <span style={{ color: 'var(--text-medium)', display: 'block' }}>Вільний баланс для калькуляцій</span>
-          </div>
-        </div>
-
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <Building size={16} style={{ color: '#5856d6', flexShrink: 0 }} />
-          <div>
-            <strong style={{ color: 'var(--text-dark)' }}>📍 Локація:</strong>
-            <span style={{ color: 'var(--text-medium)', display: 'block' }}>Стелаж/Шафа зберігання</span>
-          </div>
-        </div>
       </div>
 
       {/* Sub-tabs inside Warehouse */}

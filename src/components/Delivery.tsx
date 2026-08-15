@@ -417,7 +417,16 @@ export const Delivery: React.FC = () => {
                 <>
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.2fr', gap: '10px' }}>
                     <div className="ios-input-group">
-                      <label className="ios-label">Номер ТТН</label>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <label className="ios-label">Номер ТТН</label>
+                        <button
+                          type="button"
+                          onClick={() => setNewTtn(`59000${Math.floor(100000000 + Math.random() * 900000000)}`)}
+                          style={{ border: 'none', background: 'transparent', color: 'var(--primary)', fontSize: '10px', fontWeight: '800', cursor: 'pointer', padding: 0 }}
+                        >
+                          🎲 Згенерувати ТТН
+                        </button>
+                      </div>
                       <input placeholder="Автогенерація якщо пусто" value={newTtn} onChange={(e) => setNewTtn(e.target.value)} />
                     </div>
                     <div className="ios-input-group">
