@@ -691,6 +691,15 @@ export const Warehouse: React.FC = () => {
               </div>
 
               <span className="ios-label">Список товарів для оприбуткування:</span>
+              
+              {/* Column Headers for Multi-receipt table */}
+              <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr auto', gap: '10px', paddingBottom: '6px', borderBottom: '1.5px solid #cbd5e1', fontSize: '11px', fontWeight: '850', color: 'var(--text-dark)', textTransform: 'uppercase' }}>
+                <span>Найменування товару</span>
+                <span>Кількість</span>
+                <span>Ціна закупівлі (грн)</span>
+                <span style={{ width: '16px' }}></span>
+              </div>
+
               <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxHeight: '250px', overflowY: 'auto', paddingRight: '4px' }}>
                 {multiReceiptRows.map((row, idx) => (
                   <div key={idx} style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr auto', gap: '10px', alignItems: 'center', borderBottom: '1px solid #f1f5f9', paddingBottom: '8px' }}>
