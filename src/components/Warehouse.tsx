@@ -310,9 +310,12 @@ export const Warehouse: React.FC = () => {
         marginBottom: '16px',
         border: '0.5px solid var(--border-light)',
         display: 'grid',
-        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+        gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))',
         gap: '12px',
-        fontSize: '11px'
+        fontSize: '11px',
+        boxShadow: '0 1px 2px rgba(0,0,0,0.03)',
+        position: 'relative',
+        zIndex: 2
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <Package size={16} style={{ color: 'var(--primary)', flexShrink: 0 }} />
@@ -350,27 +353,33 @@ export const Warehouse: React.FC = () => {
       {/* Sub-tabs inside Warehouse */}
       <div style={{
         display: 'flex',
-        backgroundColor: 'rgba(120, 120, 128, 0.12)',
-        padding: '2px',
-        borderRadius: '8px',
+        alignItems: 'center',
+        backgroundColor: '#e5e5ea',
+        padding: '3px',
+        borderRadius: '10px',
         marginBottom: '16px',
-        overflowX: 'auto'
+        overflowX: 'auto',
+        position: 'relative',
+        zIndex: 1,
+        minHeight: '40px'
       }}>
         {(['zalyshki', 'vyroby', 'oprybutkuvannya', 'spysannya', 'peremishchennya', 'inventaryzatsii', 'povernennya', 'tovary'] as const).map(tab => (
           <button 
             key={tab}
+            type="button"
             onClick={() => setActiveTab(tab)}
             className="ios-btn"
             style={{
               flexGrow: 1,
-              padding: '6px 12px',
+              padding: '7px 14px',
               fontSize: '11px',
-              borderRadius: '6px',
+              borderRadius: '7px',
               backgroundColor: activeTab === tab ? '#ffffff' : 'transparent',
-              color: 'var(--text-dark)',
-              boxShadow: activeTab === tab ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
-              fontWeight: activeTab === tab ? '700' : '500',
-              whiteSpace: 'nowrap'
+              color: activeTab === tab ? 'var(--primary)' : '#1c1c1e',
+              boxShadow: activeTab === tab ? '0 1px 4px rgba(0,0,0,0.12)' : 'none',
+              fontWeight: activeTab === tab ? '800' : '600',
+              whiteSpace: 'nowrap',
+              transition: 'all 0.15s ease'
             }}
           >
             {tab === 'zalyshki' ? `Залишки (${materials.length})` : 
