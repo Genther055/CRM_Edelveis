@@ -63,11 +63,11 @@ function AppContent() {
         <Delivery />
       )}
       
-      {activeTab === 'calculator' && ['admin', 'manager'].includes(role) && (
+      {activeTab === 'calculator' && (
         <Calculator />
       )}
       
-      {activeTab === 'warehouse' && ['admin', 'manager'].includes(role) && (
+      {activeTab === 'warehouse' && (
         <Warehouse />
       )}
 
