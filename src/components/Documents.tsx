@@ -135,9 +135,30 @@ export const Documents: React.FC = () => {
       </table>
     `;
 
+    const safeProdName = (order.name || 'Бланки')
+      .split('[')[0]
+      .replace(/Угода з Email:?/gi, '')
+      .replace(/Замовлення\s*№\s*\d+/gi, '')
+      .replace(/№\s*\d+/gi, '')
+      .replace(/[-—–]/g, '')
+      .trim()
+      .replace(/[\\/:*?"<>|]/g, '')
+      .replace(/\s+/g, '_') || 'Бланки';
+
+    const safeClientName = (activeClient?.name || 'Замовник_№1')
+      .trim()
+      .replace(/[\\/:*?"<>|]/g, '')
+      .replace(/\s+/g, '_');
+
+    const paperShort = order.paperType === 'offset' ? 'Офс._70г' : order.paperType === 'gazetka' ? 'Газ._45г' : 'Крейда_130г';
+    const turnShort = order.isSamNaSebe ? 'сс' : 'без_обор';
+    const num = order.id || '33811';
+
+    const fileName = `№${num}_${safeProdName}_—_${safeClientName}_(${order.format || 'A4'},_${paperShort},_${order.colors || '1+0'},_${turnShort},_${order.quantity || 1000}_шт.).pdf`;
+
     const opt = {
       margin:       10,
-      filename:     `invoice-order-${order.id}.pdf`,
+      filename:     fileName,
       image:        { type: 'jpeg' as const, quality: 0.98 },
       html2canvas:  { scale: 2 },
       jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' as const }
