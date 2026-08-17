@@ -360,6 +360,9 @@ export const Production: React.FC = () => {
                       Наразі немає сформованих виробничих нарядів
                     </td>
                   </tr>
+                
+
+
                 ) : (
                   orders.map(order => {
                     const client = clients.find(c => c.id === order.clientId);

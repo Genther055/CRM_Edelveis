@@ -420,7 +420,23 @@ export const Calculator: React.FC = () => {
       return Math.max(0.01, rate || 0.50);
     };
 
-    const getVol = (key: string) => Math.max(1, opVolumes[key] || 1);
+    const getVol = (key: string, autoDefault: number) => {
+      const val = opVolumes[key];
+      return (val !== undefined && !isNaN(val)) ? val : autoDefault;
+    };
+
+    const actualVolumes = {
+      formMaking: getVol('formMaking', passes),
+      filmMounting: getVol('filmMounting', 1),
+      printing: getVol('printing', physicalSheets),
+      lamination: getVol('lamination', physicalSheets),
+      embossing: getVol('embossing', numQty),
+      dieCutting: getVol('dieCutting', numQty),
+      folding: getVol('folding', (Number(creaseCount) || 1) * numQty),
+      blockInsertion: getVol('blockInsertion', numQty),
+      coverMaking: getVol('coverMaking', numQty),
+      blockProcessing: getVol('blockProcessing', physicalSheets)
+    };
 
     const rates = {
       formMaking: getSafeRate('formMaking', norms.formMakingPrice),
@@ -436,16 +452,16 @@ export const Calculator: React.FC = () => {
     };
 
     const fullSums = {
-      formMaking: rates.formMaking * getVol('formMaking') * passes,
-      filmMounting: rates.filmMounting * getVol('filmMounting'),
-      printing: rates.printing * Math.max(1, physicalSheets) * passes,
-      lamination: rates.lamination * Math.max(1, physicalSheets),
-      embossing: rates.embossing * numQty * getVol('embossing'),
-      dieCutting: rates.dieCutting * numQty * getVol('dieCutting'),
-      folding: rates.folding * numQty * getVol('folding'),
-      blockInsertion: rates.blockInsertion * numQty * getVol('blockInsertion'),
-      coverMaking: rates.coverMaking * numQty * getVol('coverMaking'),
-      blockProcessing: rates.blockProcessing * Math.max(1, physicalSheets)
+      formMaking: rates.formMaking * actualVolumes.formMaking,
+      filmMounting: rates.filmMounting * actualVolumes.filmMounting,
+      printing: rates.printing * actualVolumes.printing * passes,
+      lamination: rates.lamination * actualVolumes.lamination,
+      embossing: rates.embossing * actualVolumes.embossing,
+      dieCutting: rates.dieCutting * actualVolumes.dieCutting,
+      folding: rates.folding * actualVolumes.folding,
+      blockInsertion: rates.blockInsertion * actualVolumes.blockInsertion,
+      coverMaking: rates.coverMaking * actualVolumes.coverMaking,
+      blockProcessing: rates.blockProcessing * actualVolumes.blockProcessing
     };
 
     const sums = {
@@ -498,6 +514,7 @@ export const Calculator: React.FC = () => {
       itemsPerSheet,
       paperCost,
       rates,
+      actualVolumes,
       sums,
       fullSums,
       printingCost,
@@ -1142,7 +1159,7 @@ export const Calculator: React.FC = () => {
                           <td style={{ textAlign: 'center' }}>
                             <input 
                               type="number" 
-                              value={opVolumes.formMaking} 
+                              value={opVolumes.formMaking !== undefined ? opVolumes.formMaking : calculatedOps.actualVolumes.formMaking} 
                               onChange={(e) => setOpVolumes({ ...opVolumes, formMaking: Number(e.target.value) })}
                               style={{ height: '24px', padding: '0 4px', textAlign: 'center', fontSize: '11px', width: '50px' }}
                             />
@@ -1169,7 +1186,7 @@ export const Calculator: React.FC = () => {
                           <td style={{ textAlign: 'center' }}>
                             <input 
                               type="number" 
-                              value={opVolumes.filmMounting} 
+                              value={opVolumes.filmMounting !== undefined ? opVolumes.filmMounting : calculatedOps.actualVolumes.filmMounting} 
                               onChange={(e) => setOpVolumes({ ...opVolumes, filmMounting: Number(e.target.value) })}
                               style={{ height: '24px', padding: '0 4px', textAlign: 'center', fontSize: '11px', width: '50px' }}
                             />
@@ -1193,7 +1210,7 @@ export const Calculator: React.FC = () => {
                               style={{ height: '24px', padding: '0 4px', textAlign: 'right', fontSize: '11px', width: '80px' }}
                             />
                           </td>
-                          <td style={{ textAlign: 'center', opacity: 0.6 }}>{calculatedOps.physicalSheets} арк</td>
+                          <td style={{ textAlign: 'center', opacity: 0.8, fontSize: '11px', fontWeight: '600' }}>{calculatedOps.actualVolumes.printing} арк</td>
                           <td style={{ textAlign: 'right', fontWeight: '800', color: activeOps.printing ? 'var(--text-dark)' : '#94a3b8' }}>
                             {calculatedOps.fullSums.printing.toFixed(2)} ₴
                           </td>
@@ -1213,7 +1230,7 @@ export const Calculator: React.FC = () => {
                               style={{ height: '24px', padding: '0 4px', textAlign: 'right', fontSize: '11px', width: '80px' }}
                             />
                           </td>
-                          <td style={{ textAlign: 'center', opacity: 0.6 }}>{calculatedOps.physicalSheets} арк</td>
+                          <td style={{ textAlign: 'center', opacity: 0.8, fontSize: '11px', fontWeight: '600' }}>{calculatedOps.actualVolumes.lamination} арк</td>
                           <td style={{ textAlign: 'right', fontWeight: '800', color: activeOps.lamination ? 'var(--text-dark)' : '#94a3b8' }}>
                             {calculatedOps.fullSums.lamination.toFixed(2)} ₴
                           </td>
@@ -1236,9 +1253,9 @@ export const Calculator: React.FC = () => {
                           <td style={{ textAlign: 'center' }}>
                             <input 
                               type="number" 
-                              value={opVolumes.embossing} 
+                              value={opVolumes.embossing !== undefined ? opVolumes.embossing : calculatedOps.actualVolumes.embossing} 
                               onChange={(e) => setOpVolumes({ ...opVolumes, embossing: Number(e.target.value) })}
-                              style={{ height: '24px', padding: '0 4px', textAlign: 'center', fontSize: '11px', width: '50px' }}
+                              style={{ height: '24px', padding: '0 4px', textAlign: 'center', fontSize: '11px', width: '60px' }}
                             />
                           </td>
                           <td style={{ textAlign: 'right', fontWeight: '800', color: activeOps.embossing ? 'var(--text-dark)' : '#94a3b8' }}>
@@ -1263,9 +1280,9 @@ export const Calculator: React.FC = () => {
                           <td style={{ textAlign: 'center' }}>
                             <input 
                               type="number" 
-                              value={opVolumes.dieCutting} 
+                              value={opVolumes.dieCutting !== undefined ? opVolumes.dieCutting : calculatedOps.actualVolumes.dieCutting} 
                               onChange={(e) => setOpVolumes({ ...opVolumes, dieCutting: Number(e.target.value) })}
-                              style={{ height: '24px', padding: '0 4px', textAlign: 'center', fontSize: '11px', width: '50px' }}
+                              style={{ height: '24px', padding: '0 4px', textAlign: 'center', fontSize: '11px', width: '60px' }}
                             />
                           </td>
                           <td style={{ textAlign: 'right', fontWeight: '800', color: activeOps.dieCutting ? 'var(--text-dark)' : '#94a3b8' }}>
@@ -1290,9 +1307,9 @@ export const Calculator: React.FC = () => {
                           <td style={{ textAlign: 'center' }}>
                             <input 
                               type="number" 
-                              value={opVolumes.folding} 
+                              value={opVolumes.folding !== undefined ? opVolumes.folding : calculatedOps.actualVolumes.folding} 
                               onChange={(e) => setOpVolumes({ ...opVolumes, folding: Number(e.target.value) })}
-                              style={{ height: '24px', padding: '0 4px', textAlign: 'center', fontSize: '11px', width: '50px' }}
+                              style={{ height: '24px', padding: '0 4px', textAlign: 'center', fontSize: '11px', width: '60px' }}
                             />
                           </td>
                           <td style={{ textAlign: 'right', fontWeight: '800', color: activeOps.folding ? 'var(--text-dark)' : '#94a3b8' }}>
@@ -1317,9 +1334,9 @@ export const Calculator: React.FC = () => {
                           <td style={{ textAlign: 'center' }}>
                             <input 
                               type="number" 
-                              value={opVolumes.blockInsertion} 
+                              value={opVolumes.blockInsertion !== undefined ? opVolumes.blockInsertion : calculatedOps.actualVolumes.blockInsertion} 
                               onChange={(e) => setOpVolumes({ ...opVolumes, blockInsertion: Number(e.target.value) })}
-                              style={{ height: '24px', padding: '0 4px', textAlign: 'center', fontSize: '11px', width: '50px' }}
+                              style={{ height: '24px', padding: '0 4px', textAlign: 'center', fontSize: '11px', width: '60px' }}
                             />
                           </td>
                           <td style={{ textAlign: 'right', fontWeight: '800', color: activeOps.blockInsertion ? 'var(--text-dark)' : '#94a3b8' }}>
@@ -1344,9 +1361,9 @@ export const Calculator: React.FC = () => {
                           <td style={{ textAlign: 'center' }}>
                             <input 
                               type="number" 
-                              value={opVolumes.coverMaking} 
+                              value={opVolumes.coverMaking !== undefined ? opVolumes.coverMaking : calculatedOps.actualVolumes.coverMaking} 
                               onChange={(e) => setOpVolumes({ ...opVolumes, coverMaking: Number(e.target.value) })}
-                              style={{ height: '24px', padding: '0 4px', textAlign: 'center', fontSize: '11px', width: '50px' }}
+                              style={{ height: '24px', padding: '0 4px', textAlign: 'center', fontSize: '11px', width: '60px' }}
                             />
                           </td>
                           <td style={{ textAlign: 'right', fontWeight: '800', color: activeOps.coverMaking ? 'var(--text-dark)' : '#94a3b8' }}>
@@ -1368,7 +1385,7 @@ export const Calculator: React.FC = () => {
                               style={{ height: '24px', padding: '0 4px', textAlign: 'right', fontSize: '11px', width: '80px' }}
                             />
                           </td>
-                          <td style={{ textAlign: 'center', opacity: 0.6 }}>{calculatedOps.physicalSheets} арк</td>
+                          <td style={{ textAlign: 'center', opacity: 0.8, fontSize: '11px', fontWeight: '600' }}>{calculatedOps.actualVolumes.blockProcessing} арк</td>
                           <td style={{ textAlign: 'right', fontWeight: '800', color: activeOps.blockProcessing ? 'var(--text-dark)' : '#94a3b8' }}>
                             {calculatedOps.fullSums.blockProcessing.toFixed(2)} ₴
                           </td>
