@@ -34,32 +34,53 @@ export const Tasks: React.FC = () => {
   const [tasks, setTasks] = useState<TaskItem[]>([
     {
       id: 'T-301',
-      title: 'Зробити кольоропробу для замовлення №201',
-      deadline: '2026-07-24',
+      title: 'Зробити кольоропробу CMYK для тиражу бланків A4',
+      deadline: '2026-08-18',
       priority: 'high',
-      assignee: 'Анна',
+      assignee: 'Анна (Дизайнер)',
       checklist: [
-        { id: 'c1', text: 'Завантажити файл макета у високій якості', checked: true },
-        { id: 'c2', text: 'Узгодити кольори CMYK з друкарем', checked: false }
+        { id: 'c1', text: 'Завантажити файл макета у високій якості (300 dpi)', checked: true },
+        { id: 'c2', text: 'Узгодити виліт 2мм з друкарем цифрової машини', checked: true },
+        { id: 'c3', text: 'Отримати фінальне підтвердження від замовника по Email', checked: false }
       ],
       status: 'todo',
-      clientName: 'Контрагент А',
-      dealName: 'Замовлення №1',
-      createdBy: 'Працівник Б'
+      clientName: 'ТОВ «ФармаТрейд»',
+      dealName: 'Замовлення №31101 — Бланки А4',
+      createdBy: 'Віктор (Менеджер)'
     },
     {
       id: 'T-302',
-      title: 'Підготувати закупівлю крейдованого паперу',
-      deadline: '2026-07-26',
+      title: 'Підготувати порізку тиражу 1500 шт на гіпер-порізчику',
+      deadline: '2026-08-19',
       priority: 'medium',
-      assignee: 'Анна',
-      checklist: [],
+      assignee: 'Іван (Палітурник)',
+      checklist: [
+        { id: 'c4', text: 'Перевірити наявність крейдованого паперу 130г на стелажі А', checked: true },
+        { id: 'c5', text: 'Виставити стопові мітки порізу 210х297мм', checked: false }
+      ],
       status: 'todo',
-      clientName: 'Контрагент Б',
-      createdBy: 'Працівник А'
+      clientName: 'ПРАТ «ЕкоСок»',
+      dealName: 'Замовлення №1502 — Буклети',
+      createdBy: 'Працівник А (Директор)'
+    },
+    {
+      id: 'T-303',
+      title: 'Ламінування матовою плівкою 30мкм тиражу меню',
+      deadline: '2026-08-20',
+      priority: 'low',
+      assignee: 'Сергій (Оператор)',
+      checklist: [
+        { id: 'c6', text: 'Прогріти рулонний ламінатор до 115°C', checked: false },
+        { id: 'c7', text: 'Упакувати готовий тираж у крафт-папір для доставки', checked: false }
+      ],
+      status: 'todo',
+      clientName: 'Кафе «Капучино»',
+      dealName: 'Замовлення №884 — Меню',
+      createdBy: 'Віктор (Менеджер)'
     }
   ]);
 
+  const [activeTabFilter, setActiveTabFilter] = useState<'all' | 'todo' | 'done'>('all');
   const [showAddModal, setShowAddModal] = useState(false);
   const [newTitle, setNewTitle] = useState('');
   const [newDeadline, setNewDeadline] = useState('');
@@ -127,12 +148,18 @@ export const Tasks: React.FC = () => {
     }
   };
 
+  const filteredTasks = tasks.filter(t => {
+    if (activeTabFilter === 'todo') return t.status === 'todo';
+    if (activeTabFilter === 'done') return t.status === 'done';
+    return true;
+  });
+
   return (
     <div className="main-content" style={{ backgroundColor: 'var(--bg-system)', height: '100%', overflowY: 'auto' }}>
       <div className="header-title-container">
         <div>
           <h1 className="page-title">Завдання та Чек-листи</h1>
-          <p className="subtitle">Планування та контроль виробничих доручень</p>
+          <p className="subtitle">Планування та контроль виробничих доручень друкарні</p>
         </div>
         <button 
           type="button"
@@ -145,146 +172,211 @@ export const Tasks: React.FC = () => {
         </button>
       </div>
 
+      {/* Filter Tabs Bar */}
+      <div style={{ display: 'flex', gap: '8px', marginBottom: '20px' }}>
+        <button
+          type="button"
+          onClick={() => setActiveTabFilter('all')}
+          className="ios-btn"
+          style={{
+            padding: '6px 14px',
+            fontSize: '12px',
+            borderRadius: '6px',
+            backgroundColor: activeTabFilter === 'all' ? 'var(--primary)' : 'var(--bg-card-subtle)',
+            color: activeTabFilter === 'all' ? '#ffffff' : 'var(--text-dark)',
+            border: '1px solid var(--border-light)',
+            fontWeight: '700'
+          }}
+        >
+          Усі завдання ({tasks.length})
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTabFilter('todo')}
+          className="ios-btn"
+          style={{
+            padding: '6px 14px',
+            fontSize: '12px',
+            borderRadius: '6px',
+            backgroundColor: activeTabFilter === 'todo' ? 'var(--primary)' : 'var(--bg-card-subtle)',
+            color: activeTabFilter === 'todo' ? '#ffffff' : 'var(--text-dark)',
+            border: '1px solid var(--border-light)',
+            fontWeight: '700'
+          }}
+        >
+          В роботі ({tasks.filter(t => t.status === 'todo').length})
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTabFilter('done')}
+          className="ios-btn"
+          style={{
+            padding: '6px 14px',
+            fontSize: '12px',
+            borderRadius: '6px',
+            backgroundColor: activeTabFilter === 'done' ? 'var(--primary)' : 'var(--bg-card-subtle)',
+            color: activeTabFilter === 'done' ? '#ffffff' : 'var(--text-dark)',
+            border: '1px solid var(--border-light)',
+            fontWeight: '700'
+          }}
+        >
+          Завершені ({tasks.filter(t => t.status === 'done').length})
+        </button>
+      </div>
+
       <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '20px', alignItems: 'start' }}>
-        {/* Active Tasks List */}
+        {/* Tasks List */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           
-          <div className="ios-card bg-white space-y-4">
-            <h3 style={{ fontSize: '14px', fontWeight: '800', borderBottom: '1px solid #f1f5f9', paddingBottom: '8px' }}>
-              Активні завдання
+          <div className="ios-card" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)', padding: '20px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <h3 style={{ fontSize: '14px', fontWeight: '800', borderBottom: '1px solid var(--border-light)', paddingBottom: '8px', color: 'var(--text-dark)', margin: 0 }}>
+              Список завдань
             </h3>
 
-            {tasks.filter(t => t.status === 'todo').length === 0 ? (
+            {filteredTasks.length === 0 ? (
               <p style={{ textAlign: 'center', color: 'var(--text-medium)', fontSize: '13px', padding: '20px' }}>
-                Всі завдання виконано! 🎉
+                Завдання за обраним фільтром відсутні 🎉
               </p>
             ) : (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                {tasks.filter(t => t.status === 'todo').map(task => (
-                  <div key={task.id} className="task-card" style={{
-                    padding: '16px',
-                    borderRadius: '12px',
-                    border: '0.5px solid var(--border-light)',
-                    backgroundColor: '#ffffff',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: '12px',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.01)'
-                  }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                      <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
-                        <button 
-                          type="button"
-                          onClick={() => toggleTaskStatus(task.id)}
-                          style={{
-                            border: 'none',
-                            background: 'transparent',
-                            cursor: 'pointer',
-                            color: '#c7c7cc',
-                            padding: 0,
-                            marginTop: '2px'
-                          }}
-                        >
-                          <CheckSquare size={20} />
-                        </button>
-                        <div>
-                          <h4 style={{ fontSize: '13px', fontWeight: '750', color: 'var(--text-dark)' }}>{task.title}</h4>
-                          
-                          {/* Display Client and Deal if present */}
-                          {(task.clientName || task.dealName) && (
-                            <div style={{ display: 'flex', gap: '8px', fontSize: '11px', marginTop: '6px', flexWrap: 'wrap' }}>
-                              {task.clientName && (
-                                <span style={{ backgroundColor: 'rgba(88,86,214,0.08)', color: '#5856d6', padding: '2px 6px', borderRadius: '4px', fontWeight: '700' }}>
-                                  👤 Клієнт: {task.clientName}
-                                </span>
-                              )}
-                              {task.dealName && (
-                                <span style={{ backgroundColor: 'rgba(0,122,255,0.08)', color: 'var(--primary)', padding: '2px 6px', borderRadius: '4px', fontWeight: '700' }}>
-                                  💼 Угода: {task.dealName}
+                {filteredTasks.map(task => {
+                  const doneCount = task.checklist.filter(c => c.checked).length;
+                  const totalCount = task.checklist.length;
+                  const progressPct = totalCount > 0 ? Math.round((doneCount / totalCount) * 100) : 0;
+
+                  return (
+                    <div key={task.id} className="task-card" style={{
+                      padding: '16px',
+                      borderRadius: '12px',
+                      border: '1px solid var(--border-light)',
+                      backgroundColor: 'var(--bg-card-subtle)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '12px'
+                    }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                        <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                          <button 
+                            type="button"
+                            onClick={() => toggleTaskStatus(task.id)}
+                            style={{
+                              border: 'none',
+                              background: 'transparent',
+                              cursor: 'pointer',
+                              color: task.status === 'done' ? 'var(--success)' : 'var(--text-medium)',
+                              padding: 0,
+                              marginTop: '2px'
+                            }}
+                          >
+                            {task.status === 'done' ? <CheckCircle2 size={22} /> : <CheckSquare size={20} />}
+                          </button>
+                          <div>
+                            <h4 style={{ fontSize: '13px', fontWeight: '800', color: 'var(--text-dark)', textDecoration: task.status === 'done' ? 'line-through' : 'none', margin: 0 }}>
+                              {task.title}
+                            </h4>
+                            
+                            {/* Display Client and Deal if present */}
+                            {(task.clientName || task.dealName) && (
+                              <div style={{ display: 'flex', gap: '8px', fontSize: '11px', marginTop: '6px', flexWrap: 'wrap' }}>
+                                {task.clientName && (
+                                  <span style={{ backgroundColor: 'rgba(88,86,214,0.12)', color: 'var(--primary)', padding: '2px 8px', borderRadius: '4px', fontWeight: '700', border: '1px solid var(--border-light)' }}>
+                                    👤 Замовник: {task.clientName}
+                                  </span>
+                                )}
+                                {task.dealName && (
+                                  <span style={{ backgroundColor: 'rgba(0,122,255,0.12)', color: 'var(--primary)', padding: '2px 8px', borderRadius: '4px', fontWeight: '700', border: '1px solid var(--border-light)' }}>
+                                    💼 {task.dealName}
+                                  </span>
+                                )}
+                              </div>
+                            )}
+
+                            <div style={{ display: 'flex', gap: '16px', fontSize: '11px', color: 'var(--text-medium)', marginTop: '8px', flexWrap: 'wrap' }}>
+                              <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--text-medium)' }}>
+                                <Calendar size={12} /> До: <strong style={{ color: 'var(--text-dark)', fontFamily: 'var(--font-mono)' }}>{task.deadline}</strong>
+                              </span>
+                              <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--text-medium)' }}>
+                                <User size={12} /> Виконавець: <strong style={{ color: 'var(--text-dark)' }}>{task.assignee}</strong>
+                              </span>
+                              {task.createdBy && (
+                                <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontStyle: 'italic', color: 'var(--text-medium)' }}>
+                                  ✍️ Автор: {task.createdBy}
                                 </span>
                               )}
                             </div>
-                          )}
-
-                          <div style={{ display: 'flex', gap: '16px', fontSize: '11px', color: 'var(--text-medium)', marginTop: '8px', opacity: 0.8, flexWrap: 'wrap' }}>
-                            <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                              <Calendar size={12} /> До: {task.deadline}
-                            </span>
-                            <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                              <User size={12} /> Виконавець: {task.assignee}
-                            </span>
-                            {task.createdBy && (
-                              <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontStyle: 'italic' }}>
-                                ✍️ Автор: {task.createdBy}
-                              </span>
-                            )}
                           </div>
+                        </div>
+
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <span className={getPriorityBadgeClass(task.priority)}>
+                            {task.priority === 'high' ? 'Критичний' : task.priority === 'medium' ? 'Середній' : 'Низький'}
+                          </span>
+                          <button 
+                            type="button" 
+                            onClick={() => deleteTask(task.id)} 
+                            style={{
+                              border: 'none',
+                              background: 'transparent',
+                              cursor: 'pointer',
+                              color: 'var(--danger)',
+                              padding: '4px'
+                            }}
+                          >
+                            <Trash size={14} />
+                          </button>
                         </div>
                       </div>
 
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <span className={getPriorityBadgeClass(task.priority)}>
-                          {task.priority === 'high' ? 'Критичний' : task.priority === 'medium' ? 'Середній' : 'Низький'}
-                        </span>
-                        <button 
-                          type="button" 
-                          onClick={() => deleteTask(task.id)} 
-                          style={{
-                            border: 'none',
-                            background: 'transparent',
-                            cursor: 'pointer',
-                            color: 'var(--danger)',
-                            padding: '4px',
-                            borderRadius: '50%'
-                          }}
-                        >
-                          <Trash size={14} />
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Checklist */}
-                    {task.checklist.length > 0 && (
-                      <div style={{
-                        paddingLeft: '32px',
-                        borderTop: '0.5px solid var(--border-light)',
-                        paddingTop: '10px',
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: '8px'
-                      }}>
-                        <span style={{ fontSize: '10px', fontWeight: '750', color: '#c7c7cc', textTransform: 'uppercase' }}>Чек-лист:</span>
-                        {task.checklist.map(item => (
-                          <label key={item.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', cursor: 'pointer', fontSize: '12px' }}>
-                            <input 
-                              type="checkbox"
-                              checked={item.checked}
-                              onChange={() => toggleChecklistItem(task.id, item.id)}
-                              style={{ width: '15px', height: '15px', borderRadius: '4px' }}
-                            />
-                            <span style={{
+                      {/* Checklist */}
+                      {task.checklist.length > 0 && (
+                        <div style={{
+                          paddingLeft: '32px',
+                          borderTop: '1px solid var(--border-light)',
+                          paddingTop: '10px',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '6px'
+                        }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '10px', color: 'var(--text-medium)', marginBottom: '4px' }}>
+                            <span style={{ fontWeight: '700', textTransform: 'uppercase' }}>Чек-лист виконання ({doneCount}/{totalCount}):</span>
+                            <span style={{ fontFamily: 'var(--font-mono)', fontWeight: '700', color: 'var(--primary)' }}>{progressPct}%</span>
+                          </div>
+                          {task.checklist.map(item => (
+                            <label key={item.id} style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '8px',
+                              fontSize: '11px',
+                              color: item.checked ? 'var(--text-medium)' : 'var(--text-dark)',
                               textDecoration: item.checked ? 'line-through' : 'none',
-                              color: item.checked ? '#c7c7cc' : 'var(--text-dark)'
-                            }}>{item.text}</span>
-                          </label>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                ))}
+                              cursor: 'pointer'
+                            }}>
+                              <input 
+                                type="checkbox" 
+                                checked={item.checked} 
+                                onChange={() => toggleChecklistItem(task.id, item.id)} 
+                              />
+                              {item.text}
+                            </label>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>
         </div>
 
         {/* Completed Tasks Sidebar */}
-        <div className="ios-card bg-white space-y-4">
-          <h3 style={{ fontSize: '14px', fontWeight: '800', borderBottom: '1px solid #f1f5f9', paddingBottom: '8px' }}>
-            Завершені
+        <div className="ios-card" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)', padding: '20px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+          <h3 style={{ fontSize: '14px', fontWeight: '800', borderBottom: '1px solid var(--border-light)', paddingBottom: '8px', color: 'var(--text-dark)', margin: 0 }}>
+            Завершені завдання
           </h3>
           
           {tasks.filter(t => t.status === 'done').length === 0 ? (
-            <p style={{ textAlign: 'center', color: 'var(--text-medium)', fontSize: '11px', fontStyle: 'italic', padding: '10px' }}>
+            <p style={{ textAlign: 'center', color: 'var(--text-medium)', fontSize: '12px', fontStyle: 'italic', padding: '10px' }}>
               Немає завершених завдань
             </p>
           ) : (
@@ -293,18 +385,18 @@ export const Tasks: React.FC = () => {
                 <div key={task.id} style={{
                   padding: '12px',
                   borderRadius: '8px',
-                  backgroundColor: '#f8fafc',
-                  border: '0.5px solid var(--border-light)',
+                  backgroundColor: 'var(--bg-card-subtle)',
+                  border: '1px solid var(--border-light)',
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '6px',
-                  opacity: 0.7
+                  opacity: 0.8
                 }}>
-                  <div style={{ display: 'flex', justifySelf: 'stretch', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <CheckCircle2 size={16} style={{ color: 'var(--success)' }} />
                       <div>
-                        <h4 style={{ fontSize: '12px', fontWeight: '700', textDecoration: 'line-through', color: 'var(--text-dark)' }}>{task.title}</h4>
+                        <h4 style={{ fontSize: '12px', fontWeight: '700', textDecoration: 'line-through', color: 'var(--text-dark)', margin: 0 }}>{task.title}</h4>
                         <span style={{ fontSize: '10px', color: 'var(--text-medium)' }}>Виконав: {task.assignee}</span>
                       </div>
                     </div>
@@ -317,13 +409,13 @@ export const Tasks: React.FC = () => {
                     </button>
                   </div>
                   {(task.clientName || task.dealName) && (
-                    <div style={{ display: 'flex', gap: '4px', fontSize: '9px', opacity: 0.8 }}>
+                    <div style={{ display: 'flex', gap: '4px', fontSize: '9px', color: 'var(--text-medium)' }}>
                       {task.clientName && <span>👤 {task.clientName}</span>}
                       {task.dealName && <span>💼 {task.dealName}</span>}
                     </div>
                   )}
                   {task.createdBy && (
-                    <span style={{ fontSize: '9px', color: '#8e8e93', fontStyle: 'italic' }}>Створив: {task.createdBy}</span>
+                    <span style={{ fontSize: '9px', color: 'var(--text-medium)', fontStyle: 'italic' }}>Створив: {task.createdBy}</span>
                   )}
                 </div>
               ))}

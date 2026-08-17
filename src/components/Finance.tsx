@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { 
-  TrendingUp, 
-  TrendingDown, 
   Plus, 
   Wallet,
-  FolderKanban
+  CreditCard,
+  Building,
+  PieChart,
+  ArrowUpRight,
+  ArrowDownRight
 } from 'lucide-react';
 
 interface WalletItem {
@@ -13,6 +15,7 @@ interface WalletItem {
   name: string;
   balance: number;
   currency: string;
+  accountType: 'bank' | 'cash' | 'pos';
 }
 
 interface FinancialRecord {
@@ -23,26 +26,32 @@ interface FinancialRecord {
   category: string;
   description: string;
   date: string;
-  dealId?: string; // Посилання на угоду
+  dealId?: string;
+  clientName?: string;
 }
 
 export const Finance: React.FC = () => {
   const { orders } = useApp();
 
   const [wallets, setWallets] = useState<WalletItem[]>([
-    { id: 'W-1', name: 'Готівка каса', balance: 12450, currency: 'UAH' },
-    { id: 'W-2', name: 'ПриватБанк ФОП', balance: 84300, currency: 'UAH' },
-    { id: 'W-3', name: 'Безготівковий рахунок ТОВ', balance: 250000, currency: 'UAH' }
+    { id: 'W-1', name: 'ПриватБанк ФОП (Основний)', balance: 142500, currency: 'UAH', accountType: 'bank' },
+    { id: 'W-2', name: 'Монобанк ФОП', balance: 48300, currency: 'UAH', accountType: 'bank' },
+    { id: 'W-3', name: 'Готівкова каса друкарні', balance: 18450, currency: 'UAH', accountType: 'cash' },
+    { id: 'W-4', name: 'Термінал POS Checkbox', balance: 12900, currency: 'UAH', accountType: 'pos' }
   ]);
 
   const [records, setRecords] = useState<FinancialRecord[]>(() => {
     const saved = localStorage.getItem('crm_finance_records');
     if (saved) return JSON.parse(saved);
     const initial: FinancialRecord[] = [
-      { id: 'F-1', type: 'income', amount: 4500, wallet: 'ПриватБанк ФОП', category: 'Оплата клієнта', description: 'Замовлення "Візитки для автосервісу"', date: '2026-07-24', dealId: 'ORD-2026-0001' },
-      { id: 'F-2', type: 'expense', amount: 8000, wallet: 'Готівка каса', category: 'Закупівля паперу', description: 'Офсет 70г (2 пачки А1) у постачальника Папір-Світ', date: '2026-07-23' },
-      { id: 'F-3', type: 'income', amount: 12000, wallet: 'Безготівковий рахунок ТОВ', category: 'Оплата клієнта', description: 'Передплата 100% за книги від ТОВ Креатив', date: '2026-07-22' },
-      { id: 'F-4', type: 'expense', amount: 1500, wallet: 'Готівка каса', category: 'Господарські витрати', description: 'Купівля скотчу та плівки для упаковки', date: '2026-07-21' }
+      { id: 'F-101', type: 'income', amount: 14000, wallet: 'ПриватБанк ФОП (Основний)', category: 'Оплата від замовника', description: 'Оплата 100% за тираж бланки А4 (1000 шт)', date: '2026-08-17', dealId: 'ORD-31101', clientName: 'ТОВ «ФармаТрейд»' },
+      { id: 'F-102', type: 'expense', amount: 18500, wallet: 'ПриватБанк ФОП (Основний)', category: 'Закупівля паперу', description: 'Закупівля крейдованого паперу 130г (5000 арк.) у ТОВ Папір-Світ', date: '2026-08-16' },
+      { id: 'F-103', type: 'income', amount: 8500, wallet: 'Монобанк ФОП', category: 'Оплата від замовника', description: 'Передплата за виготовлення каталогів A4', date: '2026-08-15', dealId: 'ORD-1502', clientName: 'ПРАТ «ЕкоСок»' },
+      { id: 'F-104', type: 'expense', amount: 24000, wallet: 'ПриватБанк ФОП (Основний)', category: 'Оренда приміщення', description: 'Оренда друкарського цеху за Серпень 2026', date: '2026-08-14' },
+      { id: 'F-105', type: 'income', amount: 3200, wallet: 'Термінал POS Checkbox', category: 'Касовий роздріб POS', description: 'Продаж поліграфії по касі роздрібу (Чеки POS)', date: '2026-08-14' },
+      { id: 'F-106', type: 'expense', amount: 12500, wallet: 'Готівкова каса друкарні', category: 'Виплата заробітної плати', description: 'Аванс другу групу працівників цеху', date: '2026-08-12' },
+      { id: 'F-107', type: 'income', amount: 6400, wallet: 'ПриватБанк ФОП (Основний)', category: 'Оплата від замовника', description: 'Виготовлення меню з двосторонньою ламінацією', date: '2026-08-10', dealId: 'ORD-884', clientName: 'Кафе «Капучино»' },
+      { id: 'F-108', type: 'expense', amount: 4200, wallet: 'ПриватБанк ФОП (Основний)', category: 'Сервісне обслуговування', description: 'Технічне обслуговування цифрової машини Xerox Versant', date: '2026-08-08' }
     ];
     localStorage.setItem('crm_finance_records', JSON.stringify(initial));
     return initial;
@@ -51,13 +60,14 @@ export const Finance: React.FC = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [newType, setNewType] = useState<'income' | 'expense'>('income');
   const [newAmount, setNewAmount] = useState(0);
-  const [newWallet, setNewWallet] = useState('Готівка каса');
-  const [newCategory, setNewCategory] = useState('Оплата клієнта');
+  const [newWallet, setNewWallet] = useState('ПриватБанк ФОП (Основний)');
+  const [newCategory, setNewCategory] = useState('Оплата від замовника');
   const [newDesc, setNewDesc] = useState('');
   const [newDealId, setNewDealId] = useState('');
 
   const totalIncome = records.filter(r => r.type === 'income').reduce((sum, r) => sum + r.amount, 0);
   const totalExpense = records.filter(r => r.type === 'expense').reduce((sum, r) => sum + r.amount, 0);
+  const netProfit = totalIncome - totalExpense;
 
   const handleAddRecord = (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,7 +84,6 @@ export const Finance: React.FC = () => {
       dealId: newDealId || undefined
     };
 
-    // Update wallet balance
     setWallets(wallets.map(w => {
       if (w.name === newWallet) {
         return {
@@ -90,104 +99,132 @@ export const Finance: React.FC = () => {
     localStorage.setItem('crm_finance_records', JSON.stringify(updated));
 
     setShowAddModal(false);
-    // Reset Form
     setNewAmount(0);
     setNewDesc('');
     setNewDealId('');
   };
 
   return (
-    <div className="main-content" style={{ backgroundColor: 'var(--bg-system)' }}>
+    <div className="main-content" style={{ backgroundColor: 'var(--bg-system)', height: '100%', overflowY: 'auto' }}>
       <div className="header-title-container">
         <div>
-          <h1 className="page-title">Фінансовий облік</h1>
-          <p className="subtitle">Контроль кас, безготівкових рахунків та витрат друкарні</p>
+          <h1 className="page-title">Фінансовий облік (KeepinCRM)</h1>
+          <p className="subtitle">Управлінський облік грошових потоків, кас, рахунків та рентабельності</p>
         </div>
         <button 
           type="button"
           onClick={() => setShowAddModal(true)}
           className="ios-btn ios-btn-primary"
+          style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
         >
           <Plus size={14} />
           Створити операцію
         </button>
       </div>
 
-      {/* Wallets & Balances Row */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+      {/* KeepinCRM Account Cards Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         {wallets.map(wallet => (
-          <div key={wallet.id} className="ios-card bg-white flex items-center gap-4">
-            <div className="bg-slate-100 p-3 rounded-full text-slate-700" style={{ display: 'flex' }}>
-              <Wallet size={20} />
+          <div 
+            key={wallet.id} 
+            className="ios-card" 
+            style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)', padding: '16px', display: 'flex', alignItems: 'center', gap: '12px' }}
+          >
+            <div style={{ padding: '10px', borderRadius: '50%', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--primary)', border: '1px solid var(--border-light)', display: 'flex' }}>
+              {wallet.accountType === 'bank' ? <Building size={20} /> : wallet.accountType === 'pos' ? <CreditCard size={20} /> : <Wallet size={20} />}
             </div>
             <div>
-              <h4 className="text-xs font-semibold text-slate-500 uppercase">{wallet.name}</h4>
-              <span className="text-xl font-bold text-slate-800">{wallet.balance.toFixed(2)} {wallet.currency}</span>
+              <span style={{ fontSize: '10px', fontWeight: '750', color: 'var(--text-medium)', textTransform: 'uppercase', display: 'block' }}>{wallet.name}</span>
+              <span style={{ fontSize: '16px', fontWeight: '900', color: 'var(--text-dark)', fontFamily: 'var(--font-mono)' }}>
+                {wallet.balance.toLocaleString('uk-UA', { minimumFractionDigits: 2 })} ₴
+              </span>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        <div className="ios-card flex justify-between items-center" style={{ backgroundColor: 'rgba(52, 199, 89, 0.08)', borderColor: 'rgba(52, 199, 89, 0.2)' }}>
+      {/* Financial Summary Performance Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+        <div className="ios-card" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)', padding: '18px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
-            <h4 className="text-xs font-semibold text-emerald-600 uppercase tracking-wider">Сукупні надходження</h4>
-            <span className="text-2xl font-bold text-emerald-700">+{totalIncome.toFixed(2)} грн</span>
+            <span style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-medium)', textTransform: 'uppercase' }}>Загальні надходження (Дохід)</span>
+            <h3 style={{ fontSize: '22px', fontWeight: '900', color: 'var(--success)', margin: '4px 0 0 0', fontFamily: 'var(--font-mono)' }}>
+              +{totalIncome.toLocaleString('uk-UA', { minimumFractionDigits: 2 })} ₴
+            </h3>
           </div>
-          <TrendingUp size={32} className="text-emerald-500" />
+          <div style={{ padding: '10px', borderRadius: '8px', backgroundColor: 'rgba(16, 185, 129, 0.12)', color: 'var(--success)' }}>
+            <ArrowUpRight size={24} />
+          </div>
         </div>
-        <div className="ios-card flex justify-between items-center" style={{ backgroundColor: 'rgba(255, 59, 48, 0.08)', borderColor: 'rgba(255, 59, 48, 0.2)' }}>
+
+        <div className="ios-card" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)', padding: '18px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div>
-            <h4 className="text-xs font-semibold text-red-600 uppercase tracking-wider">Сукупні витрати</h4>
-            <span className="text-2xl font-bold text-red-700">-{totalExpense.toFixed(2)} грн</span>
+            <span style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-medium)', textTransform: 'uppercase' }}>Операційні витрати (Видатки)</span>
+            <h3 style={{ fontSize: '22px', fontWeight: '900', color: 'var(--danger)', margin: '4px 0 0 0', fontFamily: 'var(--font-mono)' }}>
+              -{totalExpense.toLocaleString('uk-UA', { minimumFractionDigits: 2 })} ₴
+            </h3>
           </div>
-          <TrendingDown size={32} className="text-red-500" />
+          <div style={{ padding: '10px', borderRadius: '8px', backgroundColor: 'rgba(239, 68, 68, 0.12)', color: 'var(--danger)' }}>
+            <ArrowDownRight size={24} />
+          </div>
+        </div>
+
+        <div className="ios-card" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)', padding: '18px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <span style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-medium)', textTransform: 'uppercase' }}>Чистий операційний прибуток</span>
+            <h3 style={{ fontSize: '22px', fontWeight: '900', color: netProfit >= 0 ? 'var(--primary)' : 'var(--danger)', margin: '4px 0 0 0', fontFamily: 'var(--font-mono)' }}>
+              {netProfit >= 0 ? '+' : ''}{netProfit.toLocaleString('uk-UA', { minimumFractionDigits: 2 })} ₴
+            </h3>
+          </div>
+          <div style={{ padding: '10px', borderRadius: '8px', backgroundColor: 'rgba(0, 122, 255, 0.12)', color: 'var(--primary)' }}>
+            <PieChart size={24} />
+          </div>
         </div>
       </div>
 
       {/* Transactions Table Ledger */}
-      <div className="ios-card bg-white space-y-4">
-        <h2 className="text-sm font-bold text-slate-800 border-b border-slate-100 pb-3">Журнал фінансових операцій</h2>
+      <div className="ios-card" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)', padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+        <h2 style={{ fontSize: '14px', fontWeight: '800', color: 'var(--text-dark)', borderBottom: '1px solid var(--border-light)', paddingBottom: '10px', margin: 0 }}>
+          Журнал фінансових операцій (Ledger)
+        </h2>
         
         <div className="ios-table-container">
           <table className="ios-table">
             <thead>
               <tr>
-                <th>Дата</th>
-                <th>Тип</th>
-                <th>Сума</th>
-                <th>Категорія</th>
-                <th>Гаманець</th>
-                <th>Угода (Замовлення)</th>
-                <th>Опис</th>
+                <th style={{ color: 'var(--text-medium)' }}>Дата</th>
+                <th style={{ color: 'var(--text-medium)' }}>Тип</th>
+                <th style={{ color: 'var(--text-medium)' }}>Сума</th>
+                <th style={{ color: 'var(--text-medium)' }}>Категорія</th>
+                <th style={{ color: 'var(--text-medium)' }}>Рахунок / Гаманець</th>
+                <th style={{ color: 'var(--text-medium)' }}>Угода / Замовник</th>
+                <th style={{ color: 'var(--text-medium)' }}>Призначення платежу</th>
               </tr>
             </thead>
             <tbody>
               {records.map(record => (
-                <tr key={record.id}>
-                  <td style={{ opacity: 0.7 }}>{record.date}</td>
+                <tr key={record.id} style={{ borderBottom: '1px solid var(--border-light)' }}>
+                  <td style={{ color: 'var(--text-medium)', fontFamily: 'var(--font-mono)' }}>{record.date}</td>
                   <td>
                     <span className={`ios-badge ${record.type === 'income' ? 'ios-badge-green' : 'ios-badge-red'}`}>
-                      {record.type === 'income' ? 'Дохід' : 'Витрата'}
+                      {record.type === 'income' ? 'Надходження' : 'Витрата'}
                     </span>
                   </td>
-                  <td style={{ fontWeight: '700', color: record.type === 'income' ? 'var(--success)' : 'var(--danger)' }}>
-                    {record.type === 'income' ? '+' : '-'}{record.amount.toFixed(2)} грн
+                  <td style={{ fontWeight: '800', color: record.type === 'income' ? 'var(--success)' : 'var(--danger)', fontFamily: 'var(--font-mono)' }}>
+                    {record.type === 'income' ? '+' : '-'}{record.amount.toFixed(2)} ₴
                   </td>
-                  <td>{record.category}</td>
-                  <td>{record.wallet}</td>
-                  <td style={{ fontWeight: '600' }}>
+                  <td style={{ fontWeight: '600', color: 'var(--text-dark)' }}>{record.category}</td>
+                  <td style={{ color: 'var(--text-medium)' }}>{record.wallet}</td>
+                  <td style={{ fontWeight: '600', color: 'var(--text-dark)' }}>
                     {record.dealId ? (
-                      <span className="ios-badge ios-badge-blue flex items-center gap-1 w-fit" style={{ cursor: 'pointer' }}>
-                        <FolderKanban size={10} />
-                        {record.dealId}
+                      <span className="ios-badge ios-badge-blue" style={{ cursor: 'pointer' }}>
+                        💼 {record.dealId} {record.clientName ? `(${record.clientName})` : ''}
                       </span>
                     ) : (
-                      <span style={{ opacity: 0.4 }}>—</span>
+                      <span style={{ color: 'var(--text-medium)' }}>—</span>
                     )}
                   </td>
-                  <td style={{ opacity: 0.7 }} className="max-w-xs truncate">{record.description}</td>
+                  <td style={{ color: 'var(--text-medium)' }}>{record.description}</td>
                 </tr>
               ))}
             </tbody>

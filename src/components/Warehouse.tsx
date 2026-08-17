@@ -428,21 +428,21 @@ export const Warehouse: React.FC = () => {
           )}
 
           {/* Warehouse Table - Detailed Informative View */}
-          <div className="ios-card bg-white" style={{ padding: 0, overflow: 'hidden' }}>
+          <div className="ios-card" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)', padding: 0, overflow: 'hidden' }}>
             <div className="ios-table-container">
               <table className="ios-table">
                 <thead>
                   <tr>
-                    <th style={{ width: '40px' }}><CheckSquare size={13} /></th>
-                    <th style={{ width: '80px' }}>Код</th>
-                    <th>Найменування номенклатури</th>
-                    <th>Складська локація</th>
-                    <th style={{ width: '110px', textAlign: 'right' }}>Закупівельна ціна</th>
-                    <th style={{ width: '100px', textAlign: 'right' }}>Залишок</th>
-                    <th style={{ width: '100px', textAlign: 'right' }}>Резерв</th>
-                    <th style={{ width: '110px', textAlign: 'right' }}>Доступно</th>
-                    <th style={{ width: '100px', textAlign: 'center' }}>Статус</th>
-                    <th style={{ width: '150px', textAlign: 'center' }}>Дії</th>
+                    <th style={{ width: '40px', color: 'var(--text-medium)' }}><CheckSquare size={13} /></th>
+                    <th style={{ width: '80px', color: 'var(--text-medium)' }}>Код</th>
+                    <th style={{ color: 'var(--text-medium)' }}>Найменування номенклатури</th>
+                    <th style={{ color: 'var(--text-medium)' }}>Складська локація</th>
+                    <th style={{ width: '110px', textAlign: 'right', color: 'var(--text-medium)' }}>Закупівельна ціна</th>
+                    <th style={{ width: '100px', textAlign: 'right', color: 'var(--text-medium)' }}>Залишок</th>
+                    <th style={{ width: '100px', textAlign: 'right', color: 'var(--text-medium)' }}>Резерв</th>
+                    <th style={{ width: '110px', textAlign: 'right', color: 'var(--text-medium)' }}>Доступно</th>
+                    <th style={{ width: '100px', textAlign: 'center', color: 'var(--text-medium)' }}>Статус</th>
+                    <th style={{ width: '150px', textAlign: 'center', color: 'var(--text-medium)' }}>Дії</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -454,9 +454,10 @@ export const Warehouse: React.FC = () => {
                     const folder = getFolderForMaterial(m.type);
                     const unitPrice = m.price || 0.60;
                     const loc = m.location || `Стелаж ${m.type === 'offset' ? 'А' : m.type === 'coated' ? 'Б' : 'В'}`;
+                    const typeLabel = m.type === 'offset' ? 'Офсетний' : m.type === 'coated' ? 'Крейдований' : 'Газетний';
 
                     return (
-                      <tr key={m.id}>
+                      <tr key={m.id} style={{ borderBottom: '1px solid var(--border-light)' }}>
                         <td>
                           <input 
                             type="checkbox"
@@ -464,7 +465,7 @@ export const Warehouse: React.FC = () => {
                             onChange={() => handleSelectMaterial(m.id)}
                           />
                         </td>
-                        <td style={{ fontWeight: '600', opacity: 0.7, fontFamily: 'var(--font-mono)' }}>#{m.id}</td>
+                        <td style={{ fontWeight: '600', color: 'var(--text-medium)', fontFamily: 'var(--font-mono)' }}>#{m.id}</td>
                         <td>
                           {/* Clickable material name: triggers journal/detail modal view */}
                           <div 
@@ -475,26 +476,26 @@ export const Warehouse: React.FC = () => {
                             {m.name}
                           </div>
                           <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginTop: '2px' }}>
-                            <span className="ios-badge ios-badge-blue">{m.type}</span>
-                            {m.supplier && <span style={{ fontSize: '10px', color: '#64748b' }}>🏢 {m.supplier}</span>}
+                            <span className="ios-badge ios-badge-blue">{typeLabel}</span>
+                            {m.supplier && <span style={{ fontSize: '10px', color: 'var(--text-medium)' }}>🏢 {m.supplier}</span>}
                           </div>
                         </td>
                         <td>
-                          <span className="flex items-center gap-1 text-[11px] font-bold text-slate-600">
+                          <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', fontWeight: '700', color: 'var(--text-dark)' }}>
                             <FolderOpen size={12} style={{ color: 'var(--primary)' }} />
                             {loc} ({folder})
                           </span>
                         </td>
-                        <td style={{ textAlign: 'right', fontWeight: '700', color: '#0f172a' }}>
+                        <td style={{ textAlign: 'right', fontWeight: '700', color: 'var(--text-dark)', fontFamily: 'var(--font-mono)' }}>
                           {unitPrice.toFixed(2)} ₴/{m.unit}
                         </td>
-                        <td style={{ textAlign: 'right', fontWeight: '700' }}>
+                        <td style={{ textAlign: 'right', fontWeight: '700', color: 'var(--text-dark)', fontFamily: 'var(--font-mono)' }}>
                           {m.quantity.toLocaleString()} {m.unit}
                         </td>
-                        <td style={{ textAlign: 'right', color: '#ff9500', fontWeight: '700' }}>
+                        <td style={{ textAlign: 'right', color: 'var(--warning)', fontWeight: '700', fontFamily: 'var(--font-mono)' }}>
                           {m.reserved.toLocaleString()} {m.unit}
                         </td>
-                        <td style={{ textAlign: 'right', fontWeight: '800', color: isCritical ? 'var(--danger)' : isLow ? '#ff9500' : 'var(--success)' }}>
+                        <td style={{ textAlign: 'right', fontWeight: '800', color: isCritical ? 'var(--danger)' : isLow ? 'var(--warning)' : 'var(--success)', fontFamily: 'var(--font-mono)' }}>
                           {available.toLocaleString()} {m.unit}
                         </td>
                         <td style={{ textAlign: 'center' }}>
@@ -788,69 +789,73 @@ export const Warehouse: React.FC = () => {
       {/* Selected Material Detailed Information Modal */}
       {selectedMaterialForLog && (
         <div className="ios-modal-overlay">
-          <div className="ios-modal" style={{ maxWidth: '600px' }}>
-            <div className="ios-modal-header">
-              <h3 className="ios-modal-title">Деталі та історія товару: {selectedMaterialForLog.name}</h3>
-              <button type="button" onClick={() => setSelectedMaterialForLog(null)} style={{ border: 'none', background: 'transparent', cursor: 'pointer' }}>✕</button>
+          <div className="ios-modal" style={{ maxWidth: '600px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)' }}>
+            <div className="ios-modal-header" style={{ borderBottom: '1px solid var(--border-light)' }}>
+              <h3 className="ios-modal-title" style={{ color: 'var(--text-dark)' }}>Деталі та історія товару: {selectedMaterialForLog.name}</h3>
+              <button type="button" onClick={() => setSelectedMaterialForLog(null)} style={{ border: 'none', background: 'transparent', color: 'var(--text-medium)', cursor: 'pointer' }}>✕</button>
             </div>
             <div className="ios-modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               
               {/* Material specifications breakdown */}
-              <div style={{ backgroundColor: 'rgba(0,122,255,0.05)', padding: '12px', borderRadius: '8px' }}>
-                <span className="text-xs font-bold text-slate-700 block mb-2">Основні параметри номенклатури:</span>
+              <div style={{ backgroundColor: 'var(--bg-card-subtle)', padding: '14px', borderRadius: '8px', border: '1px solid var(--border-light)' }}>
+                <span style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-dark)', display: 'block', marginBottom: '8px' }}>
+                  Основні параметри номенклатури:
+                </span>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px', fontSize: '11px' }}>
-                  <div className="bg-white p-2 rounded shadow-sm">
-                    <span className="text-slate-500">Код / SKU:</span>
-                    <strong className="block text-slate-800 text-sm">#{selectedMaterialForLog.id}</strong>
+                  <div style={{ backgroundColor: 'var(--bg-card)', padding: '8px 10px', borderRadius: '6px', border: '1px solid var(--border-light)' }}>
+                    <span style={{ color: 'var(--text-medium)', fontSize: '10px', display: 'block' }}>Код / SKU:</span>
+                    <strong style={{ color: 'var(--text-dark)', fontSize: '12px', fontFamily: 'var(--font-mono)' }}>#{selectedMaterialForLog.id}</strong>
                   </div>
-                  <div className="bg-white p-2 rounded shadow-sm">
-                    <span className="text-slate-500">Категорія:</span>
-                    <strong className="block text-slate-800 text-sm">{selectedMaterialForLog.type}</strong>
+                  <div style={{ backgroundColor: 'var(--bg-card)', padding: '8px 10px', borderRadius: '6px', border: '1px solid var(--border-light)' }}>
+                    <span style={{ color: 'var(--text-medium)', fontSize: '10px', display: 'block' }}>Категорія:</span>
+                    <strong style={{ color: 'var(--text-dark)', fontSize: '12px' }}>
+                      {selectedMaterialForLog.type === 'offset' ? 'Офсетний папір 70г' : selectedMaterialForLog.type === 'gazetka' ? 'Газетний папір' : 'Крейдований папір'}
+                    </strong>
                   </div>
-                  <div className="bg-white p-2 rounded shadow-sm">
-                    <span className="text-slate-500">Закупівельна ціна:</span>
-                    <strong className="block text-slate-800 text-sm">{(selectedMaterialForLog.price || 0.60).toFixed(2)} ₴/{selectedMaterialForLog.unit}</strong>
+                  <div style={{ backgroundColor: 'var(--bg-card)', padding: '8px 10px', borderRadius: '6px', border: '1px solid var(--border-light)' }}>
+                    <span style={{ color: 'var(--text-medium)', fontSize: '10px', display: 'block' }}>Закупівельна ціна:</span>
+                    <strong style={{ color: 'var(--text-dark)', fontSize: '12px' }}>{(selectedMaterialForLog.price || 0.60).toFixed(2)} ₴/{selectedMaterialForLog.unit}</strong>
                   </div>
-                  <div className="bg-white p-2 rounded shadow-sm">
-                    <span className="text-slate-500">Постачальник:</span>
-                    <strong className="block text-slate-800 text-sm">{selectedMaterialForLog.supplier || 'ТОВ Папір-Світ'}</strong>
+                  <div style={{ backgroundColor: 'var(--bg-card)', padding: '8px 10px', borderRadius: '6px', border: '1px solid var(--border-light)' }}>
+                    <span style={{ color: 'var(--text-medium)', fontSize: '10px', display: 'block' }}>Постачальник:</span>
+                    <strong style={{ color: 'var(--text-dark)', fontSize: '12px' }}>{selectedMaterialForLog.supplier || 'ТОВ Папір-Світ'}</strong>
                   </div>
-                  <div className="bg-white p-2 rounded shadow-sm">
-                    <span className="text-slate-500">Локація зберігання:</span>
-                    <strong className="block text-slate-800 text-sm">{selectedMaterialForLog.location || 'Стелаж А'}</strong>
+                  <div style={{ backgroundColor: 'var(--bg-card)', padding: '8px 10px', borderRadius: '6px', border: '1px solid var(--border-light)' }}>
+                    <span style={{ color: 'var(--text-medium)', fontSize: '10px', display: 'block' }}>Локація зберігання:</span>
+                    <strong style={{ color: 'var(--text-dark)', fontSize: '12px' }}>{selectedMaterialForLog.location || 'Стелаж А'}</strong>
                   </div>
-                  <div className="bg-white p-2 rounded shadow-sm">
-                    <span className="text-slate-500">Мін. залишок:</span>
-                    <strong className="block text-slate-800 text-sm">{selectedMaterialForLog.minStock || 1000} {selectedMaterialForLog.unit}</strong>
+                  <div style={{ backgroundColor: 'var(--bg-card)', padding: '8px 10px', borderRadius: '6px', border: '1px solid var(--border-light)' }}>
+                    <span style={{ color: 'var(--text-medium)', fontSize: '10px', display: 'block' }}>Мін. залишок:</span>
+                    <strong style={{ color: 'var(--text-dark)', fontSize: '12px' }}>{selectedMaterialForLog.minStock || 1000} {selectedMaterialForLog.unit}</strong>
                   </div>
                 </div>
               </div>
 
               {/* Sales log list */}
-              <div className="ios-table-container">
+              <div className="ios-table-container" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)' }}>
                 <table className="ios-table" style={{ fontSize: '11px' }}>
                   <thead>
                     <tr>
-                      <th>Дата</th>
-                      <th>Працівник</th>
-                      <th>Кількість</th>
-                      <th>Списано під угоду</th>
+                      <th style={{ color: 'var(--text-medium)' }}>Дата</th>
+                      <th style={{ color: 'var(--text-medium)' }}>Працівник</th>
+                      <th style={{ color: 'var(--text-medium)' }}>Кількість</th>
+                      <th style={{ color: 'var(--text-medium)' }}>Списано під угоду</th>
                     </tr>
                   </thead>
                   <tbody>
                     {(!selectedMaterialForLog.salesLog || selectedMaterialForLog.salesLog.length === 0) ? (
                       <tr>
-                        <td colSpan={4} style={{ textAlign: 'center', padding: '16px', color: '#8e8e93' }}>
+                        <td colSpan={4} style={{ textAlign: 'center', padding: '16px', color: 'var(--text-medium)' }}>
                           Ручні списання відсутні
                         </td>
                       </tr>
                     ) : (
                       selectedMaterialForLog.salesLog.map(entry => (
-                        <tr key={entry.id}>
-                          <td>{entry.date}</td>
-                          <td>{entry.employee}</td>
+                        <tr key={entry.id} style={{ borderBottom: '1px solid var(--border-light)' }}>
+                          <td style={{ color: 'var(--text-dark)', fontFamily: 'var(--font-mono)' }}>{entry.date}</td>
+                          <td style={{ color: 'var(--text-dark)' }}>{entry.employee}</td>
                           <td style={{ fontWeight: '700', color: 'var(--danger)' }}>-{entry.quantity} {selectedMaterialForLog.unit}</td>
-                          <td>{entry.dealName || entry.dealId || '—'}</td>
+                          <td style={{ color: 'var(--text-dark)' }}>{entry.dealName || entry.dealId || '—'}</td>
                         </tr>
                       ))
                     )}

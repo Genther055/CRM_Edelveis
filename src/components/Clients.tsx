@@ -280,30 +280,30 @@ export const Clients: React.FC = () => {
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '130px 1fr', alignItems: 'center' }}>
-                  <span style={{ color: '#64748b' }}>Головний відповідальний</span>
+                  <span style={{ color: 'var(--text-medium)' }}>Головний відповідальний</span>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <div style={{ width: '20px', height: '20px', borderRadius: '50%', backgroundColor: '#007aff', color: '#fff', fontSize: '9px', fontWeight: '800', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ width: '20px', height: '20px', borderRadius: '50%', backgroundColor: 'var(--primary)', color: '#fff', fontSize: '9px', fontWeight: '800', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       В
                     </div>
-                    <span style={{ fontWeight: '700' }}>Віктор</span>
+                    <span style={{ fontWeight: '700', color: 'var(--text-dark)' }}>Віктор</span>
                   </div>
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '130px 1fr', alignItems: 'center' }}>
-                  <span style={{ color: '#64748b' }}>Підрядник</span>
-                  <span style={{ opacity: 0.5 }}>—</span>
+                  <span style={{ color: 'var(--text-medium)' }}>Підрядник</span>
+                  <span style={{ color: 'var(--text-medium)' }}>—</span>
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '130px 1fr', alignItems: 'flex-start' }}>
-                  <span style={{ color: '#64748b' }}>Коментар</span>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <span style={{ color: 'var(--text-medium)' }}>Коментар</span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--text-dark)' }}>
                     <span>Постійний замовник поліграфічної продукції</span>
-                    <Edit3 size={11} className="text-slate-400 cursor-pointer" />
+                    <Edit3 size={11} style={{ color: 'var(--text-medium)', cursor: 'pointer' }} />
                   </div>
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '130px 1fr', alignItems: 'center' }}>
-                  <span style={{ color: '#64748b' }}>Теги</span>
+                  <span style={{ color: 'var(--text-medium)' }}>Теги</span>
                   <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', alignItems: 'center' }}>
                     {(selectedClient.tags && selectedClient.tags.length > 0 ? selectedClient.tags : ['VIP', 'Поліграфія']).map(t => (
                       <span key={t} className="ios-badge ios-badge-purple" style={{ fontSize: '9px', display: 'flex', alignItems: 'center', gap: '4px' }}>
@@ -316,51 +316,51 @@ export const Clients: React.FC = () => {
                         placeholder="+ тег" 
                         value={newTagVal} 
                         onChange={(e) => setNewTagVal(e.target.value)} 
-                        style={{ width: '50px', height: '18px', fontSize: '9px', padding: '1px 4px', border: '1px solid #cbd5e1', borderRadius: '4px' }}
+                        style={{ width: '50px', height: '18px', fontSize: '9px', padding: '1px 4px', border: '1px solid var(--border-light)', borderRadius: '4px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)' }}
                       />
-                      <button type="button" onClick={handleAddTag} style={{ fontSize: '9px', padding: '1px 4px', border: 'none', background: '#007aff', color: '#fff', borderRadius: '3px', cursor: 'pointer' }}>+</button>
+                      <button type="button" onClick={handleAddTag} style={{ fontSize: '9px', padding: '1px 4px', border: 'none', background: 'var(--primary)', color: '#fff', borderRadius: '3px', cursor: 'pointer' }}>+</button>
                     </div>
                   </div>
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '130px 1fr', alignItems: 'center' }}>
-                  <span style={{ color: '#64748b' }}>Створив</span>
+                  <span style={{ color: 'var(--text-medium)' }}>Створив</span>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <div style={{ width: '18px', height: '18px', borderRadius: '50%', backgroundColor: '#3b82f6', color: '#fff', fontSize: '8px', fontWeight: '800', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <div style={{ width: '18px', height: '18px', borderRadius: '50%', backgroundColor: 'var(--primary)', color: '#fff', fontSize: '8px', fontWeight: '800', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                       В
                     </div>
-                    <span style={{ fontWeight: '600' }}>Працівник А</span>
+                    <span style={{ fontWeight: '600', color: 'var(--text-dark)' }}>Працівник А</span>
                   </div>
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '130px 1fr', alignItems: 'center' }}>
-                  <span style={{ color: '#64748b' }}>Дата створення</span>
-                  <span style={{ color: '#64748b', fontFamily: 'var(--font-mono)' }}>01.04.2026 12:26</span>
+                  <span style={{ color: 'var(--text-medium)' }}>Дата створення</span>
+                  <span style={{ color: 'var(--text-medium)', fontFamily: 'var(--font-mono)' }}>01.04.2026 12:26</span>
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '130px 1fr', alignItems: 'center' }}>
-                  <span style={{ color: '#64748b' }}>Остання активність</span>
-                  <span style={{ color: '#64748b', fontFamily: 'var(--font-mono)' }}>17.08.2026 13:30</span>
+                  <span style={{ color: 'var(--text-medium)' }}>Остання активність</span>
+                  <span style={{ color: 'var(--text-medium)', fontFamily: 'var(--font-mono)' }}>17.08.2026 13:30</span>
                 </div>
               </div>
 
               {/* Additional Contacts Block */}
-              <div style={{ borderTop: '1px solid #f1f5f9', paddingTop: '12px', marginTop: '8px' }}>
+              <div style={{ borderTop: '1px solid var(--border-light)', paddingTop: '12px', marginTop: '8px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                  <span style={{ fontSize: '11px', fontWeight: '800', color: '#0f172a' }}>Додаткові контакти</span>
+                  <span style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-dark)' }}>Додаткові контакти</span>
                   <button type="button" className="ios-btn ios-btn-secondary ios-btn-small" style={{ fontSize: '10px' }}>+ Додати</button>
                 </div>
-                <table style={{ width: '100%', fontSize: '10px', color: '#64748b' }}>
+                <table style={{ width: '100%', fontSize: '10px', color: 'var(--text-medium)' }}>
                   <thead>
-                    <tr style={{ textAlign: 'left', borderBottom: '1px solid #e2e8f0' }}>
-                      <th style={{ padding: '4px' }}>ПІБ</th>
-                      <th style={{ padding: '4px' }}>Телефон</th>
-                      <th style={{ padding: '4px' }}>Email</th>
+                    <tr style={{ textAlign: 'left', borderBottom: '1px solid var(--border-light)' }}>
+                      <th style={{ padding: '4px', color: 'var(--text-medium)' }}>ПІБ</th>
+                      <th style={{ padding: '4px', color: 'var(--text-medium)' }}>Телефон</th>
+                      <th style={{ padding: '4px', color: 'var(--text-medium)' }}>Email</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr>
-                      <td colSpan={3} style={{ textAlign: 'center', padding: '16px 0', opacity: 0.5 }}>
+                      <td colSpan={3} style={{ textAlign: 'center', padding: '16px 0', opacity: 0.5, color: 'var(--text-medium)' }}>
                         Немає додаткових контактів
                       </td>
                     </tr>
@@ -374,23 +374,23 @@ export const Clients: React.FC = () => {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               
               {/* Top Financial Stat Summary Grid */}
-              <div className="ios-card bg-white" style={{ padding: '16px 24px' }}>
+              <div className="ios-card" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)', padding: '16px 24px' }}>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '20px', textAlign: 'left' }}>
                   <div>
-                    <span style={{ fontSize: '11px', color: '#64748b', fontWeight: '600' }}>Сплачено</span>
-                    <p style={{ fontSize: '18px', fontWeight: '900', color: '#16a34a', margin: '2px 0 0 0' }}>
+                    <span style={{ fontSize: '11px', color: 'var(--text-medium)', fontWeight: '600' }}>Сплачено</span>
+                    <p style={{ fontSize: '18px', fontWeight: '900', color: 'var(--success)', margin: '2px 0 0 0' }}>
                       14 000,00 ₴
                     </p>
                   </div>
                   <div>
-                    <span style={{ fontSize: '11px', color: '#64748b', fontWeight: '600' }}>Очікується</span>
-                    <p style={{ fontSize: '18px', fontWeight: '900', color: '#ff9500', margin: '2px 0 0 0' }}>
+                    <span style={{ fontSize: '11px', color: 'var(--text-medium)', fontWeight: '600' }}>Очікується</span>
+                    <p style={{ fontSize: '18px', fontWeight: '900', color: 'var(--warning)', margin: '2px 0 0 0' }}>
                       20 000,00 ₴
                     </p>
                   </div>
                   <div>
-                    <span style={{ fontSize: '11px', color: '#64748b', fontWeight: '600' }}>Прибуток</span>
-                    <p style={{ fontSize: '18px', fontWeight: '900', color: '#0f172a', margin: '2px 0 0 0' }}>
+                    <span style={{ fontSize: '11px', color: 'var(--text-medium)', fontWeight: '600' }}>Прибуток</span>
+                    <p style={{ fontSize: '18px', fontWeight: '900', color: 'var(--text-dark)', margin: '2px 0 0 0' }}>
                       14 000,00 ₴
                     </p>
                   </div>
@@ -401,27 +401,27 @@ export const Clients: React.FC = () => {
               <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '16px' }}>
                 
                 {/* Tasks Donut Chart Widget */}
-                <div className="ios-card bg-white" style={{ padding: '16px' }}>
-                  <h4 style={{ fontSize: '12px', fontWeight: '800', color: '#0f172a', margin: '0 0 12px 0' }}>Завдання</h4>
+                <div className="ios-card" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)', padding: '16px' }}>
+                  <h4 style={{ fontSize: '12px', fontWeight: '800', color: 'var(--text-dark)', margin: '0 0 12px 0' }}>Завдання</h4>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
                     
                     {/* Visual Donut Ring SVG */}
                     <div style={{ position: 'relative', width: '70px', height: '70px', flexShrink: 0 }}>
                       <svg width="70" height="70" viewBox="0 0 36 36">
-                        <path stroke="#f1f5f9" strokeWidth="4" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                        <path stroke="#ff9500" strokeWidth="4" strokeDasharray="50, 100" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                        <path stroke="#ff3b30" strokeWidth="4" strokeDasharray="25, 100" strokeDashoffset="-50" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        <path stroke="var(--border-light)" strokeWidth="4" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        <path stroke="var(--warning)" strokeWidth="4" strokeDasharray="50, 100" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        <path stroke="var(--danger)" strokeWidth="4" strokeDasharray="25, 100" strokeDashoffset="-50" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
                       </svg>
                     </div>
 
                     <div style={{ fontSize: '11px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#ff9500' }}></span>
-                        <span style={{ color: '#64748b' }}>В процесі виконання - <strong>1</strong></span>
+                        <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: 'var(--warning)' }}></span>
+                        <span style={{ color: 'var(--text-medium)' }}>В процесі виконання - <strong style={{ color: 'var(--text-dark)' }}>1</strong></span>
                       </div>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: '#ff3b30' }}></span>
-                        <span style={{ color: '#64748b' }}>Протерміновано - <strong>1</strong></span>
+                        <span style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: 'var(--danger)' }}></span>
+                        <span style={{ color: 'var(--text-medium)' }}>Протерміновано - <strong style={{ color: 'var(--text-dark)' }}>1</strong></span>
                       </div>
                     </div>
 
@@ -429,16 +429,16 @@ export const Clients: React.FC = () => {
                 </div>
 
                 {/* Deals Overview Widget */}
-                <div className="ios-card bg-white" style={{ padding: '16px' }}>
-                  <h4 style={{ fontSize: '12px', fontWeight: '800', color: '#0f172a', margin: '0 0 12px 0' }}>Угоди</h4>
+                <div className="ios-card" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)', padding: '16px' }}>
+                  <h4 style={{ fontSize: '12px', fontWeight: '800', color: 'var(--text-dark)', margin: '0 0 12px 0' }}>Угоди</h4>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', fontSize: '11px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #f1f5f9', paddingBottom: '4px' }}>
-                      <span style={{ color: '#64748b' }}>Необроблені</span>
-                      <strong style={{ fontWeight: '800' }}>1</strong>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-light)', paddingBottom: '4px' }}>
+                      <span style={{ color: 'var(--text-medium)' }}>Необроблені</span>
+                      <strong style={{ fontWeight: '800', color: 'var(--text-dark)' }}>1</strong>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                      <span style={{ color: '#64748b' }}>Всього</span>
-                      <strong style={{ fontWeight: '800' }}>1</strong>
+                      <span style={{ color: 'var(--text-medium)' }}>Всього</span>
+                      <strong style={{ fontWeight: '800', color: 'var(--text-dark)' }}>1</strong>
                     </div>
                   </div>
                 </div>
@@ -446,8 +446,8 @@ export const Clients: React.FC = () => {
               </div>
 
               {/* Communication Tabs Card (Нотатки / Чати / Email) */}
-              <div className="ios-card bg-white" style={{ padding: '20px' }}>
-                <div style={{ display: 'flex', gap: '16px', borderBottom: '1px solid #e2e8f0', paddingBottom: '8px', marginBottom: '16px' }}>
+              <div className="ios-card" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)', padding: '20px' }}>
+                <div style={{ display: 'flex', gap: '16px', borderBottom: '1px solid var(--border-light)', paddingBottom: '8px', marginBottom: '16px' }}>
                   <button 
                     type="button" 
                     onClick={() => setProfileTab('notes')}
@@ -475,35 +475,35 @@ export const Clients: React.FC = () => {
                 {profileTab === 'email' && (
                   <form onSubmit={handleSendDetailEmail} style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                     <div style={{ display: 'grid', gridTemplateColumns: '60px 1fr', alignItems: 'center', fontSize: '11px' }}>
-                      <span style={{ color: '#64748b' }}>Кому</span>
+                      <span style={{ color: 'var(--text-medium)' }}>Кому</span>
                       <input 
                         value={`"${selectedClient.contact || selectedClient.name}" <${selectedClient.email || 'client1@edelveis.com'}>`} 
                         disabled 
-                        style={{ backgroundColor: '#f8fafc', padding: '4px 8px', borderRadius: '4px', border: '1px solid #e2e8f0', fontSize: '11px' }}
+                        style={{ backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', padding: '4px 8px', borderRadius: '4px', border: '1px solid var(--border-light)', fontSize: '11px' }}
                       />
                     </div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: '60px 1fr', alignItems: 'center', fontSize: '11px' }}>
-                      <span style={{ color: '#64748b' }}>CC</span>
-                      <input placeholder="Пошук копії..." style={{ padding: '4px 8px', borderRadius: '4px', border: '1px solid #e2e8f0', fontSize: '11px' }} />
+                      <span style={{ color: 'var(--text-medium)' }}>CC</span>
+                      <input placeholder="Пошук копії..." style={{ padding: '4px 8px', borderRadius: '4px', border: '1px solid var(--border-light)', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', fontSize: '11px' }} />
                     </div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: '60px 1fr', alignItems: 'center', fontSize: '11px' }}>
-                      <span style={{ color: '#64748b' }}>Від</span>
+                      <span style={{ color: 'var(--text-medium)' }}>Від</span>
                       <input 
                         value={`"Едельвейс і К" <office.edelveis@gmail.com> (E-mail)`} 
                         disabled 
-                        style={{ backgroundColor: '#f8fafc', padding: '4px 8px', borderRadius: '4px', border: '1px solid #e2e8f0', fontSize: '11px' }}
+                        style={{ backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', padding: '4px 8px', borderRadius: '4px', border: '1px solid var(--border-light)', fontSize: '11px' }}
                       />
                     </div>
 
                     <div style={{ display: 'grid', gridTemplateColumns: '60px 1fr', alignItems: 'center', fontSize: '11px' }}>
-                      <span style={{ color: '#64748b' }}>Тема</span>
+                      <span style={{ color: 'var(--text-medium)' }}>Тема</span>
                       <input 
                         placeholder="Тема листа..." 
                         value={detailEmailSubject} 
                         onChange={(e) => setDetailEmailSubject(e.target.value)} 
-                        style={{ padding: '4px 8px', borderRadius: '4px', border: '1px solid #e2e8f0', fontSize: '11px' }}
+                        style={{ padding: '4px 8px', borderRadius: '4px', border: '1px solid var(--border-light)', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', fontSize: '11px' }}
                         required
                       />
                     </div>
@@ -517,7 +517,7 @@ export const Clients: React.FC = () => {
                       placeholder="Додати текст повідомлення..." 
                       value={detailEmailBody} 
                       onChange={(e) => setDetailEmailBody(e.target.value)} 
-                      style={{ padding: '8px', fontSize: '11px', borderRadius: '6px', border: '1px solid #cbd5e1' }}
+                      style={{ padding: '8px', fontSize: '11px', borderRadius: '6px', border: '1px solid var(--border-light)', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)' }}
                       required
                     />
 
@@ -534,14 +534,14 @@ export const Clients: React.FC = () => {
                 {/* Notes Tab Content */}
                 {profileTab === 'notes' && (
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                    <textarea rows={3} placeholder="Введіть нотатку по клієнту..." style={{ padding: '8px', fontSize: '11px' }} />
+                    <textarea rows={3} placeholder="Введіть нотатку по клієнту..." style={{ padding: '8px', fontSize: '11px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)', borderRadius: '6px' }} />
                     <button type="button" className="ios-btn ios-btn-primary ios-btn-small" style={{ alignSelf: 'flex-start' }}>+ Зберегти нотатку</button>
                   </div>
                 )}
 
                 {/* Chats Tab Content */}
                 {profileTab === 'chats' && (
-                  <div style={{ fontSize: '11px', color: '#64748b', textAlign: 'center', padding: '20px' }}>
+                  <div style={{ fontSize: '11px', color: 'var(--text-medium)', textAlign: 'center', padding: '20px' }}>
                     💬 Журнал повідомлень месенджерів (Viber / Telegram) порожній
                   </div>
                 )}
@@ -549,24 +549,24 @@ export const Clients: React.FC = () => {
               </div>
 
               {/* Bottom Activity Log Card (Журнал активності) */}
-              <div className="ios-card bg-white" style={{ padding: '20px' }}>
-                <h4 style={{ fontSize: '13px', fontWeight: '800', color: '#0f172a', margin: '0 0 12px 0' }}>Журнал активності</h4>
+              <div className="ios-card" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)', padding: '20px' }}>
+                <h4 style={{ fontSize: '13px', fontWeight: '800', color: 'var(--text-dark)', margin: '0 0 12px 0' }}>Журнал активності</h4>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '11px' }}>
                   
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #f1f5f9', paddingBottom: '6px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <div style={{ width: '18px', height: '18px', borderRadius: '50%', backgroundColor: '#007aff', color: '#fff', fontSize: '8px', fontWeight: '800', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>В</div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-light)', paddingBottom: '6px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-dark)' }}>
+                      <div style={{ width: '18px', height: '18px', borderRadius: '50%', backgroundColor: 'var(--primary)', color: '#fff', fontSize: '8px', fontWeight: '800', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>В</div>
                       <span><strong>Віктор</strong> створив(-ла) email-лист з темою <strong>Re: Закупівля тиражу бланків А4</strong></span>
                     </div>
-                    <span style={{ color: '#94a3b8', fontFamily: 'var(--font-mono)', fontSize: '10px' }}>17.08.2026 13:30</span>
+                    <span style={{ color: 'var(--text-medium)', fontFamily: 'var(--font-mono)', fontSize: '10px' }}>17.08.2026 13:30</span>
                   </div>
 
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #f1f5f9', paddingBottom: '6px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <div style={{ width: '18px', height: '18px', borderRadius: '50%', backgroundColor: '#10b981', color: '#fff', fontSize: '8px', fontWeight: '800', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>А</div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-light)', paddingBottom: '6px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-dark)' }}>
+                      <div style={{ width: '18px', height: '18px', borderRadius: '50%', backgroundColor: 'var(--success)', color: '#fff', fontSize: '8px', fontWeight: '800', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>А</div>
                       <span>Створено замовлення <strong>№31101 (Бланки А4, 1000 шт)</strong> на суму <strong>433.76 грн</strong></span>
                     </div>
-                    <span style={{ color: '#94a3b8', fontFamily: 'var(--font-mono)', fontSize: '10px' }}>17.08.2026 12:00</span>
+                    <span style={{ color: 'var(--text-medium)', fontFamily: 'var(--font-mono)', fontSize: '10px' }}>17.08.2026 12:00</span>
                   </div>
 
                 </div>

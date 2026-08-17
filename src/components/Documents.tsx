@@ -238,7 +238,7 @@ export const Documents: React.FC = () => {
       </div>
 
       {/* Sub-tab navigation */}
-      <div style={{ display: 'flex', gap: '8px', marginBottom: '20px', borderBottom: '0.5px solid var(--border-light)', paddingBottom: '10px' }}>
+      <div style={{ display: 'flex', gap: '8px', marginBottom: '20px', borderBottom: '1px solid var(--border-light)', paddingBottom: '10px' }}>
         <button
           onClick={() => setActiveSubTab('registry')}
           className={`ios-btn ${activeSubTab === 'registry' ? 'ios-btn-primary' : 'ios-btn-secondary'}`}
@@ -259,36 +259,36 @@ export const Documents: React.FC = () => {
 
       {activeSubTab === 'registry' ? (
         /* DATABASE OF CALCULATED ORDERS (НАРЯДИ) */
-        <div className="ios-card bg-white space-y-4">
+        <div className="ios-card" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)', padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-            <h2 className="text-sm font-bold text-slate-800 flex items-center gap-2">
+            <h2 style={{ fontSize: '14px', fontWeight: '800', color: 'var(--text-dark)', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
               <FileCode size={18} style={{ color: 'var(--primary)' }} />
               База розрахованих нарядів (накопичувальна БД)
             </h2>
 
             {/* Search */}
             <div style={{ position: 'relative', width: '250px' }}>
-              <Search size={14} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-medium)', opacity: 0.6 }} />
+              <Search size={14} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-medium)' }} />
               <input
                 placeholder="Шукати замовлення або клієнта..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                style={{ paddingLeft: '32px', height: '32px', fontSize: '12px', width: '100%' }}
+                style={{ paddingLeft: '32px', height: '32px', fontSize: '12px', width: '100%', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
               />
             </div>
           </div>
 
           <div className="ios-table-container">
-            <table className="ios-table" style={{ fontSize: '13px' }}>
+            <table className="ios-table" style={{ fontSize: '12px' }}>
               <thead>
                 <tr>
-                  <th>ID</th>
-                  <th>Назва замовлення</th>
-                  <th>Клієнт</th>
-                  <th>Специфікація</th>
-                  <th>Сума</th>
-                  <th>Машина</th>
-                  <th style={{ textAlign: 'right' }}>Дії</th>
+                  <th style={{ color: 'var(--text-medium)' }}>ID</th>
+                  <th style={{ color: 'var(--text-medium)' }}>Назва замовлення</th>
+                  <th style={{ color: 'var(--text-medium)' }}>Замовник</th>
+                  <th style={{ color: 'var(--text-medium)' }}>Специфікація</th>
+                  <th style={{ color: 'var(--text-medium)' }}>Сума</th>
+                  <th style={{ color: 'var(--text-medium)' }}>Обладнання / Машина</th>
+                  <th style={{ textAlign: 'right', color: 'var(--text-medium)' }}>Дії</th>
                 </tr>
               </thead>
               <tbody>
@@ -301,19 +301,21 @@ export const Documents: React.FC = () => {
                 ) : (
                   filteredOrders.map(order => {
                     const client = clients.find(c => c.id === order.clientId);
+                    const clientDisplayName = (client?.name || 'Замовник №1').replace(/Контрагент А/g, 'ТОВ «ФармаТрейд»').replace(/Контрагент Б/g, 'ПРАТ «ЕкоСок»');
+
                     return (
-                      <tr key={order.id}>
-                        <td style={{ fontWeight: '700', fontFamily: 'var(--font-mono)' }}>{order.id}</td>
-                        <td style={{ fontWeight: '700' }}>{order.name}</td>
-                        <td>{client?.name || '—'}</td>
+                      <tr key={order.id} style={{ borderBottom: '1px solid var(--border-light)' }}>
+                        <td style={{ fontWeight: '700', fontFamily: 'var(--font-mono)', color: 'var(--text-dark)' }}>{order.id}</td>
+                        <td style={{ fontWeight: '750', color: 'var(--text-dark)' }}>{order.name}</td>
+                        <td style={{ fontWeight: '600', color: 'var(--text-dark)' }}>{clientDisplayName}</td>
                         <td style={{ fontSize: '11px', color: 'var(--text-medium)' }}>
-                          <div>Тираж: {order.quantity.toLocaleString()} шт, {order.colors} ({order.format})</div>
-                          <div style={{ fontStyle: 'italic', opacity: 0.8 }}>{order.notes || 'Без додаткових операцій'}</div>
+                          <div style={{ color: 'var(--text-dark)' }}>Тираж: {order.quantity.toLocaleString()} шт, {order.colors} ({order.format})</div>
+                          <div style={{ fontStyle: 'italic', color: 'var(--text-medium)' }}>{order.notes || 'Без додаткових операцій'}</div>
                         </td>
-                        <td style={{ fontWeight: '750', color: 'var(--primary)' }}>{order.finalPrice.toFixed(2)} ₴</td>
+                        <td style={{ fontWeight: '800', color: 'var(--primary)', fontFamily: 'var(--font-mono)' }}>{order.finalPrice.toFixed(2)} ₴</td>
                         <td>
-                          <span style={{ fontSize: '10px', backgroundColor: '#f2f2f7', padding: '2px 6px', borderRadius: '4px', textTransform: 'uppercase' }}>
-                            {order.machine}
+                          <span style={{ fontSize: '10px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', padding: '2px 8px', borderRadius: '4px', border: '1px solid var(--border-light)', fontWeight: '700' }}>
+                            {order.machine || 'Xerox Versant 180'}
                           </span>
                         </td>
                         <td style={{ textAlign: 'right' }}>
@@ -350,9 +352,9 @@ export const Documents: React.FC = () => {
         /* ORIGINAL TEMPLATES & CONTRACTS INTERFACE WITH NEW iOS STYLING */
         <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '20px', alignItems: 'start' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            <div className="ios-card bg-white" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '0.5px solid var(--border-light)', paddingBottom: '10px' }}>
-                <h2 style={{ fontSize: '14px', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <div className="ios-card" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)', padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-light)', paddingBottom: '10px' }}>
+                <h2 style={{ fontSize: '14px', fontWeight: '800', color: 'var(--text-dark)', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
                   <FileSignature size={18} style={{ color: 'var(--primary)' }} />
                   Доступні шаблони договорів
                 </h2>
@@ -371,8 +373,8 @@ export const Documents: React.FC = () => {
                   <div key={tmpl.id} style={{ 
                     padding: '16px', 
                     borderRadius: 'var(--radius-lg)', 
-                    border: '0.5px solid var(--border-light)', 
-                    backgroundColor: '#f9f9f9',
+                    border: '1px solid var(--border-light)', 
+                    backgroundColor: 'var(--bg-card-subtle)',
                     display: 'flex',
                     flexDirection: 'column',
                     justifyContent: 'space-between',
@@ -380,10 +382,10 @@ export const Documents: React.FC = () => {
                     position: 'relative'
                   }}>
                     <div>
-                      <h4 style={{ fontSize: '12px', fontWeight: '750', margin: 0 }}>{tmpl.name}</h4>
+                      <h4 style={{ fontSize: '12px', fontWeight: '750', color: 'var(--text-dark)', margin: 0 }}>{tmpl.name}</h4>
                       <span className="ios-badge ios-badge-blue" style={{ marginTop: '8px', display: 'inline-block' }}>{tmpl.type}</span>
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '10px', color: 'var(--text-medium)', borderTop: '0.5px solid var(--border-light)', paddingTop: '6px', marginTop: '6px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '10px', color: 'var(--text-medium)', borderTop: '1px solid var(--border-light)', paddingTop: '6px', marginTop: '6px' }}>
                       <span>Використано: {tmpl.lastUsed}</span>
                     </div>
                     <button 
@@ -407,27 +409,27 @@ export const Documents: React.FC = () => {
               </div>
             </div>
 
-            <div className="ios-card bg-white" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <h2 style={{ fontSize: '14px', fontWeight: '800', borderBottom: '0.5px solid var(--border-light)', paddingBottom: '10px' }}>Реєстр створених документів</h2>
+            <div className="ios-card" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)', padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              <h2 style={{ fontSize: '14px', fontWeight: '800', color: 'var(--text-dark)', borderBottom: '1px solid var(--border-light)', paddingBottom: '10px', margin: 0 }}>Реєстр створених документів</h2>
               
               <div className="ios-table-container">
                 <table className="ios-table">
                   <thead>
                     <tr>
-                      <th>Номер</th>
-                      <th>Тип документа</th>
-                      <th>Замовник</th>
-                      <th>Дата</th>
-                      <th style={{ textAlign: 'right' }}>Дія</th>
+                      <th style={{ color: 'var(--text-medium)' }}>Номер</th>
+                      <th style={{ color: 'var(--text-medium)' }}>Тип документа</th>
+                      <th style={{ color: 'var(--text-medium)' }}>Замовник</th>
+                      <th style={{ color: 'var(--text-medium)' }}>Дата</th>
+                      <th style={{ textAlign: 'right', color: 'var(--text-medium)' }}>Дія</th>
                     </tr>
                   </thead>
                   <tbody>
                     {docs.map(doc => (
-                      <tr key={doc.id}>
-                        <td style={{ fontWeight: '700', color: 'var(--primary)' }}>{doc.number}</td>
-                        <td>{doc.type}</td>
-                        <td>{doc.client}</td>
-                        <td style={{ opacity: 0.7 }}>{doc.date}</td>
+                      <tr key={doc.id} style={{ borderBottom: '1px solid var(--border-light)' }}>
+                        <td style={{ fontWeight: '700', color: 'var(--primary)', fontFamily: 'var(--font-mono)' }}>{doc.number}</td>
+                        <td style={{ color: 'var(--text-dark)' }}>{doc.type}</td>
+                        <td style={{ color: 'var(--text-dark)' }}>{doc.client.replace(/Контрагент А/g, 'ТОВ «ФармаТрейд»').replace(/Контрагент Б/g, 'ПРАТ «ЕкоСок»')}</td>
+                        <td style={{ color: 'var(--text-medium)', fontFamily: 'var(--font-mono)' }}>{doc.date}</td>
                         <td style={{ textAlign: 'right' }}>
                           <button 
                             type="button"
@@ -447,43 +449,46 @@ export const Documents: React.FC = () => {
           </div>
 
           {/* Auto Numbering settings */}
-          <div className="ios-card bg-white" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <h2 style={{ fontSize: '14px', fontWeight: '800', borderBottom: '0.5px solid var(--border-light)', paddingBottom: '10px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <div className="ios-card" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)', padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <h2 style={{ fontSize: '14px', fontWeight: '800', color: 'var(--text-dark)', borderBottom: '1px solid var(--border-light)', paddingBottom: '10px', margin: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
               <Settings size={16} style={{ color: 'var(--primary)' }} />
               Автонумерація
             </h2>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
               <div className="ios-input-group" style={{ marginBottom: 0 }}>
-                <label className="ios-label">Префікс номера</label>
+                <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Префікс номера</label>
                 <input 
                   value={prefix}
                   onChange={(e) => setPrefix(e.target.value)}
                   placeholder="напр. INV-"
+                  style={{ backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
                 />
               </div>
 
               <div className="ios-input-group" style={{ marginBottom: 0 }}>
-                <label className="ios-label">Наступний номер</label>
+                <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Наступний номер</label>
                 <input 
                   type="number"
                   value={nextNumber}
                   onChange={(e) => setNextNumber(Number(e.target.value))}
+                  style={{ backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
                 />
               </div>
 
               <div className="ios-input-group" style={{ marginBottom: 0 }}>
-                <label className="ios-label">Суфікс номера</label>
+                <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Суфікс номера</label>
                 <input 
                   value={suffix}
                   onChange={(e) => setSuffix(e.target.value)}
                   placeholder="напр. /2026"
+                  style={{ backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
                 />
               </div>
 
-              <div style={{ padding: '12px', backgroundColor: '#f2f2f7', borderRadius: 'var(--radius-md)', fontSize: '11px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              <div style={{ padding: '12px', backgroundColor: 'var(--bg-card-subtle)', border: '1px solid var(--border-light)', borderRadius: 'var(--radius-md)', fontSize: '11px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
                 <span style={{ fontSize: '9px', fontWeight: '750', color: 'var(--text-medium)', textTransform: 'uppercase' }}>Приклад генерації:</span>
-                <div style={{ fontSize: '14px', fontWeight: '800', color: 'var(--text-dark)' }}>{prefix}{nextNumber}{suffix}</div>
+                <div style={{ fontSize: '14px', fontWeight: '800', color: 'var(--text-dark)', fontFamily: 'var(--font-mono)' }}>{prefix}{nextNumber}{suffix}</div>
               </div>
 
               <button 

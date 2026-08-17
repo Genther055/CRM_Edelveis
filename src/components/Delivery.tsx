@@ -203,25 +203,25 @@ export const Delivery: React.FC = () => {
       </div>
 
       {/* Redesigned Cupertino Light Theme Filters Panel */}
-      <div className="ios-card bg-white space-y-4 mb-6">
+      <div className="ios-card" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)', padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px', marginBottom: '24px' }}>
         <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
           <div style={{ position: 'relative', flexGrow: 1, minWidth: '220px' }}>
-            <Search style={{ position: 'absolute', left: '10px', top: '10px', color: '#94a3b8' }} size={16} />
+            <Search style={{ position: 'absolute', left: '10px', top: '10px', color: 'var(--text-medium)' }} size={16} />
             <input 
-              placeholder="Шукати за клієнтом, ТТН, кур'єром або угодою..."
+              placeholder="Шукати за замовником, ТТН, кур'єром або угодою..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              style={{ paddingLeft: '32px', height: '36px', fontSize: '13px', width: '100%' }}
+              style={{ paddingLeft: '32px', height: '36px', fontSize: '13px', width: '100%', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
             />
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px' }}>
-            <Sliders size={13} style={{ color: '#8e8e93' }} />
-            <span style={{ fontWeight: '750' }}>Тип доставки:</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: 'var(--text-medium)' }}>
+            <Sliders size={13} style={{ color: 'var(--text-medium)' }} />
+            <span style={{ fontWeight: '750', color: 'var(--text-dark)' }}>Тип доставки:</span>
             <select 
               value={activeTypeFilter}
               onChange={(e) => setActiveTypeFilter(e.target.value as any)}
-              style={{ height: '32px', fontSize: '12px', width: '145px' }}
+              style={{ height: '32px', fontSize: '12px', width: '145px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
             >
               <option value="all">Всі типи</option>
               <option value="nova_poshta">Нова Пошта</option>
@@ -232,7 +232,7 @@ export const Delivery: React.FC = () => {
         </div>
 
         {/* Statuses Selector row */}
-        <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', borderTop: '0.5px solid var(--border-light)', paddingTop: '10px' }}>
+        <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', borderTop: '1px solid var(--border-light)', paddingTop: '10px' }}>
           {(['all', 'created', 'in_transit', 'arrived', 'received', 'refused'] as const).map(status => (
             <button
               key={status}
@@ -243,8 +243,9 @@ export const Delivery: React.FC = () => {
                 padding: '6px 12px',
                 fontSize: '11px',
                 borderRadius: '6px',
-                backgroundColor: activeStatusFilter === status ? 'var(--primary)' : 'rgba(120, 120, 128, 0.08)',
+                backgroundColor: activeStatusFilter === status ? 'var(--primary)' : 'var(--bg-card-subtle)',
                 color: activeStatusFilter === status ? '#ffffff' : 'var(--text-dark)',
+                border: '1px solid var(--border-light)',
                 fontWeight: activeStatusFilter === status ? '700' : '500',
                 whiteSpace: 'nowrap'
               }}
@@ -258,7 +259,7 @@ export const Delivery: React.FC = () => {
       {/* Deliveries Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredDeliveries.length === 0 ? (
-          <div className="ios-card bg-white col-span-full text-center py-10" style={{ color: '#8e8e93' }}>
+          <div className="ios-card col-span-full text-center py-10" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)', color: 'var(--text-medium)' }}>
             <Package size={48} style={{ margin: '0 auto 10px', opacity: 0.5 }} />
             <p>Записи про доставку за обраними фільтрами відсутні</p>
           </div>
@@ -266,8 +267,10 @@ export const Delivery: React.FC = () => {
           filteredDeliveries.map(del => {
             const notes = del.notes || '';
             const isUP = notes.includes('[УкрПошта');
+            const displayClientName = del.clientName.replace(/Контрагент А/g, 'ТОВ «ФармаТрейд»').replace(/Контрагент Б/g, 'ПРАТ «ЕкоСок»');
+
             return (
-              <div key={del.id} className="ios-card bg-white flex flex-col justify-between" style={{ minHeight: '210px' }}>
+              <div key={del.id} className="ios-card flex flex-col justify-between" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)', minHeight: '210px', padding: '16px' }}>
                 <div>
                   <div className="flex justify-between items-start mb-3">
                     <span style={{ fontSize: '11px', fontWeight: '750', color: 'var(--primary)' }}>{del.dealId}</span>
@@ -276,32 +279,32 @@ export const Delivery: React.FC = () => {
                     </span>
                   </div>
                   
-                  <h4 className="text-sm font-bold text-slate-800" style={{ fontSize: '14px', marginBottom: '8px' }}>
-                    {del.clientName}
+                  <h4 style={{ fontSize: '14px', fontWeight: '800', color: 'var(--text-dark)', marginBottom: '8px' }}>
+                    {displayClientName}
                   </h4>
 
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '12px', color: '#636366' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '12px', color: 'var(--text-medium)' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <MapPin size={12} />
-                      <span className="truncate">{del.address}</span>
+                      <MapPin size={12} style={{ color: 'var(--text-medium)' }} />
+                      <span className="truncate" style={{ color: 'var(--text-dark)' }}>{del.address}</span>
                     </div>
                     
                     {isUP ? (
                       <>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#0ea5e9' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--primary)' }}>
                           <Globe size={12} />
                           <span style={{ fontWeight: '750' }}>УкрПошта: {del.npAccountId || 'Головне'}</span>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                          <Truck size={12} />
-                          <span style={{ fontFamily: 'var(--font-mono)' }}>ТТН: {del.ttnNumber || 'Очікує генерації'}</span>
+                          <Truck size={12} style={{ color: 'var(--text-medium)' }} />
+                          <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-dark)' }}>ТТН: {del.ttnNumber || 'Очікує генерації'}</span>
                         </div>
                       </>
                     ) : (del.deliveryType || 'nova_poshta') === 'nova_poshta' ? (
                       <>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                          <Truck size={12} />
-                          <span style={{ fontFamily: 'var(--font-mono)', fontWeight: '600' }}>
+                          <Truck size={12} style={{ color: 'var(--text-medium)' }} />
+                          <span style={{ fontFamily: 'var(--font-mono)', fontWeight: '600', color: 'var(--text-dark)' }}>
                             ТТН: {del.ttnNumber || 'Не присвоєно'}
                           </span>
                         </div>
@@ -318,20 +321,20 @@ export const Delivery: React.FC = () => {
                         </div>
                         {del.deliveryTime && (
                           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            <Clock size={12} />
-                            <span>Час доставки: {del.deliveryTime}</span>
+                            <Clock size={12} style={{ color: 'var(--text-medium)' }} />
+                            <span style={{ color: 'var(--text-dark)' }}>Час доставки: {del.deliveryTime}</span>
                           </div>
                         )}
                       </>
                     )}
                     
                     <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      <Calendar size={12} />
-                      <span>Дата відправки: {del.date}</span>
+                      <Calendar size={12} style={{ color: 'var(--text-medium)' }} />
+                      <span style={{ color: 'var(--text-medium)' }}>Дата відправки: {del.date}</span>
                     </div>
 
                     {del.notes && (
-                      <div style={{ fontStyle: 'italic', fontSize: '11px', marginTop: '4px', borderLeft: '2px solid var(--border-light)', paddingLeft: '6px' }}>
+                      <div style={{ fontStyle: 'italic', fontSize: '11px', marginTop: '4px', borderLeft: '2px solid var(--border-light)', paddingLeft: '6px', color: 'var(--text-medium)' }}>
                         {del.notes}
                       </div>
                     )}
@@ -339,7 +342,7 @@ export const Delivery: React.FC = () => {
                 </div>
 
                 {/* Status Update Options */}
-                <div style={{ borderTop: '0.5px solid var(--border-light)', paddingTop: '10px', marginTop: '10px', display: 'flex', gap: '6px' }}>
+                <div style={{ borderTop: '1px solid var(--border-light)', paddingTop: '10px', marginTop: '10px', display: 'flex', gap: '6px' }}>
                   <button
                     type="button"
                     onClick={() => {
@@ -358,8 +361,9 @@ export const Delivery: React.FC = () => {
                       height: '28px',
                       fontSize: '11px',
                       borderRadius: '6px',
-                      border: 'none',
-                      backgroundColor: 'rgba(120, 120, 128, 0.08)',
+                      border: '1px solid var(--border-light)',
+                      backgroundColor: 'var(--bg-card-subtle)',
+                      color: 'var(--text-dark)',
                       padding: '0 4px',
                       width: '130px'
                     }}
