@@ -77,21 +77,18 @@ export const Login: React.FC = () => {
       justifyContent: 'center',
       minHeight: '100vh',
       width: '100vw',
-      backgroundColor: '#f2f2f7', // Default iOS light background
-      background: 'radial-gradient(circle at top right, #e5e5ea 0%, #f2f2f7 100%)',
-      padding: '20px',
-      fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif'
+      backgroundColor: 'var(--bg-system)',
+      padding: '20px'
     }}>
       <div style={{
         maxWidth: '400px',
         width: '100%',
         padding: '36px 30px',
-        boxShadow: '0 12px 30px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.03)',
-        border: '1px solid rgba(255, 255, 255, 0.8)',
-        backdropFilter: 'blur(20px)',
-        backgroundColor: 'rgba(255, 255, 255, 0.85)', // Light glassmorphic
-        color: '#1c1c1e',
-        borderRadius: '20px'
+        boxShadow: 'var(--shadow-hover)',
+        border: '1px solid var(--border-light)',
+        backgroundColor: 'var(--bg-card)',
+        color: 'var(--text-dark)',
+        borderRadius: '16px'
       }}>
         <div style={{ textAlign: 'center', marginBottom: '28px' }}>
           <div style={{
@@ -101,28 +98,27 @@ export const Login: React.FC = () => {
             width: '60px',
             height: '60px',
             borderRadius: '16px',
-            backgroundColor: '#ffffff',
-            color: '#007aff', // iOS Blue
+            backgroundColor: 'rgba(59, 130, 246, 0.12)',
+            color: 'var(--primary)',
             marginBottom: '14px',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
-            border: '1px solid rgba(0, 0, 0, 0.04)'
+            border: '1px solid var(--border-light)'
           }}>
             <Printer size={28} />
           </div>
-          <h2 style={{ fontSize: '24px', fontWeight: '800', letterSpacing: '-0.6px', color: '#1c1c1e' }}>ТОВ Едельвейс і К</h2>
-          <p style={{ fontSize: '13px', color: '#8e8e93', marginTop: '3px', fontWeight: '500' }}>
+          <h2 style={{ fontSize: '24px', fontWeight: '800', letterSpacing: '-0.6px', color: 'var(--text-dark)' }}>ТОВ Едельвейс і К</h2>
+          <p style={{ fontSize: '13px', color: 'var(--text-medium)', marginTop: '3px', fontWeight: '500' }}>
             {isRegisterMode ? 'Створення облікового запису' : 'Вхід у систему керування CRM'}
           </p>
         </div>
 
         {error && (
           <div style={{
-            backgroundColor: '#ff3b3014',
-            border: '1px solid #ff3b3030',
-            borderRadius: '10px',
-            padding: '12px',
+            backgroundColor: 'rgba(239, 68, 68, 0.12)',
+            border: '1px solid rgba(239, 68, 68, 0.3)',
+            borderRadius: '8px',
+            padding: '10px 14px',
             fontSize: '12px',
-            color: '#ff3b30',
+            color: 'var(--danger)',
             marginBottom: '20px',
             fontWeight: '600',
             textAlign: 'center'
@@ -133,12 +129,12 @@ export const Login: React.FC = () => {
 
         {successMsg && (
           <div style={{
-            backgroundColor: '#34c75914',
-            border: '1px solid #34c75930',
-            borderRadius: '10px',
-            padding: '12px',
+            backgroundColor: 'rgba(16, 185, 129, 0.12)',
+            border: '1px solid rgba(16, 185, 129, 0.3)',
+            borderRadius: '8px',
+            padding: '10px 14px',
             fontSize: '12px',
-            color: '#34c759',
+            color: 'var(--accent)',
             marginBottom: '20px',
             fontWeight: '600',
             textAlign: 'center'
@@ -150,9 +146,9 @@ export const Login: React.FC = () => {
         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
           {isRegisterMode && (
             <div className="ios-input-group" style={{ marginBottom: 0 }}>
-              <label className="ios-label" style={{ color: '#3a3a3c', fontWeight: '600' }}>Повне ім'я</label>
+              <label className="ios-label" style={{ color: 'var(--text-dark)', fontWeight: '600' }}>Повне ім'я</label>
               <div style={{ position: 'relative' }}>
-                <span style={{ position: 'absolute', left: '14px', top: '13px', color: '#8e8e93' }}>
+                <span style={{ position: 'absolute', left: '14px', top: '13px', color: 'var(--text-medium)' }}>
                   <UserIcon size={18} />
                 </span>
                 <input
@@ -160,16 +156,16 @@ export const Login: React.FC = () => {
                   placeholder="Петро Поліграф"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  style={{ paddingLeft: '42px', backgroundColor: '#ffffff', color: '#1c1c1e', border: '1px solid rgba(0, 0, 0, 0.1)' }}
+                  style={{ paddingLeft: '42px' }}
                 />
               </div>
             </div>
           )}
 
           <div className="ios-input-group" style={{ marginBottom: 0 }}>
-            <label className="ios-label" style={{ color: '#3a3a3c', fontWeight: '600' }}>Логін</label>
+            <label className="ios-label" style={{ color: 'var(--text-dark)', fontWeight: '600' }}>Логін</label>
             <div style={{ position: 'relative' }}>
-              <span style={{ position: 'absolute', left: '14px', top: '13px', color: '#8e8e93' }}>
+              <span style={{ position: 'absolute', left: '14px', top: '13px', color: 'var(--text-medium)' }}>
                 <UserIcon size={18} />
               </span>
               <input
@@ -177,15 +173,15 @@ export const Login: React.FC = () => {
                 placeholder="Введіть логін"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                style={{ paddingLeft: '42px', backgroundColor: '#ffffff', color: '#1c1c1e', border: '1px solid rgba(0, 0, 0, 0.1)' }}
+                style={{ paddingLeft: '42px' }}
               />
             </div>
           </div>
 
           <div className="ios-input-group" style={{ marginBottom: 0 }}>
-            <label className="ios-label" style={{ color: '#3a3a3c', fontWeight: '600' }}>Пароль</label>
+            <label className="ios-label" style={{ color: 'var(--text-dark)', fontWeight: '600' }}>Пароль</label>
             <div style={{ position: 'relative' }}>
-              <span style={{ position: 'absolute', left: '14px', top: '13px', color: '#8e8e93' }}>
+              <span style={{ position: 'absolute', left: '14px', top: '13px', color: 'var(--text-medium)' }}>
                 <KeyRound size={18} />
               </span>
               <input
@@ -193,18 +189,17 @@ export const Login: React.FC = () => {
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                style={{ paddingLeft: '42px', backgroundColor: '#ffffff', color: '#1c1c1e', border: '1px solid rgba(0, 0, 0, 0.1)' }}
+                style={{ paddingLeft: '42px' }}
               />
             </div>
           </div>
 
           {isRegisterMode && (
             <div className="ios-input-group" style={{ marginBottom: 0 }}>
-              <label className="ios-label" style={{ color: '#3a3a3c', fontWeight: '600' }}>Роль працівника</label>
+              <label className="ios-label" style={{ color: 'var(--text-dark)', fontWeight: '600' }}>Роль працівника</label>
               <select
                 value={role}
                 onChange={(e) => setRole(e.target.value as any)}
-                style={{ backgroundColor: '#ffffff', color: '#1c1c1e', border: '1px solid rgba(0, 0, 0, 0.1)' }}
               >
                 <option value="manager">Менеджер замовлень</option>
                 <option value="operator">Оператор цеху</option>

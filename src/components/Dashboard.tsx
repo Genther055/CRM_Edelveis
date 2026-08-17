@@ -218,18 +218,18 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab }) => {
   const allowedTools = tools.filter(t => t.allowedRoles.includes(role));
 
   return (
-    <div className="main-content bg-[#f2f2f7]" style={{ display: 'flex', flexDirection: 'column', gap: '24px', overflowY: 'auto', height: '100vh', paddingBottom: '40px' }}>
+    <div className="main-content" style={{ display: 'flex', flexDirection: 'column', gap: '24px', overflowY: 'auto', height: '100vh', paddingBottom: '40px', backgroundColor: 'var(--bg-system)' }}>
       
       {/* Welcome Banner */}
       <div style={{
-        background: '#ffffff',
+        backgroundColor: 'var(--bg-card)',
         border: '1px solid var(--border-light)',
         borderRadius: 'var(--radius-lg)',
         padding: '24px 30px',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        boxShadow: 'var(--shadow-sm)',
+        boxShadow: 'var(--shadow-flat)',
         marginTop: '10px'
       }}>
         <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
@@ -237,7 +237,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab }) => {
             width: '56px',
             height: '56px',
             borderRadius: '50%',
-            backgroundColor: '#f1f5f9',
+            backgroundColor: 'rgba(59, 130, 246, 0.12)',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -257,7 +257,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab }) => {
 
         <div style={{ display: 'flex', gap: '24px' }}>
           <div style={{ textAlign: 'right' }}>
-            <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--text-medium)', opacity: 0.7 }}>
+            <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--text-medium)', opacity: 0.8 }}>
               Виготовлено
             </span>
             <h3 style={{ fontSize: '20px', fontWeight: '800', color: 'var(--success)' }}>
@@ -266,7 +266,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab }) => {
           </div>
           <div style={{ width: '1px', backgroundColor: 'var(--border-light)' }} />
           <div style={{ textAlign: 'right' }}>
-            <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--text-medium)', opacity: 0.7 }}>
+            <span style={{ fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--text-medium)', opacity: 0.8 }}>
               У роботі
             </span>
             <h3 style={{ fontSize: '20px', fontWeight: '800', color: 'var(--primary)' }}>
@@ -280,8 +280,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab }) => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
         {/* Sales Funnel widget */}
-        <div className="ios-card bg-white space-y-4 lg:col-span-1">
-          <h3 style={{ fontSize: '14px', fontWeight: '800', color: 'var(--text-dark)', display: 'flex', alignItems: 'center', gap: '6px', borderBottom: '1px solid #f1f5f9', paddingBottom: '10px' }}>
+        <div className="ios-card space-y-4 lg:col-span-1" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)' }}>
+          <h3 style={{ fontSize: '14px', fontWeight: '800', color: 'var(--text-dark)', display: 'flex', alignItems: 'center', gap: '6px', borderBottom: '1px solid var(--border-light)', paddingBottom: '10px' }}>
             <TrendingUp size={16} style={{ color: 'var(--primary)' }} />
             Воронка продажів (Sales Funnel)
           </h3>
@@ -293,10 +293,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab }) => {
                 <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px' }}>
                     <span style={{ fontWeight: '600', color: 'var(--text-medium)' }}>{st.label}</span>
-                    <span style={{ fontWeight: '750' }}>{st.amount.toLocaleString()} ₴ ({st.count} шт.)</span>
+                    <span style={{ fontWeight: '750', color: 'var(--text-dark)' }}>{st.amount.toLocaleString()} ₴ ({st.count} шт.)</span>
                   </div>
-                  <div style={{ width: '100%', height: '14px', backgroundColor: '#e5e5ea', borderRadius: '4px', overflow: 'hidden', position: 'relative' }}>
-                    <div style={{ width: `${barPercent}%`, height: '100%', backgroundColor: 'rgba(0, 122, 255, 0.85)', borderRadius: '4px', transition: 'width 0.3s ease' }} />
+                  <div style={{ width: '100%', height: '14px', backgroundColor: 'var(--border-light)', borderRadius: '4px', overflow: 'hidden', position: 'relative' }}>
+                    <div style={{ width: `${barPercent}%`, height: '100%', backgroundColor: 'var(--primary)', borderRadius: '4px', transition: 'width 0.3s ease' }} />
                   </div>
                 </div>
               );
@@ -305,8 +305,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab }) => {
         </div>
 
         {/* Employee Performance by Branch */}
-        <div className="ios-card bg-white space-y-4 lg:col-span-1">
-          <div className="flex justify-between items-center border-b border-slate-100 pb-3">
+        <div className="ios-card space-y-4 lg:col-span-1" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)' }}>
+          <div className="flex justify-between items-center pb-3" style={{ borderBottom: '1px solid var(--border-light)' }}>
             <h3 style={{ fontSize: '14px', fontWeight: '800', color: 'var(--text-dark)', display: 'flex', alignItems: 'center', gap: '6px' }}>
               <BarChart3 size={16} style={{ color: 'var(--primary)' }} />
               Ефективність працівників
@@ -317,10 +317,10 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab }) => {
             {filteredStaff.map((staff, idx) => (
               <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
-                  <span style={{ fontWeight: '700' }}>{staff.name}</span>
+                  <span style={{ fontWeight: '700', color: 'var(--text-dark)' }}>{staff.name}</span>
                   <span style={{ fontWeight: '800', color: 'var(--primary)' }}>{staff.ordersCount} викон. замовлень</span>
                 </div>
-                <div style={{ width: '100%', height: '8px', backgroundColor: '#e5e5ea', borderRadius: '4px', overflow: 'hidden' }}>
+                <div style={{ width: '100%', height: '8px', backgroundColor: 'var(--border-light)', borderRadius: '4px', overflow: 'hidden' }}>
                   <div style={{ width: `${Math.min(100, (staff.ordersCount / 30) * 100)}%`, height: '100%', backgroundColor: 'var(--primary)', borderRadius: '4px' }} />
                 </div>
               </div>
@@ -329,29 +329,29 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab }) => {
         </div>
 
         {/* Financial Profitability widget */}
-        <div className="ios-card bg-white space-y-4 lg:col-span-1">
-          <h3 style={{ fontSize: '14px', fontWeight: '800', color: 'var(--text-dark)', display: 'flex', alignItems: 'center', gap: '6px', borderBottom: '1px solid #f1f5f9', paddingBottom: '10px' }}>
+        <div className="ios-card space-y-4 lg:col-span-1" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)' }}>
+          <h3 style={{ fontSize: '14px', fontWeight: '800', color: 'var(--text-dark)', display: 'flex', alignItems: 'center', gap: '6px', borderBottom: '1px solid var(--border-light)', paddingBottom: '10px' }}>
             <PieChart size={16} style={{ color: isLoss ? 'var(--danger)' : 'var(--success)' }} />
             Прибутковість підприємства
           </h3>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
-              <span style={{ color: '#636366' }}>Загальний дохід (Виручка):</span>
-              <strong style={{ color: '#1c1c1e' }}>{totalRevenue.toLocaleString()} ₴</strong>
+              <span style={{ color: 'var(--text-medium)' }}>Загальний дохід (Виручка):</span>
+              <strong style={{ color: 'var(--text-dark)' }}>{totalRevenue.toLocaleString()} ₴</strong>
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
-              <span style={{ color: '#636366' }}>Витрати (Собівартість + Оренда):</span>
-              <strong style={{ color: '#1c1c1e' }}>{totalExpenses.toLocaleString()} ₴</strong>
+              <span style={{ color: 'var(--text-medium)' }}>Витрати (Собівартість + Оренда):</span>
+              <strong style={{ color: 'var(--text-dark)' }}>{totalExpenses.toLocaleString()} ₴</strong>
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', borderTop: '0.5px solid var(--border-light)', paddingTop: '8px', marginTop: '4px' }}>
-              <span style={{ fontWeight: '600' }}>Чистий результат:</span>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', borderTop: '1px solid var(--border-light)', paddingTop: '8px', marginTop: '4px' }}>
+              <span style={{ fontWeight: '600', color: 'var(--text-dark)' }}>Чистий результат:</span>
               <strong style={{ 
                 color: isLoss ? 'var(--danger)' : 'var(--success)', 
                 fontSize: '12px',
-                backgroundColor: isLoss ? 'rgba(255,59,48,0.08)' : 'rgba(52,199,89,0.08)',
+                backgroundColor: isLoss ? 'rgba(239, 68, 68, 0.12)' : 'rgba(16, 185, 129, 0.12)',
                 padding: '2px 8px',
                 borderRadius: '6px',
                 fontWeight: '700'
@@ -361,11 +361,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab }) => {
             </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '6px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', textTransform: 'uppercase', color: '#8e8e93', fontWeight: '700' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', textTransform: 'uppercase', color: 'var(--text-medium)', fontWeight: '700' }}>
                 <span>Покриття витрат (Точка беззбитковості)</span>
                 <span>{breakEvenPercent}%</span>
               </div>
-              <div style={{ width: '100%', height: '10px', backgroundColor: '#e5e5ea', borderRadius: '5px', overflow: 'hidden' }}>
+              <div style={{ width: '100%', height: '10px', backgroundColor: 'var(--border-light)', borderRadius: '5px', overflow: 'hidden' }}>
                 <div style={{ 
                   width: `${breakEvenPercent}%`, 
                   height: '100%', 
@@ -373,7 +373,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab }) => {
                   borderRadius: '5px' 
                 }} />
               </div>
-              <span style={{ fontSize: '10px', color: '#8e8e93', fontStyle: 'italic', marginTop: '2px' }}>
+              <span style={{ fontSize: '10px', color: 'var(--text-medium)', fontStyle: 'italic', marginTop: '2px' }}>
                 {isLoss ? '🚨 Бізнес тимчасово працює в мінус.' : '🎉 Окупність витрат досягнута! Бізнес прибутковий.'}
               </span>
             </div>

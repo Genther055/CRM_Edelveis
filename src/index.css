@@ -3,41 +3,56 @@
 @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700;800&family=SF+Pro+Text:wght@300;400;500;600&family=Inter:wght@300;400;500;600;700&display=swap');
 
 :root {
-  /* iOS System Colors */
-  --primary: #007aff;         /* iOS System Blue */
-  --primary-hover: #0062cc;
-  --accent: #34c759;          /* iOS System Green */
-  --success: #34c759;
-  --danger: #ff3b30;          /* iOS System Red */
-  --warning: #ff9500;         /* iOS System Orange */
-  --indigo: #5856d6;          /* iOS System Indigo */
-  --teal: #30b0c7;            /* iOS System Teal */
+  /* PrimeNG System Colors */
+  --primary: #3b82f6;         /* PrimeNG Blue */
+  --primary-hover: #2563eb;
+  --accent: #10b981;          /* PrimeNG Emerald */
+  --success: #10b981;
+  --danger: #ef4444;          /* PrimeNG Red */
+  --warning: #f59e0b;         /* PrimeNG Amber */
+  --indigo: #6366f1;          /* PrimeNG Indigo */
+  --teal: #14b8a6;            
   
-  /* Backgrounds & Neutrals */
-  --bg-system: #f2f2f7;       /* iOS light system background */
-  --bg-workspace: #ffffff;    /* iOS card sheet background */
-  --bg-card: #f9f9f9;         /* iOS grouped table cell background */
-  --border-light: rgba(60, 60, 67, 0.08); /* iOS separator color */
-  --border-heavy: rgba(60, 60, 67, 0.18);
+  /* PrimeNG Light Palette */
+  --bg-system: #f8fafc;       /* PrimeNG surface-ground */
+  --bg-workspace: #ffffff;    /* PrimeNG surface-card */
+  --bg-card: #ffffff;         
+  --bg-card-subtle: #f8fafc;
+  --border-light: #e2e8f0;    /* PrimeNG surface-border */
+  --border-heavy: #cbd5e1;
   
   /* Text values */
-  --text-dark: #000000;       /* iOS primary label */
-  --text-medium: #3c3c43;     /* iOS secondary label */
-  --text-light: #3c3c43;      
-  --text-muted: rgba(60, 60, 67, 0.3);
+  --text-dark: #0f172a;       /* PrimeNG text-color */
+  --text-medium: #64748b;     /* PrimeNG text-secondary-color */
+  --text-light: #64748b;      
+  --text-muted: #94a3b8;
   
   /* Dimensions & Spacing */
-  --radius-xl: 18px;          /* iOS Squircle roundings */
-  --radius-lg: 12px;
-  --radius-md: 10px;
+  --radius-xl: 14px;          
+  --radius-lg: 10px;
+  --radius-md: 8px;
   --radius-sm: 6px;
   
-  /* Strict single font family rule for the entire application */
-  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Segoe UI", Arial, sans-serif;
-  --font-mono: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Helvetica Neue", "Segoe UI", Arial, sans-serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
+  --font-mono: -apple-system, BlinkMacSystemFont, "Inter", "Segoe UI", Roboto, sans-serif;
   
   --shadow-flat: 0 1px 3px rgba(0, 0, 0, 0.05);
-  --shadow-hover: 0 10px 40px rgba(0, 0, 0, 0.06);
+  --shadow-hover: 0 10px 25px rgba(0, 0, 0, 0.08);
+}
+
+body.dark-theme {
+  --primary: #3b82f6;
+  --bg-system: #090d16;       /* PrimeNG Dark surface-ground */
+  --bg-workspace: #1f2937;    /* PrimeNG Dark surface-card */
+  --bg-card: #1f2937;
+  --bg-card-subtle: #111827;  /* PrimeNG Dark surface-section */
+  --border-light: #374151;    /* PrimeNG Dark surface-border */
+  --border-heavy: #4b5563;
+  
+  --text-dark: #f3f4f6;       /* PrimeNG Dark text-color */
+  --text-medium: #9ca3af;     /* PrimeNG Dark text-secondary-color */
+  --text-light: #9ca3af;
+  --text-muted: #6b7280;
 }
 
 /* Global Reset */
