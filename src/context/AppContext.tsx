@@ -450,13 +450,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (!saved) return initialClients;
     try {
       const parsed: Client[] = JSON.parse(saved);
-      return parsed.map((c, i) => {
-        if (c.name.includes('Контрагент А') || c.name.includes('Замовник А')) return { ...c, name: 'Замовник №1' };
-        if (c.name.includes('Контрагент Б') || c.name.includes('Замовник Б')) return { ...c, name: 'Замовник №2' };
-        if (c.name.includes('Контрагент В') || c.name.includes('Замовник В')) return { ...c, name: 'Замовник №3' };
-        if (c.name.startsWith('Контрагент')) return { ...c, name: `Замовник №${i + 1}` };
-        return c;
-      });
+      if (parsed.length < 10 || parsed.some(c => c.name.includes('Замовник №') || c.name.includes('Контрагент'))) {
+        return initialClients;
+      }
+      return parsed;
     } catch (e) {
       return initialClients;
     }

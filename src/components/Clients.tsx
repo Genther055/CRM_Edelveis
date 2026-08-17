@@ -582,8 +582,8 @@ export const Clients: React.FC = () => {
           {/* Title Header */}
           <div className="header-title-container">
             <div>
-              <h2 className="page-title">База контрагентів</h2>
-              <p className="subtitle">Сегментація лідів, клієнтів та користувацьких розділів</p>
+              <h2 className="page-title">База замовників</h2>
+              <p className="subtitle">Сегментація лідів, постійних замовників та користувацьких розділів</p>
             </div>
             
             <div style={{ display: 'flex', gap: '8px' }}>
