@@ -222,8 +222,8 @@ button {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.15); /* Light backdrop tint */
-  backdrop-filter: blur(20px);            /* Strong blur */
+  background-color: rgba(0, 0, 0, 0.22); /* Light dim backdrop */
+  backdrop-filter: blur(4px);             /* Subtle light blur */
   z-index: 1000;
   display: flex;
   justify-content: center;
