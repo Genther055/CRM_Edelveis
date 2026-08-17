@@ -139,17 +139,19 @@ export const Calculator: React.FC = () => {
 
   const handleSelectTurnType = (type: 'sam_na_sebe' | 'bez_oborotu' | 'chuzhyi_oborut') => {
     setTurnType(type);
-    setCustomDesignPrice('');
     if (type === 'sam_na_sebe') {
       setIsSamNaSebe(true);
+      setCustomDesignPrice('34');
       if (colors === '1+0') setColors('1+1');
       if (colors === '4+0') setColors('4+4');
     } else if (type === 'bez_oborotu') {
       setIsSamNaSebe(false);
+      setCustomDesignPrice('0');
       if (colors === '1+1') setColors('1+0');
       if (colors === '4+4') setColors('4+0');
     } else if (type === 'chuzhyi_oborut') {
       setIsSamNaSebe(false);
+      setCustomDesignPrice('50');
       if (colors === '1+0') setColors('1+1');
       if (colors === '4+0') setColors('4+4');
     }
@@ -955,15 +957,15 @@ export const Calculator: React.FC = () => {
                     <button 
                       type="button" 
                       onClick={() => handleSelectTurnType('sam_na_sebe')}
-                      className={`ios-btn ${turnType === 'sam_na_sebe' && !customDesignPrice ? 'ios-btn-primary' : 'ios-btn-secondary'}`}
+                      className={`ios-btn ${turnType === 'sam_na_sebe' ? 'ios-btn-primary' : 'ios-btn-secondary'}`}
                       style={{ fontSize: '11px', padding: '6px 12px', height: '32px' }}
                     >
-                      1. Сам на себе ({norms.designSamNaSebe} грн)
+                      1. Сам на себе
                     </button>
                     <button 
                       type="button" 
                       onClick={() => handleSelectTurnType('bez_oborotu')}
-                      className={`ios-btn ${turnType === 'bez_oborotu' && !customDesignPrice ? 'ios-btn-primary' : 'ios-btn-secondary'}`}
+                      className={`ios-btn ${turnType === 'bez_oborotu' ? 'ios-btn-primary' : 'ios-btn-secondary'}`}
                       style={{ fontSize: '11px', padding: '6px 12px', height: '32px' }}
                     >
                       2. Без обороту
@@ -971,14 +973,14 @@ export const Calculator: React.FC = () => {
                     <button 
                       type="button" 
                       onClick={() => handleSelectTurnType('chuzhyi_oborut')}
-                      className={`ios-btn ${turnType === 'chuzhyi_oborut' && !customDesignPrice ? 'ios-btn-primary' : 'ios-btn-secondary'}`}
+                      className={`ios-btn ${turnType === 'chuzhyi_oborut' ? 'ios-btn-primary' : 'ios-btn-secondary'}`}
                       style={{ fontSize: '11px', padding: '6px 12px', height: '32px' }}
                     >
-                      3. Чужий оборот ({norms.designStandard} грн)
+                      3. Чужий оборот
                     </button>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                       <input 
-                        placeholder="Своя ціна (грн)"
+                        placeholder="Ціна макету (грн)"
                         value={customDesignPrice}
                         onChange={(e) => setCustomDesignPrice(e.target.value)}
                         style={{ width: '120px', height: '32px', fontSize: '11px', padding: '0 8px', backgroundColor: customDesignPrice ? 'rgba(0,122,255,0.08)' : undefined }}
