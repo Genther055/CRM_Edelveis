@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { 
   Settings, 
@@ -133,6 +133,20 @@ export const Calculator: React.FC = () => {
     }
     return isSamNaSebe ? norms.designSamNaSebe : norms.designStandard;
   }, [isSamNaSebe, norms, customDesignPrice]);
+
+  // Automatically compose full descriptive product title with customer and chosen options
+  useEffect(() => {
+    const paperName = paperType === 'offset' ? 'Офсетний 70г' : paperType === 'gazetka' ? 'Газетний 45г' : 'Крейдований 130г';
+    const clientTitle = activeClient ? activeClient.name : '';
+    const baseProd = category === 'Бланки' ? subCategory : category;
+    
+    const optionsSummary = `${selectedFormat}, ${paperName}, ${colors}, ${quantity} шт.`;
+    const autoTitle = clientTitle 
+      ? `${baseProd} — ${clientTitle} (${optionsSummary})`
+      : `${baseProd} (${optionsSummary})`;
+
+    setName(autoTitle);
+  }, [category, subCategory, selectedClientId, selectedFormat, paperType, colors, quantity, activeClient]);
 
   const handleSelectSubCategory = (sub: 'Бланки' | 'Листівки') => {
     setSubCategory(sub);
