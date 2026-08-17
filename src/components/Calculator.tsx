@@ -46,7 +46,9 @@ export const Calculator: React.FC = () => {
   const [calcMode, setCalcMode] = useState<'auto' | 'operations'>('auto');
 
   // Input states
-  const [name, setName] = useState('Замовлення №' + Math.floor(Math.random() * 1000));
+  const [orderNumber, setOrderNumber] = useState<number>(() => Math.floor(10000 + Math.random() * 90000));
+  const [subCategory, setSubCategory] = useState<'Бланки' | 'Листівки'>('Бланки');
+  const [name, setName] = useState('Бланки А4');
   const [category, setCategory] = useState<'Візитки' | 'Бланки' | 'Буклети' | 'Книги' | 'Наліпки' | 'Календарі' | 'Блокноти' | 'Папки'>('Бланки');
   const [quantity, setQuantity] = useState(1000);
   const [packingCount, setPackingCount] = useState(1);
@@ -132,14 +134,37 @@ export const Calculator: React.FC = () => {
     return isSamNaSebe ? norms.designSamNaSebe : norms.designStandard;
   }, [isSamNaSebe, norms, customDesignPrice]);
 
+  const handleSelectSubCategory = (sub: 'Бланки' | 'Листівки') => {
+    setSubCategory(sub);
+    if (sub === 'Бланки') {
+      setPaperType('offset');
+      setColors('1+0');
+      setName('Бланки А4');
+      setSelectedFormat('A4');
+    } else {
+      setPaperType('coated');
+      setColors('4+4');
+      setName('Листівки А5');
+      setSelectedFormat('A5');
+    }
+  };
+
   // Select Product from Catalog
   const handleSelectCategory = (cat: 'Візитки' | 'Бланки' | 'Буклети' | 'Книги' | 'Наліпки' | 'Календарі' | 'Блокноти' | 'Папки') => {
     setCategory(cat);
     setStep('editor');
     setCalcMode('auto');
     
-    // Adjust default settings for that product type
-    if (cat === 'Візитки') {
+    if (cat === 'Бланки') {
+      setQuantity(1000);
+      setPaperType('offset');
+      setColors('1+0');
+      setSelectedFormat('A4');
+      setBindingType('none');
+      setLaminationType('none');
+      setName('Бланки А4');
+      setSubCategory('Бланки');
+    } else if (cat === 'Візитки') {
       setQuantity(100);
       setPaperType('coated');
       setColors('4+4');
@@ -456,9 +481,9 @@ export const Calculator: React.FC = () => {
     const specNotes = `Формат: ${selectedFormat} (${orientation}), Скріплення: ${bindingType}, Ламінація: ${laminationType}, Бігів: ${creaseCount} ст.`;
     
     addOrder({
-      name: `${name} [${category}]`,
+      name: `№ ${orderNumber} - ${name} [${category === 'Бланки' ? subCategory : category}]`,
       clientId: selectedClientId,
-      category,
+      category: category === 'Бланки' ? subCategory : category,
       quantity,
       packingCount,
       paperType,
@@ -479,8 +504,10 @@ export const Calculator: React.FC = () => {
       notes: specNotes
     });
 
-    alert('Замовлення успішно створено та надіслано у виробництво!');
-    setName('Замовлення №' + Math.floor(Math.random() * 1000));
+    alert(`Замовлення № ${orderNumber} успішно створено та надіслано у виробництво!`);
+    const nextOrderNum = Math.floor(10000 + Math.random() * 90000);
+    setOrderNumber(nextOrderNum);
+    setName(category === 'Бланки' ? subCategory + ' А4' : category);
   };
 
   const handleSaveAsTemplate = (e: React.FormEvent) => {
@@ -792,15 +819,48 @@ export const Calculator: React.FC = () => {
                   Параметри тиражу
                 </h3>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                {category === 'Бланки' && (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', backgroundColor: '#f8fafc', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', marginBottom: '4px' }}>
+                    <span style={{ fontSize: '11px', fontWeight: '850', color: 'var(--text-dark)', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>Вибір продукції:</span>
+                    <div style={{ display: 'flex', gap: '8px', flexGrow: 1 }}>
+                      <button
+                        type="button"
+                        onClick={() => handleSelectSubCategory('Бланки')}
+                        className={`ios-btn ${subCategory === 'Бланки' ? 'ios-btn-primary' : 'ios-btn-secondary'}`}
+                        style={{ flexGrow: 1, fontSize: '12px', padding: '6px 12px', fontWeight: subCategory === 'Бланки' ? '800' : '500' }}
+                      >
+                        📄 Бланки
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleSelectSubCategory('Листівки')}
+                        className={`ios-btn ${subCategory === 'Листівки' ? 'ios-btn-primary' : 'ios-btn-secondary'}`}
+                        style={{ flexGrow: 1, fontSize: '12px', padding: '6px 12px', fontWeight: subCategory === 'Листівки' ? '800' : '500' }}
+                      >
+                        📜 Листівки
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                <div style={{ display: 'grid', gridTemplateColumns: '110px 1fr 1.2fr', gap: '12px' }}>
                   <div className="ios-input-group" style={{ marginBottom: 0 }}>
-                    <label className="ios-label">Контрагент</label>
+                    <label className="ios-label">№ Замовлення</label>
+                    <input 
+                      value={`#${orderNumber}`} 
+                      disabled 
+                      readOnly
+                      style={{ backgroundColor: '#f2f2f7', cursor: 'not-allowed', fontWeight: '800', color: 'var(--primary)', textAlign: 'center' }} 
+                    />
+                  </div>
+                  <div className="ios-input-group" style={{ marginBottom: 0 }}>
+                    <label className="ios-label">Замовник</label>
                     <select value={selectedClientId} onChange={(e) => setSelectedClientId(e.target.value)}>
                       {clients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                     </select>
                   </div>
                   <div className="ios-input-group" style={{ marginBottom: 0 }}>
-                    <label className="ios-label">Назва розрахунку</label>
+                    <label className="ios-label">Продукція</label>
                     <input value={name} onChange={(e) => setName(e.target.value)} />
                   </div>
                 </div>
