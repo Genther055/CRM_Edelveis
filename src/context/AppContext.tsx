@@ -60,87 +60,63 @@ const initialUsers: User[] = [
 const initialClients: Client[] = [
   { 
     id: '1', 
-    name: 'Замовник А (ТОВ "Едельвейс і К")', 
-    contact: 'Олександр Дмитрович', 
+    name: 'Замовник №1', 
+    contact: 'Представник 1', 
     phone: '+380671234567', 
-    email: 'edelveis@gmail.com', 
+    email: 'zamovnyk1@example.com', 
     discount: 10, 
     city: 'Вінниця',
-    tags: ['Постійний', 'VIP', 'Друкарня'],
-    files: ['Договір_поставки_2026.pdf', 'Реквізити.pdf'],
+    tags: ['Постійний', 'VIP'],
+    files: ['Договір_поставки.pdf'],
     type: 'client'
   },
   { 
     id: '2', 
-    name: 'Замовник Б (ФОП Мельник - "Арома Кава")', 
-    contact: 'Ірина Мельник', 
+    name: 'Замовник №2', 
+    contact: 'Представник 2', 
     phone: '+380939876543', 
-    email: 'aroma.coffee@gmail.com', 
+    email: 'zamovnyk2@example.com', 
     discount: 5, 
     city: 'Вінниця',
-    tags: ['Постійний', 'Меню', 'Листівки'],
-    files: ['Макет_меню_v2.pdf'],
+    tags: ['Постійний', 'Листівки'],
+    files: [],
     type: 'client'
   },
   { 
     id: '3', 
-    name: 'Замовник В (Мережа аптек "Поділля-Фарм")', 
-    contact: 'Сергій Миколайович', 
+    name: 'Замовник №3', 
+    contact: 'Представник 3', 
     phone: '+380501112233', 
-    email: 'pharm.podillya@ukr.net', 
+    email: 'zamovnyk3@example.com', 
     discount: 8, 
     city: 'Вінниця',
-    tags: ['Гурт', 'Буклети', 'Беджі'],
-    files: ['Брендбук_Аптека.pdf'],
+    tags: ['Гурт', 'Буклети'],
+    files: [],
     type: 'client'
   },
   { 
     id: '4', 
-    name: 'Видавництво "Подільська Книга"', 
-    contact: 'Олена Петрівна', 
+    name: 'Замовник №4', 
+    contact: 'Представник 4', 
     phone: '+380975554433', 
-    email: 'books.podillya@gmail.com', 
+    email: 'zamovnyk4@example.com', 
     discount: 12, 
     city: 'Вінниця',
-    tags: ['Книги', 'Тверда обкладинка', 'VIP'],
-    files: ['Техзавдання_Книга_А5.pdf'],
+    tags: ['Книги', 'VIP'],
+    files: [],
     type: 'client'
   },
   { 
     id: '5', 
-    name: 'Студія краси "Beauty Zone"', 
-    contact: 'Марія Ковальчук', 
+    name: 'Замовник №5', 
+    contact: 'Представник 5', 
     phone: '+380637778899', 
-    email: 'beauty.zone.vn@gmail.com', 
+    email: 'zamovnyk5@example.com', 
     discount: 0, 
     city: 'Вінниця',
-    tags: ['Візитки', 'Новий'],
+    tags: ['Новий'],
     files: [],
     type: 'lead'
-  },
-  { 
-    id: '6', 
-    name: 'ТОВ "Агро-Вінниця"', 
-    contact: 'Володимир Васильович', 
-    phone: '+380682223344', 
-    email: 'agro.vin@gmail.com', 
-    discount: 15, 
-    city: 'Вінниця',
-    tags: ['Календарі', 'Гурт', 'Папки'],
-    files: ['Договір_корпоративний.pdf'],
-    type: 'client'
-  },
-  { 
-    id: '7', 
-    name: 'Пивоварня "Вінницьке Крафтове"', 
-    contact: 'Андрій Шевченко', 
-    phone: '+380961239876', 
-    email: 'craft.beer.vn@gmail.com', 
-    discount: 5, 
-    city: 'Вінниця',
-    tags: ['Наліпки', 'Етикетка', 'Постійний'],
-    files: ['Етикетка_пляшка_330мл.ai'],
-    type: 'client'
   }
 ];
 
@@ -388,11 +364,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (!saved) return initialClients;
     try {
       const parsed: Client[] = JSON.parse(saved);
-      return parsed.map((c) => {
-        if (c.name.includes('Контрагент А')) return { ...c, name: 'Замовник А (ТОВ "Едельвейс і К")' };
-        if (c.name.includes('Контрагент Б')) return { ...c, name: 'Замовник Б (ФОП Мельник)' };
-        if (c.name.includes('Контрагент В')) return { ...c, name: 'Замовник В (Поліграф-Сервіс)' };
-        if (c.name.startsWith('Контрагент')) return { ...c, name: c.name.replace('Контрагент', 'Замовник') };
+      return parsed.map((c, i) => {
+        if (c.name.includes('Контрагент А') || c.name.includes('Замовник А')) return { ...c, name: 'Замовник №1' };
+        if (c.name.includes('Контрагент Б') || c.name.includes('Замовник Б')) return { ...c, name: 'Замовник №2' };
+        if (c.name.includes('Контрагент В') || c.name.includes('Замовник В')) return { ...c, name: 'Замовник №3' };
+        if (c.name.startsWith('Контрагент')) return { ...c, name: `Замовник №${i + 1}` };
         return c;
       });
     } catch (e) {
