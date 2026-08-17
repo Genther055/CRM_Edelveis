@@ -105,8 +105,8 @@ export const Triggers: React.FC = () => {
     <div className="main-content bg-[#f2f2f7]">
       <div className="header-title-container">
         <div>
-          <h1 className="page-title text-slate-900">Тригери та Автоматизація</h1>
-          <p className="subtitle">Налаштування автоматичних процесів та правил роботи Keepin Bot</p>
+          <h1 className="page-title text-slate-900">Автоматизація CRM</h1>
+          <p className="subtitle">Конструктор автоматичних правил, сповіщень, авто-ТТН та списання сировини</p>
         </div>
       </div>
 

@@ -14,6 +14,7 @@ import {
   FileSignature, 
   Coins, 
   Sliders, 
+  Zap,
   Settings as SettingsIcon,
   LogOut
 } from 'lucide-react';
@@ -42,7 +43,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
     { id: 'tasks', name: 'Завдання', icon: CheckSquare, visible: true },
     { id: 'documents', name: 'Документи', icon: FileSignature, visible: ['admin', 'manager'].includes(role) },
     { id: 'finance', name: 'Фінанси', icon: Coins, visible: ['admin', 'manager'].includes(role) },
-    { id: 'triggers', name: 'Тригери', icon: Sliders, visible: ['admin'].includes(role) },
+    { id: 'triggers', name: 'Автоматизація', icon: Zap, visible: ['admin', 'manager'].includes(role) },
     { id: 'settings', name: 'Налаштування', icon: SettingsIcon, visible: ['admin'].includes(role) }
   ];
 

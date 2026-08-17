@@ -60,7 +60,7 @@ export const Profile: React.FC = () => {
   };
 
   return (
-    <div className="main-content bg-[#f8fafc]" style={{ overflowY: 'auto', height: '100%', paddingBottom: '40px' }}>
+    <div className="main-content bg-[#f8fafc]" style={{ paddingBottom: '100px', minHeight: '100%' }}>
       
       {/* Top Banner Profile Summary */}
       <div style={{
