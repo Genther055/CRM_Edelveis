@@ -145,114 +145,121 @@ export const Finance: React.FC = () => {
         </div>
       </div>
 
-      {/* BAS 11 Navigation Sub-tabs Menu */}
-      <div style={{ 
-        display: 'flex', 
-        gap: '4px', 
-        overflowX: 'auto', 
-        paddingBottom: '8px', 
-        marginBottom: '20px', 
-        borderBottom: '1px solid var(--border-light)',
-        whiteSpace: 'nowrap'
+      {/* BAS 11 Navigation Sub-tabs Menu Card Header */}
+      <div className="ios-card" style={{ 
+        backgroundColor: 'var(--bg-card)', 
+        border: '1px solid var(--border-light)', 
+        padding: '12px 14px', 
+        marginBottom: '20px',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
       }}>
-        <button
-          onClick={() => setActivePanel('main')}
-          className={`ios-btn ${activePanel === 'main' ? 'ios-btn-primary' : 'ios-btn-secondary'}`}
-          style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', padding: '6px 12px' }}
-        >
-          <Home size={14} />
-          Головне
-        </button>
+        <div style={{ 
+          display: 'flex', 
+          gap: '6px', 
+          overflowX: 'auto', 
+          paddingBottom: '4px',
+          whiteSpace: 'nowrap',
+          alignItems: 'center'
+        }}>
+          <button
+            onClick={() => setActivePanel('main')}
+            className={`ios-btn ${activePanel === 'main' ? 'ios-btn-primary' : 'ios-btn-secondary'}`}
+            style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', padding: '6px 12px' }}
+          >
+            <Home size={14} />
+            Головне
+          </button>
 
-        <button
-          onClick={() => setActivePanel('executive')}
-          className={`ios-btn ${activePanel === 'executive' ? 'ios-btn-primary' : 'ios-btn-secondary'}`}
-          style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', padding: '6px 12px' }}
-        >
-          <Briefcase size={14} />
-          Керівнику
-        </button>
+          <button
+            onClick={() => setActivePanel('executive')}
+            className={`ios-btn ${activePanel === 'executive' ? 'ios-btn-primary' : 'ios-btn-secondary'}`}
+            style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', padding: '6px 12px' }}
+          >
+            <Briefcase size={14} />
+            Керівнику
+          </button>
 
-        <button
-          onClick={() => setActivePanel('bank_cash')}
-          className={`ios-btn ${activePanel === 'bank_cash' ? 'ios-btn-primary' : 'ios-btn-secondary'}`}
-          style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', padding: '6px 12px' }}
-        >
-          <Landmark size={14} />
-          Банк і каса
-        </button>
+          <button
+            onClick={() => setActivePanel('bank_cash')}
+            className={`ios-btn ${activePanel === 'bank_cash' ? 'ios-btn-primary' : 'ios-btn-secondary'}`}
+            style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', padding: '6px 12px' }}
+          >
+            <Landmark size={14} />
+            Банк і каса
+          </button>
 
-        <button
-          onClick={() => setActivePanel('sales')}
-          className={`ios-btn ${activePanel === 'sales' ? 'ios-btn-primary' : 'ios-btn-secondary'}`}
-          style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', padding: '6px 12px' }}
-        >
-          <ShoppingCart size={14} />
-          Продажі
-        </button>
+          <button
+            onClick={() => setActivePanel('sales')}
+            className={`ios-btn ${activePanel === 'sales' ? 'ios-btn-primary' : 'ios-btn-secondary'}`}
+            style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', padding: '6px 12px' }}
+          >
+            <ShoppingCart size={14} />
+            Продажі
+          </button>
 
-        <button
-          onClick={() => setActivePanel('purchases')}
-          className={`ios-btn ${activePanel === 'purchases' ? 'ios-btn-primary' : 'ios-btn-secondary'}`}
-          style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', padding: '6px 12px' }}
-        >
-          <Package size={14} />
-          Купівлі
-        </button>
+          <button
+            onClick={() => setActivePanel('purchases')}
+            className={`ios-btn ${activePanel === 'purchases' ? 'ios-btn-primary' : 'ios-btn-secondary'}`}
+            style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', padding: '6px 12px' }}
+          >
+            <Package size={14} />
+            Купівлі
+          </button>
 
-        <button
-          onClick={() => setActivePanel('fixed_assets')}
-          className={`ios-btn ${activePanel === 'fixed_assets' ? 'ios-btn-primary' : 'ios-btn-secondary'}`}
-          style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', padding: '6px 12px' }}
-        >
-          <HardDrive size={14} />
-          ОЗ і НМА
-        </button>
+          <button
+            onClick={() => setActivePanel('fixed_assets')}
+            className={`ios-btn ${activePanel === 'fixed_assets' ? 'ios-btn-primary' : 'ios-btn-secondary'}`}
+            style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', padding: '6px 12px' }}
+          >
+            <HardDrive size={14} />
+            ОЗ і НМА
+          </button>
 
-        <button
-          onClick={() => setActivePanel('payroll')}
-          className={`ios-btn ${activePanel === 'payroll' ? 'ios-btn-primary' : 'ios-btn-secondary'}`}
-          style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', padding: '6px 12px' }}
-        >
-          <Users size={14} />
-          Зарплата і кадри
-        </button>
+          <button
+            onClick={() => setActivePanel('payroll')}
+            className={`ios-btn ${activePanel === 'payroll' ? 'ios-btn-primary' : 'ios-btn-secondary'}`}
+            style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', padding: '6px 12px' }}
+          >
+            <Users size={14} />
+            Зарплата і кадри
+          </button>
 
-        <button
-          onClick={() => setActivePanel('operations')}
-          className={`ios-btn ${activePanel === 'operations' ? 'ios-btn-primary' : 'ios-btn-secondary'}`}
-          style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', padding: '6px 12px' }}
-        >
-          <BookOpen size={14} />
-          Операції
-        </button>
+          <button
+            onClick={() => setActivePanel('operations')}
+            className={`ios-btn ${activePanel === 'operations' ? 'ios-btn-primary' : 'ios-btn-secondary'}`}
+            style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', padding: '6px 12px' }}
+          >
+            <BookOpen size={14} />
+            Операції
+          </button>
 
-        <button
-          onClick={() => setActivePanel('reports')}
-          className={`ios-btn ${activePanel === 'reports' ? 'ios-btn-primary' : 'ios-btn-secondary'}`}
-          style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', padding: '6px 12px' }}
-        >
-          <FileSpreadsheet size={14} />
-          Звіти
-        </button>
+          <button
+            onClick={() => setActivePanel('reports')}
+            className={`ios-btn ${activePanel === 'reports' ? 'ios-btn-primary' : 'ios-btn-secondary'}`}
+            style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', padding: '6px 12px' }}
+          >
+            <FileSpreadsheet size={14} />
+            Звіти
+          </button>
 
-        <button
-          onClick={() => setActivePanel('dictionaries')}
-          className={`ios-btn ${activePanel === 'dictionaries' ? 'ios-btn-primary' : 'ios-btn-secondary'}`}
-          style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', padding: '6px 12px' }}
-        >
-          <BookMarked size={14} />
-          Довідники
-        </button>
+          <button
+            onClick={() => setActivePanel('dictionaries')}
+            className={`ios-btn ${activePanel === 'dictionaries' ? 'ios-btn-primary' : 'ios-btn-secondary'}`}
+            style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', padding: '6px 12px' }}
+          >
+            <BookMarked size={14} />
+            Довідники
+          </button>
 
-        <button
-          onClick={() => setActivePanel('admin')}
-          className={`ios-btn ${activePanel === 'admin' ? 'ios-btn-primary' : 'ios-btn-secondary'}`}
-          style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', padding: '6px 12px' }}
-        >
-          <ShieldCheck size={14} />
-          Адміністрування
-        </button>
+          <button
+            onClick={() => setActivePanel('admin')}
+            className={`ios-btn ${activePanel === 'admin' ? 'ios-btn-primary' : 'ios-btn-secondary'}`}
+            style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', padding: '6px 12px' }}
+          >
+            <ShieldCheck size={14} />
+            Адміністрування
+          </button>
+        </div>
       </div>
 
       {/* --- PANEL CONTENT SWITCHER --- */}
@@ -260,8 +267,8 @@ export const Finance: React.FC = () => {
       {/* PANEL 1: ГОЛОВНЕ */}
       {activePanel === 'main' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          {/* Executive Overview Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          {/* Executive Overview Cards - Explicit 4-column CSS Grid */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '14px' }}>
             {wallets.map(w => (
               <div key={w.id} className="ios-card" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)', padding: '16px' }}>
                 <span style={{ fontSize: '10px', fontWeight: '750', color: 'var(--text-medium)', textTransform: 'uppercase', display: 'block' }}>{w.name}</span>
@@ -345,7 +352,7 @@ export const Finance: React.FC = () => {
       {/* PANEL 2: КЕРІВНИКУ */}
       {activePanel === 'executive' && (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))', gap: '16px' }}>
             <div className="ios-card" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)', padding: '18px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
                 <span style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-medium)', textTransform: 'uppercase' }}>Валовий прибуток (Margin)</span>
