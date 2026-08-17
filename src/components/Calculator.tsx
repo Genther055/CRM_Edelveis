@@ -880,7 +880,7 @@ export const Calculator: React.FC = () => {
                       padding: '10px 12px', 
                       borderRadius: '8px', 
                       border: '0.5px solid var(--border-light)', 
-                      backgroundColor: '#f9f9f9',
+                      backgroundColor: 'var(--bg-card-subtle)',
                       cursor: 'pointer',
                       fontSize: '12px'
                     }}
@@ -907,7 +907,7 @@ export const Calculator: React.FC = () => {
             </button>
             
             {/* Calculation Mode Selector */}
-            <div style={{ display: 'flex', backgroundColor: 'rgba(120, 120, 128, 0.12)', padding: '2px', borderRadius: '8px' }}>
+            <div style={{ display: 'flex', backgroundColor: 'var(--bg-card-subtle)', border: '1px solid var(--border-light)', padding: '2px', borderRadius: '8px' }}>
               <button
                 type="button"
                 onClick={() => setCalcMode('auto')}
@@ -916,10 +916,9 @@ export const Calculator: React.FC = () => {
                   padding: '6px 12px',
                   fontSize: '12px',
                   borderRadius: '6px',
-                  backgroundColor: calcMode === 'auto' ? '#ffffff' : 'transparent',
-                  color: 'var(--text-dark)',
-                  fontWeight: calcMode === 'auto' ? '700' : '500',
-                  boxShadow: calcMode === 'auto' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'
+                  backgroundColor: calcMode === 'auto' ? 'var(--primary)' : 'transparent',
+                  color: calcMode === 'auto' ? '#ffffff' : 'var(--text-dark)',
+                  fontWeight: calcMode === 'auto' ? '700' : '500'
                 }}
               >
                 Параметричний конструктор
@@ -932,10 +931,9 @@ export const Calculator: React.FC = () => {
                   padding: '6px 12px',
                   fontSize: '12px',
                   borderRadius: '6px',
-                  backgroundColor: calcMode === 'operations' ? '#ffffff' : 'transparent',
-                  color: 'var(--text-dark)',
-                  fontWeight: calcMode === 'operations' ? '700' : '500',
-                  boxShadow: calcMode === 'operations' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none'
+                  backgroundColor: calcMode === 'operations' ? 'var(--primary)' : 'transparent',
+                  color: calcMode === 'operations' ? '#ffffff' : 'var(--text-dark)',
+                  fontWeight: calcMode === 'operations' ? '700' : '500'
                 }}
               >
                 Поопераційний (1С)
@@ -959,13 +957,13 @@ export const Calculator: React.FC = () => {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               
               {/* Product specifications specifications */}
-              <div className="ios-card bg-white space-y-4">
-                <h3 style={{ fontSize: '14px', fontWeight: '800', color: 'var(--text-dark)', borderBottom: '1px solid #f1f5f9', paddingBottom: '8px' }}>
+              <div className="ios-card" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <h3 style={{ fontSize: '14px', fontWeight: '800', color: 'var(--text-dark)', borderBottom: '1px solid var(--border-light)', paddingBottom: '8px' }}>
                   Параметри тиражу
                 </h3>
 
                 {category === 'Бланки' && (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', backgroundColor: '#f8fafc', padding: '10px 12px', borderRadius: '8px', border: '1px solid #cbd5e1', marginBottom: '4px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', backgroundColor: 'var(--bg-card-subtle)', padding: '10px 12px', borderRadius: '8px', border: '1px solid var(--border-light)', marginBottom: '4px' }}>
                     <span style={{ fontSize: '11px', fontWeight: '850', color: 'var(--text-dark)', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>Вибір продукції:</span>
                     <div style={{ display: 'flex', gap: '8px', flexGrow: 1 }}>
                       <button
@@ -990,58 +988,60 @@ export const Calculator: React.FC = () => {
 
                 <div style={{ display: 'grid', gridTemplateColumns: '110px 1fr 1.2fr', gap: '12px' }}>
                   <div className="ios-input-group" style={{ marginBottom: 0 }}>
-                    <label className="ios-label">№ Замовлення</label>
+                    <label className="ios-label" style={{ color: 'var(--text-medium)' }}>№ Замовлення</label>
                     <input 
                       value={`#${orderNumber}`} 
                       disabled 
                       readOnly
-                      style={{ backgroundColor: '#f2f2f7', cursor: 'not-allowed', fontWeight: '800', color: 'var(--primary)', textAlign: 'center' }} 
+                      style={{ backgroundColor: 'var(--bg-card-subtle)', cursor: 'not-allowed', fontWeight: '800', color: 'var(--primary)', textAlign: 'center', border: '1px solid var(--border-light)' }} 
                     />
                   </div>
                   <div className="ios-input-group" style={{ marginBottom: 0 }}>
-                    <label className="ios-label">Замовник</label>
-                    <select value={selectedClientId} onChange={(e) => setSelectedClientId(e.target.value)}>
+                    <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Замовник</label>
+                    <select value={selectedClientId} onChange={(e) => setSelectedClientId(e.target.value)} style={{ backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}>
                       {clients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                     </select>
                   </div>
                   <div className="ios-input-group" style={{ marginBottom: 0 }}>
-                    <label className="ios-label">Продукція</label>
-                    <input value={name} onChange={(e) => setName(e.target.value)} />
+                    <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Продукція</label>
+                    <input value={name} onChange={(e) => setName(e.target.value)} style={{ backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }} />
                   </div>
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1.2fr 1fr', gap: '12px' }}>
                   <div className="ios-input-group" style={{ marginBottom: 0 }}>
-                    <label className="ios-label">Тираж (шт.)</label>
+                    <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Тираж (шт.)</label>
                     <input 
                       type="number" 
                       min="1" 
                       value={quantity} 
                       onChange={(e) => setQuantity(e.target.value === '' ? '' : Number(e.target.value))} 
                       onBlur={() => { if (quantity === '' || Number(quantity) < 1) setQuantity(100); }}
+                      style={{ backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
                     />
                   </div>
                   <div className="ios-input-group" style={{ marginBottom: 0 }}>
-                    <label className="ios-label">Штук в 1 упаковці</label>
+                    <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Штук в 1 упаковці</label>
                     <input 
                       type="number" 
                       min="0" 
                       value={packingCount} 
                       onChange={(e) => setPackingCount(e.target.value === '' ? '' : Number(e.target.value))}
                       onBlur={() => { if (packingCount === '') setPackingCount(1); }} 
+                      style={{ backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
                     />
                   </div>
                   <div className="ios-input-group" style={{ marginBottom: 0 }}>
-                    <label className="ios-label">Матеріал паперу</label>
-                    <select value={paperType} onChange={(e) => setPaperType(e.target.value as any)}>
+                    <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Матеріал паперу</label>
+                    <select value={paperType} onChange={(e) => setPaperType(e.target.value as any)} style={{ backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}>
                       <option value="offset">Офсетний 70г</option>
                       <option value="gazetka">Газетний 45г</option>
                       <option value="coated">Крейдований 130г</option>
                     </select>
                   </div>
                   <div className="ios-input-group" style={{ marginBottom: 0 }}>
-                    <label className="ios-label">Кольоровість</label>
-                    <select value={colors} onChange={(e) => setColors(e.target.value)}>
+                    <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Кольоровість</label>
+                    <select value={colors} onChange={(e) => setColors(e.target.value)} style={{ backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}>
                       <option value="1+0">1+0 (ЧБ 1-стор)</option>
                       <option value="1+1">1+1 (ЧБ 2-стор)</option>
                       <option value="4+0">4+0 (Колір 1-стор)</option>
@@ -1051,7 +1051,7 @@ export const Calculator: React.FC = () => {
                 </div>
 
                 {/* Design selection: 1. Сам на себе, 2. Без обороту, 3. Чужий оборот + вільне поле */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', paddingTop: '10px', borderTop: '0.5px solid var(--border-light)', flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px', paddingTop: '10px', borderTop: '1px solid var(--border-light)', flexWrap: 'wrap' }}>
                   <span style={{ fontSize: '11px', fontWeight: '750', color: 'var(--text-medium)', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>Спуск / Оборот:</span>
                   <div style={{ display: 'flex', gap: '6px', flexGrow: 1, alignItems: 'center', flexWrap: 'wrap' }}>
                     <button 
@@ -1083,7 +1083,7 @@ export const Calculator: React.FC = () => {
                         placeholder="Ціна макету (грн)"
                         value={customDesignPrice}
                         onChange={(e) => setCustomDesignPrice(e.target.value)}
-                        style={{ width: '120px', height: '32px', fontSize: '11px', padding: '0 8px', backgroundColor: customDesignPrice ? 'rgba(0,122,255,0.08)' : undefined }}
+                        style={{ width: '120px', height: '32px', fontSize: '11px', padding: '0 8px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
                       />
                     </div>
                   </div>
@@ -1092,16 +1092,16 @@ export const Calculator: React.FC = () => {
 
               {/* Comprehensive idruk Options Panel */}
               {calcMode === 'auto' && (
-                <div className="ios-card bg-white space-y-4">
-                  <h3 style={{ fontSize: '14px', fontWeight: '800', color: 'var(--text-dark)', borderBottom: '1px solid #f1f5f9', paddingBottom: '8px' }}>
+                <div className="ios-card" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  <h3 style={{ fontSize: '14px', fontWeight: '800', color: 'var(--text-dark)', borderBottom: '1px solid var(--border-light)', paddingBottom: '8px' }}>
                     Технічні специфікації виробу
                   </h3>
 
                   <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
                     {/* Format and Orientation */}
                     <div className="ios-input-group">
-                      <label className="ios-label">Формат виробу</label>
-                      <select value={selectedFormat} onChange={(e) => setSelectedFormat(e.target.value)}>
+                      <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Формат виробу</label>
+                      <select value={selectedFormat} onChange={(e) => setSelectedFormat(e.target.value)} style={{ backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}>
                         <option value="A4">A4 (210х297 мм)</option>
                         <option value="A5">A5 (148х210 мм)</option>
                         <option value="A3">A3 (297х420 мм)</option>
@@ -1111,8 +1111,8 @@ export const Calculator: React.FC = () => {
                     </div>
 
                     <div className="ios-input-group">
-                      <label className="ios-label">Орієнтація</label>
-                      <select value={orientation} onChange={(e) => setOrientation(e.target.value as any)}>
+                      <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Орієнтація</label>
+                      <select value={orientation} onChange={(e) => setOrientation(e.target.value as any)} style={{ backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}>
                         <option value="portrait">Портретна (вертикальна)</option>
                         <option value="landscape">Альбомна (горизонтальна)</option>
                       </select>
@@ -1121,25 +1121,25 @@ export const Calculator: React.FC = () => {
 
                   {/* Multi-page / Book options */}
                   {category === 'Книги' && (
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px', backgroundColor: '#f8fafc', padding: '12px', borderRadius: '8px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px', backgroundColor: 'var(--bg-card-subtle)', padding: '12px', borderRadius: '8px', border: '1px solid var(--border-light)' }}>
                       <div className="ios-input-group">
-                        <label className="ios-label">Обкладинка папір</label>
-                        <select value={coverPaperType} onChange={(e) => setCoverPaperType(e.target.value as any)}>
+                        <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Обкладинка папір</label>
+                        <select value={coverPaperType} onChange={(e) => setCoverPaperType(e.target.value as any)} style={{ backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}>
                           <option value="coated">Крейда 300г</option>
                           <option value="cardboard">Картон 350г</option>
                           <option value="offset">Офсет 150г</option>
                         </select>
                       </div>
                       <div className="ios-input-group">
-                        <label className="ios-label">Кольори обкл.</label>
-                        <select value={coverColors} onChange={(e) => setCoverColors(e.target.value)}>
+                        <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Кольори обкл.</label>
+                        <select value={coverColors} onChange={(e) => setCoverColors(e.target.value)} style={{ backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}>
                           <option value="4+4">4+4 (Повна)</option>
                           <option value="4+0">4+0</option>
                         </select>
                       </div>
                       <div className="ios-input-group">
-                        <label className="ios-label">Стор. блоку</label>
-                        <input type="number" step="4" value={innerPages} onChange={(e) => setInnerPages(Number(e.target.value))} />
+                        <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Стор. блоку</label>
+                        <input type="number" step="4" value={innerPages} onChange={(e) => setInnerPages(Number(e.target.value))} style={{ backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }} />
                       </div>
                     </div>
                   )}
@@ -1148,8 +1148,8 @@ export const Calculator: React.FC = () => {
                   {!(category === 'Бланки' && subCategory === 'Бланки') && (
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px', paddingTop: '10px' }}>
                       <div className="ios-input-group">
-                        <label className="ios-label">Тип скріплення</label>
-                        <select value={bindingType} onChange={(e) => setBindingType(e.target.value as any)}>
+                        <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Тип скріплення</label>
+                        <select value={bindingType} onChange={(e) => setBindingType(e.target.value as any)} style={{ backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}>
                           <option value="none">Без скріплення</option>
                           <option value="staple">Скоба (шиття)</option>
                           <option value="spring">Металева пружина</option>
@@ -1158,8 +1158,8 @@ export const Calculator: React.FC = () => {
                         </select>
                       </div>
                       <div className="ios-input-group">
-                        <label className="ios-label">Ламінування</label>
-                        <select value={laminationType} onChange={(e) => setLaminationType(e.target.value as any)}>
+                        <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Ламінування</label>
+                        <select value={laminationType} onChange={(e) => setLaminationType(e.target.value as any)} style={{ backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}>
                           <option value="none">Без ламінування</option>
                           <option value="gloss">Глянцева плівка</option>
                           <option value="matte">Матова плівка</option>
@@ -1167,8 +1167,8 @@ export const Calculator: React.FC = () => {
                         </select>
                       </div>
                       <div className="ios-input-group">
-                        <label className="ios-label">Кількість бігів</label>
-                        <input type="number" min="0" value={creaseCount} onChange={(e) => setCreaseCount(Number(e.target.value))} />
+                        <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Кількість бігів</label>
+                        <input type="number" min="0" value={creaseCount} onChange={(e) => setCreaseCount(Number(e.target.value))} style={{ backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }} />
                       </div>
                     </div>
                   )}
@@ -1177,33 +1177,33 @@ export const Calculator: React.FC = () => {
 
               {calcMode === 'auto' ? (
                 /* Simple Business Logic Breakdown Output */
-                <div className="ios-card bg-white space-y-4">
-                  <h3 style={{ fontSize: '14px', fontWeight: '800', color: 'var(--text-dark)', borderBottom: '1px solid #f1f5f9', paddingBottom: '8px' }}>
+                <div className="ios-card" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  <h3 style={{ fontSize: '14px', fontWeight: '800', color: 'var(--text-dark)', borderBottom: '1px solid var(--border-light)', paddingBottom: '8px' }}>
                     Склад собівартості
                   </h3>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '13px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-medium)' }}>
                       <span>Переддрукарська підготовка:</span>
-                      <strong style={{ fontFamily: 'var(--font-mono)' }}>{designCost.toFixed(2)} грн</strong>
+                      <strong style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-dark)' }}>{designCost.toFixed(2)} грн</strong>
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-medium)' }}>
                       <span>Витрати паперу:</span>
-                      <strong style={{ fontFamily: 'var(--font-mono)' }}>{calculatedOps.paperCost.toFixed(2)} грн</strong>
+                      <strong style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-dark)' }}>{calculatedOps.paperCost.toFixed(2)} грн</strong>
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-medium)' }}>
                       <span>Прогін на машині ({calculatedOps.machine}):</span>
-                      <strong style={{ fontFamily: 'var(--font-mono)' }}>{calculatedOps.printingCost.toFixed(2)} грн</strong>
+                      <strong style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-dark)' }}>{calculatedOps.printingCost.toFixed(2)} грн</strong>
                     </div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-medium)' }}>
                       <span>Порізка та упаковка:</span>
-                      <strong style={{ fontFamily: 'var(--font-mono)' }}>{(calculatedOps.cuttingCost + calculatedOps.packingCost).toFixed(2)} грн</strong>
+                      <strong style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-dark)' }}>{(calculatedOps.cuttingCost + calculatedOps.packingCost).toFixed(2)} грн</strong>
                     </div>
                   </div>
                 </div>
               ) : (
                 /* Advanced Operations list - exact 1C Replica */
-                <div className="ios-card bg-white" style={{ padding: '16px 0', overflow: 'hidden' }}>
-                  <div style={{ padding: '0 16px 8px 16px', borderBottom: '1px solid #f1f5f9', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div className="ios-card" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)', padding: '16px 0', overflow: 'hidden' }}>
+                  <div style={{ padding: '0 16px 8px 16px', borderBottom: '1px solid var(--border-light)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <h3 style={{ fontSize: '14px', fontWeight: '800', color: 'var(--text-dark)' }}>
                       Виробничі операції та калькуляція собівартості (1С)
                     </h3>
@@ -1215,7 +1215,7 @@ export const Calculator: React.FC = () => {
                   <div className="ios-table-container" style={{ border: 'none', borderRadius: 0 }}>
                     <table className="ios-table" style={{ fontSize: '12px' }}>
                       <thead>
-                        <tr style={{ backgroundColor: '#f8fafc' }}>
+                        <tr style={{ backgroundColor: 'var(--bg-card-subtle)' }}>
                           <th style={{ width: '40px', padding: '10px' }}>[x]</th>
                           <th>Назва операції</th>
                           <th style={{ width: '100px', textAlign: 'right' }}>Тариф (грн)</th>
@@ -1229,13 +1229,13 @@ export const Calculator: React.FC = () => {
                           <td style={{ textAlign: 'center' }}>
                             <input type="checkbox" checked={activeOps.formMaking} onChange={(e) => setActiveOps({ ...activeOps, formMaking: e.target.checked })} />
                           </td>
-                          <td style={{ fontWeight: '700', color: activeOps.formMaking ? 'var(--text-dark)' : '#94a3b8' }}>Копіювання форм / Виготовлення форми</td>
+                          <td style={{ fontWeight: '700', color: activeOps.formMaking ? 'var(--text-dark)' : 'var(--text-medium)' }}>Копіювання форм / Виготовлення форми</td>
                           <td style={{ textAlign: 'right' }}>
                             <input 
                               type="number" 
                               value={opCustomRates.formMaking !== undefined ? opCustomRates.formMaking : norms.formMakingPrice} 
                               onChange={(e) => setOpCustomRates({ ...opCustomRates, formMaking: Number(e.target.value) })}
-                              style={{ height: '24px', padding: '0 4px', textAlign: 'right', fontSize: '11px', width: '80px' }}
+                              style={{ height: '24px', padding: '0 4px', textAlign: 'right', fontSize: '11px', width: '80px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
                             />
                           </td>
                           <td style={{ textAlign: 'center' }}>
@@ -1243,10 +1243,10 @@ export const Calculator: React.FC = () => {
                               type="number" 
                               value={opVolumes.formMaking !== undefined ? opVolumes.formMaking : calculatedOps.actualVolumes.formMaking} 
                               onChange={(e) => setOpVolumes({ ...opVolumes, formMaking: Number(e.target.value) })}
-                              style={{ height: '24px', padding: '0 4px', textAlign: 'center', fontSize: '11px', width: '50px' }}
+                              style={{ height: '24px', padding: '0 4px', textAlign: 'center', fontSize: '11px', width: '50px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
                             />
                           </td>
-                          <td style={{ textAlign: 'right', fontWeight: '800', color: activeOps.formMaking ? 'var(--text-dark)' : '#94a3b8' }}>
+                          <td style={{ textAlign: 'right', fontWeight: '800', color: activeOps.formMaking ? 'var(--text-dark)' : 'var(--text-medium)' }}>
                             {calculatedOps.fullSums.formMaking.toFixed(2)} ₴
                           </td>
                         </tr>
@@ -1256,13 +1256,13 @@ export const Calculator: React.FC = () => {
                           <td style={{ textAlign: 'center' }}>
                             <input type="checkbox" checked={activeOps.filmMounting} onChange={(e) => setActiveOps({ ...activeOps, filmMounting: e.target.checked })} />
                           </td>
-                          <td style={{ fontWeight: '700', color: activeOps.filmMounting ? 'var(--text-dark)' : '#94a3b8' }}>Монтаж плівок (лакофарбових)</td>
+                          <td style={{ fontWeight: '700', color: activeOps.filmMounting ? 'var(--text-dark)' : 'var(--text-medium)' }}>Монтаж плівок (лакофарбових)</td>
                           <td style={{ textAlign: 'right' }}>
                             <input 
                               type="number" 
                               value={opCustomRates.filmMounting !== undefined ? opCustomRates.filmMounting : norms.filmMountingPrice} 
                               onChange={(e) => setOpCustomRates({ ...opCustomRates, filmMounting: Number(e.target.value) })}
-                              style={{ height: '24px', padding: '0 4px', textAlign: 'right', fontSize: '11px', width: '80px' }}
+                              style={{ height: '24px', padding: '0 4px', textAlign: 'right', fontSize: '11px', width: '80px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
                             />
                           </td>
                           <td style={{ textAlign: 'center' }}>
@@ -1270,10 +1270,10 @@ export const Calculator: React.FC = () => {
                               type="number" 
                               value={opVolumes.filmMounting !== undefined ? opVolumes.filmMounting : calculatedOps.actualVolumes.filmMounting} 
                               onChange={(e) => setOpVolumes({ ...opVolumes, filmMounting: Number(e.target.value) })}
-                              style={{ height: '24px', padding: '0 4px', textAlign: 'center', fontSize: '11px', width: '50px' }}
+                              style={{ height: '24px', padding: '0 4px', textAlign: 'center', fontSize: '11px', width: '50px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
                             />
                           </td>
-                          <td style={{ textAlign: 'right', fontWeight: '800', color: activeOps.filmMounting ? 'var(--text-dark)' : '#94a3b8' }}>
+                          <td style={{ textAlign: 'right', fontWeight: '800', color: activeOps.filmMounting ? 'var(--text-dark)' : 'var(--text-medium)' }}>
                             {calculatedOps.fullSums.filmMounting.toFixed(2)} ₴
                           </td>
                         </tr>
@@ -1283,17 +1283,17 @@ export const Calculator: React.FC = () => {
                           <td style={{ textAlign: 'center' }}>
                             <input type="checkbox" checked={activeOps.printing} onChange={(e) => setActiveOps({ ...activeOps, printing: e.target.checked })} />
                           </td>
-                          <td style={{ fontWeight: '700', color: activeOps.printing ? 'var(--text-dark)' : '#94a3b8' }}>Прогон друкарської машини ({calculatedOps.machine})</td>
+                          <td style={{ fontWeight: '700', color: activeOps.printing ? 'var(--text-dark)' : 'var(--text-medium)' }}>Прогон друкарської машини ({calculatedOps.machine})</td>
                           <td style={{ textAlign: 'right' }}>
                             <input 
                               type="number" 
                               value={opCustomRates.printing !== undefined ? opCustomRates.printing : calculatedOps.rates.printing} 
                               onChange={(e) => setOpCustomRates({ ...opCustomRates, printing: Number(e.target.value) })}
-                              style={{ height: '24px', padding: '0 4px', textAlign: 'right', fontSize: '11px', width: '80px' }}
+                              style={{ height: '24px', padding: '0 4px', textAlign: 'right', fontSize: '11px', width: '80px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
                             />
                           </td>
-                          <td style={{ textAlign: 'center', opacity: 0.8, fontSize: '11px', fontWeight: '600' }}>{calculatedOps.actualVolumes.printing} арк</td>
-                          <td style={{ textAlign: 'right', fontWeight: '800', color: activeOps.printing ? 'var(--text-dark)' : '#94a3b8' }}>
+                          <td style={{ textAlign: 'center', opacity: 0.8, fontSize: '11px', fontWeight: '600', color: 'var(--text-dark)' }}>{calculatedOps.actualVolumes.printing} арк</td>
+                          <td style={{ textAlign: 'right', fontWeight: '800', color: activeOps.printing ? 'var(--text-dark)' : 'var(--text-medium)' }}>
                             {calculatedOps.fullSums.printing.toFixed(2)} ₴
                           </td>
                         </tr>
@@ -1303,17 +1303,17 @@ export const Calculator: React.FC = () => {
                           <td style={{ textAlign: 'center' }}>
                             <input type="checkbox" checked={activeOps.lamination} onChange={(e) => setActiveOps({ ...activeOps, lamination: e.target.checked })} />
                           </td>
-                          <td style={{ fontWeight: '700', color: activeOps.lamination ? 'var(--text-dark)' : '#94a3b8' }}>Ламінування (мат / глянець)</td>
+                          <td style={{ fontWeight: '700', color: activeOps.lamination ? 'var(--text-dark)' : 'var(--text-medium)' }}>Ламінування (мат / глянець)</td>
                           <td style={{ textAlign: 'right' }}>
                             <input 
                               type="number" 
                               value={opCustomRates.lamination !== undefined ? opCustomRates.lamination : calculatedOps.rates.lamination} 
                               onChange={(e) => setOpCustomRates({ ...opCustomRates, lamination: Number(e.target.value) })}
-                              style={{ height: '24px', padding: '0 4px', textAlign: 'right', fontSize: '11px', width: '80px' }}
+                              style={{ height: '24px', padding: '0 4px', textAlign: 'right', fontSize: '11px', width: '80px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
                             />
                           </td>
-                          <td style={{ textAlign: 'center', opacity: 0.8, fontSize: '11px', fontWeight: '600' }}>{calculatedOps.actualVolumes.lamination} арк</td>
-                          <td style={{ textAlign: 'right', fontWeight: '800', color: activeOps.lamination ? 'var(--text-dark)' : '#94a3b8' }}>
+                          <td style={{ textAlign: 'center', opacity: 0.8, fontSize: '11px', fontWeight: '600', color: 'var(--text-dark)' }}>{calculatedOps.actualVolumes.lamination} арк</td>
+                          <td style={{ textAlign: 'right', fontWeight: '800', color: activeOps.lamination ? 'var(--text-dark)' : 'var(--text-medium)' }}>
                             {calculatedOps.fullSums.lamination.toFixed(2)} ₴
                           </td>
                         </tr>
@@ -1323,13 +1323,13 @@ export const Calculator: React.FC = () => {
                           <td style={{ textAlign: 'center' }}>
                             <input type="checkbox" checked={activeOps.embossing} onChange={(e) => setActiveOps({ ...activeOps, embossing: e.target.checked })} />
                           </td>
-                          <td style={{ fontWeight: '700', color: activeOps.embossing ? 'var(--text-dark)' : '#94a3b8' }}>Тиснення складне (фольгою)</td>
+                          <td style={{ fontWeight: '700', color: activeOps.embossing ? 'var(--text-dark)' : 'var(--text-medium)' }}>Тиснення складне (фольгою)</td>
                           <td style={{ textAlign: 'right' }}>
                             <input 
                               type="number" 
                               value={opCustomRates.embossing !== undefined ? opCustomRates.embossing : norms.embossingPrice} 
                               onChange={(e) => setOpCustomRates({ ...opCustomRates, embossing: Number(e.target.value) })}
-                              style={{ height: '24px', padding: '0 4px', textAlign: 'right', fontSize: '11px', width: '80px' }}
+                              style={{ height: '24px', padding: '0 4px', textAlign: 'right', fontSize: '11px', width: '80px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
                             />
                           </td>
                           <td style={{ textAlign: 'center' }}>
@@ -1337,10 +1337,10 @@ export const Calculator: React.FC = () => {
                               type="number" 
                               value={opVolumes.embossing !== undefined ? opVolumes.embossing : calculatedOps.actualVolumes.embossing} 
                               onChange={(e) => setOpVolumes({ ...opVolumes, embossing: Number(e.target.value) })}
-                              style={{ height: '24px', padding: '0 4px', textAlign: 'center', fontSize: '11px', width: '60px' }}
+                              style={{ height: '24px', padding: '0 4px', textAlign: 'center', fontSize: '11px', width: '60px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
                             />
                           </td>
-                          <td style={{ textAlign: 'right', fontWeight: '800', color: activeOps.embossing ? 'var(--text-dark)' : '#94a3b8' }}>
+                          <td style={{ textAlign: 'right', fontWeight: '800', color: activeOps.embossing ? 'var(--text-dark)' : 'var(--text-medium)' }}>
                             {calculatedOps.fullSums.embossing.toFixed(2)} ₴
                           </td>
                         </tr>
@@ -1350,13 +1350,13 @@ export const Calculator: React.FC = () => {
                           <td style={{ textAlign: 'center' }}>
                             <input type="checkbox" checked={activeOps.dieCutting} onChange={(e) => setActiveOps({ ...activeOps, dieCutting: e.target.checked })} />
                           </td>
-                          <td style={{ fontWeight: '700', color: activeOps.dieCutting ? 'var(--text-dark)' : '#94a3b8' }}>Висечка штампом</td>
+                          <td style={{ fontWeight: '700', color: activeOps.dieCutting ? 'var(--text-dark)' : 'var(--text-medium)' }}>Висечка штампом</td>
                           <td style={{ textAlign: 'right' }}>
                             <input 
                               type="number" 
                               value={opCustomRates.dieCutting !== undefined ? opCustomRates.dieCutting : norms.dieCuttingPrice} 
                               onChange={(e) => setOpCustomRates({ ...opCustomRates, dieCutting: Number(e.target.value) })}
-                              style={{ height: '24px', padding: '0 4px', textAlign: 'right', fontSize: '11px', width: '80px' }}
+                              style={{ height: '24px', padding: '0 4px', textAlign: 'right', fontSize: '11px', width: '80px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
                             />
                           </td>
                           <td style={{ textAlign: 'center' }}>
@@ -1364,10 +1364,10 @@ export const Calculator: React.FC = () => {
                               type="number" 
                               value={opVolumes.dieCutting !== undefined ? opVolumes.dieCutting : calculatedOps.actualVolumes.dieCutting} 
                               onChange={(e) => setOpVolumes({ ...opVolumes, dieCutting: Number(e.target.value) })}
-                              style={{ height: '24px', padding: '0 4px', textAlign: 'center', fontSize: '11px', width: '60px' }}
+                              style={{ height: '24px', padding: '0 4px', textAlign: 'center', fontSize: '11px', width: '60px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
                             />
                           </td>
-                          <td style={{ textAlign: 'right', fontWeight: '800', color: activeOps.dieCutting ? 'var(--text-dark)' : '#94a3b8' }}>
+                          <td style={{ textAlign: 'right', fontWeight: '800', color: activeOps.dieCutting ? 'var(--text-dark)' : 'var(--text-medium)' }}>
                             {calculatedOps.fullSums.dieCutting.toFixed(2)} ₴
                           </td>
                         </tr>
@@ -1377,13 +1377,13 @@ export const Calculator: React.FC = () => {
                           <td style={{ textAlign: 'center' }}>
                             <input type="checkbox" checked={activeOps.folding} onChange={(e) => setActiveOps({ ...activeOps, folding: e.target.checked })} />
                           </td>
-                          <td style={{ fontWeight: '700', color: activeOps.folding ? 'var(--text-dark)' : '#94a3b8' }}>Біговка / Фальцювання (згини)</td>
+                          <td style={{ fontWeight: '700', color: activeOps.folding ? 'var(--text-dark)' : 'var(--text-medium)' }}>Біговка / Фальцювання (згини)</td>
                           <td style={{ textAlign: 'right' }}>
                             <input 
                               type="number" 
                               value={opCustomRates.folding !== undefined ? opCustomRates.folding : norms.foldingPrice} 
                               onChange={(e) => setOpCustomRates({ ...opCustomRates, folding: Number(e.target.value) })}
-                              style={{ height: '24px', padding: '0 4px', textAlign: 'right', fontSize: '11px', width: '80px' }}
+                              style={{ height: '24px', padding: '0 4px', textAlign: 'right', fontSize: '11px', width: '80px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
                             />
                           </td>
                           <td style={{ textAlign: 'center' }}>
@@ -1391,10 +1391,10 @@ export const Calculator: React.FC = () => {
                               type="number" 
                               value={opVolumes.folding !== undefined ? opVolumes.folding : calculatedOps.actualVolumes.folding} 
                               onChange={(e) => setOpVolumes({ ...opVolumes, folding: Number(e.target.value) })}
-                              style={{ height: '24px', padding: '0 4px', textAlign: 'center', fontSize: '11px', width: '60px' }}
+                              style={{ height: '24px', padding: '0 4px', textAlign: 'center', fontSize: '11px', width: '60px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
                             />
                           </td>
-                          <td style={{ textAlign: 'right', fontWeight: '800', color: activeOps.folding ? 'var(--text-dark)' : '#94a3b8' }}>
+                          <td style={{ textAlign: 'right', fontWeight: '800', color: activeOps.folding ? 'var(--text-dark)' : 'var(--text-medium)' }}>
                             {calculatedOps.fullSums.folding.toFixed(2)} ₴
                           </td>
                         </tr>
@@ -1404,13 +1404,13 @@ export const Calculator: React.FC = () => {
                           <td style={{ textAlign: 'center' }}>
                             <input type="checkbox" checked={activeOps.blockInsertion} onChange={(e) => setActiveOps({ ...activeOps, blockInsertion: e.target.checked })} />
                           </td>
-                          <td style={{ fontWeight: '700', color: activeOps.blockInsertion ? 'var(--text-dark)' : '#94a3b8' }}>Вставка блока брошури</td>
+                          <td style={{ fontWeight: '700', color: activeOps.blockInsertion ? 'var(--text-dark)' : 'var(--text-medium)' }}>Вставка блока брошури</td>
                           <td style={{ textAlign: 'right' }}>
                             <input 
                               type="number" 
                               value={opCustomRates.blockInsertion !== undefined ? opCustomRates.blockInsertion : norms.blockInsertionPrice} 
                               onChange={(e) => setOpCustomRates({ ...opCustomRates, blockInsertion: Number(e.target.value) })}
-                              style={{ height: '24px', padding: '0 4px', textAlign: 'right', fontSize: '11px', width: '80px' }}
+                              style={{ height: '24px', padding: '0 4px', textAlign: 'right', fontSize: '11px', width: '80px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
                             />
                           </td>
                           <td style={{ textAlign: 'center' }}>
@@ -1418,10 +1418,10 @@ export const Calculator: React.FC = () => {
                               type="number" 
                               value={opVolumes.blockInsertion !== undefined ? opVolumes.blockInsertion : calculatedOps.actualVolumes.blockInsertion} 
                               onChange={(e) => setOpVolumes({ ...opVolumes, blockInsertion: Number(e.target.value) })}
-                              style={{ height: '24px', padding: '0 4px', textAlign: 'center', fontSize: '11px', width: '60px' }}
+                              style={{ height: '24px', padding: '0 4px', textAlign: 'center', fontSize: '11px', width: '60px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
                             />
                           </td>
-                          <td style={{ textAlign: 'right', fontWeight: '800', color: activeOps.blockInsertion ? 'var(--text-dark)' : '#94a3b8' }}>
+                          <td style={{ textAlign: 'right', fontWeight: '800', color: activeOps.blockInsertion ? 'var(--text-dark)' : 'var(--text-medium)' }}>
                             {calculatedOps.fullSums.blockInsertion.toFixed(2)} ₴
                           </td>
                         </tr>
@@ -1431,13 +1431,13 @@ export const Calculator: React.FC = () => {
                           <td style={{ textAlign: 'center' }}>
                             <input type="checkbox" checked={activeOps.coverMaking} onChange={(e) => setActiveOps({ ...activeOps, coverMaking: e.target.checked })} />
                           </td>
-                          <td style={{ fontWeight: '700', color: activeOps.coverMaking ? 'var(--text-dark)' : '#94a3b8' }}>Виготовлення кришки твердої</td>
+                          <td style={{ fontWeight: '700', color: activeOps.coverMaking ? 'var(--text-dark)' : 'var(--text-medium)' }}>Виготовлення кришки твердої</td>
                           <td style={{ textAlign: 'right' }}>
                             <input 
                               type="number" 
                               value={opCustomRates.coverMaking !== undefined ? opCustomRates.coverMaking : norms.coverMakingPrice} 
                               onChange={(e) => setOpCustomRates({ ...opCustomRates, coverMaking: Number(e.target.value) })}
-                              style={{ height: '24px', padding: '0 4px', textAlign: 'right', fontSize: '11px', width: '80px' }}
+                              style={{ height: '24px', padding: '0 4px', textAlign: 'right', fontSize: '11px', width: '80px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
                             />
                           </td>
                           <td style={{ textAlign: 'center' }}>
@@ -1445,10 +1445,10 @@ export const Calculator: React.FC = () => {
                               type="number" 
                               value={opVolumes.coverMaking !== undefined ? opVolumes.coverMaking : calculatedOps.actualVolumes.coverMaking} 
                               onChange={(e) => setOpVolumes({ ...opVolumes, coverMaking: Number(e.target.value) })}
-                              style={{ height: '24px', padding: '0 4px', textAlign: 'center', fontSize: '11px', width: '60px' }}
+                              style={{ height: '24px', padding: '0 4px', textAlign: 'center', fontSize: '11px', width: '60px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
                             />
                           </td>
-                          <td style={{ textAlign: 'right', fontWeight: '800', color: activeOps.coverMaking ? 'var(--text-dark)' : '#94a3b8' }}>
+                          <td style={{ textAlign: 'right', fontWeight: '800', color: activeOps.coverMaking ? 'var(--text-dark)' : 'var(--text-medium)' }}>
                             {calculatedOps.fullSums.coverMaking.toFixed(2)} ₴
                           </td>
                         </tr>
@@ -1458,17 +1458,17 @@ export const Calculator: React.FC = () => {
                           <td style={{ textAlign: 'center' }}>
                             <input type="checkbox" checked={activeOps.blockProcessing} onChange={(e) => setActiveOps({ ...activeOps, blockProcessing: e.target.checked })} />
                           </td>
-                          <td style={{ fontWeight: '700', color: activeOps.blockProcessing ? 'var(--text-dark)' : '#94a3b8' }}>Обробка блока (порізка, шліф)</td>
+                          <td style={{ fontWeight: '700', color: activeOps.blockProcessing ? 'var(--text-dark)' : 'var(--text-medium)' }}>Обробка блока (порізка, шліф)</td>
                           <td style={{ textAlign: 'right' }}>
                             <input 
                               type="number" 
                               value={opCustomRates.blockProcessing !== undefined ? opCustomRates.blockProcessing : norms.blockProcessingPrice} 
                               onChange={(e) => setOpCustomRates({ ...opCustomRates, blockProcessing: Number(e.target.value) })}
-                              style={{ height: '24px', padding: '0 4px', textAlign: 'right', fontSize: '11px', width: '80px' }}
+                              style={{ height: '24px', padding: '0 4px', textAlign: 'right', fontSize: '11px', width: '80px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
                             />
                           </td>
-                          <td style={{ textAlign: 'center', opacity: 0.8, fontSize: '11px', fontWeight: '600' }}>{calculatedOps.actualVolumes.blockProcessing} арк</td>
-                          <td style={{ textAlign: 'right', fontWeight: '800', color: activeOps.blockProcessing ? 'var(--text-dark)' : '#94a3b8' }}>
+                          <td style={{ textAlign: 'center', opacity: 0.8, fontSize: '11px', fontWeight: '600', color: 'var(--text-dark)' }}>{calculatedOps.actualVolumes.blockProcessing} арк</td>
+                          <td style={{ textAlign: 'right', fontWeight: '800', color: activeOps.blockProcessing ? 'var(--text-dark)' : 'var(--text-medium)' }}>
                             {calculatedOps.fullSums.blockProcessing.toFixed(2)} ₴
                           </td>
                         </tr>
@@ -1482,25 +1482,25 @@ export const Calculator: React.FC = () => {
 
             {/* Right Side Summary panel */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-              <div className="ios-card bg-white space-y-4">
-                <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Підсумки прорахунку</span>
+              <div className="ios-card" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <span style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-medium)', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block' }}>Підсумки прорахунку</span>
                 
                 <div>
-                  <span style={{ fontSize: '12px', color: '#636366' }}>Ціна продажу для клієнта:</span>
-                  <p style={{ fontSize: '30px', fontWeight: '800', color: 'var(--primary)' }}>
+                  <span style={{ fontSize: '12px', color: 'var(--text-medium)' }}>Ціна продажу для клієнта:</span>
+                  <p style={{ fontSize: '30px', fontWeight: '800', color: 'var(--primary)', margin: '2px 0 0 0' }}>
                     {calculatedOps.finalPrice.toFixed(2)} <span style={{ fontSize: '14px', fontWeight: '600' }}>грн</span>
                   </p>
                   
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', borderTop: '0.5px solid var(--border-light)', paddingTop: '10px', marginTop: '10px', fontSize: '11px' }}>
-                    <div className="flex justify-between">
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', borderTop: '1px solid var(--border-light)', paddingTop: '10px', marginTop: '10px', fontSize: '11px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-medium)' }}>
                       <span>Собівартість виробництва:</span>
-                      <strong>{calculatedOps.subtotal.toFixed(2)} грн</strong>
+                      <strong style={{ color: 'var(--text-dark)' }}>{calculatedOps.subtotal.toFixed(2)} грн</strong>
                     </div>
-                    <div className="flex justify-between">
+                    <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-medium)' }}>
                       <span>Маржа ({marginPercent}%):</span>
-                      <strong>+{calculatedOps.marginAmount.toFixed(2)} грн</strong>
+                      <strong style={{ color: 'var(--text-dark)' }}>+{calculatedOps.marginAmount.toFixed(2)} грн</strong>
                     </div>
-                    <div className="flex justify-between">
+                    <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-medium)' }}>
                       <span>Ціна за одиницю (шт):</span>
                       <strong style={{ color: 'var(--primary)' }}>{calculatedOps.unitPrice.toFixed(2)} грн</strong>
                     </div>
@@ -1511,16 +1511,18 @@ export const Calculator: React.FC = () => {
                 <div style={{
                   padding: '10px',
                   borderRadius: '8px',
-                  backgroundColor: paperWarehouseStatus.hasEnough ? 'rgba(52, 199, 89, 0.08)' : 'rgba(255, 149, 0, 0.08)',
-                  fontSize: '11px'
+                  backgroundColor: paperWarehouseStatus.hasEnough ? 'rgba(16, 185, 129, 0.12)' : 'rgba(245, 158, 11, 0.12)',
+                  color: paperWarehouseStatus.hasEnough ? 'var(--success)' : 'var(--warning)',
+                  fontSize: '11px',
+                  border: '1px solid var(--border-light)'
                 }}>
-                  <strong>Склад:</strong> {paperWarehouseStatus.materialName} ({paperWarehouseStatus.available} доступно, потрібно {calculatedOps.physicalSheets})
+                  <strong style={{ color: 'var(--text-dark)' }}>Склад:</strong> {paperWarehouseStatus.materialName} ({paperWarehouseStatus.available} доступно, потрібно {calculatedOps.physicalSheets})
                 </div>
 
                 {/* Margin manual percentage selector with Range Slider */}
                 <div className="ios-input-group" style={{ marginBottom: 0 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
-                    <label className="ios-label" style={{ marginBottom: 0 }}>Відсоток маржі / націнки:</label>
+                    <label className="ios-label" style={{ marginBottom: 0, color: 'var(--text-medium)' }}>Відсоток маржі / націнки:</label>
                     <span style={{ fontSize: '14px', fontWeight: '800', color: 'var(--primary)' }}>{marginPercent}%</span>
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
@@ -1539,9 +1541,9 @@ export const Calculator: React.FC = () => {
                         min="0"
                         value={marginPercent}
                         onChange={(e) => setMarginPercent(Number(e.target.value))}
-                        style={{ width: '70px', height: '28px', textAlign: 'center', fontSize: '12px' }}
+                        style={{ width: '70px', height: '28px', textAlign: 'center', fontSize: '12px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
                       />
-                      <div style={{ display: 'flex', gap: '2px', backgroundColor: '#f2f2f7', padding: '2px', borderRadius: '6px', flexGrow: 1 }}>
+                      <div style={{ display: 'flex', gap: '2px', backgroundColor: 'var(--bg-card-subtle)', border: '1px solid var(--border-light)', padding: '2px', borderRadius: '6px', flexGrow: 1 }}>
                         {[0, 50, 100, 150, 200].map(m => (
                           <button
                             key={m}
@@ -1552,7 +1554,8 @@ export const Calculator: React.FC = () => {
                               flexGrow: 1,
                               padding: '2px 4px',
                               fontSize: '10px',
-                              backgroundColor: marginPercent === m ? '#ffffff' : 'transparent',
+                              backgroundColor: marginPercent === m ? 'var(--primary)' : 'transparent',
+                              color: marginPercent === m ? '#ffffff' : 'var(--text-dark)',
                               borderRadius: '4px',
                               fontWeight: marginPercent === m ? '800' : '500'
                             }}
@@ -1587,7 +1590,7 @@ export const Calculator: React.FC = () => {
               </div>
 
               {/* Tariffs settings button */}
-              <div className="ios-card bg-white" style={{ padding: '8px 12px' }}>
+              <div className="ios-card" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)', padding: '8px 12px' }}>
                 <button 
                   onClick={() => {
                     if (isAdmin) {
@@ -1598,7 +1601,7 @@ export const Calculator: React.FC = () => {
                     }
                   }}
                   className="ios-btn ios-btn-secondary w-full"
-                  style={{ border: '1px dashed var(--border-heavy)', backgroundColor: 'transparent' }}
+                  style={{ border: '1px dashed var(--border-light)', backgroundColor: 'transparent' }}
                 >
                   <Settings size={13} />
                   Змінити базові тарифи
@@ -1612,90 +1615,90 @@ export const Calculator: React.FC = () => {
       {/* Invoice preview modal */}
       {showInvoice && (
         <div className="ios-modal-overlay">
-          <div className="ios-modal" style={{ maxWidth: '750px' }}>
-            <div className="ios-modal-header">
-              <h3 className="ios-modal-title">Рахунок-Специфікація замовлення</h3>
-              <button onClick={() => setShowInvoice(false)} style={{ border: 'none', background: 'transparent' }}>✕</button>
+          <div className="ios-modal" style={{ maxWidth: '750px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)' }}>
+            <div className="ios-modal-header" style={{ borderBottom: '1px solid var(--border-light)' }}>
+              <h3 className="ios-modal-title" style={{ color: 'var(--text-dark)' }}>Рахунок-Специфікація замовлення</h3>
+              <button onClick={() => setShowInvoice(false)} style={{ border: 'none', background: 'transparent', color: 'var(--text-medium)', cursor: 'pointer' }}>✕</button>
             </div>
             
-            <div className="ios-modal-body" id="invoice-preview-container" style={{ padding: '28px', backgroundColor: '#FFFFFF', color: '#1C1C1E', fontSize: '11px', lineHeight: '1.4' }}>
+            <div className="ios-modal-body" id="invoice-preview-container" style={{ padding: '28px', backgroundColor: 'var(--bg-card)', color: 'var(--text-dark)', fontSize: '11px', lineHeight: '1.4' }}>
               {/* Document Header */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px solid #000', paddingBottom: '12px', marginBottom: '16px', gap: '16px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px solid var(--border-light)', paddingBottom: '12px', marginBottom: '16px', gap: '16px' }}>
                 <div style={{ flexShrink: 0 }}>
-                  <h4 style={{ fontSize: '18px', fontWeight: '900', letterSpacing: '-0.5px', margin: 0 }}>РАХУНОК-СПЕЦИФІКАЦІЯ № {orderNumber}</h4>
-                  <p style={{ fontSize: '11px', color: '#636366', margin: '2px 0 0 0' }}>Поліграфічна компанія «Едельвейс і К»</p>
+                  <h4 style={{ fontSize: '18px', fontWeight: '900', letterSpacing: '-0.5px', margin: 0, color: 'var(--text-dark)' }}>РАХУНОК-СПЕЦИФІКАЦІЯ № {orderNumber}</h4>
+                  <p style={{ fontSize: '11px', color: 'var(--text-medium)', margin: '2px 0 0 0' }}>Поліграфічна компанія «Едельвейс і К»</p>
                 </div>
-                <div style={{ textAlign: 'right', flexGrow: 1, minWidth: '220px', backgroundColor: '#F8FAFC', padding: '8px 14px', borderRadius: '6px', border: '1px solid #E2E8F0' }}>
-                  <p style={{ fontSize: '12px', fontWeight: '700', margin: 0 }}>Дата: {new Date().toLocaleDateString('uk-UA')}</p>
-                  <p style={{ fontSize: '12px', color: '#1E293B', margin: '4px 0 0 0', fontWeight: '600' }}>
-                    Покупець (Замовник): <span style={{ fontWeight: '800', color: '#007AFF', fontSize: '13px' }}>{activeClient?.name || '—'}</span>
+                <div style={{ textAlign: 'right', flexGrow: 1, minWidth: '220px', backgroundColor: 'var(--bg-card-subtle)', padding: '8px 14px', borderRadius: '6px', border: '1px solid var(--border-light)' }}>
+                  <p style={{ fontSize: '12px', fontWeight: '700', margin: 0, color: 'var(--text-dark)' }}>Дата: {new Date().toLocaleDateString('uk-UA')}</p>
+                  <p style={{ fontSize: '12px', color: 'var(--text-medium)', margin: '4px 0 0 0', fontWeight: '600' }}>
+                    Покупець (Замовник): <span style={{ fontWeight: '800', color: 'var(--primary)', fontSize: '13px' }}>{activeClient?.name || '—'}</span>
                   </p>
                 </div>
               </div>
 
               {/* Product Specification & Quantity Banner */}
               <div style={{ display: 'grid', gridTemplateColumns: '2.5fr 1fr', gap: '10px', marginBottom: '16px' }}>
-                <div style={{ backgroundColor: '#F2F2F7', padding: '10px 14px', borderRadius: '6px', border: '1px solid #E5E5EA' }}>
-                  <span style={{ fontSize: '9px', fontWeight: '800', color: '#8E8E93', textTransform: 'uppercase', display: 'block', marginBottom: '2px' }}>Продукція / Специфікація</span>
-                  <p style={{ fontSize: '13px', fontWeight: '800', margin: 0, color: '#000' }}>{name}</p>
+                <div style={{ backgroundColor: 'var(--bg-card-subtle)', padding: '10px 14px', borderRadius: '6px', border: '1px solid var(--border-light)' }}>
+                  <span style={{ fontSize: '9px', fontWeight: '800', color: 'var(--text-medium)', textTransform: 'uppercase', display: 'block', marginBottom: '2px' }}>Продукція / Специфікація</span>
+                  <p style={{ fontSize: '13px', fontWeight: '800', margin: 0, color: 'var(--text-dark)' }}>{name}</p>
                 </div>
-                <div style={{ backgroundColor: '#F2F2F7', padding: '10px 14px', borderRadius: '6px', border: '1px solid #E5E5EA', textAlign: 'right' }}>
-                  <span style={{ fontSize: '9px', fontWeight: '800', color: '#8E8E93', textTransform: 'uppercase', display: 'block', marginBottom: '2px' }}>Тираж замовлення</span>
-                  <p style={{ fontSize: '14px', fontWeight: '900', margin: 0, color: '#007AFF' }}>{quantity} шт.</p>
+                <div style={{ backgroundColor: 'var(--bg-card-subtle)', padding: '10px 14px', borderRadius: '6px', border: '1px solid var(--border-light)', textAlign: 'right' }}>
+                  <span style={{ fontSize: '9px', fontWeight: '800', color: 'var(--text-medium)', textTransform: 'uppercase', display: 'block', marginBottom: '2px' }}>Тираж замовлення</span>
+                  <p style={{ fontSize: '14px', fontWeight: '900', margin: 0, color: 'var(--primary)' }}>{quantity} шт.</p>
                 </div>
               </div>
 
               {/* 1. Матеріали та специфікація паперу */}
               <div style={{ marginBottom: '16px' }}>
-                <h5 style={{ fontSize: '11px', fontWeight: '800', borderBottom: '1px solid #E5E5EA', paddingBottom: '4px', marginBottom: '8px', color: 'var(--primary)', textTransform: 'uppercase', margin: 0 }}>
+                <h5 style={{ fontSize: '11px', fontWeight: '800', borderBottom: '1px solid var(--border-light)', paddingBottom: '4px', marginBottom: '8px', color: 'var(--primary)', textTransform: 'uppercase', margin: 0 }}>
                   1. Матеріали та сировина
                 </h5>
-                <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 1fr', gap: '10px', backgroundColor: '#FAFAFC', padding: '8px 12px', borderRadius: '6px', border: '1px solid #E5E5EA' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 1fr', gap: '10px', backgroundColor: 'var(--bg-card-subtle)', padding: '8px 12px', borderRadius: '6px', border: '1px solid var(--border-light)' }}>
                   <div>
-                    <span style={{ color: '#8E8E93', display: 'block', fontSize: '10px' }}>Матеріал паперу:</span>
-                    <strong style={{ fontSize: '11px' }}>{paperType === 'offset' ? 'Офсетний 70г' : paperType === 'gazetka' ? 'Газетний 45г' : 'Крейдований 130г'}</strong>
+                    <span style={{ color: 'var(--text-medium)', display: 'block', fontSize: '10px' }}>Матеріал паперу:</span>
+                    <strong style={{ fontSize: '11px', color: 'var(--text-dark)' }}>{paperType === 'offset' ? 'Офсетний 70г' : paperType === 'gazetka' ? 'Газетний 45г' : 'Крейдований 130г'}</strong>
                   </div>
                   <div>
-                    <span style={{ color: '#8E8E93', display: 'block', fontSize: '10px' }}>Розмір друкарського листа:</span>
-                    <strong style={{ fontSize: '11px' }}>{calculatedOps.format} ({calculatedOps.format === 'A1' ? '594x841 мм' : calculatedOps.format === 'A2' ? '420x594 мм' : '297x420 мм'})</strong>
+                    <span style={{ color: 'var(--text-medium)', display: 'block', fontSize: '10px' }}>Розмір друкарського листа:</span>
+                    <strong style={{ fontSize: '11px', color: 'var(--text-dark)' }}>{calculatedOps.format} ({calculatedOps.format === 'A1' ? '594x841 мм' : calculatedOps.format === 'A2' ? '420x594 мм' : '297x420 мм'})</strong>
                   </div>
                   <div>
-                    <span style={{ color: '#8E8E93', display: 'block', fontSize: '10px' }}>Обсяг матеріалу:</span>
-                    <strong style={{ fontSize: '11px' }}>{calculatedOps.physicalSheets} арк. (+{Math.ceil(calculatedOps.physicalSheets * 0.05)} тех. відх.)</strong>
+                    <span style={{ color: 'var(--text-medium)', display: 'block', fontSize: '10px' }}>Обсяг матеріалу:</span>
+                    <strong style={{ fontSize: '11px', color: 'var(--text-dark)' }}>{calculatedOps.physicalSheets} арк. (+{Math.ceil(calculatedOps.physicalSheets * 0.05)} тех. відх.)</strong>
                   </div>
                 </div>
               </div>
 
               {/* 2. Процес друку */}
               <div style={{ marginBottom: '16px' }}>
-                <h5 style={{ fontSize: '11px', fontWeight: '800', borderBottom: '1px solid #E5E5EA', paddingBottom: '4px', marginBottom: '8px', color: 'var(--primary)', textTransform: 'uppercase', margin: 0 }}>
+                <h5 style={{ fontSize: '11px', fontWeight: '800', borderBottom: '1px solid var(--border-light)', paddingBottom: '4px', marginBottom: '8px', color: 'var(--primary)', textTransform: 'uppercase', margin: 0 }}>
                   2. Процес друку (Друкарська машина & Параметри)
                 </h5>
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px', border: '1px solid #E5E5EA' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px', border: '1px solid var(--border-light)' }}>
                   <tbody>
-                    <tr style={{ borderBottom: '1px solid #E5E5EA', backgroundColor: '#FAFAFC' }}>
-                      <td style={{ padding: '6px 10px', color: '#636366', width: '30%' }}>Друкарська машина:</td>
-                      <td style={{ padding: '6px 10px', fontWeight: '700', width: '20%' }}>{calculatedOps.machine}</td>
-                      <td style={{ padding: '6px 10px', color: '#636366', width: '30%' }}>Красочність (кольоровість):</td>
-                      <td style={{ padding: '6px 10px', fontWeight: '700', width: '20%' }}>{colors} ({['1+1', '4+4'].includes(colors) ? '2-стор' : '1-стор'})</td>
+                    <tr style={{ borderBottom: '1px solid var(--border-light)', backgroundColor: 'var(--bg-card-subtle)' }}>
+                      <td style={{ padding: '6px 10px', color: 'var(--text-medium)', width: '30%' }}>Друкарська машина:</td>
+                      <td style={{ padding: '6px 10px', fontWeight: '700', color: 'var(--text-dark)', width: '20%' }}>{calculatedOps.machine}</td>
+                      <td style={{ padding: '6px 10px', color: 'var(--text-medium)', width: '30%' }}>Красочність (кольоровість):</td>
+                      <td style={{ padding: '6px 10px', fontWeight: '700', color: 'var(--text-dark)', width: '20%' }}>{colors} ({['1+1', '4+4'].includes(colors) ? '2-стор' : '1-стор'})</td>
                     </tr>
-                    <tr style={{ borderBottom: '1px solid #E5E5EA' }}>
-                      <td style={{ padding: '6px 10px', color: '#636366' }}>Однотипних листів (на арк):</td>
-                      <td style={{ padding: '6px 10px', fontWeight: '700' }}>{calculatedOps.itemsPerSheet} шт./арк</td>
-                      <td style={{ padding: '6px 10px', color: '#636366' }}>Спуск макету / оборот:</td>
-                      <td style={{ padding: '6px 10px', fontWeight: '700' }}>{turnType === 'sam_na_sebe' ? 'Сам на себе (с/с)' : turnType === 'bez_oborotu' ? 'Без обороту' : 'Чужий оборот (ч/о)'}</td>
+                    <tr style={{ borderBottom: '1px solid var(--border-light)' }}>
+                      <td style={{ padding: '6px 10px', color: 'var(--text-medium)' }}>Однотипних листів (на арк):</td>
+                      <td style={{ padding: '6px 10px', fontWeight: '700', color: 'var(--text-dark)' }}>{calculatedOps.itemsPerSheet} шт./арк</td>
+                      <td style={{ padding: '6px 10px', color: 'var(--text-medium)' }}>Спуск макету / оборот:</td>
+                      <td style={{ padding: '6px 10px', fontWeight: '700', color: 'var(--text-dark)' }}>{turnType === 'sam_na_sebe' ? 'Сам на себе (с/с)' : turnType === 'bez_oborotu' ? 'Без обороту' : 'Чужий оборот (ч/о)'}</td>
                     </tr>
-                    <tr style={{ borderBottom: '1px solid #E5E5EA', backgroundColor: '#FAFAFC' }}>
-                      <td style={{ padding: '6px 10px', color: '#636366' }}>Кількість друкованих листів:</td>
-                      <td style={{ padding: '6px 10px', fontWeight: '700' }}>{calculatedOps.physicalSheets} арк</td>
-                      <td style={{ padding: '6px 10px', color: '#636366' }}>Фактичні прогони (прогоно-відбитки):</td>
-                      <td style={{ padding: '6px 10px', fontWeight: '700' }}>{calculatedOps.physicalSheets * (['1+1', '4+4'].includes(colors) ? 2 : 1)} прогонів</td>
+                    <tr style={{ borderBottom: '1px solid var(--border-light)', backgroundColor: 'var(--bg-card-subtle)' }}>
+                      <td style={{ padding: '6px 10px', color: 'var(--text-medium)' }}>Кількість друкованих листів:</td>
+                      <td style={{ padding: '6px 10px', fontWeight: '700', color: 'var(--text-dark)' }}>{calculatedOps.physicalSheets} арк</td>
+                      <td style={{ padding: '6px 10px', color: 'var(--text-medium)' }}>Фактичні прогони (прогоно-відбитки):</td>
+                      <td style={{ padding: '6px 10px', fontWeight: '700', color: 'var(--text-dark)' }}>{calculatedOps.physicalSheets * (['1+1', '4+4'].includes(colors) ? 2 : 1)} прогонів</td>
                     </tr>
                     <tr>
-                      <td style={{ padding: '6px 10px', color: '#636366' }}>Приладка / Форми:</td>
-                      <td style={{ padding: '6px 10px', fontWeight: '700' }}>{['1+1', '4+4'].includes(colors) ? 2 : 1} компл. форм</td>
-                      <td style={{ padding: '6px 10px', color: '#636366' }}>Технічні відходи (приладка):</td>
-                      <td style={{ padding: '6px 10px', fontWeight: '700' }}>+{Math.ceil(calculatedOps.physicalSheets * 0.05)} арк. (5%)</td>
+                      <td style={{ padding: '6px 10px', color: 'var(--text-medium)' }}>Приладка / Форми:</td>
+                      <td style={{ padding: '6px 10px', fontWeight: '700', color: 'var(--text-dark)' }}>{['1+1', '4+4'].includes(colors) ? 2 : 1} компл. форм</td>
+                      <td style={{ padding: '6px 10px', color: 'var(--text-medium)' }}>Технічні відходи (приладка):</td>
+                      <td style={{ padding: '6px 10px', fontWeight: '700', color: 'var(--text-dark)' }}>+{Math.ceil(calculatedOps.physicalSheets * 0.05)} арк. (5%)</td>
                     </tr>
                   </tbody>
                 </table>
@@ -1703,24 +1706,24 @@ export const Calculator: React.FC = () => {
 
               {/* 3. Післядрукарська обробка (Післядрук) */}
               <div style={{ marginBottom: '16px' }}>
-                <h5 style={{ fontSize: '11px', fontWeight: '800', borderBottom: '1px solid #E5E5EA', paddingBottom: '4px', marginBottom: '8px', color: 'var(--primary)', textTransform: 'uppercase', margin: 0 }}>
+                <h5 style={{ fontSize: '11px', fontWeight: '800', borderBottom: '1px solid var(--border-light)', paddingBottom: '4px', marginBottom: '8px', color: 'var(--primary)', textTransform: 'uppercase', margin: 0 }}>
                   3. Післядрукарська обробка (Післядрук)
                 </h5>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '11px' }}>
-                  <div style={{ padding: '6px 10px', border: '1px solid #E5E5EA', borderRadius: '4px', backgroundColor: '#FAFAFC' }}>
-                    <span style={{ color: '#8E8E93' }}>Порізка тиражу:</span> <strong>Формат {selectedFormat}</strong>
+                  <div style={{ padding: '6px 10px', border: '1px solid var(--border-light)', borderRadius: '4px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)' }}>
+                    <span style={{ color: 'var(--text-medium)' }}>Порізка тиражу:</span> <strong style={{ color: 'var(--text-dark)' }}>Формат {selectedFormat}</strong>
                   </div>
-                  <div style={{ padding: '6px 10px', border: '1px solid #E5E5EA', borderRadius: '4px', backgroundColor: '#FAFAFC' }}>
-                    <span style={{ color: '#8E8E93' }}>Ламінування:</span> <strong>{laminationType === 'none' ? 'Без ламінування' : laminationType === 'gloss' ? 'Глянцева плівка' : laminationType === 'matte' ? 'Матова плівка' : 'Soft-touch оксамит'}</strong>
+                  <div style={{ padding: '6px 10px', border: '1px solid var(--border-light)', borderRadius: '4px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)' }}>
+                    <span style={{ color: 'var(--text-medium)' }}>Ламінування:</span> <strong style={{ color: 'var(--text-dark)' }}>{laminationType === 'none' ? 'Без ламінування' : laminationType === 'gloss' ? 'Глянцева плівка' : laminationType === 'matte' ? 'Матова плівка' : 'Soft-touch оксамит'}</strong>
                   </div>
-                  <div style={{ padding: '6px 10px', border: '1px solid #E5E5EA', borderRadius: '4px', backgroundColor: '#FAFAFC' }}>
-                    <span style={{ color: '#8E8E93' }}>Бігування / Фальцювання:</span> <strong>{Number(creaseCount) > 0 ? `${creaseCount} бігів (згинів)` : 'Ні'}</strong>
+                  <div style={{ padding: '6px 10px', border: '1px solid var(--border-light)', borderRadius: '4px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)' }}>
+                    <span style={{ color: 'var(--text-medium)' }}>Бігування / Фальцювання:</span> <strong style={{ color: 'var(--text-dark)' }}>{Number(creaseCount) > 0 ? `${creaseCount} бігів (згинів)` : 'Ні'}</strong>
                   </div>
-                  <div style={{ padding: '6px 10px', border: '1px solid #E5E5EA', borderRadius: '4px', backgroundColor: '#FAFAFC' }}>
-                    <span style={{ color: '#8E8E93' }}>Скріплення:</span> <strong>{bindingType === 'none' ? 'Без скріплення' : bindingType === 'staple' ? 'Скоба (шиття)' : bindingType === 'spring' ? 'Пружина' : bindingType === 'glue' ? 'Клей (КБС)' : 'Тверда палітурка'}</strong>
+                  <div style={{ padding: '6px 10px', border: '1px solid var(--border-light)', borderRadius: '4px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)' }}>
+                    <span style={{ color: 'var(--text-medium)' }}>Скріплення:</span> <strong style={{ color: 'var(--text-dark)' }}>{bindingType === 'none' ? 'Без скріплення' : bindingType === 'staple' ? 'Скоба (шиття)' : bindingType === 'spring' ? 'Пружина' : bindingType === 'glue' ? 'Клей (КБС)' : 'Тверда палітурка'}</strong>
                   </div>
-                  <div style={{ padding: '6px 10px', border: '1px solid #E5E5EA', borderRadius: '4px', backgroundColor: '#FAFAFC', gridColumn: 'span 2' }}>
-                    <span style={{ color: '#8E8E93' }}>Пакування та укладання:</span> <strong>{Number(packingCount) > 0 ? `${calculatedOps.totalPackages} пак. по ${packingCount} шт.` : 'Стандартне пакування'}</strong>
+                  <div style={{ padding: '6px 10px', border: '1px solid var(--border-light)', borderRadius: '4px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', gridColumn: 'span 2' }}>
+                    <span style={{ color: 'var(--text-medium)' }}>Пакування та укладання:</span> <strong style={{ color: 'var(--text-dark)' }}>{Number(packingCount) > 0 ? `${calculatedOps.totalPackages} пак. по ${packingCount} шт.` : 'Стандартне пакування'}</strong>
                   </div>
                 </div>
               </div>
@@ -1772,18 +1775,18 @@ export const Calculator: React.FC = () => {
       {/* Save Template Modal */}
       {showTemplateModal && (
         <div className="ios-modal-overlay">
-          <form onSubmit={handleSaveAsTemplate} className="ios-modal" style={{ maxWidth: '400px' }}>
-            <div className="ios-modal-header">
-              <h3 className="ios-modal-title">Зберегти розрахунок як шаблон</h3>
-              <button type="button" onClick={() => setShowTemplateModal(false)} style={{ border: 'none', background: 'transparent' }}>✕</button>
+          <form onSubmit={handleSaveAsTemplate} className="ios-modal" style={{ maxWidth: '400px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)' }}>
+            <div className="ios-modal-header" style={{ borderBottom: '1px solid var(--border-light)' }}>
+              <h3 className="ios-modal-title" style={{ color: 'var(--text-dark)' }}>Зберегти розрахунок як шаблон</h3>
+              <button type="button" onClick={() => setShowTemplateModal(false)} style={{ border: 'none', background: 'transparent', color: 'var(--text-medium)', cursor: 'pointer' }}>✕</button>
             </div>
             <div className="ios-modal-body">
               <div className="ios-input-group">
-                <label className="ios-label">Назва шаблону *</label>
-                <input required placeholder="напр. Євробуклет 130г 500шт" value={templateName} onChange={(e) => setTemplateName(e.target.value)} />
+                <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Назва шаблону *</label>
+                <input required placeholder="напр. Євробуклет 130г 500шт" value={templateName} onChange={(e) => setTemplateName(e.target.value)} style={{ backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }} />
               </div>
             </div>
-            <div className="ios-modal-footer">
+            <div className="ios-modal-footer" style={{ borderTop: '1px solid var(--border-light)' }}>
               <button type="button" onClick={() => setShowTemplateModal(false)} className="ios-btn ios-btn-secondary">Скасувати</button>
               <button type="submit" className="ios-btn ios-btn-primary">Зберегти шаблон</button>
             </div>
@@ -1794,67 +1797,67 @@ export const Calculator: React.FC = () => {
       {/* Norms settings edit modal (Admin) */}
       {showNorms && isAdmin && (
         <div className="ios-modal-overlay">
-          <div className="ios-modal" style={{ maxWidth: '500px' }}>
-            <div className="ios-modal-header">
-              <h3 className="ios-modal-title">Базові тарифи підприємства</h3>
-              <button onClick={() => setShowNorms(false)} style={{ border: 'none', background: 'transparent' }}>✕</button>
+          <div className="ios-modal" style={{ maxWidth: '500px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)' }}>
+            <div className="ios-modal-header" style={{ borderBottom: '1px solid var(--border-light)' }}>
+              <h3 className="ios-modal-title" style={{ color: 'var(--text-dark)' }}>Базові тарифи підприємства</h3>
+              <button onClick={() => setShowNorms(false)} style={{ border: 'none', background: 'transparent', color: 'var(--text-medium)', cursor: 'pointer' }}>✕</button>
             </div>
             <form onSubmit={(e) => { e.preventDefault(); updateNorms(tempNorms); setShowNorms(false); alert('Тарифи оновлено!'); }}>
               <div className="ios-modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '14px', maxHeight: '420px', overflowY: 'auto' }}>
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Папір та дизайн</span>
+                <span style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-medium)', textTransform: 'uppercase', display: 'block' }}>Папір та дизайн</span>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px' }}>
                   <div className="ios-input-group">
-                    <label className="ios-label">Офсет 70г</label>
-                    <input type="number" step="any" value={tempNorms.paperOffsetPrice} onChange={(e) => setTempNorms({ ...tempNorms, paperOffsetPrice: Number(e.target.value) })} />
+                    <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Офсет 70г</label>
+                    <input type="number" step="any" value={tempNorms.paperOffsetPrice} onChange={(e) => setTempNorms({ ...tempNorms, paperOffsetPrice: Number(e.target.value) })} style={{ backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }} />
                   </div>
                   <div className="ios-input-group">
-                    <label className="ios-label">Газетка 45г</label>
-                    <input type="number" step="any" value={tempNorms.paperGazetkaPrice} onChange={(e) => setTempNorms({ ...tempNorms, paperGazetkaPrice: Number(e.target.value) })} />
+                    <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Газетка 45г</label>
+                    <input type="number" step="any" value={tempNorms.paperGazetkaPrice} onChange={(e) => setTempNorms({ ...tempNorms, paperGazetkaPrice: Number(e.target.value) })} style={{ backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }} />
                   </div>
                   <div className="ios-input-group">
-                    <label className="ios-label">Крейдований 130г</label>
-                    <input type="number" step="any" value={tempNorms.paperCoatedPrice} onChange={(e) => setTempNorms({ ...tempNorms, paperCoatedPrice: Number(e.target.value) })} />
+                    <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Крейдований 130г</label>
+                    <input type="number" step="any" value={tempNorms.paperCoatedPrice} onChange={(e) => setTempNorms({ ...tempNorms, paperCoatedPrice: Number(e.target.value) })} style={{ backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }} />
                   </div>
                 </div>
 
-                <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Післядрукарські тарифи за операцію</span>
+                <span style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-medium)', textTransform: 'uppercase', display: 'block' }}>Післядрукарські тарифи за операцію</span>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                   <div className="ios-input-group">
-                    <label className="ios-label">Виготовлення форм</label>
-                    <input type="number" step="any" value={tempNorms.formMakingPrice} onChange={(e) => setTempNorms({ ...tempNorms, formMakingPrice: Number(e.target.value) })} />
+                    <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Виготовлення форм</label>
+                    <input type="number" step="any" value={tempNorms.formMakingPrice} onChange={(e) => setTempNorms({ ...tempNorms, formMakingPrice: Number(e.target.value) })} style={{ backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }} />
                   </div>
                   <div className="ios-input-group">
-                    <label className="ios-label">Монтаж плівок</label>
-                    <input type="number" step="any" value={tempNorms.filmMountingPrice} onChange={(e) => setTempNorms({ ...tempNorms, filmMountingPrice: Number(e.target.value) })} />
+                    <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Монтаж плівок</label>
+                    <input type="number" step="any" value={tempNorms.filmMountingPrice} onChange={(e) => setTempNorms({ ...tempNorms, filmMountingPrice: Number(e.target.value) })} style={{ backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }} />
                   </div>
                   <div className="ios-input-group">
-                    <label className="ios-label">Мат ламінація</label>
-                    <input type="number" step="any" value={tempNorms.laminationMattePrice} onChange={(e) => setTempNorms({ ...tempNorms, laminationMattePrice: Number(e.target.value) })} />
+                    <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Мат ламінація</label>
+                    <input type="number" step="any" value={tempNorms.laminationMattePrice} onChange={(e) => setTempNorms({ ...tempNorms, laminationMattePrice: Number(e.target.value) })} style={{ backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }} />
                   </div>
                   <div className="ios-input-group">
-                    <label className="ios-label">Глянець ламінація</label>
-                    <input type="number" step="any" value={tempNorms.laminationGlossyPrice} onChange={(e) => setTempNorms({ ...tempNorms, laminationGlossyPrice: Number(e.target.value) })} />
+                    <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Глянець ламінація</label>
+                    <input type="number" step="any" value={tempNorms.laminationGlossyPrice} onChange={(e) => setTempNorms({ ...tempNorms, laminationGlossyPrice: Number(e.target.value) })} style={{ backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }} />
                   </div>
                   <div className="ios-input-group">
-                    <label className="ios-label">Складне тиснення</label>
-                    <input type="number" step="any" value={tempNorms.embossingPrice} onChange={(e) => setTempNorms({ ...tempNorms, embossingPrice: Number(e.target.value) })} />
+                    <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Складне тиснення</label>
+                    <input type="number" step="any" value={tempNorms.embossingPrice} onChange={(e) => setTempNorms({ ...tempNorms, embossingPrice: Number(e.target.value) })} style={{ backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }} />
                   </div>
                   <div className="ios-input-group">
-                    <label className="ios-label">Висічка штампом</label>
-                    <input type="number" step="any" value={tempNorms.dieCuttingPrice} onChange={(e) => setTempNorms({ ...tempNorms, dieCuttingPrice: Number(e.target.value) })} />
+                    <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Висічка штампом</label>
+                    <input type="number" step="any" value={tempNorms.dieCuttingPrice} onChange={(e) => setTempNorms({ ...tempNorms, dieCuttingPrice: Number(e.target.value) })} style={{ backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }} />
                   </div>
                   <div className="ios-input-group">
-                    <label className="ios-label">Біговка (згин)</label>
-                    <input type="number" step="any" value={tempNorms.foldingPrice} onChange={(e) => setTempNorms({ ...tempNorms, foldingPrice: Number(e.target.value) })} />
+                    <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Біговка (згин)</label>
+                    <input type="number" step="any" value={tempNorms.foldingPrice} onChange={(e) => setTempNorms({ ...tempNorms, foldingPrice: Number(e.target.value) })} style={{ backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }} />
                   </div>
                   <div className="ios-input-group">
-                    <label className="ios-label">Вставка блока</label>
-                    <input type="number" step="any" value={tempNorms.blockInsertionPrice} onChange={(e) => setTempNorms({ ...tempNorms, blockInsertionPrice: Number(e.target.value) })} />
+                    <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Вставка блока</label>
+                    <input type="number" step="any" value={tempNorms.blockInsertionPrice} onChange={(e) => setTempNorms({ ...tempNorms, blockInsertionPrice: Number(e.target.value) })} style={{ backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }} />
                   </div>
                 </div>
 
               </div>
-              <div className="ios-modal-footer">
+              <div className="ios-modal-footer" style={{ borderTop: '1px solid var(--border-light)' }}>
                 <button type="button" onClick={() => setShowNorms(false)} className="ios-btn ios-btn-secondary">Скасувати</button>
                 <button type="submit" className="ios-btn ios-btn-primary">Зберегти зміни</button>
               </div>
