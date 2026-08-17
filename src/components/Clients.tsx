@@ -612,7 +612,7 @@ export const Clients: React.FC = () => {
             
             {/* Left Segment Sidebar filters */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              <div style={{ padding: '4px 8px', fontSize: '11px', fontWeight: '800', color: '#8e8e93', textTransform: 'uppercase' }}>
+              <div style={{ padding: '4px 8px', fontSize: '11px', fontWeight: '800', color: 'var(--text-medium)', textTransform: 'uppercase' }}>
                 Сегменти бази
               </div>
               
@@ -624,8 +624,9 @@ export const Clients: React.FC = () => {
                   width: '100%',
                   textAlign: 'left',
                   justifyContent: 'flex-start',
-                  backgroundColor: activeSegmentFilter === 'all' ? 'var(--primary)' : '#ffffff',
-                  color: activeSegmentFilter === 'all' ? '#ffffff' : 'var(--text-dark)'
+                  backgroundColor: activeSegmentFilter === 'all' ? 'var(--primary)' : 'var(--bg-card)',
+                  color: activeSegmentFilter === 'all' ? '#ffffff' : 'var(--text-dark)',
+                  border: activeSegmentFilter === 'all' ? 'none' : '1px solid var(--border-light)'
                 }}
               >
                 <Filter size={13} />
@@ -640,8 +641,9 @@ export const Clients: React.FC = () => {
                   width: '100%',
                   textAlign: 'left',
                   justifyContent: 'flex-start',
-                  backgroundColor: activeSegmentFilter === 'leads' ? 'var(--primary)' : '#ffffff',
-                  color: activeSegmentFilter === 'leads' ? '#ffffff' : 'var(--text-dark)'
+                  backgroundColor: activeSegmentFilter === 'leads' ? 'var(--primary)' : 'var(--bg-card)',
+                  color: activeSegmentFilter === 'leads' ? '#ffffff' : 'var(--text-dark)',
+                  border: activeSegmentFilter === 'leads' ? 'none' : '1px solid var(--border-light)'
                 }}
               >
                 <Sliders size={13} />
@@ -656,8 +658,9 @@ export const Clients: React.FC = () => {
                   width: '100%',
                   textAlign: 'left',
                   justifyContent: 'flex-start',
-                  backgroundColor: activeSegmentFilter === 'clients' ? 'var(--primary)' : '#ffffff',
-                  color: activeSegmentFilter === 'clients' ? '#ffffff' : 'var(--text-dark)'
+                  backgroundColor: activeSegmentFilter === 'clients' ? 'var(--primary)' : 'var(--bg-card)',
+                  color: activeSegmentFilter === 'clients' ? '#ffffff' : 'var(--text-dark)',
+                  border: activeSegmentFilter === 'clients' ? 'none' : '1px solid var(--border-light)'
                 }}
               >
                 <User size={13} />
@@ -667,7 +670,7 @@ export const Clients: React.FC = () => {
               {/* User Custom sections listing */}
               {clientSections.length > 0 && (
                 <>
-                  <div style={{ padding: '12px 8px 4px 8px', fontSize: '11px', fontWeight: '800', color: '#8e8e93', textTransform: 'uppercase' }}>
+                  <div style={{ padding: '12px 8px 4px 8px', fontSize: '11px', fontWeight: '800', color: 'var(--text-medium)', textTransform: 'uppercase' }}>
                     Користувацькі розділи
                   </div>
                   {clientSections.map(sec => (
@@ -680,8 +683,9 @@ export const Clients: React.FC = () => {
                         width: '100%',
                         textAlign: 'left',
                         justifyContent: 'space-between',
-                        backgroundColor: activeSegmentFilter === `section_${sec.id}` ? 'var(--primary)' : '#ffffff',
-                        color: activeSegmentFilter === `section_${sec.id}` ? '#ffffff' : 'var(--text-dark)'
+                        backgroundColor: activeSegmentFilter === `section_${sec.id}` ? 'var(--primary)' : 'var(--bg-card)',
+                        color: activeSegmentFilter === `section_${sec.id}` ? '#ffffff' : 'var(--text-dark)',
+                        border: activeSegmentFilter === `section_${sec.id}` ? 'none' : '1px solid var(--border-light)'
                       }}
                     >
                       <span className="flex items-center gap-1.5 truncate">
