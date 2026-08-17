@@ -124,7 +124,7 @@ export const Calculator: React.FC = () => {
     return clients.find(c => c.id === selectedClientId) || null;
   }, [clients, selectedClientId]);
 
-  const [customDesignPrice, setCustomDesignPrice] = useState<string>('');
+  const [customDesignPrice, setCustomDesignPrice] = useState<string>('34');
 
   // Determine standard or sam na sebe or custom design cost
   const designCost = useMemo(() => {
@@ -175,20 +175,45 @@ export const Calculator: React.FC = () => {
 
   const handleSelectSubCategory = (sub: 'Бланки' | 'Листівки') => {
     setSubCategory(sub);
+    setTurnType('sam_na_sebe');
+    setCustomDesignPrice('34');
+    setIsSamNaSebe(true);
     if (sub === 'Бланки') {
       setPaperType('offset');
       setColors('1+0');
-      setName('Бланки А4');
       setSelectedFormat('A4');
       setLaminationType('none');
       setCreaseCount(0);
+      setActiveOps({
+        formMaking: true,
+        filmMounting: true,
+        printing: true,
+        lamination: false,
+        embossing: false,
+        dieCutting: false,
+        folding: false,
+        blockInsertion: false,
+        coverMaking: false,
+        blockProcessing: true
+      });
     } else {
       setPaperType('coated');
       setColors('4+4');
-      setName('Листівки А5');
       setSelectedFormat('A5');
       setLaminationType('none');
       setCreaseCount(0);
+      setActiveOps({
+        formMaking: true,
+        filmMounting: true,
+        printing: true,
+        lamination: false,
+        embossing: false,
+        dieCutting: false,
+        folding: false,
+        blockInsertion: false,
+        coverMaking: false,
+        blockProcessing: true
+      });
     }
   };
 
