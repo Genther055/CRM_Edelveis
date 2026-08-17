@@ -49,18 +49,20 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
   return (
     <div style={{
       width: '230px',
-      height: '100%',
+      height: '100vh',
+      maxHeight: '100vh',
       backgroundColor: '#ffffff', // Clean premium white sidebar
       display: 'flex',
       flexDirection: 'column',
-      padding: '20px 14px',
+      padding: '16px 12px',
       justifyContent: 'space-between',
       alignItems: 'stretch',
       flexShrink: 0,
       borderRight: '1px solid var(--border-light)',
-      zIndex: 40
+      zIndex: 40,
+      overflowY: 'auto'
     }}>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', width: '100%' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%', minHeight: 0, flexGrow: 1 }}>
         {/* User Profile Avatar at the top (Shows Name and Role next to it) */}
         <div 
           onClick={() => setActiveTab('profile')}
@@ -73,7 +75,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
             padding: '8px',
             borderRadius: '10px',
             backgroundColor: activeTab === 'profile' ? 'rgba(0,122,255,0.08)' : 'transparent',
-            transition: 'background-color 0.2s ease'
+            transition: 'background-color 0.2s ease',
+            flexShrink: 0
           }}
         >
           <div 
@@ -107,7 +110,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
         <div style={{
           width: '100%',
           overflowY: 'auto',
-          maxHeight: 'calc(100vh - 170px)',
+          flexGrow: 1,
+          minHeight: 0,
           display: 'flex',
           flexDirection: 'column',
           gap: '4px'

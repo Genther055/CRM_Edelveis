@@ -466,9 +466,19 @@ button {
 }
 
 .sidebar-scroll-container::-webkit-scrollbar {
-  display: none;
+  width: 4px;
+}
+.sidebar-scroll-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar-scroll-container::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+}
+.sidebar-scroll-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 122, 255, 0.5);
 }
 .sidebar-scroll-container {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
+  -ms-overflow-style: auto;
+  scrollbar-width: thin;
 }
