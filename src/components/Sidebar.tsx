@@ -56,14 +56,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
       width: '230px',
       height: '100vh',
       maxHeight: '100vh',
-      backgroundColor: isDark ? '#161b22' : '#ffffff',
+      backgroundColor: isDark ? '#111827' : '#ffffff',
       display: 'flex',
       flexDirection: 'column',
       padding: '16px 12px',
       justifyContent: 'space-between',
       alignItems: 'stretch',
       flexShrink: 0,
-      borderRight: isDark ? '1px solid #21262d' : '1px solid var(--border-light)',
+      borderRight: isDark ? '1px solid #1f2937' : '1px solid var(--border-light)',
       zIndex: 40,
       overflowY: 'auto'
     }}>
@@ -77,39 +77,40 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
             gap: '10px', 
             width: '100%', 
             cursor: 'pointer',
-            padding: '8px',
-            borderRadius: '10px',
+            padding: '8px 10px',
+            borderRadius: '8px',
             backgroundColor: activeTab === 'profile' 
-              ? (isDark ? '#21262d' : 'rgba(0,122,255,0.08)') 
-              : 'transparent',
-            transition: 'background-color 0.2s ease',
+              ? (isDark ? '#1f2937' : 'rgba(0,122,255,0.08)') 
+              : (isDark ? 'rgba(255, 255, 255, 0.03)' : 'transparent'),
+            border: isDark ? '1px solid #374151' : 'none',
+            transition: 'all 0.15s ease',
             flexShrink: 0
           }}
         >
           <div 
             style={{
-              width: '36px',
-              height: '36px',
+              width: '34px',
+              height: '34px',
               borderRadius: '50%',
-              backgroundColor: isDark ? '#21262d' : '#f4f4f6',
+              backgroundColor: isDark ? '#374151' : '#f4f4f6',
               border: activeTab === 'profile' 
-                ? (isDark ? '2px solid #38bdf8' : '2px solid var(--primary)') 
-                : (isDark ? '1px solid #30363d' : '1px solid var(--border-light)'),
+                ? (isDark ? '2px solid #3b82f6' : '2px solid var(--primary)') 
+                : (isDark ? '1px solid #4b5563' : '1px solid var(--border-light)'),
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: isDark ? '#f0f6fc' : 'var(--text-dark)',
+              color: isDark ? '#f3f4f6' : 'var(--text-dark)',
               overflow: 'hidden',
               flexShrink: 0
             }}
           >
-            <UserIcon size={18} />
+            <UserIcon size={17} />
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-            <span style={{ fontSize: '12px', fontWeight: '800', color: isDark ? '#f0f6fc' : 'var(--text-dark)', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
+            <span style={{ fontSize: '12px', fontWeight: '750', color: isDark ? '#f3f4f6' : 'var(--text-dark)', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
               {currentUser?.name || 'Гість'}
             </span>
-            <span style={{ fontSize: '10px', color: isDark ? '#8b949e' : 'var(--text-medium)', opacity: 0.8 }}>
+            <span style={{ fontSize: '10px', color: isDark ? '#9ca3af' : 'var(--text-medium)', fontWeight: '500' }}>
               {role === 'admin' ? 'Адміністратор' : role === 'manager' ? 'Менеджер' : 'Оператор'}
             </span>
           </div>
@@ -123,9 +124,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
           minHeight: 0,
           display: 'flex',
           flexDirection: 'column',
-          gap: '4px'
+          gap: '3px'
         }} className="sidebar-scroll-container">
-          <nav style={{ display: 'flex', flexDirection: 'column', gap: '4px', width: '100%' }}>
+          <nav style={{ display: 'flex', flexDirection: 'column', gap: '3px', width: '100%' }}>
             {menuItems.map(item => {
               if (!item.visible) return null;
               const Icon = item.icon;
@@ -141,28 +142,35 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
                     gap: '12px',
                     width: '100%',
                     padding: '8px 12px',
-                    borderRadius: '8px',
+                    borderRadius: '6px',
                     border: 'none',
                     backgroundColor: isActive 
-                      ? (isDark ? '#21262d' : 'var(--primary)') 
+                      ? (isDark ? 'rgba(59, 130, 246, 0.16)' : 'var(--primary)') 
                       : 'transparent',
                     color: isActive 
-                      ? (isDark ? '#38bdf8' : '#ffffff') 
-                      : (isDark ? '#c9d1d9' : 'var(--text-dark)'),
+                      ? (isDark ? '#60a5fa' : '#ffffff') 
+                      : (isDark ? '#9ca3af' : 'var(--text-dark)'),
                     cursor: 'pointer',
                     transition: 'all 0.15s ease',
-                    fontWeight: isActive ? '800' : '600',
+                    fontWeight: isActive ? '750' : '500',
                     fontSize: '12px',
-                    textAlign: 'left'
+                    textAlign: 'left',
+                    borderLeft: isActive && isDark ? '3px solid #3b82f6' : '3px solid transparent'
                   }}
                   onMouseEnter={(e) => {
-                    if (!isActive) e.currentTarget.style.backgroundColor = isDark ? 'rgba(255, 255, 255, 0.05)' : '#f4f4f6';
+                    if (!isActive) {
+                      e.currentTarget.style.backgroundColor = isDark ? 'rgba(255, 255, 255, 0.05)' : '#f4f4f6';
+                      if (isDark) e.currentTarget.style.color = '#f3f4f6';
+                    }
                   }}
                   onMouseLeave={(e) => {
-                    if (!isActive) e.currentTarget.style.backgroundColor = 'transparent';
+                    if (!isActive) {
+                      e.currentTarget.style.backgroundColor = 'transparent';
+                      if (isDark) e.currentTarget.style.color = '#9ca3af';
+                    }
                   }}
                 >
-                  <Icon size={16} style={{ flexShrink: 0, color: isActive ? (isDark ? '#38bdf8' : '#ffffff') : 'inherit' }} />
+                  <Icon size={16} style={{ flexShrink: 0, color: isActive ? (isDark ? '#60a5fa' : '#ffffff') : 'inherit' }} />
                   <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {item.name}
                   </span>
