@@ -663,7 +663,7 @@ export const Calculator: React.FC = () => {
     if (!element) return;
 
     const safeName = name.replace(/[\\/:*?"<>|]/g, '').trim().replace(/\s+/g, '_');
-    const fileName = `Рахунок-Специфікація_№${orderNumber}_${safeName}.pdf`;
+    const fileName = `№${orderNumber}_${safeName}.pdf`;
 
     // Clone element to a temporary clean container on document.body to eliminate modal position Y-offset blank page bug
     const tempContainer = document.createElement('div');
