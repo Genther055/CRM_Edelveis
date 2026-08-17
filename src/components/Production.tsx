@@ -370,7 +370,7 @@ export const Production: React.FC = () => {
                 <tr>
                   <th style={{ width: '90px' }}>№ Наряду</th>
                   <th>Назва замовлення / Продукція</th>
-                  <th>Контрагент</th>
+                  <th>Замовник</th>
                   <th>Тираж / Формат</th>
                   <th>Специфікація та папір</th>
                   <th style={{ textAlign: 'right' }}>Вартість</th>

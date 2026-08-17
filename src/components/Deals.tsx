@@ -203,7 +203,7 @@ export const Deals: React.FC = () => {
           <p className="subtitle">Керування воронками дистрибуції, B2B друком та роздрібними POS-чеками</p>
         </div>
         
-        <div style={{ display: 'flex', gap: '4px', backgroundColor: 'rgba(120, 120, 128, 0.12)', padding: '2px', borderRadius: '8px' }}>
+        <div style={{ display: 'flex', gap: '4px', backgroundColor: 'var(--bg-card-subtle)', border: '1px solid var(--border-light)', padding: '2px', borderRadius: '8px' }}>
           <button
             type="button"
             onClick={() => setActivePipeline('b2b')}
@@ -212,9 +212,8 @@ export const Deals: React.FC = () => {
               padding: '6px 12px',
               fontSize: '11px',
               borderRadius: '6px',
-              backgroundColor: activePipeline === 'b2b' ? '#ffffff' : 'transparent',
-              color: 'var(--text-dark)',
-              boxShadow: activePipeline === 'b2b' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+              backgroundColor: activePipeline === 'b2b' ? 'var(--primary)' : 'transparent',
+              color: activePipeline === 'b2b' ? '#ffffff' : 'var(--text-dark)',
               fontWeight: activePipeline === 'b2b' ? '700' : '500'
             }}
           >
@@ -228,9 +227,8 @@ export const Deals: React.FC = () => {
               padding: '6px 12px',
               fontSize: '11px',
               borderRadius: '6px',
-              backgroundColor: activePipeline === 'pos' ? '#ffffff' : 'transparent',
-              color: 'var(--text-dark)',
-              boxShadow: activePipeline === 'pos' ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+              backgroundColor: activePipeline === 'pos' ? 'var(--primary)' : 'transparent',
+              color: activePipeline === 'pos' ? '#ffffff' : 'var(--text-dark)',
               fontWeight: activePipeline === 'pos' ? '700' : '500'
             }}
           >
@@ -243,24 +241,24 @@ export const Deals: React.FC = () => {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', flexGrow: 1 }}>
           
           {/* Filters Panel */}
-          <div className="ios-card bg-white space-y-3" style={{ padding: '16px' }}>
+          <div className="ios-card" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)', padding: '16px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
             <div style={{ display: 'flex', gap: '12px', alignItems: 'center', flexWrap: 'wrap' }}>
               <div style={{ position: 'relative', width: '280px' }}>
-                <Search style={{ position: 'absolute', left: '10px', top: '9px', color: '#94a3b8' }} size={14} />
+                <Search style={{ position: 'absolute', left: '10px', top: '9px', color: 'var(--text-medium)' }} size={14} />
                 <input 
                   placeholder="Пошук угоди..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  style={{ paddingLeft: '32px', height: '32px', fontSize: '12px', width: '100%' }}
+                  style={{ paddingLeft: '32px', height: '32px', fontSize: '12px', width: '100%', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
                 />
               </div>
 
               <div style={{ display: 'flex', gap: '8px', alignItems: 'center', fontSize: '12px' }}>
-                <span style={{ fontWeight: '750', color: '#636366' }}>Важливість:</span>
+                <span style={{ fontWeight: '750', color: 'var(--text-medium)' }}>Важливість:</span>
                 <select 
                   value={importantFilter} 
                   onChange={(e) => setImportantFilter(e.target.value as any)}
-                  style={{ height: '32px', fontSize: '11px', width: '120px' }}
+                  style={{ height: '32px', fontSize: '11px', width: '120px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
                 >
                   <option value="all">Всі угоди</option>
                   <option value="important">⭐ Важливі (VIP)</option>
@@ -268,11 +266,11 @@ export const Deals: React.FC = () => {
               </div>
 
               <div style={{ display: 'flex', gap: '8px', alignItems: 'center', fontSize: '12px' }}>
-                <span style={{ fontWeight: '750', color: '#636366' }}>Статус оплати:</span>
+                <span style={{ fontWeight: '750', color: 'var(--text-medium)' }}>Статус оплати:</span>
                 <select 
                   value={paymentFilter} 
                   onChange={(e) => setPaymentFilter(e.target.value as any)}
-                  style={{ height: '32px', fontSize: '11px', width: '130px' }}
+                  style={{ height: '32px', fontSize: '11px', width: '130px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
                 >
                   <option value="all">Всі оплати</option>
                   <option value="unpaid">Неоплачені</option>
@@ -282,20 +280,20 @@ export const Deals: React.FC = () => {
               </div>
             </div>
 
-            <div style={{ display: 'flex', gap: '10px', alignItems: 'center', fontSize: '11px', borderTop: '0.5px solid var(--border-light)', paddingTop: '10px' }}>
-              <span style={{ fontWeight: '700', color: '#8e8e93', display: 'flex', alignItems: 'center', gap: '4px' }}>
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center', fontSize: '11px', borderTop: '1px solid var(--border-light)', paddingTop: '10px', color: 'var(--text-medium)' }}>
+              <span style={{ fontWeight: '700', color: 'var(--text-medium)', display: 'flex', alignItems: 'center', gap: '4px' }}>
                 <Sliders size={12} />
                 Поля картки:
               </span>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer', color: 'var(--text-dark)' }}>
                 <input type="checkbox" checked={showProductCol} onChange={(e) => setShowProductCol(e.target.checked)} />
                 Папір
               </label>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer', color: 'var(--text-dark)' }}>
                 <input type="checkbox" checked={showTtnNumberCol} onChange={(e) => setShowTtnNumberCol(e.target.checked)} />
                 ТТН
               </label>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '4px', cursor: 'pointer', color: 'var(--text-dark)' }}>
                 <input type="checkbox" checked={showTtnStatusCol} onChange={(e) => setShowTtnStatusCol(e.target.checked)} />
                 Статус ТТН
               </label>
@@ -315,12 +313,13 @@ export const Deals: React.FC = () => {
                     style={{
                       minWidth: '240px',
                       width: '240px',
-                      backgroundColor: 'rgba(120, 120, 128, 0.08)',
+                      backgroundColor: 'var(--bg-card-subtle)',
+                      border: '1px solid var(--border-light)',
                       borderRadius: 'var(--radius-lg)',
                       display: 'flex',
                       flexDirection: 'column',
                       maxHeight: 'calc(100vh - 220px)',
-                      padding: '4px'
+                      padding: '6px'
                     }}
                   >
                     {/* Stage Header */}
@@ -344,7 +343,7 @@ export const Deals: React.FC = () => {
                     {/* Deal Cards */}
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', overflowY: 'auto', minHeight: '120px' }}>
                       {stageDeals.length === 0 ? (
-                        <div style={{ fontSize: '10px', color: '#8e8e93', textAlign: 'center', padding: '20px 0' }}>
+                        <div style={{ fontSize: '10px', color: 'var(--text-medium)', textAlign: 'center', padding: '20px 0' }}>
                           Немає угод
                         </div>
                       ) : (
@@ -356,7 +355,8 @@ export const Deals: React.FC = () => {
                               key={deal.id}
                               onClick={() => setSelectedOrder(deal)}
                               style={{
-                                backgroundColor: '#ffffff',
+                                backgroundColor: 'var(--bg-card)',
+                                border: selectedOrder?.id === deal.id ? '2px solid var(--primary)' : isOverdue ? '1.5px solid var(--danger)' : '1px solid var(--border-light)',
                                 borderRadius: 'var(--radius-md)',
                                 padding: '12px',
                                 display: 'flex',
@@ -364,7 +364,6 @@ export const Deals: React.FC = () => {
                                 gap: '6px',
                                 boxShadow: '0 1px 3px rgba(0,0,0,0.04)',
                                 cursor: 'pointer',
-                                border: selectedOrder?.id === deal.id ? '2.5px solid var(--primary)' : isOverdue ? '1.5px solid var(--danger)' : 'none',
                                 position: 'relative'
                               }}
                             >
@@ -379,7 +378,7 @@ export const Deals: React.FC = () => {
                                     SLA Увага ({hoursVal}г)
                                   </span>
                                 ) : (
-                                  <span style={{ fontSize: '9px', opacity: 0.5 }}>
+                                  <span style={{ fontSize: '9px', color: 'var(--text-medium)' }}>
                                     {deal.createdAt.split('T')[0]}
                                   </span>
                                 )}
@@ -389,21 +388,21 @@ export const Deals: React.FC = () => {
                                 {deal.name}
                               </h4>
                               
-                              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '10px', color: 'var(--text-medium)', opacity: 0.8 }}>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '10px', color: 'var(--text-medium)' }}>
                                 <User size={10} />
                                 <span>{getClientName(deal.clientId)}</span>
                               </div>
 
                               {showProductCol && (
-                                <div style={{ fontSize: '10px', backgroundColor: 'rgba(120, 120, 128, 0.06)', padding: '4px 6px', borderRadius: '4px', marginTop: '2px' }}>
+                                <div style={{ fontSize: '10px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', padding: '4px 6px', borderRadius: '4px', marginTop: '2px', border: '1px solid var(--border-light)' }}>
                                   📦 Товар: {deal.paperType === 'offset' ? 'Офсет 70г' : deal.paperType === 'gazetka' ? 'Газетка' : 'Крейдований 130г'}
                                   {deal.totalMarkupPercent ? ` (+${deal.totalMarkupPercent}% нац)` : ''}
                                 </div>
                               )}
 
                               {showTtnNumberCol && deal.ttnNumber && (
-                                <div style={{ fontSize: '10px', color: '#636366' }}>
-                                  🚚 ТТН: <span style={{ fontFamily: 'var(--font-mono)' }}>{deal.ttnNumber}</span>
+                                <div style={{ fontSize: '10px', color: 'var(--text-medium)' }}>
+                                  🚚 ТТН: <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-dark)' }}>{deal.ttnNumber}</span>
                                 </div>
                               )}
 
@@ -415,7 +414,7 @@ export const Deals: React.FC = () => {
                                 </div>
                               )}
 
-                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '0.5px solid var(--border-light)', paddingTop: '8px', marginTop: '4px' }}>
+                              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border-light)', paddingTop: '8px', marginTop: '4px' }}>
                                 <span style={{ fontSize: '12px', fontWeight: '800', color: 'var(--text-dark)' }}>
                                   {deal.finalPrice.toLocaleString()} ₴
                                 </span>
@@ -453,13 +452,13 @@ export const Deals: React.FC = () => {
 
             {/* Selected Deal Side Details Panel */}
             {selectedOrder && (
-              <div className="ios-card bg-white" style={{ display: 'flex', flexDirection: 'column', gap: '14px', position: 'sticky', top: '20px' }}>
-                <div style={{ display: 'flex', justifySelf: 'stretch', justifyContent: 'space-between', alignItems: 'center', borderBottom: '0.5px solid var(--border-light)', paddingBottom: '8px' }}>
-                  <h3 style={{ fontSize: '13px', fontWeight: '800', color: '#0f172a', textTransform: 'uppercase' }}>Угода: {selectedOrder.id}</h3>
+              <div className="ios-card" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)', display: 'flex', flexDirection: 'column', gap: '14px', position: 'sticky', top: '20px' }}>
+                <div style={{ display: 'flex', justifySelf: 'stretch', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-light)', paddingBottom: '8px' }}>
+                  <h3 style={{ fontSize: '13px', fontWeight: '800', color: 'var(--text-dark)', textTransform: 'uppercase' }}>Угода: {selectedOrder.id}</h3>
                   <button 
                     type="button" 
                     onClick={() => setSelectedOrder(null)} 
-                    style={{ border: 'none', background: 'transparent', color: '#94a3b8', cursor: 'pointer' }}
+                    style={{ border: 'none', background: 'transparent', color: 'var(--text-medium)', cursor: 'pointer' }}
                   >
                     ✕
                   </button>
@@ -486,7 +485,7 @@ export const Deals: React.FC = () => {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '12px' }}>
                   
                   {/* VIP Important flag toggle */}
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: '#f2f2f7', padding: '8px', borderRadius: '8px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: 'var(--bg-card-subtle)', border: '1px solid var(--border-light)', padding: '8px', borderRadius: '8px' }}>
                     <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', fontWeight: '750', cursor: 'pointer', color: 'var(--text-dark)' }}>
                       <input 
                         type="checkbox" 
@@ -498,42 +497,42 @@ export const Deals: React.FC = () => {
                   </div>
 
                   {/* Calculated Margin display */}
-                  <div style={{ backgroundColor: 'rgba(52, 199, 89, 0.08)', padding: '10px', borderRadius: '8px', border: '1px solid rgba(52, 199, 89, 0.2)', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <div style={{ backgroundColor: 'rgba(16, 185, 129, 0.12)', padding: '10px', borderRadius: '8px', border: '1px solid var(--border-light)', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <Info size={14} style={{ color: 'var(--success)' }} />
-                    <span style={{ fontSize: '11px', fontWeight: '700' }}>
+                    <span style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-dark)' }}>
                       Системна маржа угоди: <strong style={{ color: 'var(--success)', fontSize: '12px' }}>{selectedOrder.margin || 100}%</strong>
                     </span>
                   </div>
 
                   <div>
-                    <span style={{ color: '#64748b', fontSize: '9px', fontWeight: '700', textTransform: 'uppercase' }}>Назва замовлення</span>
-                    <p style={{ fontWeight: '800', fontSize: '14px' }}>{selectedOrder.name}</p>
+                    <span style={{ color: 'var(--text-medium)', fontSize: '9px', fontWeight: '700', textTransform: 'uppercase' }}>Назва замовлення</span>
+                    <p style={{ fontWeight: '800', fontSize: '14px', color: 'var(--text-dark)', margin: 0 }}>{selectedOrder.name}</p>
                   </div>
 
                   {/* Change Client dropdown inside the deal specification */}
                   <div>
-                    <label className="ios-label">Змінити клієнта угоди</label>
+                    <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Змінити замовника угоди</label>
                     <select
                       value={selectedOrder.clientId}
                       onChange={(e) => {
                         const updated = { ...selectedOrder, clientId: e.target.value };
                         updateOrder(updated);
                         setSelectedOrder(updated);
-                        addSystemNotification(`👤 Угода ${selectedOrder.id}: Змінено клієнта на "${getClientName(e.target.value)}"`);
+                        addSystemNotification(`👤 Угода ${selectedOrder.id}: Змінено замовника на "${getClientName(e.target.value)}"`);
                       }}
-                      style={{ height: '32px', fontSize: '12px' }}
+                      style={{ height: '32px', fontSize: '12px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
                     >
                       {clients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                     </select>
                   </div>
 
                   {/* Manual Stock Returns, Writeoffs, and Total Order Markup percentage */}
-                  <div style={{ border: '0.5px solid var(--border-light)', padding: '10px', borderRadius: 'var(--radius-md)', backgroundColor: '#f9f9f9' }}>
-                    <span style={{ color: '#64748b', fontSize: '9px', fontWeight: '700', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>
+                  <div style={{ border: '1px solid var(--border-light)', padding: '10px', borderRadius: 'var(--radius-md)', backgroundColor: 'var(--bg-card-subtle)' }}>
+                    <span style={{ color: 'var(--text-medium)', fontSize: '9px', fontWeight: '700', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>
                       Контроль складу та націнки (Товари)
                     </span>
-                    <p style={{ fontSize: '11px', marginBottom: '8px' }}>
-                      Папір: <strong>{selectedOrder.paperType === 'offset' ? 'Офсетний' : selectedOrder.paperType === 'gazetka' ? 'Газетний' : 'Крейдований'}</strong> ({selectedOrder.physicalSheets} арк.)
+                    <p style={{ fontSize: '11px', marginBottom: '8px', color: 'var(--text-dark)' }}>
+                      Папір: <strong style={{ color: 'var(--text-dark)' }}>{selectedOrder.paperType === 'offset' ? 'Офсетний' : selectedOrder.paperType === 'gazetka' ? 'Газетний' : 'Крейдований'}</strong> ({selectedOrder.physicalSheets} арк.)
                     </p>
                     
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px', marginBottom: '6px' }}>
@@ -541,7 +540,7 @@ export const Deals: React.FC = () => {
                         type="button"
                         onClick={() => handleManualWriteoff(selectedOrder)}
                         className="ios-btn ios-btn-secondary ios-btn-small"
-                        style={{ backgroundColor: 'rgba(255, 149, 0, 0.08)', color: 'var(--warning)', border: 'none', justifyContent: 'center' }}
+                        style={{ backgroundColor: 'rgba(245, 158, 11, 0.12)', color: 'var(--warning)', border: 'none', justifyContent: 'center' }}
                       >
                         <Archive size={12} />
                         Списати
@@ -550,7 +549,7 @@ export const Deals: React.FC = () => {
                         type="button"
                         onClick={() => handleManualReturn(selectedOrder)}
                         className="ios-btn ios-btn-secondary ios-btn-small"
-                        style={{ backgroundColor: 'rgba(52, 199, 89, 0.08)', color: 'var(--success)', border: 'none', justifyContent: 'center' }}
+                        style={{ backgroundColor: 'rgba(16, 185, 129, 0.12)', color: 'var(--success)', border: 'none', justifyContent: 'center' }}
                       >
                         <RotateCcw size={12} />
                         Повернути
@@ -561,14 +560,14 @@ export const Deals: React.FC = () => {
                       type="button"
                       onClick={() => handleDuplicateProductInOrder(selectedOrder)}
                       className="ios-btn ios-btn-secondary ios-btn-small w-full mb-3"
-                      style={{ display: 'flex', gap: '4px', justifyContent: 'center', backgroundColor: '#e5e5ea' }}
+                      style={{ display: 'flex', gap: '4px', justifyContent: 'center', backgroundColor: 'var(--bg-card)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
                     >
                       <Copy size={12} />
                       Дублювати товар у замовленні
                     </button>
 
                     <div className="ios-input-group" style={{ marginBottom: 0 }}>
-                      <label className="ios-label">Загальна націнка на товари (%)</label>
+                      <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Загальна націнка на товари (%)</label>
                       <input
                         type="number"
                         min="0"
@@ -585,14 +584,15 @@ export const Deals: React.FC = () => {
                           updateOrder(updated);
                           setSelectedOrder(updated);
                         }}
+                        style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
                       />
                     </div>
                   </div>
 
                   {/* Custom fields */}
                   {customFields.length > 0 && (
-                    <div style={{ borderTop: '0.5px solid var(--border-light)', paddingTop: '10px' }}>
-                      <span style={{ color: '#64748b', fontSize: '9px', fontWeight: '700', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>
+                    <div style={{ borderTop: '1px solid var(--border-light)', paddingTop: '10px' }}>
+                      <span style={{ color: 'var(--text-medium)', fontSize: '9px', fontWeight: '700', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>
                         Користувацькі поля
                       </span>
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
@@ -603,8 +603,8 @@ export const Deals: React.FC = () => {
                           }
                           return (
                             <div key={cf.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px' }}>
-                              <span>{cf.name}:</span>
-                              <span style={{ fontWeight: '700' }}>{displayVal}</span>
+                              <span style={{ color: 'var(--text-medium)' }}>{cf.name}:</span>
+                              <span style={{ fontWeight: '700', color: 'var(--text-dark)' }}>{displayVal}</span>
                             </div>
                           );
                         })}
@@ -613,12 +613,12 @@ export const Deals: React.FC = () => {
                   )}
 
                   {/* TTN Logistics panel */}
-                  <div style={{ borderTop: '0.5px solid var(--border-light)', paddingTop: '10px' }}>
-                    <span style={{ color: '#64748b', fontSize: '9px', fontWeight: '700', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>
+                  <div style={{ borderTop: '1px solid var(--border-light)', paddingTop: '10px' }}>
+                    <span style={{ color: 'var(--text-medium)', fontSize: '9px', fontWeight: '700', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>
                       Логістика (Нова Пошта)
                     </span>
                     <div className="ios-input-group">
-                      <label className="ios-label">Номер ЕН (ТТН)</label>
+                      <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Номер ЕН (ТТН)</label>
                       <input 
                         value={selectedOrder.ttnNumber || ''} 
                         onChange={(e) => {
@@ -634,10 +634,11 @@ export const Deals: React.FC = () => {
                           setSelectedOrder(updated);
                         }}
                         placeholder="Введіть номер ТТН..."
+                        style={{ backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
                       />
                     </div>
                     
-                    <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', marginTop: '6px', cursor: 'pointer' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', marginTop: '6px', cursor: 'pointer', color: 'var(--text-dark)' }}>
                       <input 
                         type="checkbox" 
                         checked={autoDescTtn} 
@@ -647,8 +648,8 @@ export const Deals: React.FC = () => {
                     </label>
                   </div>
 
-                  <div style={{ borderTop: '0.5px solid var(--border-light)', paddingTop: '10px', display: 'flex', justifyContent: 'space-between' }}>
-                    <span>Сума бюджету:</span>
+                  <div style={{ borderTop: '1px solid var(--border-light)', paddingTop: '10px', display: 'flex', justifyContent: 'space-between' }}>
+                    <span style={{ color: 'var(--text-medium)' }}>Сума бюджету:</span>
                     <span style={{ fontWeight: '800', color: 'var(--primary)', fontSize: '14px' }}>{selectedOrder.finalPrice.toLocaleString()} ₴</span>
                   </div>
                 </div>
@@ -659,28 +660,28 @@ export const Deals: React.FC = () => {
       ) : (
         <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '20px', alignItems: 'start' }}>
           {/* POS Cart list */}
-          <div className="ios-card bg-white space-y-4">
-            <h2 style={{ fontSize: '14px', fontWeight: '700', color: '#0f172a', borderBottom: '1px solid #f1f5f9', paddingBottom: '8px' }}>
+          <div className="ios-card" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+            <h2 style={{ fontSize: '14px', fontWeight: '700', color: 'var(--text-dark)', borderBottom: '1px solid var(--border-light)', paddingBottom: '8px', margin: 0 }}>
               Чек POS Терміналу
             </h2>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               {posItems.map(item => (
-                <div key={item.id} style={{ display: 'flex', justifySelf: 'stretch', justifyContent: 'space-between', alignItems: 'center', border: '0.5px solid var(--border-light)', padding: '10px 12px', borderRadius: '6px', backgroundColor: '#f8fafc' }}>
+                <div key={item.id} style={{ display: 'flex', justifySelf: 'stretch', justifyContent: 'space-between', alignItems: 'center', border: '1px solid var(--border-light)', padding: '10px 12px', borderRadius: '6px', backgroundColor: 'var(--bg-card-subtle)' }}>
                   <div>
-                    <h4 style={{ fontSize: '12px', fontWeight: '750', color: '#0f172a' }}>{item.name}</h4>
-                    <span style={{ fontSize: '10px', color: '#64748b', fontFamily: 'var(--font-mono)' }}>
+                    <h4 style={{ fontSize: '12px', fontWeight: '750', color: 'var(--text-dark)', margin: 0 }}>{item.name}</h4>
+                    <span style={{ fontSize: '10px', color: 'var(--text-medium)', fontFamily: 'var(--font-mono)' }}>
                       {item.price} ₴ × {item.qty} од.
                     </span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                    <span style={{ fontSize: '12px', fontWeight: '800', color: '#0f172a', fontFamily: 'var(--font-mono)' }}>
+                    <span style={{ fontSize: '12px', fontWeight: '800', color: 'var(--text-dark)', fontFamily: 'var(--font-mono)' }}>
                       {(item.price * item.qty).toLocaleString()} ₴
                     </span>
                     <button 
                       type="button"
                       onClick={() => setPosItems(posItems.filter(i => i.id !== item.id))}
-                      style={{ border: 'none', background: 'transparent', color: '#ef4444', display: 'flex', cursor: 'pointer' }}
+                      style={{ border: 'none', background: 'transparent', color: 'var(--danger)', display: 'flex', cursor: 'pointer' }}
                     >
                       <XCircle size={14} />
                     </button>
@@ -706,18 +707,18 @@ export const Deals: React.FC = () => {
           </div>
 
           {/* POS Summary panel */}
-          <div style={{ backgroundColor: 'var(--text-dark)', color: '#ffffff', borderRadius: 'var(--radius-lg)', padding: '20px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
-            <h3 style={{ fontSize: '11px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.4px', borderBottom: '1px solid #1e293b', paddingBottom: '10px', color: '#94a3b8' }}>
+          <div style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)', borderRadius: 'var(--radius-lg)', padding: '20px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            <h3 style={{ fontSize: '11px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.4px', borderBottom: '1px solid var(--border-light)', paddingBottom: '10px', color: 'var(--text-medium)', margin: 0 }}>
               Касовий звіт
             </h3>
             
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: '#cbd5e1' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: 'var(--text-medium)' }}>
                 <span>Усього товарів</span>
-                <span>{posItems.reduce((sum, i) => sum + i.qty, 0)} од.</span>
+                <span style={{ color: 'var(--text-dark)' }}>{posItems.reduce((sum, i) => sum + i.qty, 0)} од.</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', borderTop: '1px solid #1e293b', paddingTop: '14px', marginTop: '6px' }}>
-                <span style={{ fontSize: '12px', fontWeight: '500', color: '#94a3b8' }}>Разом до сплати</span>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', borderTop: '1px solid var(--border-light)', paddingTop: '14px', marginTop: '6px' }}>
+                <span style={{ fontSize: '12px', fontWeight: '500', color: 'var(--text-medium)' }}>Разом до сплати</span>
                 <span style={{ fontSize: '24px', fontWeight: '800', fontFamily: 'var(--font-mono)', color: 'var(--success)' }}>
                   {posItems.reduce((sum, i) => sum + (i.price * i.qty), 0).toLocaleString()} ₴
                 </span>
@@ -734,7 +735,6 @@ export const Deals: React.FC = () => {
               className="ios-btn ios-btn-primary"
               style={{
                 width: '100%',
-                backgroundColor: 'var(--success)',
                 opacity: posItems.length === 0 ? 0.4 : 1
               }}
             >

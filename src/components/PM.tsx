@@ -162,7 +162,7 @@ export const PM: React.FC = () => {
               <tr>
                 <th style={{ width: '40px' }}>ID</th>
                 <th>Назва виробу / Макету</th>
-                <th>Контрагент</th>
+                <th>Замовник</th>
                 <th>Дизайнер (PM)</th>
                 <th>Статус дизайну</th>
                 <th>Етап роботи</th>

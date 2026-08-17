@@ -77,24 +77,24 @@ export const Employees: React.FC = () => {
       </div>
 
       {/* Filter Toolbar */}
-      <div style={{ display: 'flex', gap: '10px', marginBottom: '16px', backgroundColor: '#ffffff', border: '1px solid #cbd5e1', borderRadius: '4px', padding: '10px 14px', alignItems: 'center', flexWrap: 'wrap' }}>
+      <div style={{ display: 'flex', gap: '10px', marginBottom: '16px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)', borderRadius: 'var(--radius-md)', padding: '10px 14px', alignItems: 'center', flexWrap: 'wrap' }}>
         <div style={{ position: 'relative', width: '250px' }}>
-          <Search style={{ position: 'absolute', left: '8px', top: '8px', color: '#94a3b8' }} size={13} />
+          <Search style={{ position: 'absolute', left: '10px', top: '8px', color: 'var(--text-medium)' }} size={14} />
           <input 
             placeholder="Шукати за ПІБ, телефоном..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            style={{ paddingLeft: '28px', height: '28px', fontSize: '12px', border: '1px solid #cbd5e1', borderRadius: '4px' }}
+            style={{ paddingLeft: '32px', height: '30px', fontSize: '12px', border: '1px solid var(--border-light)', borderRadius: '6px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', width: '100%' }}
           />
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: '#475569' }}>
-          <Briefcase size={14} style={{ color: '#64748b' }} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: 'var(--text-medium)' }}>
+          <Briefcase size={14} style={{ color: 'var(--text-medium)' }} />
           <span>Посада:</span>
           <select 
             value={filterRole}
             onChange={(e) => setFilterRole(e.target.value)}
-            style={{ height: '28px', fontSize: '12px', border: '1px solid #cbd5e1', borderRadius: '4px', padding: '0 4px', backgroundColor: '#ffffff' }}
+            style={{ height: '30px', fontSize: '12px', border: '1px solid var(--border-light)', borderRadius: '6px', padding: '0 8px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)' }}
           >
             <option value="all">Всі посади</option>
             <option value="Директор">Директор</option>
@@ -105,17 +105,17 @@ export const Employees: React.FC = () => {
             <option value="Оператор цифрового друку">Оператор цифрового друку</option>
             <option value="Палітурник / Порізчик">Палітурник / Порізчик</option>
             <option value="Кур'єр">Кур'єр</option>
-            <option value="Технолог, operator рулонної етикетки">Технолог, оператор рулонної етикетки</option>
+            <option value="Технолог, оператор рулонної етикетки">Технолог, оператор рулонної етикетки</option>
           </select>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: '#475569' }}>
-          <Filter size={14} style={{ color: '#64748b' }} />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: 'var(--text-medium)' }}>
+          <Filter size={14} style={{ color: 'var(--text-medium)' }} />
           <span>Статус:</span>
           <select 
             value={filterStatus}
             onChange={(e) => setFilterStatus(e.target.value)}
-            style={{ height: '28px', fontSize: '12px', border: '1px solid #cbd5e1', borderRadius: '4px', padding: '0 4px', backgroundColor: '#ffffff' }}
+            style={{ height: '30px', fontSize: '12px', border: '1px solid var(--border-light)', borderRadius: '6px', padding: '0 8px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)' }}
           >
             <option value="all">Всі статуси</option>
             <option value="Активний">Працює</option>
@@ -126,45 +126,45 @@ export const Employees: React.FC = () => {
       </div>
 
       {/* Grid of employees */}
-      <div className="ios-table-container" style={{ backgroundColor: '#ffffff' }}>
+      <div className="ios-table-container" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)' }}>
         <table className="ios-table">
           <thead>
             <tr>
-              <th style={{ width: '80px' }}>ID</th>
-              <th>Прізвище, Ім'я, По батькові</th>
-              <th>Посада</th>
-              <th>Контакти</th>
-              <th>День народження</th>
-              <th>Дата найму</th>
-              <th style={{ width: '120px' }}>Статус</th>
+              <th style={{ width: '80px', color: 'var(--text-medium)' }}>ID</th>
+              <th style={{ color: 'var(--text-medium)' }}>Прізвище, Ім'я, По батькові</th>
+              <th style={{ color: 'var(--text-medium)' }}>Посада</th>
+              <th style={{ color: 'var(--text-medium)' }}>Контакти</th>
+              <th style={{ color: 'var(--text-medium)' }}>День народження</th>
+              <th style={{ color: 'var(--text-medium)' }}>Дата найму</th>
+              <th style={{ width: '120px', color: 'var(--text-medium)' }}>Статус</th>
             </tr>
           </thead>
           <tbody>
             {filteredEmployees.map(emp => (
-              <tr key={emp.id} className={emp.id === 'EMP-02' ? 'hover:bg-blue-50' : ''} style={{ backgroundColor: emp.id === 'EMP-02' ? 'rgba(59, 130, 246, 0.03)' : 'transparent' }}>
-                <td style={{ fontFamily: 'var(--font-mono)', fontWeight: '600' }}>{emp.id}</td>
+              <tr key={emp.id} style={{ backgroundColor: emp.id === 'EMP-02' ? 'rgba(0, 122, 255, 0.08)' : 'transparent', borderBottom: '1px solid var(--border-light)' }}>
+                <td style={{ fontFamily: 'var(--font-mono)', fontWeight: '600', color: 'var(--text-dark)' }}>{emp.id}</td>
                 <td>
-                  <div style={{ fontWeight: '700', color: '#0f172a' }}>{emp.name}</div>
-                  {emp.id === 'EMP-02' && <span style={{ fontSize: '9px', backgroundColor: 'rgba(59,130,246,0.1)', color: '#3b82f6', padding: '1px 4px', borderRadius: '3px', fontWeight: 'bold' }}>Власник кабінету</span>}
+                  <div style={{ fontWeight: '700', color: 'var(--text-dark)' }}>{emp.name}</div>
+                  {emp.id === 'EMP-02' && <span style={{ fontSize: '9px', backgroundColor: 'rgba(0,122,255,0.15)', color: 'var(--primary)', padding: '1px 6px', borderRadius: '3px', fontWeight: 'bold', display: 'inline-block', marginTop: '2px' }}>Власник кабінету</span>}
                 </td>
-                <td style={{ fontWeight: '600', color: '#475569' }}>{emp.role}</td>
+                <td style={{ fontWeight: '600', color: 'var(--text-dark)' }}>{emp.role}</td>
                 <td>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <Phone size={12} style={{ color: '#94a3b8' }} />
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--text-dark)' }}>
+                    <Phone size={12} style={{ color: 'var(--text-medium)' }} />
                     <span style={{ fontFamily: 'var(--font-mono)' }}>{emp.phone}</span>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px' }}>
-                    <Mail size={12} style={{ color: '#94a3b8' }} />
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', marginTop: '2px', color: 'var(--text-medium)' }}>
+                    <Mail size={12} style={{ color: 'var(--text-medium)' }} />
                     <span>{emp.email}</span>
                   </div>
                 </td>
                 <td>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontFamily: 'var(--font-mono)' }}>
-                    <Calendar size={12} style={{ color: '#94a3b8' }} />
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontFamily: 'var(--font-mono)', color: 'var(--text-dark)' }}>
+                    <Calendar size={12} style={{ color: 'var(--text-medium)' }} />
                     <span>{emp.birthday}</span>
                   </div>
                 </td>
-                <td style={{ fontFamily: 'var(--font-mono)' }}>{emp.hireDate}</td>
+                <td style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-dark)' }}>{emp.hireDate}</td>
                 <td>{getStatusBadge(emp.status)}</td>
               </tr>
             ))}

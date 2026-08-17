@@ -416,7 +416,7 @@ export const Documents: React.FC = () => {
                     <tr>
                       <th>Номер</th>
                       <th>Тип документа</th>
-                      <th>Контрагент</th>
+                      <th>Замовник</th>
                       <th>Дата</th>
                       <th style={{ textAlign: 'right' }}>Дія</th>
                     </tr>
