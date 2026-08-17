@@ -43,8 +43,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
     { id: 'warehouse', name: 'Склад', icon: Archive, visible: true },
     { id: 'production', name: 'Виробництво', icon: Layers, visible: true },
     { id: 'tasks', name: 'Завдання', icon: CheckSquare, visible: true },
-    { id: 'documents', name: 'Документи', icon: FileSignature, visible: ['admin', 'manager'].includes(role) },
-    { id: 'finance', name: 'Фінанси', icon: Coins, visible: ['admin', 'manager'].includes(role) },
+    { id: 'documents', name: 'Документи', icon: FileSignature, visible: true },
+    { id: 'finance', name: 'BAS Бухгалтерія', icon: Coins, visible: true },
     { id: 'triggers', name: 'Автоматизація', icon: Zap, visible: ['admin', 'manager'].includes(role) },
     { id: 'settings', name: 'Налаштування', icon: SettingsIcon, visible: ['admin'].includes(role) }
   ];
