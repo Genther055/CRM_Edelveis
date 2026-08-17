@@ -149,15 +149,15 @@ export const Profile: React.FC = () => {
   };
 
   return (
-    <div className="main-content bg-[#f8fafc]" style={{ paddingBottom: '100px', minHeight: '100%' }}>
+    <div className="main-content" style={{ backgroundColor: 'var(--bg-system)', paddingBottom: '100px', minHeight: '100%' }}>
       
       {/* Top Banner Profile Summary */}
       <div style={{
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'space-between',
-        backgroundColor: '#ffffff',
-        border: '1px solid #e2e8f0',
+        backgroundColor: 'var(--bg-card)',
+        border: '1px solid var(--border-light)',
         borderRadius: '12px',
         padding: '24px',
         marginBottom: '20px',
@@ -172,16 +172,16 @@ export const Profile: React.FC = () => {
               width: '84px',
               height: '84px',
               borderRadius: '50%',
-              backgroundColor: '#007aff',
+              backgroundColor: 'var(--primary)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
               color: '#ffffff',
               fontSize: '32px',
               fontWeight: '800',
-              boxShadow: '0 4px 12px rgba(0, 122, 255, 0.25)',
+              boxShadow: '0 4px 12px rgba(59, 130, 246, 0.25)',
               overflow: 'hidden',
-              border: '3px solid #ffffff'
+              border: '3px solid var(--bg-card)'
             }}>
               {avatarUrl ? (
                 <img src={avatarUrl} alt={fullName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
@@ -195,7 +195,7 @@ export const Profile: React.FC = () => {
               position: 'absolute',
               bottom: '0',
               right: '0',
-              backgroundColor: '#007aff',
+              backgroundColor: 'var(--primary)',
               color: '#ffffff',
               borderRadius: '50%',
               padding: '6px',
@@ -211,8 +211,8 @@ export const Profile: React.FC = () => {
           </div>
 
           <div>
-            <h1 style={{ fontSize: '22px', fontWeight: '800', color: '#0f172a', margin: 0 }}>{fullName}</h1>
-            <p style={{ fontSize: '13px', color: '#64748b', marginTop: '4px', margin: 0 }}>{position} • Поліграфія Вінниця</p>
+            <h1 style={{ fontSize: '22px', fontWeight: '800', color: 'var(--text-dark)', margin: 0 }}>{fullName}</h1>
+            <p style={{ fontSize: '13px', color: 'var(--text-medium)', marginTop: '4px', margin: 0 }}>{position} • Поліграфія Вінниця</p>
             <div style={{ display: 'flex', gap: '8px', marginTop: '8px' }}>
               <span className="ios-badge ios-badge-blue">
                 {employmentStatus === 'Active' ? '🟢 Працює (Активний)' : employmentStatus === 'Hold' ? '🟠 На паузі / Відпустка' : employmentStatus === 'Freelancer' ? '🔵 Фрілансер' : '🔴 Звільнений'}
@@ -235,43 +235,43 @@ export const Profile: React.FC = () => {
 
       {/* KPI Productivity Metrics Cards Grid */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px', marginBottom: '24px' }}>
-        <div className="ios-card bg-white" style={{ padding: '16px', display: 'flex', alignItems: 'center', gap: '14px' }}>
-          <div style={{ padding: '10px', backgroundColor: 'rgba(52, 199, 89, 0.1)', color: '#34c759', borderRadius: '10px' }}>
+        <div className="ios-card" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)', padding: '16px', display: 'flex', alignItems: 'center', gap: '14px' }}>
+          <div style={{ padding: '10px', backgroundColor: 'rgba(16, 185, 129, 0.12)', color: 'var(--success)', borderRadius: '10px' }}>
             <TrendingUp size={22} />
           </div>
           <div>
-            <span style={{ fontSize: '11px', color: '#64748b', fontWeight: '600', textTransform: 'uppercase' }}>КПД / Продуктивність</span>
-            <p style={{ fontSize: '20px', fontWeight: '800', color: '#0f172a', margin: 0 }}>96.4%</p>
+            <span style={{ fontSize: '11px', color: 'var(--text-medium)', fontWeight: '600', textTransform: 'uppercase' }}>КПД / Продуктивність</span>
+            <p style={{ fontSize: '20px', fontWeight: '800', color: 'var(--text-dark)', margin: 0 }}>96.4%</p>
           </div>
         </div>
 
-        <div className="ios-card bg-white" style={{ padding: '16px', display: 'flex', alignItems: 'center', gap: '14px' }}>
-          <div style={{ padding: '10px', backgroundColor: 'rgba(0, 122, 255, 0.1)', color: '#007aff', borderRadius: '10px' }}>
+        <div className="ios-card" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)', padding: '16px', display: 'flex', alignItems: 'center', gap: '14px' }}>
+          <div style={{ padding: '10px', backgroundColor: 'rgba(59, 130, 246, 0.12)', color: 'var(--primary)', borderRadius: '10px' }}>
             <CheckCircle size={22} />
           </div>
           <div>
-            <span style={{ fontSize: '11px', color: '#64748b', fontWeight: '600', textTransform: 'uppercase' }}>Виконано замовлень</span>
-            <p style={{ fontSize: '20px', fontWeight: '800', color: '#0f172a', margin: 0 }}>48 тиражів</p>
+            <span style={{ fontSize: '11px', color: 'var(--text-medium)', fontWeight: '600', textTransform: 'uppercase' }}>Виконано замовлень</span>
+            <p style={{ fontSize: '20px', fontWeight: '800', color: 'var(--text-dark)', margin: 0 }}>48 тиражів</p>
           </div>
         </div>
 
-        <div className="ios-card bg-white" style={{ padding: '16px', display: 'flex', alignItems: 'center', gap: '14px' }}>
-          <div style={{ padding: '10px', backgroundColor: 'rgba(255, 149, 0, 0.1)', color: '#ff9500', borderRadius: '10px' }}>
+        <div className="ios-card" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)', padding: '16px', display: 'flex', alignItems: 'center', gap: '14px' }}>
+          <div style={{ padding: '10px', backgroundColor: 'rgba(245, 158, 11, 0.12)', color: 'var(--warning)', borderRadius: '10px' }}>
             <Clock size={22} />
           </div>
           <div>
-            <span style={{ fontSize: '11px', color: '#64748b', fontWeight: '600', textTransform: 'uppercase' }}>Сер. час на макет</span>
-            <p style={{ fontSize: '20px', fontWeight: '800', color: '#0f172a', margin: 0 }}>1.4 год</p>
+            <span style={{ fontSize: '11px', color: 'var(--text-medium)', fontWeight: '600', textTransform: 'uppercase' }}>Сер. час на макет</span>
+            <p style={{ fontSize: '20px', fontWeight: '800', color: 'var(--text-dark)', margin: 0 }}>1.4 год</p>
           </div>
         </div>
 
-        <div className="ios-card bg-white" style={{ padding: '16px', display: 'flex', alignItems: 'center', gap: '14px' }}>
-          <div style={{ padding: '10px', backgroundColor: 'rgba(88, 86, 214, 0.1)', color: '#5856d6', borderRadius: '10px' }}>
+        <div className="ios-card" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)', padding: '16px', display: 'flex', alignItems: 'center', gap: '14px' }}>
+          <div style={{ padding: '10px', backgroundColor: 'rgba(139, 92, 246, 0.12)', color: '#8b5cf6', borderRadius: '10px' }}>
             <Award size={22} />
           </div>
           <div>
-            <span style={{ fontSize: '11px', color: '#64748b', fontWeight: '600', textTransform: 'uppercase' }}>Оцінка якості</span>
-            <p style={{ fontSize: '20px', fontWeight: '800', color: '#0f172a', margin: 0 }}>4.9 / 5.0</p>
+            <span style={{ fontSize: '11px', color: 'var(--text-medium)', fontWeight: '600', textTransform: 'uppercase' }}>Оцінка якості</span>
+            <p style={{ fontSize: '20px', fontWeight: '800', color: 'var(--text-dark)', margin: 0 }}>4.9 / 5.0</p>
           </div>
         </div>
       </div>
@@ -279,63 +279,63 @@ export const Profile: React.FC = () => {
       <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '20px', marginBottom: '24px' }}>
         
         {/* Basic Information Card */}
-        <div className="ios-card bg-white" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <h3 style={{ fontSize: '15px', fontWeight: '800', borderBottom: '1px solid #e2e8f0', paddingBottom: '10px', color: '#0f172a', margin: 0 }}>
+        <div className="ios-card" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <h3 style={{ fontSize: '15px', fontWeight: '800', borderBottom: '1px solid var(--border-light)', paddingBottom: '10px', color: 'var(--text-dark)', margin: 0 }}>
             Основна інформація
           </h3>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '12px 20px', fontSize: '13px', alignItems: 'center' }}>
-            <span style={{ color: '#64748b', fontWeight: '600' }}>Повне ім'я:</span>
-            <input value={fullName} onChange={(e) => setFullName(e.target.value)} style={{ padding: '6px 10px', borderRadius: '6px', border: '1px solid #cbd5e1' }} />
+            <span style={{ color: 'var(--text-medium)', fontWeight: '600' }}>Повне ім'я:</span>
+            <input value={fullName} onChange={(e) => setFullName(e.target.value)} style={{ padding: '6px 10px', borderRadius: '6px', border: '1px solid var(--border-light)', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)' }} />
 
-            <span style={{ color: '#64748b', fontWeight: '600' }}>Нікнейм:</span>
-            <input value={nickname} onChange={(e) => setNickname(e.target.value)} style={{ padding: '6px 10px', borderRadius: '6px', border: '1px solid #cbd5e1' }} />
+            <span style={{ color: 'var(--text-medium)', fontWeight: '600' }}>Нікнейм:</span>
+            <input value={nickname} onChange={(e) => setNickname(e.target.value)} style={{ padding: '6px 10px', borderRadius: '6px', border: '1px solid var(--border-light)', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)' }} />
 
-            <span style={{ color: '#64748b', fontWeight: '600' }}>Робочий Email:</span>
-            <input value={workingEmail} onChange={(e) => setWorkingEmail(e.target.value)} style={{ padding: '6px 10px', borderRadius: '6px', border: '1px solid #cbd5e1' }} />
+            <span style={{ color: 'var(--text-medium)', fontWeight: '600' }}>Робочий Email:</span>
+            <input value={workingEmail} onChange={(e) => setWorkingEmail(e.target.value)} style={{ padding: '6px 10px', borderRadius: '6px', border: '1px solid var(--border-light)', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)' }} />
 
-            <span style={{ color: '#64748b', fontWeight: '600' }}>Посада:</span>
-            <input value={position} onChange={(e) => setPosition(e.target.value)} style={{ padding: '6px 10px', borderRadius: '6px', border: '1px solid #cbd5e1' }} />
+            <span style={{ color: 'var(--text-medium)', fontWeight: '600' }}>Посада:</span>
+            <input value={position} onChange={(e) => setPosition(e.target.value)} style={{ padding: '6px 10px', borderRadius: '6px', border: '1px solid var(--border-light)', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)' }} />
 
-            <span style={{ color: '#64748b', fontWeight: '600' }}>Дата найму:</span>
-            <input value={employmentDay} onChange={(e) => setEmploymentDay(e.target.value)} style={{ padding: '6px 10px', borderRadius: '6px', border: '1px solid #cbd5e1' }} />
+            <span style={{ color: 'var(--text-medium)', fontWeight: '600' }}>Дата найму:</span>
+            <input value={employmentDay} onChange={(e) => setEmploymentDay(e.target.value)} style={{ padding: '6px 10px', borderRadius: '6px', border: '1px solid var(--border-light)', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)' }} />
 
-            <span style={{ color: '#64748b', fontWeight: '600' }}>День народження:</span>
-            <input value={birthday} onChange={(e) => setBirthday(e.target.value)} style={{ padding: '6px 10px', borderRadius: '6px', border: '1px solid #cbd5e1' }} />
+            <span style={{ color: 'var(--text-medium)', fontWeight: '600' }}>День народження:</span>
+            <input value={birthday} onChange={(e) => setBirthday(e.target.value)} style={{ padding: '6px 10px', borderRadius: '6px', border: '1px solid var(--border-light)', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)' }} />
           </div>
         </div>
 
         {/* Contact details & Status Card (Ukrainian Labels) */}
-        <div className="ios-card bg-white" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-          <h3 style={{ fontSize: '15px', fontWeight: '800', borderBottom: '1px solid #e2e8f0', paddingBottom: '10px', color: '#0f172a', margin: 0 }}>
+        <div className="ios-card" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <h3 style={{ fontSize: '15px', fontWeight: '800', borderBottom: '1px solid var(--border-light)', paddingBottom: '10px', color: 'var(--text-dark)', margin: 0 }}>
             Контактні дані & Статус
           </h3>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '13px' }}>
             <div className="ios-input-group" style={{ marginBottom: 0 }}>
-              <label className="ios-label">Мобільний телефон</label>
+              <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Мобільний телефон</label>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <Phone size={14} className="text-slate-400" />
-                <input value={personalPhone} onChange={(e) => setPersonalPhone(e.target.value)} />
+                <Phone size={14} style={{ color: 'var(--text-medium)' }} />
+                <input value={personalPhone} onChange={(e) => setPersonalPhone(e.target.value)} style={{ backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }} />
               </div>
             </div>
 
             <div className="ios-input-group" style={{ marginBottom: 0 }}>
-              <label className="ios-label">Особистий Email</label>
+              <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Особистий Email</label>
               <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <Mail size={14} className="text-slate-400" />
-                <input value={personalEmail} onChange={(e) => setPersonalEmail(e.target.value)} />
+                <Mail size={14} style={{ color: 'var(--text-medium)' }} />
+                <input value={personalEmail} onChange={(e) => setPersonalEmail(e.target.value)} style={{ backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }} />
               </div>
             </div>
 
             <div className="ios-input-group" style={{ marginBottom: 0 }}>
-              <label className="ios-label">Відповідальний менеджер</label>
-              <input value={resourceManager} onChange={(e) => setResourceManager(e.target.value)} />
+              <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Відповідальний менеджер</label>
+              <input value={resourceManager} onChange={(e) => setResourceManager(e.target.value)} style={{ backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }} />
             </div>
 
             {/* Employment Status Selector in Ukrainian */}
             <div className="ios-input-group" style={{ marginBottom: 0 }}>
-              <label className="ios-label">Статус працевлаштування</label>
+              <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Статус працевлаштування</label>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px', marginTop: '4px' }}>
                 {[
                   { key: 'Active', label: '🟢 Працює' },
@@ -352,10 +352,10 @@ export const Profile: React.FC = () => {
                       fontSize: '11px',
                       fontWeight: '750',
                       borderRadius: '6px',
-                      border: 'none',
                       cursor: 'pointer',
-                      backgroundColor: employmentStatus === item.key ? '#007aff' : '#f1f5f9',
-                      color: employmentStatus === item.key ? '#ffffff' : '#475569',
+                      backgroundColor: employmentStatus === item.key ? 'var(--primary)' : 'var(--bg-card-subtle)',
+                      color: employmentStatus === item.key ? '#ffffff' : 'var(--text-dark)',
+                      border: employmentStatus === item.key ? 'none' : '1px solid var(--border-light)',
                       transition: 'all 0.15s ease'
                     }}
                   >
@@ -367,7 +367,7 @@ export const Profile: React.FC = () => {
 
             {/* Categories tag clouds */}
             <div className="ios-input-group" style={{ marginBottom: 0 }}>
-              <label className="ios-label">Спеціалізація друкарні</label>
+              <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Спеціалізація друкарні</label>
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '6px' }}>
                 {categories.map(cat => {
                   const isChecked = activeCategories.includes(cat);
@@ -381,10 +381,10 @@ export const Profile: React.FC = () => {
                         fontSize: '10px',
                         fontWeight: '700',
                         borderRadius: '999px',
-                        border: '1px solid #cbd5e1',
                         cursor: 'pointer',
-                        backgroundColor: isChecked ? '#e0f2fe' : '#ffffff',
-                        color: isChecked ? '#0284c7' : '#64748b'
+                        backgroundColor: isChecked ? 'rgba(59, 130, 246, 0.16)' : 'var(--bg-card-subtle)',
+                        color: isChecked ? 'var(--primary)' : 'var(--text-medium)',
+                        border: isChecked ? '1px solid var(--primary)' : '1px solid var(--border-light)'
                       }}
                     >
                       {isChecked ? '✓ ' : '+ '}{cat}
@@ -398,14 +398,14 @@ export const Profile: React.FC = () => {
       </div>
 
       {/* Vacation Admin Tracker (GudHub Style Table) */}
-      <div className="ios-card bg-white" style={{ marginBottom: '24px', padding: '20px' }}>
+      <div className="ios-card" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)', marginBottom: '24px', padding: '20px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', flexWrap: 'wrap', gap: '10px' }}>
           <div>
-            <h3 style={{ fontSize: '16px', fontWeight: '800', color: '#0f172a', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <CalendarDays size={18} className="text-blue-500" />
+            <h3 style={{ fontSize: '16px', fontWeight: '800', color: 'var(--text-dark)', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <CalendarDays size={18} style={{ color: 'var(--primary)' }} />
               Журнал відпусток та відсутностей
             </h3>
-            <p style={{ fontSize: '11px', color: '#64748b', margin: '2px 0 0 0' }}>Облік лікарняних, графіку відпусток та дистанційної роботи команди</p>
+            <p style={{ fontSize: '11px', color: 'var(--text-medium)', margin: '2px 0 0 0' }}>Облік лікарняних, графіку відпусток та дистанційної роботи команди</p>
           </div>
           <button onClick={() => setShowVacationModal(true)} className="ios-btn ios-btn-secondary" style={{ fontSize: '11px' }}>
             + Подати заявку
@@ -415,7 +415,7 @@ export const Profile: React.FC = () => {
         <div style={{ overflowX: 'auto' }}>
           <table className="ios-table" style={{ width: '100%', fontSize: '12px' }}>
             <thead>
-              <tr style={{ textAlign: 'left', borderBottom: '2px solid #e2e8f0' }}>
+              <tr style={{ textAlign: 'left', borderBottom: '1px solid var(--border-light)' }}>
                 <th style={{ padding: '8px 12px' }}>Користувач</th>
                 <th style={{ padding: '8px 12px' }}>Логін</th>
                 <th style={{ padding: '8px 12px' }}>Тип відсутності</th>
@@ -427,21 +427,21 @@ export const Profile: React.FC = () => {
             </thead>
             <tbody>
               {vacations.map(record => (
-                <tr key={record.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                  <td style={{ padding: '10px 12px', fontWeight: '700' }}>
+                <tr key={record.id} style={{ borderBottom: '1px solid var(--border-light)' }}>
+                  <td style={{ padding: '10px 12px', fontWeight: '700', color: 'var(--text-dark)' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <div style={{ width: '24px', height: '24px', borderRadius: '50%', backgroundColor: '#007aff', color: '#fff', fontSize: '10px', fontWeight: '800', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <div style={{ width: '24px', height: '24px', borderRadius: '50%', backgroundColor: 'var(--primary)', color: '#fff', fontSize: '10px', fontWeight: '800', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         {record.user.charAt(record.user.length - 1)}
                       </div>
                       {record.user}
                     </div>
                   </td>
-                  <td style={{ padding: '10px 12px', color: '#007aff', fontWeight: '600', fontFamily: 'var(--font-mono)' }}>{record.teamMember}</td>
+                  <td style={{ padding: '10px 12px', color: 'var(--primary)', fontWeight: '600', fontFamily: 'var(--font-mono)' }}>{record.teamMember}</td>
                   <td style={{ padding: '10px 12px' }}>{getStatusBadge(record.type)}</td>
-                  <td style={{ padding: '10px 12px', fontFamily: 'var(--font-mono)' }}>{record.date}</td>
-                  <td style={{ padding: '10px 12px', color: '#64748b', fontFamily: 'var(--font-mono)' }}>{record.time}</td>
-                  <td style={{ padding: '10px 12px', fontWeight: '700' }}>{record.hours} год</td>
-                  <td style={{ padding: '10px 12px', color: '#64748b' }}>{record.project}</td>
+                  <td style={{ padding: '10px 12px', fontFamily: 'var(--font-mono)', color: 'var(--text-dark)' }}>{record.date}</td>
+                  <td style={{ padding: '10px 12px', color: 'var(--text-medium)', fontFamily: 'var(--font-mono)' }}>{record.time}</td>
+                  <td style={{ padding: '10px 12px', fontWeight: '700', color: 'var(--text-dark)' }}>{record.hours} год</td>
+                  <td style={{ padding: '10px 12px', color: 'var(--text-medium)' }}>{record.project}</td>
                 </tr>
               ))}
             </tbody>
@@ -450,14 +450,14 @@ export const Profile: React.FC = () => {
       </div>
 
       {/* 10 Recent User Tasks Table */}
-      <div className="ios-card bg-white" style={{ padding: '20px' }}>
+      <div className="ios-card" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)', padding: '20px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
           <div>
-            <h3 style={{ fontSize: '16px', fontWeight: '800', color: '#0f172a', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <FileText size={18} className="text-blue-500" />
+            <h3 style={{ fontSize: '16px', fontWeight: '800', color: 'var(--text-dark)', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <FileText size={18} style={{ color: 'var(--primary)' }} />
               Останні 10 завдань користувача
             </h3>
-            <p style={{ fontSize: '11px', color: '#64748b', margin: '2px 0 0 0' }}>Оперативний перелік виконаних та поточних виробничих задач</p>
+            <p style={{ fontSize: '11px', color: 'var(--text-medium)', margin: '2px 0 0 0' }}>Оперативний перелік виконаних та поточних виробничих задач</p>
           </div>
         </div>
 
@@ -478,22 +478,22 @@ export const Profile: React.FC = () => {
             </thead>
             <tbody>
               {profileTasks.map(task => (
-                <tr key={task.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
-                  <td style={{ padding: '10px 12px', fontWeight: '700', fontFamily: 'var(--font-mono)' }}>{task.id}</td>
-                  <td style={{ padding: '10px 12px', fontWeight: '700' }}>{task.project}</td>
+                <tr key={task.id} style={{ borderBottom: '1px solid var(--border-light)' }}>
+                  <td style={{ padding: '10px 12px', fontWeight: '700', fontFamily: 'var(--font-mono)', color: 'var(--text-dark)' }}>{task.id}</td>
+                  <td style={{ padding: '10px 12px', fontWeight: '700', color: 'var(--text-dark)' }}>{task.project}</td>
                   <td style={{ padding: '10px 12px' }}>
-                    <div style={{ fontWeight: '600' }}>{task.scene}</div>
-                    <span style={{ fontSize: '10px', color: '#64748b', fontFamily: 'var(--font-mono)' }}>{task.file}</span>
+                    <div style={{ fontWeight: '600', color: 'var(--text-dark)' }}>{task.scene}</div>
+                    <span style={{ fontSize: '10px', color: 'var(--text-medium)', fontFamily: 'var(--font-mono)' }}>{task.file}</span>
                   </td>
                   <td style={{ padding: '10px 12px' }}>
                     <span className={`ios-badge ${task.status === 'Завершено' ? 'ios-badge-green' : task.status === 'Черга' ? 'ios-badge-blue' : 'ios-badge-orange'}`}>
                       {task.status}
                     </span>
                   </td>
-                  <td style={{ padding: '10px 12px', fontFamily: 'var(--font-mono)' }}>{task.startDate}</td>
-                  <td style={{ padding: '10px 12px' }}>{task.duration}</td>
-                  <td style={{ padding: '10px 12px', fontWeight: '700', color: '#007aff' }}>{task.estimation}</td>
-                  <td style={{ padding: '10px 12px' }}>{task.objectCategory}</td>
+                  <td style={{ padding: '10px 12px', fontFamily: 'var(--font-mono)', color: 'var(--text-dark)' }}>{task.startDate}</td>
+                  <td style={{ padding: '10px 12px', color: 'var(--text-dark)' }}>{task.duration}</td>
+                  <td style={{ padding: '10px 12px', fontWeight: '700', color: 'var(--primary)' }}>{task.estimation}</td>
+                  <td style={{ padding: '10px 12px', color: 'var(--text-dark)' }}>{task.objectCategory}</td>
                   <td style={{ padding: '10px 12px' }}>
                     <span className={`ios-badge ${task.level === 'Складний' ? 'ios-badge-red' : task.level === 'Середній' ? 'ios-badge-orange' : 'ios-badge-green'}`}>
                       {task.level}
@@ -509,10 +509,10 @@ export const Profile: React.FC = () => {
       {/* Vacation Order Modal */}
       {showVacationModal && (
         <div className="ios-modal-overlay">
-          <form onSubmit={handleAddVacation} className="ios-modal" style={{ maxWidth: '480px' }}>
-            <div className="ios-modal-header">
-              <h3 className="ios-modal-title">Оформлення відпустки / відсутності</h3>
-              <button type="button" onClick={() => setShowVacationModal(false)} style={{ border: 'none', background: 'transparent' }}>✕</button>
+          <form onSubmit={handleAddVacation} className="ios-modal" style={{ maxWidth: '480px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)' }}>
+            <div className="ios-modal-header" style={{ borderBottom: '1px solid var(--border-light)' }}>
+              <h3 className="ios-modal-title" style={{ color: 'var(--text-dark)' }}>Оформлення відпустки / відсутності</h3>
+              <button type="button" onClick={() => setShowVacationModal(false)} style={{ border: 'none', background: 'transparent', color: 'var(--text-medium)', cursor: 'pointer' }}>✕</button>
             </div>
             
             <div className="ios-modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
