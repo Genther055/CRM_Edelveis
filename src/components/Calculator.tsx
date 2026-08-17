@@ -940,7 +940,7 @@ export const Calculator: React.FC = () => {
                     />
                   </div>
                   <div className="ios-input-group" style={{ marginBottom: 0 }}>
-                    <label className="ios-label">Пачки (шт)</label>
+                    <label className="ios-label">Штук в 1 упаковці</label>
                     <input 
                       type="number" 
                       min="0" 
