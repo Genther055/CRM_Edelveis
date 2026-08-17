@@ -1566,21 +1566,29 @@ export const Calculator: React.FC = () => {
             
             <div className="ios-modal-body" id="invoice-preview-container" style={{ padding: '28px', backgroundColor: '#FFFFFF', color: '#1C1C1E', fontSize: '11px', lineHeight: '1.4' }}>
               {/* Document Header */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '2px solid #000', paddingBottom: '12px', marginBottom: '16px' }}>
-                <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px solid #000', paddingBottom: '12px', marginBottom: '16px', gap: '16px' }}>
+                <div style={{ flexShrink: 0 }}>
                   <h4 style={{ fontSize: '18px', fontWeight: '900', letterSpacing: '-0.5px', margin: 0 }}>РАХУНОК-СПЕЦИФІКАЦІЯ № {orderNumber}</h4>
                   <p style={{ fontSize: '11px', color: '#636366', margin: '2px 0 0 0' }}>Поліграфічна компанія «Едельвейс і К»</p>
                 </div>
-                <div style={{ textAlign: 'right' }}>
+                <div style={{ textAlign: 'right', flexGrow: 1, minWidth: '220px', backgroundColor: '#F8FAFC', padding: '8px 14px', borderRadius: '6px', border: '1px solid #E2E8F0' }}>
                   <p style={{ fontSize: '12px', fontWeight: '700', margin: 0 }}>Дата: {new Date().toLocaleDateString('uk-UA')}</p>
-                  <p style={{ fontSize: '11px', color: '#636366', margin: '2px 0 0 0' }}>Покупець (Замовник): <strong>{activeClient?.name || '—'}</strong></p>
+                  <p style={{ fontSize: '12px', color: '#1E293B', margin: '4px 0 0 0', fontWeight: '600' }}>
+                    Покупець (Замовник): <span style={{ fontWeight: '800', color: '#007AFF', fontSize: '13px' }}>{activeClient?.name || '—'}</span>
+                  </p>
                 </div>
               </div>
 
-              {/* Product Specification Title */}
-              <div style={{ backgroundColor: '#F2F2F7', padding: '10px 14px', borderRadius: '6px', marginBottom: '16px', border: '1px solid #E5E5EA' }}>
-                <span style={{ fontSize: '9px', fontWeight: '800', color: '#8E8E93', textTransform: 'uppercase', display: 'block', marginBottom: '2px' }}>Продукція / Специфікація</span>
-                <p style={{ fontSize: '13px', fontWeight: '800', margin: 0, color: '#000' }}>{name}</p>
+              {/* Product Specification & Quantity Banner */}
+              <div style={{ display: 'grid', gridTemplateColumns: '2.5fr 1fr', gap: '10px', marginBottom: '16px' }}>
+                <div style={{ backgroundColor: '#F2F2F7', padding: '10px 14px', borderRadius: '6px', border: '1px solid #E5E5EA' }}>
+                  <span style={{ fontSize: '9px', fontWeight: '800', color: '#8E8E93', textTransform: 'uppercase', display: 'block', marginBottom: '2px' }}>Продукція / Специфікація</span>
+                  <p style={{ fontSize: '13px', fontWeight: '800', margin: 0, color: '#000' }}>{name}</p>
+                </div>
+                <div style={{ backgroundColor: '#F2F2F7', padding: '10px 14px', borderRadius: '6px', border: '1px solid #E5E5EA', textAlign: 'right' }}>
+                  <span style={{ fontSize: '9px', fontWeight: '800', color: '#8E8E93', textTransform: 'uppercase', display: 'block', marginBottom: '2px' }}>Тираж замовлення</span>
+                  <p style={{ fontSize: '14px', fontWeight: '900', margin: 0, color: '#007AFF' }}>{quantity} шт.</p>
+                </div>
               </div>
 
               {/* 1. Матеріали та специфікація паперу */}
