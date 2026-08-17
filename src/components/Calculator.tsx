@@ -662,25 +662,28 @@ export const Calculator: React.FC = () => {
     const element = document.getElementById('invoice-preview-container');
     if (!element) return;
 
-    const safeProdName = (name || 'Бланки')
-      .split('[')[0]
-      .replace(/Угода з Email:?/gi, '')
-      .replace(/Замовлення\s*№\s*\d+/gi, '')
-      .replace(/№\s*\d+/gi, '')
-      .replace(/[-—–]/g, '')
-      .trim()
-      .replace(/[\\/:*?"<>|]/g, '')
-      .replace(/\s+/g, '_') || 'Бланки';
+    const matchNum = (name || '').match(/№\s*(\d+)/);
+    const num = matchNum ? matchNum[1] : (orderNumber || '33811');
 
-    const safeClientName = (activeClient?.name || 'Замовник_№1')
-      .trim()
-      .replace(/[\\/:*?"<>|]/g, '')
-      .replace(/\s+/g, '_');
+    let rawProd = subCategory || category || 'Бланки';
+    if (!rawProd || (rawProd as string) === 'Основна' || (rawProd as string).includes('Угода')) {
+      if ((name || '').toLowerCase().includes('бланк')) {
+        rawProd = 'Бланки';
+      } else if ((name || '').toLowerCase().includes('листівк')) {
+        rawProd = 'Листівки';
+      } else {
+        rawProd = 'Бланки';
+      }
+    }
+    const safeProdName = rawProd.replace(/[\\/:*?"<>|]/g, '').trim().replace(/\s+/g, '_');
+
+    const rawClient = activeClient?.name || 'Замовник №1';
+    const safeClientName = rawClient.replace(/[\\/:*?"<>|]/g, '').trim().replace(/\s+/g, '_');
 
     const paperShort = paperType === 'offset' ? 'Офс._70г' : paperType === 'gazetka' ? 'Газ._45г' : 'Крейда_130г';
     const turnShort = turnType === 'sam_na_sebe' ? 'сс' : turnType === 'bez_oborotu' ? 'без_обор' : 'чо';
 
-    const fileName = `№${orderNumber}_${safeProdName}_—_${safeClientName}_(${selectedFormat},_${paperShort},_${colors},_${turnShort},_${quantity}_шт.).pdf`;
+    const fileName = `№${num}_${safeProdName}_—_${safeClientName}_(${selectedFormat},_${paperShort},_${colors},_${turnShort},_${quantity}_шт.).pdf`;
 
     // Clone element to a temporary clean container on document.body to eliminate modal position Y-offset blank page bug
     const tempContainer = document.createElement('div');

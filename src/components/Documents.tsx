@@ -135,24 +135,29 @@ export const Documents: React.FC = () => {
       </table>
     `;
 
-    const safeProdName = (order.name || 'Бланки')
-      .split('[')[0]
-      .replace(/Угода з Email:?/gi, '')
-      .replace(/Замовлення\s*№\s*\d+/gi, '')
-      .replace(/№\s*\d+/gi, '')
-      .replace(/[-—–]/g, '')
-      .trim()
-      .replace(/[\\/:*?"<>|]/g, '')
-      .replace(/\s+/g, '_') || 'Бланки';
+    // Extract 5-digit order number if present in title, otherwise fallback to order.id
+    const matchNum = (order.name || '').match(/№\s*(\d+)/);
+    const num = matchNum ? matchNum[1] : (order.id || '33811');
 
-    const safeClientName = (activeClient?.name || 'Замовник_№1')
-      .trim()
-      .replace(/[\\/:*?"<>|]/g, '')
-      .replace(/\s+/g, '_');
+    // Product name: use order.category or clean product name
+    let rawProd = order.category || 'Бланки';
+    if (!order.category || order.category === 'Основна' || order.category.includes('Угода')) {
+      if ((order.name || '').toLowerCase().includes('бланк')) {
+        rawProd = 'Бланки';
+      } else if ((order.name || '').toLowerCase().includes('листівк')) {
+        rawProd = 'Листівки';
+      } else {
+        rawProd = 'Бланки';
+      }
+    }
+    const safeProdName = rawProd.replace(/[\\/:*?"<>|]/g, '').trim().replace(/\s+/g, '_');
+
+    // Client name: use activeClient.name or fallback
+    const rawClient = activeClient?.name || 'Замовник №1';
+    const safeClientName = rawClient.replace(/[\\/:*?"<>|]/g, '').trim().replace(/\s+/g, '_');
 
     const paperShort = order.paperType === 'offset' ? 'Офс._70г' : order.paperType === 'gazetka' ? 'Газ._45г' : 'Крейда_130г';
     const turnShort = order.isSamNaSebe ? 'сс' : 'без_обор';
-    const num = order.id || '33811';
 
     const fileName = `№${num}_${safeProdName}_—_${safeClientName}_(${order.format || 'A4'},_${paperShort},_${order.colors || '1+0'},_${turnShort},_${order.quantity || 1000}_шт.).pdf`;
 
