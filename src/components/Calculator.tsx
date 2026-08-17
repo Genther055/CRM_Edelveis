@@ -692,13 +692,33 @@ export const Calculator: React.FC = () => {
     tempContainer.style.top = '0px';
     tempContainer.style.width = '750px';
     tempContainer.style.backgroundColor = '#FFFFFF';
+    tempContainer.style.color = '#1C1C1E';
 
     const clone = element.cloneNode(true) as HTMLElement;
     clone.style.margin = '0';
-    clone.style.padding = '20px';
+    clone.style.padding = '24px';
     clone.style.maxHeight = 'none';
     clone.style.overflow = 'visible';
-    
+    clone.style.backgroundColor = '#FFFFFF';
+    clone.style.color = '#1C1C1E';
+
+    // Traverse clone and replace any CSS variables with explicit high-contrast print colors so sheet stays white in Dark Theme
+    const allElements = [clone, ...Array.from(clone.querySelectorAll('*'))] as HTMLElement[];
+    allElements.forEach(el => {
+      const style = el.getAttribute('style') || '';
+      if (style.includes('var(')) {
+        const newStyle = style
+          .replace(/var\(--bg-card-subtle\)/g, '#F8FAFC')
+          .replace(/var\(--bg-card\)/g, '#FFFFFF')
+          .replace(/var\(--bg-system\)/g, '#FFFFFF')
+          .replace(/var\(--border-light\)/g, '#E2E8F0')
+          .replace(/var\(--text-dark\)/g, '#1C1C1E')
+          .replace(/var\(--text-medium\)/g, '#636366')
+          .replace(/var\(--primary\)/g, '#007AFF');
+        el.setAttribute('style', newStyle);
+      }
+    });
+
     tempContainer.appendChild(clone);
     document.body.appendChild(tempContainer);
 
@@ -710,7 +730,8 @@ export const Calculator: React.FC = () => {
         scale: 2, 
         useCORS: true,
         scrollX: 0,
-        scrollY: 0
+        scrollY: 0,
+        backgroundColor: '#FFFFFF'
       },
       jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' as const },
       pagebreak:    { mode: ['avoid-all', 'css'] }
@@ -1621,84 +1642,84 @@ export const Calculator: React.FC = () => {
               <button onClick={() => setShowInvoice(false)} style={{ border: 'none', background: 'transparent', color: 'var(--text-medium)', cursor: 'pointer' }}>✕</button>
             </div>
             
-            <div className="ios-modal-body" id="invoice-preview-container" style={{ padding: '28px', backgroundColor: 'var(--bg-card)', color: 'var(--text-dark)', fontSize: '11px', lineHeight: '1.4' }}>
+            <div className="ios-modal-body" id="invoice-preview-container" style={{ padding: '28px', backgroundColor: '#FFFFFF', color: '#1C1C1E', fontSize: '11px', lineHeight: '1.4', borderRadius: '8px', border: '1px solid #E2E8F0' }}>
               {/* Document Header */}
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px solid var(--border-light)', paddingBottom: '12px', marginBottom: '16px', gap: '16px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px solid #1C1C1E', paddingBottom: '12px', marginBottom: '16px', gap: '16px' }}>
                 <div style={{ flexShrink: 0 }}>
-                  <h4 style={{ fontSize: '18px', fontWeight: '900', letterSpacing: '-0.5px', margin: 0, color: 'var(--text-dark)' }}>РАХУНОК-СПЕЦИФІКАЦІЯ № {orderNumber}</h4>
-                  <p style={{ fontSize: '11px', color: 'var(--text-medium)', margin: '2px 0 0 0' }}>Поліграфічна компанія «Едельвейс і К»</p>
+                  <h4 style={{ fontSize: '18px', fontWeight: '900', letterSpacing: '-0.5px', margin: 0, color: '#1C1C1E' }}>РАХУНОК-СПЕЦИФІКАЦІЯ № {orderNumber}</h4>
+                  <p style={{ fontSize: '11px', color: '#636366', margin: '2px 0 0 0' }}>Поліграфічна компанія «Едельвейс і К»</p>
                 </div>
-                <div style={{ textAlign: 'right', flexGrow: 1, minWidth: '220px', backgroundColor: 'var(--bg-card-subtle)', padding: '8px 14px', borderRadius: '6px', border: '1px solid var(--border-light)' }}>
-                  <p style={{ fontSize: '12px', fontWeight: '700', margin: 0, color: 'var(--text-dark)' }}>Дата: {new Date().toLocaleDateString('uk-UA')}</p>
-                  <p style={{ fontSize: '12px', color: 'var(--text-medium)', margin: '4px 0 0 0', fontWeight: '600' }}>
-                    Покупець (Замовник): <span style={{ fontWeight: '800', color: 'var(--primary)', fontSize: '13px' }}>{activeClient?.name || '—'}</span>
+                <div style={{ textAlign: 'right', flexGrow: 1, minWidth: '220px', backgroundColor: '#F8FAFC', padding: '8px 14px', borderRadius: '6px', border: '1px solid #E2E8F0' }}>
+                  <p style={{ fontSize: '12px', fontWeight: '700', margin: 0, color: '#1C1C1E' }}>Дата: {new Date().toLocaleDateString('uk-UA')}</p>
+                  <p style={{ fontSize: '12px', color: '#636366', margin: '4px 0 0 0', fontWeight: '600' }}>
+                    Покупець (Замовник): <span style={{ fontWeight: '800', color: '#007AFF', fontSize: '13px' }}>{activeClient?.name || '—'}</span>
                   </p>
                 </div>
               </div>
 
               {/* Product Specification & Quantity Banner */}
               <div style={{ display: 'grid', gridTemplateColumns: '2.5fr 1fr', gap: '10px', marginBottom: '16px' }}>
-                <div style={{ backgroundColor: 'var(--bg-card-subtle)', padding: '10px 14px', borderRadius: '6px', border: '1px solid var(--border-light)' }}>
-                  <span style={{ fontSize: '9px', fontWeight: '800', color: 'var(--text-medium)', textTransform: 'uppercase', display: 'block', marginBottom: '2px' }}>Продукція / Специфікація</span>
-                  <p style={{ fontSize: '13px', fontWeight: '800', margin: 0, color: 'var(--text-dark)' }}>{name}</p>
+                <div style={{ backgroundColor: '#F8FAFC', padding: '10px 14px', borderRadius: '6px', border: '1px solid #E2E8F0' }}>
+                  <span style={{ fontSize: '9px', fontWeight: '800', color: '#636366', textTransform: 'uppercase', display: 'block', marginBottom: '2px' }}>Продукція / Специфікація</span>
+                  <p style={{ fontSize: '13px', fontWeight: '800', margin: 0, color: '#1C1C1E' }}>{name}</p>
                 </div>
-                <div style={{ backgroundColor: 'var(--bg-card-subtle)', padding: '10px 14px', borderRadius: '6px', border: '1px solid var(--border-light)', textAlign: 'right' }}>
-                  <span style={{ fontSize: '9px', fontWeight: '800', color: 'var(--text-medium)', textTransform: 'uppercase', display: 'block', marginBottom: '2px' }}>Тираж замовлення</span>
-                  <p style={{ fontSize: '14px', fontWeight: '900', margin: 0, color: 'var(--primary)' }}>{quantity} шт.</p>
+                <div style={{ backgroundColor: '#F8FAFC', padding: '10px 14px', borderRadius: '6px', border: '1px solid #E2E8F0', textAlign: 'right' }}>
+                  <span style={{ fontSize: '9px', fontWeight: '800', color: '#636366', textTransform: 'uppercase', display: 'block', marginBottom: '2px' }}>Тираж замовлення</span>
+                  <p style={{ fontSize: '14px', fontWeight: '900', margin: 0, color: '#007AFF' }}>{quantity} шт.</p>
                 </div>
               </div>
 
               {/* 1. Матеріали та специфікація паперу */}
               <div style={{ marginBottom: '16px' }}>
-                <h5 style={{ fontSize: '11px', fontWeight: '800', borderBottom: '1px solid var(--border-light)', paddingBottom: '4px', marginBottom: '8px', color: 'var(--primary)', textTransform: 'uppercase', margin: 0 }}>
+                <h5 style={{ fontSize: '11px', fontWeight: '800', borderBottom: '1px solid #E2E8F0', paddingBottom: '4px', marginBottom: '8px', color: '#007AFF', textTransform: 'uppercase', margin: 0 }}>
                   1. Матеріали та сировина
                 </h5>
-                <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 1fr', gap: '10px', backgroundColor: 'var(--bg-card-subtle)', padding: '8px 12px', borderRadius: '6px', border: '1px solid var(--border-light)' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 1fr', gap: '10px', backgroundColor: '#F8FAFC', padding: '8px 12px', borderRadius: '6px', border: '1px solid #E2E8F0' }}>
                   <div>
-                    <span style={{ color: 'var(--text-medium)', display: 'block', fontSize: '10px' }}>Матеріал паперу:</span>
-                    <strong style={{ fontSize: '11px', color: 'var(--text-dark)' }}>{paperType === 'offset' ? 'Офсетний 70г' : paperType === 'gazetka' ? 'Газетний 45г' : 'Крейдований 130г'}</strong>
+                    <span style={{ color: '#636366', display: 'block', fontSize: '10px' }}>Матеріал паперу:</span>
+                    <strong style={{ fontSize: '11px', color: '#1C1C1E' }}>{paperType === 'offset' ? 'Офсетний 70г' : paperType === 'gazetka' ? 'Газетний 45г' : 'Крейдований 130г'}</strong>
                   </div>
                   <div>
-                    <span style={{ color: 'var(--text-medium)', display: 'block', fontSize: '10px' }}>Розмір друкарського листа:</span>
-                    <strong style={{ fontSize: '11px', color: 'var(--text-dark)' }}>{calculatedOps.format} ({calculatedOps.format === 'A1' ? '594x841 мм' : calculatedOps.format === 'A2' ? '420x594 мм' : '297x420 мм'})</strong>
+                    <span style={{ color: '#636366', display: 'block', fontSize: '10px' }}>Розмір друкарського листа:</span>
+                    <strong style={{ fontSize: '11px', color: '#1C1C1E' }}>{calculatedOps.format} ({calculatedOps.format === 'A1' ? '594x841 мм' : calculatedOps.format === 'A2' ? '420x594 мм' : '297x420 мм'})</strong>
                   </div>
                   <div>
-                    <span style={{ color: 'var(--text-medium)', display: 'block', fontSize: '10px' }}>Обсяг матеріалу:</span>
-                    <strong style={{ fontSize: '11px', color: 'var(--text-dark)' }}>{calculatedOps.physicalSheets} арк. (+{Math.ceil(calculatedOps.physicalSheets * 0.05)} тех. відх.)</strong>
+                    <span style={{ color: '#636366', display: 'block', fontSize: '10px' }}>Обсяг матеріалу:</span>
+                    <strong style={{ fontSize: '11px', color: '#1C1C1E' }}>{calculatedOps.physicalSheets} арк. (+{Math.ceil(calculatedOps.physicalSheets * 0.05)} тех. відх.)</strong>
                   </div>
                 </div>
               </div>
 
               {/* 2. Процес друку */}
               <div style={{ marginBottom: '16px' }}>
-                <h5 style={{ fontSize: '11px', fontWeight: '800', borderBottom: '1px solid var(--border-light)', paddingBottom: '4px', marginBottom: '8px', color: 'var(--primary)', textTransform: 'uppercase', margin: 0 }}>
+                <h5 style={{ fontSize: '11px', fontWeight: '800', borderBottom: '1px solid #E2E8F0', paddingBottom: '4px', marginBottom: '8px', color: '#007AFF', textTransform: 'uppercase', margin: 0 }}>
                   2. Процес друку (Друкарська машина & Параметри)
                 </h5>
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px', border: '1px solid var(--border-light)' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px', border: '1px solid #E2E8F0' }}>
                   <tbody>
-                    <tr style={{ borderBottom: '1px solid var(--border-light)', backgroundColor: 'var(--bg-card-subtle)' }}>
-                      <td style={{ padding: '6px 10px', color: 'var(--text-medium)', width: '30%' }}>Друкарська машина:</td>
-                      <td style={{ padding: '6px 10px', fontWeight: '700', color: 'var(--text-dark)', width: '20%' }}>{calculatedOps.machine}</td>
-                      <td style={{ padding: '6px 10px', color: 'var(--text-medium)', width: '30%' }}>Красочність (кольоровість):</td>
-                      <td style={{ padding: '6px 10px', fontWeight: '700', color: 'var(--text-dark)', width: '20%' }}>{colors} ({['1+1', '4+4'].includes(colors) ? '2-стор' : '1-стор'})</td>
+                    <tr style={{ borderBottom: '1px solid #E2E8F0', backgroundColor: '#F8FAFC' }}>
+                      <td style={{ padding: '6px 10px', color: '#636366', width: '30%' }}>Друкарська машина:</td>
+                      <td style={{ padding: '6px 10px', fontWeight: '700', color: '#1C1C1E', width: '20%' }}>{calculatedOps.machine}</td>
+                      <td style={{ padding: '6px 10px', color: '#636366', width: '30%' }}>Красочність (кольоровість):</td>
+                      <td style={{ padding: '6px 10px', fontWeight: '700', color: '#1C1C1E', width: '20%' }}>{colors} ({['1+1', '4+4'].includes(colors) ? '2-стор' : '1-стор'})</td>
                     </tr>
-                    <tr style={{ borderBottom: '1px solid var(--border-light)' }}>
-                      <td style={{ padding: '6px 10px', color: 'var(--text-medium)' }}>Однотипних листів (на арк):</td>
-                      <td style={{ padding: '6px 10px', fontWeight: '700', color: 'var(--text-dark)' }}>{calculatedOps.itemsPerSheet} шт./арк</td>
-                      <td style={{ padding: '6px 10px', color: 'var(--text-medium)' }}>Спуск макету / оборот:</td>
-                      <td style={{ padding: '6px 10px', fontWeight: '700', color: 'var(--text-dark)' }}>{turnType === 'sam_na_sebe' ? 'Сам на себе (с/с)' : turnType === 'bez_oborotu' ? 'Без обороту' : 'Чужий оборот (ч/о)'}</td>
+                    <tr style={{ borderBottom: '1px solid #E2E8F0' }}>
+                      <td style={{ padding: '6px 10px', color: '#636366' }}>Однотипних листів (на арк):</td>
+                      <td style={{ padding: '6px 10px', fontWeight: '700', color: '#1C1C1E' }}>{calculatedOps.itemsPerSheet} шт./арк</td>
+                      <td style={{ padding: '6px 10px', color: '#636366' }}>Спуск макету / оборот:</td>
+                      <td style={{ padding: '6px 10px', fontWeight: '700', color: '#1C1C1E' }}>{turnType === 'sam_na_sebe' ? 'Сам на себе (с/с)' : turnType === 'bez_oborotu' ? 'Без обороту' : 'Чужий оборот (ч/о)'}</td>
                     </tr>
-                    <tr style={{ borderBottom: '1px solid var(--border-light)', backgroundColor: 'var(--bg-card-subtle)' }}>
-                      <td style={{ padding: '6px 10px', color: 'var(--text-medium)' }}>Кількість друкованих листів:</td>
-                      <td style={{ padding: '6px 10px', fontWeight: '700', color: 'var(--text-dark)' }}>{calculatedOps.physicalSheets} арк</td>
-                      <td style={{ padding: '6px 10px', color: 'var(--text-medium)' }}>Фактичні прогони (прогоно-відбитки):</td>
-                      <td style={{ padding: '6px 10px', fontWeight: '700', color: 'var(--text-dark)' }}>{calculatedOps.physicalSheets * (['1+1', '4+4'].includes(colors) ? 2 : 1)} прогонів</td>
+                    <tr style={{ borderBottom: '1px solid #E2E8F0', backgroundColor: '#F8FAFC' }}>
+                      <td style={{ padding: '6px 10px', color: '#636366' }}>Кількість друкованих листів:</td>
+                      <td style={{ padding: '6px 10px', fontWeight: '700', color: '#1C1C1E' }}>{calculatedOps.physicalSheets} арк</td>
+                      <td style={{ padding: '6px 10px', color: '#636366' }}>Фактичні прогони (прогоно-відбитки):</td>
+                      <td style={{ padding: '6px 10px', fontWeight: '700', color: '#1C1C1E' }}>{calculatedOps.physicalSheets * (['1+1', '4+4'].includes(colors) ? 2 : 1)} прогонів</td>
                     </tr>
                     <tr>
-                      <td style={{ padding: '6px 10px', color: 'var(--text-medium)' }}>Приладка / Форми:</td>
-                      <td style={{ padding: '6px 10px', fontWeight: '700', color: 'var(--text-dark)' }}>{['1+1', '4+4'].includes(colors) ? 2 : 1} компл. форм</td>
-                      <td style={{ padding: '6px 10px', color: 'var(--text-medium)' }}>Технічні відходи (приладка):</td>
-                      <td style={{ padding: '6px 10px', fontWeight: '700', color: 'var(--text-dark)' }}>+{Math.ceil(calculatedOps.physicalSheets * 0.05)} арк. (5%)</td>
+                      <td style={{ padding: '6px 10px', color: '#636366' }}>Приладка / Форми:</td>
+                      <td style={{ padding: '6px 10px', fontWeight: '700', color: '#1C1C1E' }}>{['1+1', '4+4'].includes(colors) ? 2 : 1} компл. форм</td>
+                      <td style={{ padding: '6px 10px', color: '#636366' }}>Технічні відходи (приладка):</td>
+                      <td style={{ padding: '6px 10px', fontWeight: '700', color: '#1C1C1E' }}>+{Math.ceil(calculatedOps.physicalSheets * 0.05)} арк. (5%)</td>
                     </tr>
                   </tbody>
                 </table>
@@ -1706,58 +1727,58 @@ export const Calculator: React.FC = () => {
 
               {/* 3. Післядрукарська обробка (Післядрук) */}
               <div style={{ marginBottom: '16px' }}>
-                <h5 style={{ fontSize: '11px', fontWeight: '800', borderBottom: '1px solid var(--border-light)', paddingBottom: '4px', marginBottom: '8px', color: 'var(--primary)', textTransform: 'uppercase', margin: 0 }}>
+                <h5 style={{ fontSize: '11px', fontWeight: '800', borderBottom: '1px solid #E2E8F0', paddingBottom: '4px', marginBottom: '8px', color: '#007AFF', textTransform: 'uppercase', margin: 0 }}>
                   3. Післядрукарська обробка (Післядрук)
                 </h5>
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', fontSize: '11px' }}>
-                  <div style={{ padding: '6px 10px', border: '1px solid var(--border-light)', borderRadius: '4px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)' }}>
-                    <span style={{ color: 'var(--text-medium)' }}>Порізка тиражу:</span> <strong style={{ color: 'var(--text-dark)' }}>Формат {selectedFormat}</strong>
+                  <div style={{ padding: '6px 10px', border: '1px solid #E2E8F0', borderRadius: '4px', backgroundColor: '#F8FAFC', color: '#1C1C1E' }}>
+                    <span style={{ color: '#636366' }}>Порізка тиражу:</span> <strong style={{ color: '#1C1C1E' }}>Формат {selectedFormat}</strong>
                   </div>
-                  <div style={{ padding: '6px 10px', border: '1px solid var(--border-light)', borderRadius: '4px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)' }}>
-                    <span style={{ color: 'var(--text-medium)' }}>Ламінування:</span> <strong style={{ color: 'var(--text-dark)' }}>{laminationType === 'none' ? 'Без ламінування' : laminationType === 'gloss' ? 'Глянцева плівка' : laminationType === 'matte' ? 'Матова плівка' : 'Soft-touch оксамит'}</strong>
+                  <div style={{ padding: '6px 10px', border: '1px solid #E2E8F0', borderRadius: '4px', backgroundColor: '#F8FAFC', color: '#1C1C1E' }}>
+                    <span style={{ color: '#636366' }}>Ламінування:</span> <strong style={{ color: '#1C1C1E' }}>{laminationType === 'none' ? 'Без ламінування' : laminationType === 'gloss' ? 'Глянцева плівка' : laminationType === 'matte' ? 'Матова плівка' : 'Soft-touch оксамит'}</strong>
                   </div>
-                  <div style={{ padding: '6px 10px', border: '1px solid var(--border-light)', borderRadius: '4px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)' }}>
-                    <span style={{ color: 'var(--text-medium)' }}>Бігування / Фальцювання:</span> <strong style={{ color: 'var(--text-dark)' }}>{Number(creaseCount) > 0 ? `${creaseCount} бігів (згинів)` : 'Ні'}</strong>
+                  <div style={{ padding: '6px 10px', border: '1px solid #E2E8F0', borderRadius: '4px', backgroundColor: '#F8FAFC', color: '#1C1C1E' }}>
+                    <span style={{ color: '#636366' }}>Бігування / Фальцювання:</span> <strong style={{ color: '#1C1C1E' }}>{Number(creaseCount) > 0 ? `${creaseCount} бігів (згинів)` : 'Ні'}</strong>
                   </div>
-                  <div style={{ padding: '6px 10px', border: '1px solid var(--border-light)', borderRadius: '4px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)' }}>
-                    <span style={{ color: 'var(--text-medium)' }}>Скріплення:</span> <strong style={{ color: 'var(--text-dark)' }}>{bindingType === 'none' ? 'Без скріплення' : bindingType === 'staple' ? 'Скоба (шиття)' : bindingType === 'spring' ? 'Пружина' : bindingType === 'glue' ? 'Клей (КБС)' : 'Тверда палітурка'}</strong>
+                  <div style={{ padding: '6px 10px', border: '1px solid #E2E8F0', borderRadius: '4px', backgroundColor: '#F8FAFC', color: '#1C1C1E' }}>
+                    <span style={{ color: '#636366' }}>Скріплення:</span> <strong style={{ color: '#1C1C1E' }}>{bindingType === 'none' ? 'Без скріплення' : bindingType === 'staple' ? 'Скоба (шиття)' : bindingType === 'spring' ? 'Пружина' : bindingType === 'glue' ? 'Клей (КБС)' : 'Тверда палітурка'}</strong>
                   </div>
-                  <div style={{ padding: '6px 10px', border: '1px solid var(--border-light)', borderRadius: '4px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', gridColumn: 'span 2' }}>
-                    <span style={{ color: 'var(--text-medium)' }}>Пакування та укладання:</span> <strong style={{ color: 'var(--text-dark)' }}>{Number(packingCount) > 0 ? `${calculatedOps.totalPackages} пак. по ${packingCount} шт.` : 'Стандартне пакування'}</strong>
+                  <div style={{ padding: '6px 10px', border: '1px solid #E2E8F0', borderRadius: '4px', backgroundColor: '#F8FAFC', color: '#1C1C1E', gridColumn: 'span 2' }}>
+                    <span style={{ color: '#636366' }}>Пакування та укладання:</span> <strong style={{ color: '#1C1C1E' }}>{Number(packingCount) > 0 ? `${calculatedOps.totalPackages} пак. по ${packingCount} шт.` : 'Стандартне пакування'}</strong>
                   </div>
                 </div>
               </div>
 
               {/* 4. Фінансовий розрахунок вартості */}
               <div>
-                <h5 style={{ fontSize: '11px', fontWeight: '800', borderBottom: '1px solid #E5E5EA', paddingBottom: '4px', marginBottom: '8px', color: 'var(--primary)', textTransform: 'uppercase', margin: 0 }}>
+                <h5 style={{ fontSize: '11px', fontWeight: '800', borderBottom: '1px solid #E5E5EA', paddingBottom: '4px', marginBottom: '8px', color: '#007AFF', textTransform: 'uppercase', margin: 0 }}>
                   4. Фінансовий підсумок
                 </h5>
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
                   <thead>
                     <tr style={{ borderBottom: '2px solid #1C1C1E', textAlign: 'left' }}>
-                      <th style={{ padding: '6px 0', fontWeight: '700' }}>Складова замовлення</th>
-                      <th style={{ padding: '6px 0', textAlign: 'center', fontWeight: '700' }}>Обсяг</th>
-                      <th style={{ padding: '6px 0', textAlign: 'right', fontWeight: '700' }}>Сума (грн)</th>
+                      <th style={{ padding: '6px 0', fontWeight: '700', color: '#1C1C1E' }}>Складова замовлення</th>
+                      <th style={{ padding: '6px 0', textAlign: 'center', fontWeight: '700', color: '#1C1C1E' }}>Обсяг</th>
+                      <th style={{ padding: '6px 0', textAlign: 'right', fontWeight: '700', color: '#1C1C1E' }}>Сума (грн)</th>
                     </tr>
                   </thead>
                   <tbody>
                     <tr style={{ borderBottom: '1px solid #E5E5EA' }}>
-                      <td style={{ padding: '6px 0' }}>Макет та переддрук (Оборот: {turnType === 'sam_na_sebe' ? 'с/с' : turnType === 'bez_oborotu' ? 'без обор.' : 'ч/о'})</td>
-                      <td style={{ padding: '6px 0', textAlign: 'center' }}>1 посл.</td>
-                      <td style={{ padding: '6px 0', textAlign: 'right' }}>{designCost.toFixed(2)} ₴</td>
+                      <td style={{ padding: '6px 0', color: '#1C1C1E' }}>Макет та переддрук (Оборот: {turnType === 'sam_na_sebe' ? 'с/с' : turnType === 'bez_oborotu' ? 'без обор.' : 'ч/о'})</td>
+                      <td style={{ padding: '6px 0', textAlign: 'center', color: '#1C1C1E' }}>1 посл.</td>
+                      <td style={{ padding: '6px 0', textAlign: 'right', color: '#1C1C1E' }}>{designCost.toFixed(2)} ₴</td>
                     </tr>
                     <tr style={{ borderBottom: '1px solid #E5E5EA' }}>
-                      <td style={{ padding: '6px 0' }}>Матеріали + Поліграфічний друк + Післядрукарські операції</td>
-                      <td style={{ padding: '6px 0', textAlign: 'center' }}>{quantity} шт.</td>
-                      <td style={{ padding: '6px 0', textAlign: 'right' }}>{(calculatedOps.finalPrice - designCost).toFixed(2)} ₴</td>
+                      <td style={{ padding: '6px 0', color: '#1C1C1E' }}>Матеріали + Поліграфічний друк + Післядрукарські операції</td>
+                      <td style={{ padding: '6px 0', textAlign: 'center', color: '#1C1C1E' }}>{quantity} шт.</td>
+                      <td style={{ padding: '6px 0', textAlign: 'right', color: '#1C1C1E' }}>{(calculatedOps.finalPrice - designCost).toFixed(2)} ₴</td>
                     </tr>
                   </tbody>
                   <tfoot>
                     <tr style={{ fontSize: '14px', fontWeight: '800' }}>
-                      <td style={{ padding: '12px 0 0 0' }}>РАЗОМ ДО СПЛАТИ:</td>
+                      <td style={{ padding: '12px 0 0 0', color: '#1C1C1E' }}>РАЗОМ ДО СПЛАТИ:</td>
                       <td style={{ padding: '12px 0 0 0', textAlign: 'center', fontSize: '11px', color: '#636366' }}>Ціна за 1 шт: {calculatedOps.unitPrice.toFixed(2)} грн</td>
-                      <td style={{ padding: '12px 0 0 0', textAlign: 'right', color: 'var(--primary)', fontSize: '16px' }}>{calculatedOps.finalPrice.toFixed(2)} грн</td>
+                      <td style={{ padding: '12px 0 0 0', textAlign: 'right', color: '#007AFF', fontSize: '16px' }}>{calculatedOps.finalPrice.toFixed(2)} грн</td>
                     </tr>
                   </tfoot>
                 </table>
