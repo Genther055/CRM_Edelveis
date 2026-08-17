@@ -50,8 +50,8 @@ export const Calculator: React.FC = () => {
   const [subCategory, setSubCategory] = useState<'Бланки' | 'Листівки'>('Бланки');
   const [name, setName] = useState('Бланки А4');
   const [category, setCategory] = useState<'Візитки' | 'Бланки' | 'Буклети' | 'Книги' | 'Наліпки' | 'Календарі' | 'Блокноти' | 'Папки'>('Бланки');
-  const [quantity, setQuantity] = useState(1000);
-  const [packingCount, setPackingCount] = useState(1);
+  const [quantity, setQuantity] = useState<number | ''>(1000);
+  const [packingCount, setPackingCount] = useState<number | ''>(1);
   const [paperType, setPaperType] = useState<'offset' | 'gazetka' | 'coated'>('offset');
   const [colors, setColors] = useState('1+0');
   const [isSamNaSebe, setIsSamNaSebe] = useState(true);
@@ -348,17 +348,20 @@ export const Calculator: React.FC = () => {
     let printRate = norms.printRates.rizograph;
     let itemsPerSheet = 2;
 
-    if (quantity < 1000) {
+    const numQty = Math.max(1, Number(quantity) || 1);
+    const numPack = Math.max(0, Number(packingCount) || 0);
+
+    if (numQty < 1000) {
       machine = 'Різограф';
       format = 'A3';
       printRate = norms.printRates.rizograph;
       itemsPerSheet = selectedFormat.includes('90x50') ? 24 : (selectedFormat === 'A3' ? 1 : 2);
-    } else if (quantity < 3000) {
+    } else if (numQty < 3000) {
       machine = 'Опція 1';
       format = 'A3';
       printRate = norms.printRates.option1;
       itemsPerSheet = selectedFormat.includes('90x50') ? 24 : (selectedFormat === 'A3' ? 1 : 2);
-    } else if (quantity < 7000) {
+    } else if (numQty < 7000) {
       machine = 'Опція 2';
       format = 'A2';
       printRate = norms.printRates.option2;
@@ -370,7 +373,7 @@ export const Calculator: React.FC = () => {
       itemsPerSheet = selectedFormat.includes('90x50') ? 96 : (selectedFormat === 'A3' ? 4 : 8);
     }
 
-    const physicalSheets = Math.ceil(quantity / itemsPerSheet);
+    const physicalSheets = Math.ceil(numQty / itemsPerSheet);
     
     // Choose paper rate
     let paperPrice = norms.paperOffsetPrice;
@@ -379,8 +382,8 @@ export const Calculator: React.FC = () => {
     const paperCost = physicalSheets * paperPrice;
 
     const passes = ['1+1', '4+4'].includes(colors) ? 2 : 1;
-    const cuttingCost = quantity * norms.cuttingRate;
-    const packingCost = packingCount * norms.packingRate;
+    const cuttingCost = numQty * norms.cuttingRate;
+    const packingCost = numPack * norms.packingRate;
 
     let subtotal = 0;
     let printingCost = 0;
@@ -412,11 +415,11 @@ export const Calculator: React.FC = () => {
       filmMounting: rates.filmMounting * getVol('filmMounting'),
       printing: rates.printing * Math.max(1, physicalSheets) * passes,
       lamination: rates.lamination * Math.max(1, physicalSheets),
-      embossing: rates.embossing * quantity * getVol('embossing'),
-      dieCutting: rates.dieCutting * quantity * getVol('dieCutting'),
-      folding: rates.folding * quantity * getVol('folding'),
-      blockInsertion: rates.blockInsertion * quantity * getVol('blockInsertion'),
-      coverMaking: rates.coverMaking * quantity * getVol('coverMaking'),
+      embossing: rates.embossing * numQty * getVol('embossing'),
+      dieCutting: rates.dieCutting * numQty * getVol('dieCutting'),
+      folding: rates.folding * numQty * getVol('folding'),
+      blockInsertion: rates.blockInsertion * numQty * getVol('blockInsertion'),
+      coverMaking: rates.coverMaking * numQty * getVol('coverMaking'),
       blockProcessing: rates.blockProcessing * Math.max(1, physicalSheets)
     };
 
@@ -439,10 +442,10 @@ export const Calculator: React.FC = () => {
       
       // Additional premium factors
       let extraBindingCost = 0;
-      if (bindingType === 'staple') extraBindingCost = quantity * 1.5;
-      if (bindingType === 'spring') extraBindingCost = quantity * 6.5;
-      if (bindingType === 'glue') extraBindingCost = quantity * 12.0;
-      if (bindingType === 'hardcover') extraBindingCost = quantity * 45.0;
+      if (bindingType === 'staple') extraBindingCost = numQty * 1.5;
+      if (bindingType === 'spring') extraBindingCost = numQty * 6.5;
+      if (bindingType === 'glue') extraBindingCost = numQty * 12.0;
+      if (bindingType === 'hardcover') extraBindingCost = numQty * 45.0;
 
       let extraLaminationCost = 0;
       if (laminationType !== 'none') {
@@ -450,7 +453,7 @@ export const Calculator: React.FC = () => {
         extraLaminationCost = physicalSheets * factor;
       }
 
-      let extraFoldingCost = creaseCount * 0.15 * quantity;
+      let extraFoldingCost = creaseCount * 0.15 * numQty;
 
       subtotal = designCost + paperCost + printingCost + cuttingCost + packingCost + extraBindingCost + extraLaminationCost + extraFoldingCost;
     } else {
@@ -461,7 +464,7 @@ export const Calculator: React.FC = () => {
 
     const marginAmount = subtotal * (marginPercent / 100);
     const finalPrice = subtotal + marginAmount;
-    const unitPrice = finalPrice / quantity;
+    const unitPrice = finalPrice / numQty;
 
     return {
       machine,
@@ -502,8 +505,8 @@ export const Calculator: React.FC = () => {
       name: `№ ${orderNumber} - ${name} [${category === 'Бланки' ? subCategory : category}]`,
       clientId: selectedClientId,
       category: category === 'Бланки' ? subCategory : category,
-      quantity,
-      packingCount,
+      quantity: Number(quantity) || 1,
+      packingCount: Number(packingCount) || 1,
       paperType,
       colors,
       isSamNaSebe,
@@ -535,8 +538,8 @@ export const Calculator: React.FC = () => {
     const newTpl: CalcTemplate = {
       name: templateName,
       category,
-      quantity,
-      packingCount,
+      quantity: Number(quantity) || 1,
+      packingCount: Number(packingCount) || 1,
       paperType,
       colors,
       isSamNaSebe,
@@ -886,11 +889,23 @@ export const Calculator: React.FC = () => {
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1.2fr 1fr', gap: '12px' }}>
                   <div className="ios-input-group" style={{ marginBottom: 0 }}>
                     <label className="ios-label">Тираж (шт.)</label>
-                    <input type="number" min="1" value={quantity} onChange={(e) => setQuantity(Math.max(1, Number(e.target.value)))} />
+                    <input 
+                      type="number" 
+                      min="1" 
+                      value={quantity} 
+                      onChange={(e) => setQuantity(e.target.value === '' ? '' : Number(e.target.value))} 
+                      onBlur={() => { if (quantity === '' || Number(quantity) < 1) setQuantity(100); }}
+                    />
                   </div>
                   <div className="ios-input-group" style={{ marginBottom: 0 }}>
                     <label className="ios-label">Пачки (шт)</label>
-                    <input type="number" min="0" value={packingCount} onChange={(e) => setPackingCount(Number(e.target.value))} />
+                    <input 
+                      type="number" 
+                      min="0" 
+                      value={packingCount} 
+                      onChange={(e) => setPackingCount(e.target.value === '' ? '' : Number(e.target.value))}
+                      onBlur={() => { if (packingCount === '') setPackingCount(1); }} 
+                    />
                   </div>
                   <div className="ios-input-group" style={{ marginBottom: 0 }}>
                     <label className="ios-label">Матеріал паперу</label>
