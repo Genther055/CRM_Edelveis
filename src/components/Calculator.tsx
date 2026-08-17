@@ -1239,9 +1239,9 @@ export const Calculator: React.FC = () => {
                         <tr style={{ backgroundColor: 'var(--bg-card-subtle)' }}>
                           <th style={{ width: '40px', padding: '10px' }}>[x]</th>
                           <th>Назва операції</th>
-                          <th style={{ width: '100px', textAlign: 'right' }}>Тариф (грн)</th>
+                          <th style={{ width: '110px', textAlign: 'right' }}>Тариф (грн)</th>
                           <th style={{ width: '80px', textAlign: 'center' }}>Обсяг</th>
-                          <th style={{ width: '110px', textAlign: 'right' }}>Вартість</th>
+                          <th style={{ width: '140px', textAlign: 'right' }}>Вартість</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -1254,9 +1254,10 @@ export const Calculator: React.FC = () => {
                           <td style={{ textAlign: 'right' }}>
                             <input 
                               type="number" 
+                              step="0.00000001"
                               value={opCustomRates.formMaking !== undefined ? opCustomRates.formMaking : norms.formMakingPrice} 
                               onChange={(e) => setOpCustomRates({ ...opCustomRates, formMaking: Number(e.target.value) })}
-                              style={{ height: '24px', padding: '0 4px', textAlign: 'right', fontSize: '11px', width: '80px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
+                              style={{ height: '24px', padding: '0 4px', textAlign: 'right', fontSize: '11px', width: '95px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
                             />
                           </td>
                           <td style={{ textAlign: 'center' }}>
@@ -1267,8 +1268,8 @@ export const Calculator: React.FC = () => {
                               style={{ height: '24px', padding: '0 4px', textAlign: 'center', fontSize: '11px', width: '50px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
                             />
                           </td>
-                          <td style={{ textAlign: 'right', fontWeight: '800', color: activeOps.formMaking ? 'var(--text-dark)' : 'var(--text-medium)' }}>
-                            {calculatedOps.fullSums.formMaking.toFixed(2)} ₴
+                          <td style={{ textAlign: 'right', fontWeight: '800', color: activeOps.formMaking ? 'var(--text-dark)' : 'var(--text-medium)', fontFamily: 'var(--font-mono)' }}>
+                            {calculatedOps.fullSums.formMaking.toFixed(8)} ₴
                           </td>
                         </tr>
 
@@ -1281,9 +1282,10 @@ export const Calculator: React.FC = () => {
                           <td style={{ textAlign: 'right' }}>
                             <input 
                               type="number" 
+                              step="0.00000001"
                               value={opCustomRates.filmMounting !== undefined ? opCustomRates.filmMounting : norms.filmMountingPrice} 
                               onChange={(e) => setOpCustomRates({ ...opCustomRates, filmMounting: Number(e.target.value) })}
-                              style={{ height: '24px', padding: '0 4px', textAlign: 'right', fontSize: '11px', width: '80px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
+                              style={{ height: '24px', padding: '0 4px', textAlign: 'right', fontSize: '11px', width: '95px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
                             />
                           </td>
                           <td style={{ textAlign: 'center' }}>
@@ -1294,8 +1296,8 @@ export const Calculator: React.FC = () => {
                               style={{ height: '24px', padding: '0 4px', textAlign: 'center', fontSize: '11px', width: '50px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
                             />
                           </td>
-                          <td style={{ textAlign: 'right', fontWeight: '800', color: activeOps.filmMounting ? 'var(--text-dark)' : 'var(--text-medium)' }}>
-                            {calculatedOps.fullSums.filmMounting.toFixed(2)} ₴
+                          <td style={{ textAlign: 'right', fontWeight: '800', color: activeOps.filmMounting ? 'var(--text-dark)' : 'var(--text-medium)', fontFamily: 'var(--font-mono)' }}>
+                            {calculatedOps.fullSums.filmMounting.toFixed(8)} ₴
                           </td>
                         </tr>
 
@@ -1308,14 +1310,15 @@ export const Calculator: React.FC = () => {
                           <td style={{ textAlign: 'right' }}>
                             <input 
                               type="number" 
+                              step="0.00000001"
                               value={opCustomRates.printing !== undefined ? opCustomRates.printing : calculatedOps.rates.printing} 
                               onChange={(e) => setOpCustomRates({ ...opCustomRates, printing: Number(e.target.value) })}
-                              style={{ height: '24px', padding: '0 4px', textAlign: 'right', fontSize: '11px', width: '80px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
+                              style={{ height: '24px', padding: '0 4px', textAlign: 'right', fontSize: '11px', width: '95px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
                             />
                           </td>
                           <td style={{ textAlign: 'center', opacity: 0.8, fontSize: '11px', fontWeight: '600', color: 'var(--text-dark)' }}>{calculatedOps.actualVolumes.printing} арк</td>
-                          <td style={{ textAlign: 'right', fontWeight: '800', color: activeOps.printing ? 'var(--text-dark)' : 'var(--text-medium)' }}>
-                            {calculatedOps.fullSums.printing.toFixed(2)} ₴
+                          <td style={{ textAlign: 'right', fontWeight: '800', color: activeOps.printing ? 'var(--text-dark)' : 'var(--text-medium)', fontFamily: 'var(--font-mono)' }}>
+                            {calculatedOps.fullSums.printing.toFixed(8)} ₴
                           </td>
                         </tr>
 
@@ -1328,14 +1331,15 @@ export const Calculator: React.FC = () => {
                           <td style={{ textAlign: 'right' }}>
                             <input 
                               type="number" 
+                              step="0.00000001"
                               value={opCustomRates.lamination !== undefined ? opCustomRates.lamination : calculatedOps.rates.lamination} 
                               onChange={(e) => setOpCustomRates({ ...opCustomRates, lamination: Number(e.target.value) })}
-                              style={{ height: '24px', padding: '0 4px', textAlign: 'right', fontSize: '11px', width: '80px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
+                              style={{ height: '24px', padding: '0 4px', textAlign: 'right', fontSize: '11px', width: '95px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
                             />
                           </td>
                           <td style={{ textAlign: 'center', opacity: 0.8, fontSize: '11px', fontWeight: '600', color: 'var(--text-dark)' }}>{calculatedOps.actualVolumes.lamination} арк</td>
-                          <td style={{ textAlign: 'right', fontWeight: '800', color: activeOps.lamination ? 'var(--text-dark)' : 'var(--text-medium)' }}>
-                            {calculatedOps.fullSums.lamination.toFixed(2)} ₴
+                          <td style={{ textAlign: 'right', fontWeight: '800', color: activeOps.lamination ? 'var(--text-dark)' : 'var(--text-medium)', fontFamily: 'var(--font-mono)' }}>
+                            {calculatedOps.fullSums.lamination.toFixed(8)} ₴
                           </td>
                         </tr>
 
@@ -1348,9 +1352,10 @@ export const Calculator: React.FC = () => {
                           <td style={{ textAlign: 'right' }}>
                             <input 
                               type="number" 
+                              step="0.00000001"
                               value={opCustomRates.embossing !== undefined ? opCustomRates.embossing : norms.embossingPrice} 
                               onChange={(e) => setOpCustomRates({ ...opCustomRates, embossing: Number(e.target.value) })}
-                              style={{ height: '24px', padding: '0 4px', textAlign: 'right', fontSize: '11px', width: '80px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
+                              style={{ height: '24px', padding: '0 4px', textAlign: 'right', fontSize: '11px', width: '95px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
                             />
                           </td>
                           <td style={{ textAlign: 'center' }}>
@@ -1361,8 +1366,8 @@ export const Calculator: React.FC = () => {
                               style={{ height: '24px', padding: '0 4px', textAlign: 'center', fontSize: '11px', width: '60px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
                             />
                           </td>
-                          <td style={{ textAlign: 'right', fontWeight: '800', color: activeOps.embossing ? 'var(--text-dark)' : 'var(--text-medium)' }}>
-                            {calculatedOps.fullSums.embossing.toFixed(2)} ₴
+                          <td style={{ textAlign: 'right', fontWeight: '800', color: activeOps.embossing ? 'var(--text-dark)' : 'var(--text-medium)', fontFamily: 'var(--font-mono)' }}>
+                            {calculatedOps.fullSums.embossing.toFixed(8)} ₴
                           </td>
                         </tr>
 
@@ -1375,9 +1380,10 @@ export const Calculator: React.FC = () => {
                           <td style={{ textAlign: 'right' }}>
                             <input 
                               type="number" 
+                              step="0.00000001"
                               value={opCustomRates.dieCutting !== undefined ? opCustomRates.dieCutting : norms.dieCuttingPrice} 
                               onChange={(e) => setOpCustomRates({ ...opCustomRates, dieCutting: Number(e.target.value) })}
-                              style={{ height: '24px', padding: '0 4px', textAlign: 'right', fontSize: '11px', width: '80px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
+                              style={{ height: '24px', padding: '0 4px', textAlign: 'right', fontSize: '11px', width: '95px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
                             />
                           </td>
                           <td style={{ textAlign: 'center' }}>
@@ -1388,8 +1394,8 @@ export const Calculator: React.FC = () => {
                               style={{ height: '24px', padding: '0 4px', textAlign: 'center', fontSize: '11px', width: '60px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
                             />
                           </td>
-                          <td style={{ textAlign: 'right', fontWeight: '800', color: activeOps.dieCutting ? 'var(--text-dark)' : 'var(--text-medium)' }}>
-                            {calculatedOps.fullSums.dieCutting.toFixed(2)} ₴
+                          <td style={{ textAlign: 'right', fontWeight: '800', color: activeOps.dieCutting ? 'var(--text-dark)' : 'var(--text-medium)', fontFamily: 'var(--font-mono)' }}>
+                            {calculatedOps.fullSums.dieCutting.toFixed(8)} ₴
                           </td>
                         </tr>
 
@@ -1402,9 +1408,10 @@ export const Calculator: React.FC = () => {
                           <td style={{ textAlign: 'right' }}>
                             <input 
                               type="number" 
+                              step="0.00000001"
                               value={opCustomRates.folding !== undefined ? opCustomRates.folding : norms.foldingPrice} 
                               onChange={(e) => setOpCustomRates({ ...opCustomRates, folding: Number(e.target.value) })}
-                              style={{ height: '24px', padding: '0 4px', textAlign: 'right', fontSize: '11px', width: '80px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
+                              style={{ height: '24px', padding: '0 4px', textAlign: 'right', fontSize: '11px', width: '95px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
                             />
                           </td>
                           <td style={{ textAlign: 'center' }}>
@@ -1415,8 +1422,8 @@ export const Calculator: React.FC = () => {
                               style={{ height: '24px', padding: '0 4px', textAlign: 'center', fontSize: '11px', width: '60px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
                             />
                           </td>
-                          <td style={{ textAlign: 'right', fontWeight: '800', color: activeOps.folding ? 'var(--text-dark)' : 'var(--text-medium)' }}>
-                            {calculatedOps.fullSums.folding.toFixed(2)} ₴
+                          <td style={{ textAlign: 'right', fontWeight: '800', color: activeOps.folding ? 'var(--text-dark)' : 'var(--text-medium)', fontFamily: 'var(--font-mono)' }}>
+                            {calculatedOps.fullSums.folding.toFixed(8)} ₴
                           </td>
                         </tr>
 
@@ -1429,9 +1436,10 @@ export const Calculator: React.FC = () => {
                           <td style={{ textAlign: 'right' }}>
                             <input 
                               type="number" 
+                              step="0.00000001"
                               value={opCustomRates.blockInsertion !== undefined ? opCustomRates.blockInsertion : norms.blockInsertionPrice} 
                               onChange={(e) => setOpCustomRates({ ...opCustomRates, blockInsertion: Number(e.target.value) })}
-                              style={{ height: '24px', padding: '0 4px', textAlign: 'right', fontSize: '11px', width: '80px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
+                              style={{ height: '24px', padding: '0 4px', textAlign: 'right', fontSize: '11px', width: '95px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
                             />
                           </td>
                           <td style={{ textAlign: 'center' }}>
@@ -1442,8 +1450,8 @@ export const Calculator: React.FC = () => {
                               style={{ height: '24px', padding: '0 4px', textAlign: 'center', fontSize: '11px', width: '60px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
                             />
                           </td>
-                          <td style={{ textAlign: 'right', fontWeight: '800', color: activeOps.blockInsertion ? 'var(--text-dark)' : 'var(--text-medium)' }}>
-                            {calculatedOps.fullSums.blockInsertion.toFixed(2)} ₴
+                          <td style={{ textAlign: 'right', fontWeight: '800', color: activeOps.blockInsertion ? 'var(--text-dark)' : 'var(--text-medium)', fontFamily: 'var(--font-mono)' }}>
+                            {calculatedOps.fullSums.blockInsertion.toFixed(8)} ₴
                           </td>
                         </tr>
 
@@ -1456,9 +1464,10 @@ export const Calculator: React.FC = () => {
                           <td style={{ textAlign: 'right' }}>
                             <input 
                               type="number" 
+                              step="0.00000001"
                               value={opCustomRates.coverMaking !== undefined ? opCustomRates.coverMaking : norms.coverMakingPrice} 
                               onChange={(e) => setOpCustomRates({ ...opCustomRates, coverMaking: Number(e.target.value) })}
-                              style={{ height: '24px', padding: '0 4px', textAlign: 'right', fontSize: '11px', width: '80px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
+                              style={{ height: '24px', padding: '0 4px', textAlign: 'right', fontSize: '11px', width: '95px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
                             />
                           </td>
                           <td style={{ textAlign: 'center' }}>
@@ -1469,8 +1478,8 @@ export const Calculator: React.FC = () => {
                               style={{ height: '24px', padding: '0 4px', textAlign: 'center', fontSize: '11px', width: '60px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
                             />
                           </td>
-                          <td style={{ textAlign: 'right', fontWeight: '800', color: activeOps.coverMaking ? 'var(--text-dark)' : 'var(--text-medium)' }}>
-                            {calculatedOps.fullSums.coverMaking.toFixed(2)} ₴
+                          <td style={{ textAlign: 'right', fontWeight: '800', color: activeOps.coverMaking ? 'var(--text-dark)' : 'var(--text-medium)', fontFamily: 'var(--font-mono)' }}>
+                            {calculatedOps.fullSums.coverMaking.toFixed(8)} ₴
                           </td>
                         </tr>
 
@@ -1483,14 +1492,15 @@ export const Calculator: React.FC = () => {
                           <td style={{ textAlign: 'right' }}>
                             <input 
                               type="number" 
+                              step="0.00000001"
                               value={opCustomRates.blockProcessing !== undefined ? opCustomRates.blockProcessing : norms.blockProcessingPrice} 
                               onChange={(e) => setOpCustomRates({ ...opCustomRates, blockProcessing: Number(e.target.value) })}
-                              style={{ height: '24px', padding: '0 4px', textAlign: 'right', fontSize: '11px', width: '80px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
+                              style={{ height: '24px', padding: '0 4px', textAlign: 'right', fontSize: '11px', width: '95px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
                             />
                           </td>
                           <td style={{ textAlign: 'center', opacity: 0.8, fontSize: '11px', fontWeight: '600', color: 'var(--text-dark)' }}>{calculatedOps.actualVolumes.blockProcessing} арк</td>
-                          <td style={{ textAlign: 'right', fontWeight: '800', color: activeOps.blockProcessing ? 'var(--text-dark)' : 'var(--text-medium)' }}>
-                            {calculatedOps.fullSums.blockProcessing.toFixed(2)} ₴
+                          <td style={{ textAlign: 'right', fontWeight: '800', color: activeOps.blockProcessing ? 'var(--text-dark)' : 'var(--text-medium)', fontFamily: 'var(--font-mono)' }}>
+                            {calculatedOps.fullSums.blockProcessing.toFixed(8)} ₴
                           </td>
                         </tr>
                       </tbody>
@@ -1523,7 +1533,7 @@ export const Calculator: React.FC = () => {
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', color: 'var(--text-medium)' }}>
                       <span>Ціна за одиницю (шт):</span>
-                      <strong style={{ color: 'var(--primary)' }}>{calculatedOps.unitPrice.toFixed(2)} грн</strong>
+                      <strong style={{ color: 'var(--primary)', fontFamily: 'var(--font-mono)' }}>{calculatedOps.unitPrice.toFixed(8)} грн</strong>
                     </div>
                   </div>
                 </div>
