@@ -55,6 +55,7 @@ export const Calculator: React.FC = () => {
   const [paperType, setPaperType] = useState<'offset' | 'gazetka' | 'coated'>('offset');
   const [colors, setColors] = useState('1+0');
   const [isSamNaSebe, setIsSamNaSebe] = useState(true);
+  const [turnType, setTurnType] = useState<'sam_na_sebe' | 'bez_oborotu' | 'chuzhyi_oborut'>('sam_na_sebe');
   const [selectedClientId, setSelectedClientId] = useState(clients[0]?.id || '');
   const [marginPercent, setMarginPercent] = useState<number>(100);
 
@@ -131,22 +132,43 @@ export const Calculator: React.FC = () => {
       const parsed = parseFloat(customDesignPrice.replace(',', '.'));
       return isNaN(parsed) ? 0 : parsed;
     }
-    return isSamNaSebe ? norms.designSamNaSebe : norms.designStandard;
-  }, [isSamNaSebe, norms, customDesignPrice]);
+    if (turnType === 'sam_na_sebe') return norms.designSamNaSebe;
+    if (turnType === 'chuzhyi_oborut') return norms.designStandard;
+    return 0; // Без обороту
+  }, [turnType, norms, customDesignPrice]);
+
+  const handleSelectTurnType = (type: 'sam_na_sebe' | 'bez_oborotu' | 'chuzhyi_oborut') => {
+    setTurnType(type);
+    setCustomDesignPrice('');
+    if (type === 'sam_na_sebe') {
+      setIsSamNaSebe(true);
+      if (colors === '1+0') setColors('1+1');
+      if (colors === '4+0') setColors('4+4');
+    } else if (type === 'bez_oborotu') {
+      setIsSamNaSebe(false);
+      if (colors === '1+1') setColors('1+0');
+      if (colors === '4+4') setColors('4+0');
+    } else if (type === 'chuzhyi_oborut') {
+      setIsSamNaSebe(false);
+      if (colors === '1+0') setColors('1+1');
+      if (colors === '4+0') setColors('4+4');
+    }
+  };
 
   // Automatically compose full descriptive product title with customer and chosen options
   useEffect(() => {
     const paperName = paperType === 'offset' ? 'Офсетний 70г' : paperType === 'gazetka' ? 'Газетний 45г' : 'Крейдований 130г';
     const clientTitle = activeClient ? activeClient.name : '';
     const baseProd = category === 'Бланки' ? subCategory : category;
+    const turnLabel = turnType === 'sam_na_sebe' ? 'Сам на себе' : turnType === 'bez_oborotu' ? 'Без обороту' : 'Чужий оборот';
     
-    const optionsSummary = `${selectedFormat}, ${paperName}, ${colors}, ${quantity} шт.`;
+    const optionsSummary = `${selectedFormat}, ${paperName}, ${colors}, ${turnLabel}, ${quantity} шт.`;
     const autoTitle = clientTitle 
       ? `${baseProd} — ${clientTitle} (${optionsSummary})`
       : `${baseProd} (${optionsSummary})`;
 
     setName(autoTitle);
-  }, [category, subCategory, selectedClientId, selectedFormat, paperType, colors, quantity, activeClient]);
+  }, [category, subCategory, selectedClientId, selectedFormat, paperType, colors, turnType, quantity, activeClient]);
 
   const handleSelectSubCategory = (sub: 'Бланки' | 'Листівки') => {
     setSubCategory(sub);
@@ -926,32 +948,40 @@ export const Calculator: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Design selection: 1. Сам на себе, 2. Верстка + вільне поле */}
+                {/* Design selection: 1. Сам на себе, 2. Без обороту, 3. Чужий оборот + вільне поле */}
                 <div style={{ display: 'flex', alignItems: 'center', gap: '10px', paddingTop: '10px', borderTop: '0.5px solid var(--border-light)', flexWrap: 'wrap' }}>
-                  <span style={{ fontSize: '11px', fontWeight: '750', color: 'var(--text-medium)', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>Макет / Дизайн:</span>
+                  <span style={{ fontSize: '11px', fontWeight: '750', color: 'var(--text-medium)', textTransform: 'uppercase', whiteSpace: 'nowrap' }}>Спуск / Оборот:</span>
                   <div style={{ display: 'flex', gap: '6px', flexGrow: 1, alignItems: 'center', flexWrap: 'wrap' }}>
                     <button 
                       type="button" 
-                      onClick={() => { setIsSamNaSebe(true); setCustomDesignPrice(''); }}
-                      className={`ios-btn ${isSamNaSebe && !customDesignPrice ? 'ios-btn-primary' : 'ios-btn-secondary'}`}
+                      onClick={() => handleSelectTurnType('sam_na_sebe')}
+                      className={`ios-btn ${turnType === 'sam_na_sebe' && !customDesignPrice ? 'ios-btn-primary' : 'ios-btn-secondary'}`}
                       style={{ fontSize: '11px', padding: '6px 12px', height: '32px' }}
                     >
                       1. Сам на себе ({norms.designSamNaSebe} грн)
                     </button>
                     <button 
                       type="button" 
-                      onClick={() => { setIsSamNaSebe(false); setCustomDesignPrice(''); }}
-                      className={`ios-btn ${!isSamNaSebe && !customDesignPrice ? 'ios-btn-primary' : 'ios-btn-secondary'}`}
+                      onClick={() => handleSelectTurnType('bez_oborotu')}
+                      className={`ios-btn ${turnType === 'bez_oborotu' && !customDesignPrice ? 'ios-btn-primary' : 'ios-btn-secondary'}`}
                       style={{ fontSize: '11px', padding: '6px 12px', height: '32px' }}
                     >
-                      2. Верстка ({norms.designStandard} грн)
+                      2. Без обороту
+                    </button>
+                    <button 
+                      type="button" 
+                      onClick={() => handleSelectTurnType('chuzhyi_oborut')}
+                      className={`ios-btn ${turnType === 'chuzhyi_oborut' && !customDesignPrice ? 'ios-btn-primary' : 'ios-btn-secondary'}`}
+                      style={{ fontSize: '11px', padding: '6px 12px', height: '32px' }}
+                    >
+                      3. Чужий оборот ({norms.designStandard} грн)
                     </button>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                       <input 
                         placeholder="Своя ціна (грн)"
                         value={customDesignPrice}
                         onChange={(e) => setCustomDesignPrice(e.target.value)}
-                        style={{ width: '130px', height: '32px', fontSize: '11px', padding: '0 8px', backgroundColor: customDesignPrice ? 'rgba(0,122,255,0.08)' : undefined }}
+                        style={{ width: '120px', height: '32px', fontSize: '11px', padding: '0 8px', backgroundColor: customDesignPrice ? 'rgba(0,122,255,0.08)' : undefined }}
                       />
                     </div>
                   </div>
