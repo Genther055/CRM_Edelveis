@@ -81,63 +81,119 @@ export const Documents: React.FC = () => {
     element.style.color = '#1C1C1E';
     element.style.fontFamily = 'sans-serif';
     
-    element.innerHTML = `
-      <div style="display: flex; justify-content: space-between; border-bottom: 2px solid #000; padding-bottom: 16px; margin-bottom: 20px;">
-        <div>
-          <h4 style="font-size: 20px; font-weight: 900; font-style: italic; margin: 0;">НАРЯД-ЗАМОВЛЕННЯ №${order.id}</h4>
-          <p style="font-size: 12px; color: #8E8E93; margin: 4px 0 0 0;">База розрахунків CRM</p>
-        </div>
-        <div style="text-align: right;">
-          <p style="font-size: 13px; font-weight: 700; margin: 0;">${order.name}</p>
-          <p style="font-size: 11px; color: #8E8E93; margin: 4px 0 0 0;">Створено: ${new Date(order.createdAt).toLocaleDateString('uk-UA')}</p>
-        </div>
-      </div>
-
-      <div style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 30px; margin-bottom: 32px; font-size: 12px;">
-        <div>
-          <p style="font-size: 9px; font-weight: 750; color: #8e8e93; text-transform: uppercase; margin-bottom: 4px;">Специфікація замовлення</p>
-          <p style="margin: 3px 0;"><strong>Замовник:</strong> ${activeClient?.name || '—'}</p>
-          <p style="margin: 3px 0;"><strong>Тираж:</strong> ${order.quantity.toLocaleString()} шт.</p>
-          <p style="margin: 3px 0;"><strong>Друкарська машина:</strong> ${order.machine}</p>
-          <p style="margin: 3px 0;"><strong>Формат:</strong> ${order.format}</p>
-          <p style="margin: 3px 0;"><strong>Папір:</strong> ${order.paperType === 'offset' ? 'Офсет 70г' : order.paperType === 'gazetka' ? 'Газетний 45г' : 'Крейдований 130г'}</p>
-          <p style="margin: 3px 0;"><strong>Параметри післядруку:</strong> ${order.notes || '—'}</p>
-        </div>
-        <div style="text-align: right;">
-          <p style="font-size: 9px; font-weight: 750; color: #8e8e93; text-transform: uppercase; margin: 0;">Ціна за одиницю</p>
-          <p style="font-size: 22px; font-weight: 800; color: #007aff; margin: 4px 0;">${order.unitPrice.toFixed(2)} грн</p>
-        </div>
-      </div>
-
-      <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
-        <thead>
-          <tr style="border-bottom: 2px solid #1c1c1e; text-align: left;">
-            <th style="padding: 6px 0; font-weight: 700;">Назва робіт/послуг</th>
-            <th style="padding: 6px 0; text-align: right; font-weight: 700;">Сума (грн)</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr style="border-bottom: 1px solid #E5E5EA;">
-            <td style="padding: 8px 0;">Переддрукарська підготовка та розробка дизайну</td>
-            <td style="padding: 8px 0; text-align: right;">${order.designCost.toFixed(2)}</td>
-          </tr>
-          <tr style="border-bottom: 1px solid #E5E5EA;">
-            <td style="padding: 8px 0;">Матеріали, поліграфічний друк та поопераційна збірка тиражу</td>
-            <td style="padding: 8px 0; text-align: right;">${(order.finalPrice - order.designCost).toFixed(2)}</td>
-          </tr>
-        </tbody>
-        <tfoot>
-          <tr style="font-size: 16px; font-weight: 800;">
-            <td style="padding: 16px 0 0 0;">РАЗОМ:</td>
-            <td style="padding: 16px 0 0 0; text-align: right; color: #007aff;">${order.finalPrice.toFixed(2)} грн</td>
-          </tr>
-        </tfoot>
-      </table>
-    `;
-
     // Extract 5-digit order number if present in title, otherwise fallback to order.id
     const matchNum = (order.name || '').match(/№\s*(\d+)/);
     const num = matchNum ? matchNum[1] : (order.id || '33811');
+
+    element.innerHTML = `
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #000; padding-bottom: 12px; margin-bottom: 16px; gap: 16px;">
+        <div>
+          <h4 style="font-size: 18px; font-weight: 900; letter-spacing: -0.5px; margin: 0;">РАХУНОК-СПЕЦИФІКАЦІЯ № ${num}</h4>
+          <p style="font-size: 11px; color: #636366; margin: 2px 0 0 0;">Поліграфічна компанія «Едельвейс і К»</p>
+        </div>
+        <div style="text-align: right; background-color: #F8FAFC; padding: 8px 14px; border-radius: 6px; border: 1px solid #E2E8F0;">
+          <p style="font-size: 12px; font-weight: 700; margin: 0;">Дата: ${new Date(order.createdAt || Date.now()).toLocaleDateString('uk-UA')}</p>
+          <p style="font-size: 12px; color: #1E293B; margin: 4px 0 0 0; font-weight: 600;">
+            Покупець (Замовник): <span style="font-weight: 800; color: #007AFF; font-size: 13px;">${activeClient?.name || 'Замовник №1'}</span>
+          </p>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 2.5fr 1fr; gap: 10px; margin-bottom: 16px;">
+        <div style="background-color: #F2F2F7; padding: 10px 14px; border-radius: 6px; border: 1px solid #E5E5EA;">
+          <span style="font-size: 9px; font-weight: 800; color: #8E8E93; text-transform: uppercase; display: block; margin-bottom: 2px;">Продукція / Специфікація</span>
+          <p style="font-size: 13px; font-weight: 800; margin: 0; color: #000;">${order.name}</p>
+        </div>
+        <div style="background-color: #F2F2F7; padding: 10px 14px; border-radius: 6px; border: 1px solid #E5E5EA; text-align: right;">
+          <span style="font-size: 9px; font-weight: 800; color: #8E8E93; text-transform: uppercase; display: block; margin-bottom: 2px;">Тираж замовлення</span>
+          <p style="font-size: 14px; font-weight: 900; margin: 0; color: #007AFF;">${order.quantity} шт.</p>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 16px;">
+        <h5 style="font-size: 11px; font-weight: 800; border-bottom: 1px solid #E5E5EA; padding-bottom: 4px; margin-bottom: 8px; color: #007AFF; text-transform: uppercase; margin: 0;">
+          1. Матеріали та сировина
+        </h5>
+        <div style="display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 10px; background-color: #FAFAFC; padding: 8px 12px; border-radius: 6px; border: 1px solid #E5E5EA;">
+          <div>
+            <span style="color: #8E8E93; display: block; font-size: 10px;">Матеріал паперу:</span>
+            <strong style="font-size: 11px;">${order.paperType === 'offset' ? 'Офсетний 70г' : order.paperType === 'gazetka' ? 'Газетний 45г' : 'Крейдований 130г'}</strong>
+          </div>
+          <div>
+            <span style="color: #8E8E93; display: block; font-size: 10px;">Розмір друкарського листа:</span>
+            <strong style="font-size: 11px;">${order.format || 'A4'}</strong>
+          </div>
+          <div>
+            <span style="color: #8E8E93; display: block; font-size: 10px;">Обсяг матеріалу:</span>
+            <strong style="font-size: 11px;">${order.physicalSheets || 500} арк. (+${Math.ceil((order.physicalSheets || 500) * 0.05)} тех. відх.)</strong>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-bottom: 16px;">
+        <h5 style="font-size: 11px; font-weight: 800; border-bottom: 1px solid #E5E5EA; padding-bottom: 4px; margin-bottom: 8px; color: #007AFF; text-transform: uppercase; margin: 0;">
+          2. Процес друку (Друкарська машина & Параметри)
+        </h5>
+        <table style="width: 100%; border-collapse: collapse; font-size: 11px; border: 1px solid #E5E5EA;">
+          <tbody>
+            <tr style="border-bottom: 1px solid #E5E5EA; background-color: #FAFAFC;">
+              <td style="padding: 6px 10px; color: #636366; width: 30%;">Друкарська машина:</td>
+              <td style="padding: 6px 10px; font-weight: 700; width: 20%;">${order.machine || 'Опція 1'}</td>
+              <td style="padding: 6px 10px; color: #636366; width: 30%;">Красочність (кольоровість):</td>
+              <td style="padding: 6px 10px; font-weight: 700; width: 20%;">${order.colors || '1+0'}</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #E5E5EA;">
+              <td style="padding: 6px 10px; color: #636366;">Однотипних листів (на арк):</td>
+              <td style="padding: 6px 10px; font-weight: 700;">${order.itemsPerSheet || 2} шт./арк</td>
+              <td style="padding: 6px 10px; color: #636366;">Спуск макету / оборот:</td>
+              <td style="padding: 6px 10px; font-weight: 700;">${order.isSamNaSebe ? 'Сам на себе (с/с)' : 'Без обороту'}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div style="margin-bottom: 16px;">
+        <h5 style="font-size: 11px; font-weight: 800; border-bottom: 1px solid #E5E5EA; padding-bottom: 4px; margin-bottom: 8px; color: #007AFF; text-transform: uppercase; margin: 0;">
+          3. Післядрукарська обробка (Післядрук)
+        </h5>
+        <div style="padding: 8px 12px; border: 1px solid #E5E5EA; border-radius: 6px; background-color: #FAFAFC; font-size: 11px;">
+          ${order.notes || 'Порізка в готовий формат, пакування в пачки.'}
+        </div>
+      </div>
+
+      <div>
+        <h5 style="font-size: 11px; font-weight: 800; border-bottom: 1px solid #E5E5EA; padding-bottom: 4px; margin-bottom: 8px; color: #007AFF; text-transform: uppercase; margin: 0;">
+          4. Фінансовий підсумок
+        </h5>
+        <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+          <thead>
+            <tr style="border-bottom: 2px solid #1C1C1E; text-align: left;">
+              <th style="padding: 6px 0; font-weight: 700;">Складова замовлення</th>
+              <th style="padding: 6px 0; text-align: center; font-weight: 700;">Обсяг</th>
+              <th style="padding: 6px 0; text-align: right; font-weight: 700;">Сума (грн)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom: 1px solid #E5E5EA;">
+              <td style="padding: 6px 0;">Макет та переддрук</td>
+              <td style="padding: 6px 0; text-align: center;">1 посл.</td>
+              <td style="padding: 6px 0; text-align: right;">${(order.designCost || 34).toFixed(2)} ₴</td>
+            </tr>
+            <tr style="border-bottom: 1px solid #E5E5EA;">
+              <td style="padding: 6px 0;">Матеріали + Поліграфічний друк + Післядрукарські операції</td>
+              <td style="padding: 6px 0; text-align: center;">${order.quantity} шт.</td>
+              <td style="padding: 6px 0; text-align: right;">${(order.finalPrice - (order.designCost || 34)).toFixed(2)} ₴</td>
+            </tr>
+          </tbody>
+          <tfoot>
+            <tr style="font-size: 14px; font-weight: 800;">
+              <td style="padding: 12px 0 0 0;" colSpan="2">РАЗОМ ДО СПЛАТИ:</td>
+              <td style="padding: 12px 0 0 0; text-align: right; color: #007AFF;">${order.finalPrice.toFixed(2)} ₴</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    `;
 
     // Product name: use order.category or clean product name
     let rawProd = order.category || 'Бланки';
@@ -445,69 +501,136 @@ export const Documents: React.FC = () => {
       {/* Doc details view modal */}
       {selectedDocOrder && (
         <div className="ios-modal-overlay">
-          <div className="ios-modal" style={{ maxWidth: '550px' }}>
+          <div className="ios-modal" style={{ maxWidth: '750px' }}>
             <div className="ios-modal-header">
-              <h3 className="ios-modal-title">Деталі наряду №{selectedDocOrder.id}</h3>
-              <button onClick={() => setSelectedDocOrder(null)} style={{ border: 'none', background: 'transparent' }}>✕</button>
+              <h3 className="ios-modal-title">Рахунок-Специфікація замовлення №{selectedDocOrder.id}</h3>
+              <button onClick={() => setSelectedDocOrder(null)} style={{ border: 'none', background: 'transparent', cursor: 'pointer' }}>✕</button>
             </div>
-            <div className="ios-modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '13px' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', backgroundColor: '#f8fafc', padding: '12px', borderRadius: '8px' }}>
-                <div>
-                  <span style={{ color: 'var(--text-medium)', fontSize: '11px' }}>Назва замовлення:</span>
-                  <p style={{ fontWeight: '750', margin: '2px 0 0 0' }}>{selectedDocOrder.name}</p>
+            
+            <div className="ios-modal-body" id="invoice-preview-container" style={{ padding: '24px', backgroundColor: '#FFFFFF', color: '#1C1C1E', fontSize: '11px', lineHeight: '1.4' }}>
+              
+              {/* Document Header */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px solid #000', paddingBottom: '12px', marginBottom: '16px', gap: '16px' }}>
+                <div style={{ flexShrink: 0 }}>
+                  <h4 style={{ fontSize: '18px', fontWeight: '900', letterSpacing: '-0.5px', margin: 0 }}>
+                    РАХУНОК-СПЕЦИФІКАЦІЯ № {selectedDocOrder.name.match(/№\s*(\d+)/)?.[1] || selectedDocOrder.id}
+                  </h4>
+                  <p style={{ fontSize: '11px', color: '#636366', margin: '2px 0 0 0' }}>Поліграфічна компанія «Едельвейс і К»</p>
                 </div>
-                <div>
-                  <span style={{ color: 'var(--text-medium)', fontSize: '11px' }}>Дата прорахунку:</span>
-                  <p style={{ fontWeight: '700', margin: '2px 0 0 0' }}>{new Date(selectedDocOrder.createdAt).toLocaleString('uk-UA')}</p>
-                </div>
-              </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px', borderBottom: '0.5px solid var(--border-light)', paddingBottom: '10px' }}>
-                <div>
-                  <span style={{ color: 'var(--text-medium)', fontSize: '11px' }}>Тираж:</span>
-                  <p style={{ fontWeight: '700', margin: '2px 0 0 0' }}>{selectedDocOrder.quantity.toLocaleString()} шт</p>
-                </div>
-                <div>
-                  <span style={{ color: 'var(--text-medium)', fontSize: '11px' }}>Формат:</span>
-                  <p style={{ fontWeight: '700', margin: '2px 0 0 0' }}>{selectedDocOrder.format}</p>
-                </div>
-                <div>
-                  <span style={{ color: 'var(--text-medium)', fontSize: '11px' }}>Кольоровість:</span>
-                  <p style={{ fontWeight: '700', margin: '2px 0 0 0' }}>{selectedDocOrder.colors}</p>
+                <div style={{ textAlign: 'right', flexGrow: 1, minWidth: '220px', backgroundColor: '#F8FAFC', padding: '8px 14px', borderRadius: '6px', border: '1px solid #E2E8F0' }}>
+                  <p style={{ fontSize: '12px', fontWeight: '700', margin: 0 }}>
+                    Дата: {new Date(selectedDocOrder.createdAt || Date.now()).toLocaleDateString('uk-UA')}
+                  </p>
+                  <p style={{ fontSize: '12px', color: '#1E293B', margin: '4px 0 0 0', fontWeight: '600' }}>
+                    Покупець (Замовник): <span style={{ fontWeight: '800', color: '#007AFF', fontSize: '13px' }}>
+                      {clients.find(c => c.id === selectedDocOrder.clientId)?.name || 'Замовник №1'}
+                    </span>
+                  </p>
                 </div>
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', borderBottom: '0.5px solid var(--border-light)', paddingBottom: '10px' }}>
-                <div>
-                  <span style={{ color: 'var(--text-medium)', fontSize: '11px' }}>Друкарська машина:</span>
-                  <p style={{ fontWeight: '700', margin: '2px 0 0 0' }}>{selectedDocOrder.machine}</p>
+              {/* Product Specification & Quantity Banner */}
+              <div style={{ display: 'grid', gridTemplateColumns: '2.5fr 1fr', gap: '10px', marginBottom: '16px' }}>
+                <div style={{ backgroundColor: '#F2F2F7', padding: '10px 14px', borderRadius: '6px', border: '1px solid #E5E5EA' }}>
+                  <span style={{ fontSize: '9px', fontWeight: '800', color: '#8E8E93', textTransform: 'uppercase', display: 'block', marginBottom: '2px' }}>Продукція / Специфікація</span>
+                  <p style={{ fontSize: '13px', fontWeight: '800', margin: 0, color: '#000' }}>{selectedDocOrder.name}</p>
                 </div>
-                <div>
-                  <span style={{ color: 'var(--text-medium)', fontSize: '11px' }}>Папір:</span>
-                  <p style={{ fontWeight: '700', margin: '2px 0 0 0' }}>{selectedDocOrder.paperType === 'offset' ? 'Офсет 70г' : selectedDocOrder.paperType === 'gazetka' ? 'Газетний 45г' : 'Крейдований 130г'}</p>
+                <div style={{ backgroundColor: '#F2F2F7', padding: '10px 14px', borderRadius: '6px', border: '1px solid #E5E5EA', textAlign: 'right' }}>
+                  <span style={{ fontSize: '9px', fontWeight: '800', color: '#8E8E93', textTransform: 'uppercase', display: 'block', marginBottom: '2px' }}>Тираж замовлення</span>
+                  <p style={{ fontSize: '14px', fontWeight: '900', margin: 0, color: '#007AFF' }}>{selectedDocOrder.quantity.toLocaleString()} шт.</p>
                 </div>
               </div>
 
+              {/* 1. Матеріали та сировина */}
+              <div style={{ marginBottom: '16px' }}>
+                <h5 style={{ fontSize: '11px', fontWeight: '800', borderBottom: '1px solid #E5E5EA', paddingBottom: '4px', marginBottom: '8px', color: '#007AFF', textTransform: 'uppercase', margin: 0 }}>
+                  1. Матеріали та сировина
+                </h5>
+                <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 1fr', gap: '10px', backgroundColor: '#FAFAFC', padding: '8px 12px', borderRadius: '6px', border: '1px solid #E5E5EA' }}>
+                  <div>
+                    <span style={{ color: '#8E8E93', display: 'block', fontSize: '10px' }}>Матеріал паперу:</span>
+                    <strong style={{ fontSize: '11px' }}>{selectedDocOrder.paperType === 'offset' ? 'Офсетний 70г' : selectedDocOrder.paperType === 'gazetka' ? 'Газетний 45г' : 'Крейдований 130г'}</strong>
+                  </div>
+                  <div>
+                    <span style={{ color: '#8E8E93', display: 'block', fontSize: '10px' }}>Розмір друкарського листа:</span>
+                    <strong style={{ fontSize: '11px' }}>{selectedDocOrder.format || 'A4'}</strong>
+                  </div>
+                  <div>
+                    <span style={{ color: '#8E8E93', display: 'block', fontSize: '10px' }}>Обсяг матеріалу:</span>
+                    <strong style={{ fontSize: '11px' }}>{selectedDocOrder.physicalSheets || 500} арк. (+{Math.ceil((selectedDocOrder.physicalSheets || 500) * 0.05)} тех. відх.)</strong>
+                  </div>
+                </div>
+              </div>
+
+              {/* 2. Процес друку */}
+              <div style={{ marginBottom: '16px' }}>
+                <h5 style={{ fontSize: '11px', fontWeight: '800', borderBottom: '1px solid #E5E5EA', paddingBottom: '4px', marginBottom: '8px', color: '#007AFF', textTransform: 'uppercase', margin: 0 }}>
+                  2. Процес друку (Друкарська машина & Параметри)
+                </h5>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px', border: '1px solid #E5E5EA' }}>
+                  <tbody>
+                    <tr style={{ borderBottom: '1px solid #E5E5EA', backgroundColor: '#FAFAFC' }}>
+                      <td style={{ padding: '6px 10px', color: '#636366', width: '30%' }}>Друкарська машина:</td>
+                      <td style={{ padding: '6px 10px', fontWeight: '700', width: '20%' }}>{selectedDocOrder.machine || 'Опція 1'}</td>
+                      <td style={{ padding: '6px 10px', color: '#636366', width: '30%' }}>Красочність (кольоровість):</td>
+                      <td style={{ padding: '6px 10px', fontWeight: '700', width: '20%' }}>{selectedDocOrder.colors || '1+0'}</td>
+                    </tr>
+                    <tr style={{ borderBottom: '1px solid #E5E5EA' }}>
+                      <td style={{ padding: '6px 10px', color: '#636366' }}>Однотипних листів (на арк):</td>
+                      <td style={{ padding: '6px 10px', fontWeight: '700' }}>{selectedDocOrder.itemsPerSheet || 2} шт./арк</td>
+                      <td style={{ padding: '6px 10px', color: '#636366' }}>Спуск макету / оборот:</td>
+                      <td style={{ padding: '6px 10px', fontWeight: '700' }}>{selectedDocOrder.isSamNaSebe ? 'Сам на себе (с/с)' : 'Без обороту'}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+
+              {/* 3. Післядрукарська обробка */}
+              <div style={{ marginBottom: '16px' }}>
+                <h5 style={{ fontSize: '11px', fontWeight: '800', borderBottom: '1px solid #E5E5EA', paddingBottom: '4px', marginBottom: '8px', color: '#007AFF', textTransform: 'uppercase', margin: 0 }}>
+                  3. Післядрукарська обробка (Післядрук)
+                </h5>
+                <div style={{ padding: '8px 12px', border: '1px solid #E5E5EA', borderRadius: '6px', backgroundColor: '#FAFAFC', fontSize: '11px' }}>
+                  {selectedDocOrder.notes || 'Порізка в готовий формат, пакування в пачки.'}
+                </div>
+              </div>
+
+              {/* 4. Фінансовий розрахунок */}
               <div>
-                <span style={{ color: 'var(--text-medium)', fontSize: '11px' }}>Специфікація післядрукарської обробки:</span>
-                <p style={{ margin: '4px 0 0 0', padding: '8px', backgroundColor: '#f2f2f7', borderRadius: '6px', fontStyle: 'italic' }}>
-                  {selectedDocOrder.notes || 'Не вказано'}
-                </p>
+                <h5 style={{ fontSize: '11px', fontWeight: '800', borderBottom: '1px solid #E5E5EA', paddingBottom: '4px', marginBottom: '8px', color: '#007AFF', textTransform: 'uppercase', margin: 0 }}>
+                  4. Фінансовий підсумок
+                </h5>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
+                  <thead>
+                    <tr style={{ borderBottom: '2px solid #1C1C1E', textAlign: 'left' }}>
+                      <th style={{ padding: '6px 0', fontWeight: '700' }}>Складова замовлення</th>
+                      <th style={{ padding: '6px 0', textAlign: 'center', fontWeight: '700' }}>Обсяг</th>
+                      <th style={{ padding: '6px 0', textAlign: 'right', fontWeight: '700' }}>Сума (грн)</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr style={{ borderBottom: '1px solid #E5E5EA' }}>
+                      <td style={{ padding: '6px 0' }}>Макет та переддрук</td>
+                      <td style={{ padding: '6px 0', textAlign: 'center' }}>1 посл.</td>
+                      <td style={{ padding: '6px 0', textAlign: 'right' }}>{(selectedDocOrder.designCost || 34).toFixed(2)} ₴</td>
+                    </tr>
+                    <tr style={{ borderBottom: '1px solid #E5E5EA' }}>
+                      <td style={{ padding: '6px 0' }}>Матеріали + Поліграфічний друк + Післядрукарські операції</td>
+                      <td style={{ padding: '6px 0', textAlign: 'center' }}>{selectedDocOrder.quantity} шт.</td>
+                      <td style={{ padding: '6px 0', textAlign: 'right' }}>{(selectedDocOrder.finalPrice - (selectedDocOrder.designCost || 34)).toFixed(2)} ₴</td>
+                    </tr>
+                  </tbody>
+                  <tfoot>
+                    <tr style={{ fontSize: '14px', fontWeight: '800' }}>
+                      <td style={{ padding: '12px 0 0 0' }} colSpan={2}>РАЗОМ ДО СПЛАТИ:</td>
+                      <td style={{ padding: '12px 0 0 0', textAlign: 'right', color: '#007AFF' }}>{selectedDocOrder.finalPrice.toFixed(2)} ₴</td>
+                    </tr>
+                  </tfoot>
+                </table>
               </div>
 
-              <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '0.5px solid var(--border-light)', paddingTop: '10px', marginTop: '10px' }}>
-                <span>Собівартість:</span>
-                <strong>{selectedDocOrder.subtotal.toFixed(2)} ₴</strong>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                <span>Націнка ({selectedDocOrder.margin}%):</span>
-                <strong>+{selectedDocOrder.marginAmount.toFixed(2)} ₴</strong>
-              </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '16px', fontWeight: '800' }}>
-                <span>Сума до сплати:</span>
-                <span style={{ color: 'var(--primary)' }}>{selectedDocOrder.finalPrice.toFixed(2)} ₴</span>
-              </div>
             </div>
+
             <div className="ios-modal-footer">
               <button onClick={() => setSelectedDocOrder(null)} className="ios-btn ios-btn-secondary">Закрити</button>
               <button onClick={() => { generatePDFForOrder(selectedDocOrder); setSelectedDocOrder(null); }} className="ios-btn ios-btn-primary">Завантажити рахунок</button>
