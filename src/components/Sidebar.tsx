@@ -49,24 +49,26 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
     { id: 'settings', name: 'Налаштування', icon: SettingsIcon, visible: ['admin'].includes(role) }
   ];
 
+  const isDark = theme === 'dark';
+
   return (
     <div style={{
       width: '230px',
       height: '100vh',
       maxHeight: '100vh',
-      backgroundColor: '#ffffff', // Clean premium white sidebar
+      backgroundColor: isDark ? '#161b22' : '#ffffff',
       display: 'flex',
       flexDirection: 'column',
       padding: '16px 12px',
       justifyContent: 'space-between',
       alignItems: 'stretch',
       flexShrink: 0,
-      borderRight: '1px solid var(--border-light)',
+      borderRight: isDark ? '1px solid #21262d' : '1px solid var(--border-light)',
       zIndex: 40,
       overflowY: 'auto'
     }}>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%', minHeight: 0, flexGrow: 1 }}>
-        {/* User Profile Avatar at the top (Shows Name and Role next to it) */}
+        {/* User Profile Avatar at the top */}
         <div 
           onClick={() => setActiveTab('profile')}
           style={{ 
@@ -77,7 +79,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
             cursor: 'pointer',
             padding: '8px',
             borderRadius: '10px',
-            backgroundColor: activeTab === 'profile' ? 'rgba(0,122,255,0.08)' : 'transparent',
+            backgroundColor: activeTab === 'profile' 
+              ? (isDark ? '#21262d' : 'rgba(0,122,255,0.08)') 
+              : 'transparent',
             transition: 'background-color 0.2s ease',
             flexShrink: 0
           }}
@@ -87,12 +91,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
               width: '36px',
               height: '36px',
               borderRadius: '50%',
-              backgroundColor: '#f4f4f6',
-              border: activeTab === 'profile' ? '2px solid var(--primary)' : '1px solid var(--border-light)',
+              backgroundColor: isDark ? '#21262d' : '#f4f4f6',
+              border: activeTab === 'profile' 
+                ? (isDark ? '2px solid #38bdf8' : '2px solid var(--primary)') 
+                : (isDark ? '1px solid #30363d' : '1px solid var(--border-light)'),
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              color: 'var(--text-dark)',
+              color: isDark ? '#f0f6fc' : 'var(--text-dark)',
               overflow: 'hidden',
               flexShrink: 0
             }}
@@ -100,10 +106,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
             <UserIcon size={18} />
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-            <span style={{ fontSize: '12px', fontWeight: '800', color: 'var(--text-dark)', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
+            <span style={{ fontSize: '12px', fontWeight: '800', color: isDark ? '#f0f6fc' : 'var(--text-dark)', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
               {currentUser?.name || 'Гість'}
             </span>
-            <span style={{ fontSize: '10px', color: 'var(--text-medium)', opacity: 0.7 }}>
+            <span style={{ fontSize: '10px', color: isDark ? '#8b949e' : 'var(--text-medium)', opacity: 0.8 }}>
               {role === 'admin' ? 'Адміністратор' : role === 'manager' ? 'Менеджер' : 'Оператор'}
             </span>
           </div>
@@ -137,22 +143,26 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
                     padding: '8px 12px',
                     borderRadius: '8px',
                     border: 'none',
-                    backgroundColor: isActive ? 'var(--primary)' : 'transparent',
-                    color: isActive ? '#ffffff' : 'var(--text-dark)',
+                    backgroundColor: isActive 
+                      ? (isDark ? '#21262d' : 'var(--primary)') 
+                      : 'transparent',
+                    color: isActive 
+                      ? (isDark ? '#38bdf8' : '#ffffff') 
+                      : (isDark ? '#c9d1d9' : 'var(--text-dark)'),
                     cursor: 'pointer',
                     transition: 'all 0.15s ease',
-                    fontWeight: isActive ? '750' : '500',
+                    fontWeight: isActive ? '800' : '600',
                     fontSize: '12px',
                     textAlign: 'left'
                   }}
                   onMouseEnter={(e) => {
-                    if (!isActive) e.currentTarget.style.backgroundColor = '#f4f4f6';
+                    if (!isActive) e.currentTarget.style.backgroundColor = isDark ? 'rgba(255, 255, 255, 0.05)' : '#f4f4f6';
                   }}
                   onMouseLeave={(e) => {
                     if (!isActive) e.currentTarget.style.backgroundColor = 'transparent';
                   }}
                 >
-                  <Icon size={16} style={{ flexShrink: 0 }} />
+                  <Icon size={16} style={{ flexShrink: 0, color: isActive ? (isDark ? '#38bdf8' : '#ffffff') : 'inherit' }} />
                   <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                     {item.name}
                   </span>
