@@ -72,6 +72,14 @@ interface EmployeeSalary {
 export const Finance: React.FC = () => {
   const [activePanel, setActivePanel] = useState<BasPanel>('main');
 
+  // Clear legacy cache if old structure detected
+  React.useEffect(() => {
+    const saved = localStorage.getItem('crm_finance_records');
+    if (saved && (saved.includes('F-1"') || saved.includes('Готівка каса"'))) {
+      localStorage.removeItem('crm_finance_records');
+    }
+  }, []);
+
   // --- BAS State & Mock Accounting Data ---
   const [wallets] = useState([
     { id: 'W-1', name: '31101 - ПриватБанк ФОП (Основний)', balance: 142500, currency: 'UAH', accountType: 'bank' },

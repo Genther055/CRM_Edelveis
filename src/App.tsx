@@ -83,11 +83,11 @@ function AppContent() {
         <Chats />
       )}
 
-      {activeTab === 'documents' && ['admin', 'manager'].includes(role) && (
+      {activeTab === 'documents' && (
         <Documents />
       )}
 
-      {activeTab === 'finance' && ['admin', 'manager'].includes(role) && (
+      {activeTab === 'finance' && (
         <Finance />
       )}
 
