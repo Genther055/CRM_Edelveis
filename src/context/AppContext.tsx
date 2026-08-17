@@ -386,7 +386,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        return { ...initialNorms, ...parsed };
+        return { ...initialNorms, ...parsed, packingRate: 1.5 };
       } catch (e) {
         return initialNorms;
       }
