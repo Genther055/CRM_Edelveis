@@ -60,7 +60,7 @@ const initialUsers: User[] = [
 const initialClients: Client[] = [
   { 
     id: '1', 
-    name: 'Контрагент А', 
+    name: 'Замовник А (ТОВ Едельвейс)', 
     contact: 'Представник А', 
     phone: '+380671234567', 
     email: 'client.a@example.com', 
@@ -72,7 +72,7 @@ const initialClients: Client[] = [
   },
   { 
     id: '2', 
-    name: 'Контрагент Б', 
+    name: 'Замовник Б (ФОП Мельник)', 
     contact: 'Представник Б', 
     phone: '+380939876543', 
     email: 'client.b@example.com', 
@@ -84,7 +84,7 @@ const initialClients: Client[] = [
   },
   { 
     id: '3', 
-    name: 'Контрагент В', 
+    name: 'Замовник В (Поліграф-Сервіс)', 
     contact: 'Представник В', 
     phone: '+380501112233', 
     email: 'client.c@example.com', 

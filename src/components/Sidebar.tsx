@@ -31,7 +31,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
   const menuItems = [
     { id: 'dashboard', name: 'Робочий стіл', icon: LayoutGrid, visible: true },
     { id: 'leads', name: 'Запити', icon: Sliders, visible: ['admin', 'manager'].includes(role) },
-    { id: 'clients', name: 'Клієнти', icon: Users, visible: ['admin', 'manager'].includes(role) },
+    { id: 'clients', name: 'Замовники', icon: Users, visible: ['admin', 'manager'].includes(role) },
     { id: 'employees', name: 'Співробітники', icon: UserIcon, visible: ['admin', 'manager'].includes(role) },
     { id: 'pm', name: 'Дизайн макетів (PM)', icon: Briefcase, visible: ['admin', 'manager'].includes(role) },
     { id: 'deals', name: 'Угоди', icon: FolderKanban, visible: ['admin', 'manager'].includes(role) },

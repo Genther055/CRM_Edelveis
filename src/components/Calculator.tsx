@@ -829,7 +829,7 @@ export const Calculator: React.FC = () => {
                         className={`ios-btn ${subCategory === 'Бланки' ? 'ios-btn-primary' : 'ios-btn-secondary'}`}
                         style={{ flexGrow: 1, fontSize: '12px', padding: '6px 12px', fontWeight: subCategory === 'Бланки' ? '800' : '500' }}
                       >
-                        📄 Бланки
+                        Бланки
                       </button>
                       <button
                         type="button"
@@ -837,7 +837,7 @@ export const Calculator: React.FC = () => {
                         className={`ios-btn ${subCategory === 'Листівки' ? 'ios-btn-primary' : 'ios-btn-secondary'}`}
                         style={{ flexGrow: 1, fontSize: '12px', padding: '6px 12px', fontWeight: subCategory === 'Листівки' ? '800' : '500' }}
                       >
-                        📜 Листівки
+                        Листівки
                       </button>
                     </div>
                   </div>
@@ -877,9 +877,9 @@ export const Calculator: React.FC = () => {
                   <div className="ios-input-group" style={{ marginBottom: 0 }}>
                     <label className="ios-label">Матеріал паперу</label>
                     <select value={paperType} onChange={(e) => setPaperType(e.target.value as any)}>
-                      <option value="offset">Офсетний 70г (A1)</option>
-                      <option value="gazetka">Газетний 45г (A1)</option>
-                      <option value="coated">Крейдований 130г (A1)</option>
+                      <option value="offset">Офсетний 70г</option>
+                      <option value="gazetka">Газетний 45г</option>
+                      <option value="coated">Крейдований 130г</option>
                     </select>
                   </div>
                   <div className="ios-input-group" style={{ marginBottom: 0 }}>
@@ -979,32 +979,34 @@ export const Calculator: React.FC = () => {
                     </div>
                   )}
 
-                  {/* Postpress operations selection */}
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px', paddingTop: '10px' }}>
-                    <div className="ios-input-group">
-                      <label className="ios-label">Тип скріплення</label>
-                      <select value={bindingType} onChange={(e) => setBindingType(e.target.value as any)}>
-                        <option value="none">Без скріплення</option>
-                        <option value="staple">Скоба (шиття)</option>
-                        <option value="spring">Металева пружина</option>
-                        <option value="glue">Клейове (КБС)</option>
-                        <option value="hardcover">Тверда палітурка</option>
-                      </select>
+                  {/* Postpress operations selection (Hidden for Бланки) */}
+                  {category !== 'Бланки' && (
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px', paddingTop: '10px' }}>
+                      <div className="ios-input-group">
+                        <label className="ios-label">Тип скріплення</label>
+                        <select value={bindingType} onChange={(e) => setBindingType(e.target.value as any)}>
+                          <option value="none">Без скріплення</option>
+                          <option value="staple">Скоба (шиття)</option>
+                          <option value="spring">Металева пружина</option>
+                          <option value="glue">Клейове (КБС)</option>
+                          <option value="hardcover">Тверда палітурка</option>
+                        </select>
+                      </div>
+                      <div className="ios-input-group">
+                        <label className="ios-label">Ламінування</label>
+                        <select value={laminationType} onChange={(e) => setLaminationType(e.target.value as any)}>
+                          <option value="none">Без ламінування</option>
+                          <option value="gloss">Глянцева плівка</option>
+                          <option value="matte">Матова плівка</option>
+                          <option value="softtouch">Soft-touch оксамит</option>
+                        </select>
+                      </div>
+                      <div className="ios-input-group">
+                        <label className="ios-label">Кількість бігів</label>
+                        <input type="number" min="0" value={creaseCount} onChange={(e) => setCreaseCount(Number(e.target.value))} />
+                      </div>
                     </div>
-                    <div className="ios-input-group">
-                      <label className="ios-label">Ламінування</label>
-                      <select value={laminationType} onChange={(e) => setLaminationType(e.target.value as any)}>
-                        <option value="none">Без ламінування</option>
-                        <option value="gloss">Глянцева плівка</option>
-                        <option value="matte">Матова плівка</option>
-                        <option value="softtouch">Soft-touch оксамит</option>
-                      </select>
-                    </div>
-                    <div className="ios-input-group">
-                      <label className="ios-label">Кількість бігів</label>
-                      <input type="number" min="0" value={creaseCount} onChange={(e) => setCreaseCount(Number(e.target.value))} />
-                    </div>
-                  </div>
+                  )}
                 </div>
               )}
 
