@@ -665,27 +665,45 @@ export const Calculator: React.FC = () => {
     const safeName = name.replace(/[\\/:*?"<>|]/g, '').trim().replace(/\s+/g, '_');
     const fileName = `Рахунок-Специфікація_№${orderNumber}_${safeName}.pdf`;
 
+    // Clone element to a temporary clean container on document.body to eliminate modal position Y-offset blank page bug
+    const tempContainer = document.createElement('div');
+    tempContainer.style.position = 'absolute';
+    tempContainer.style.left = '-9999px';
+    tempContainer.style.top = '0px';
+    tempContainer.style.width = '750px';
+    tempContainer.style.backgroundColor = '#FFFFFF';
+
+    const clone = element.cloneNode(true) as HTMLElement;
+    clone.style.margin = '0';
+    clone.style.padding = '20px';
+    clone.style.maxHeight = 'none';
+    clone.style.overflow = 'visible';
+    
+    tempContainer.appendChild(clone);
+    document.body.appendChild(tempContainer);
+
     const opt = {
-      margin:       [8, 8, 8, 8] as [number, number, number, number],
+      margin:       [6, 6, 6, 6] as [number, number, number, number],
       filename:     fileName,
       image:        { type: 'jpeg' as const, quality: 0.98 },
       html2canvas:  { 
         scale: 2, 
         useCORS: true,
         scrollX: 0,
-        scrollY: 0,
-        windowWidth: 800
+        scrollY: 0
       },
       jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' as const },
-      pagebreak:    { mode: ['avoid-all', 'css', 'legacy'] }
+      pagebreak:    { mode: ['avoid-all', 'css'] }
     };
 
-    const parent = element.parentElement;
-    const origParentOverflow = parent ? parent.style.overflow : '';
-    if (parent) parent.style.overflow = 'visible';
-
-    html2pdf().from(element).set(opt).save().then(() => {
-      if (parent) parent.style.overflow = origParentOverflow;
+    html2pdf().from(clone).set(opt).save().then(() => {
+      if (document.body.contains(tempContainer)) {
+        document.body.removeChild(tempContainer);
+      }
+    }).catch(() => {
+      if (document.body.contains(tempContainer)) {
+        document.body.removeChild(tempContainer);
+      }
     });
   };
 
