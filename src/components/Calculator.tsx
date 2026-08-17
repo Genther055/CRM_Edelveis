@@ -141,11 +141,15 @@ export const Calculator: React.FC = () => {
       setColors('1+0');
       setName('Бланки А4');
       setSelectedFormat('A4');
+      setLaminationType('none');
+      setCreaseCount(0);
     } else {
       setPaperType('coated');
       setColors('4+4');
       setName('Листівки А5');
       setSelectedFormat('A5');
+      setLaminationType('none');
+      setCreaseCount(0);
     }
   };
 
@@ -979,8 +983,8 @@ export const Calculator: React.FC = () => {
                     </div>
                   )}
 
-                  {/* Postpress operations selection (Hidden for Бланки) */}
-                  {category !== 'Бланки' && (
+                  {/* Postpress / Prepress operations selection (Enabled for Листівки, hidden for Бланки) */}
+                  {!(category === 'Бланки' && subCategory === 'Бланки') && (
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px', paddingTop: '10px' }}>
                       <div className="ios-input-group">
                         <label className="ios-label">Тип скріплення</label>
