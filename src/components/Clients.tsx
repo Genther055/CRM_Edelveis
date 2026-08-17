@@ -216,7 +216,7 @@ export const Clients: React.FC = () => {
             }}
           >
             <Filter size={13} />
-            Всі контрагенти
+            Всі замовники
           </button>
 
           <button
@@ -248,7 +248,7 @@ export const Clients: React.FC = () => {
             }}
           >
             <User size={13} />
-            Клієнти
+            Замовники (Постійні)
           </button>
 
           {/* User Custom sections listing */}
@@ -314,7 +314,7 @@ export const Clients: React.FC = () => {
                 <table className="ios-table">
                   <thead>
                     <tr>
-                      <th>Назва контрагента</th>
+                      <th>Назва замовника</th>
                       <th>Місто</th>
                       <th>Тип</th>
                       <th>Статус / Розділ</th>

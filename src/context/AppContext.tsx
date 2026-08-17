@@ -60,39 +60,87 @@ const initialUsers: User[] = [
 const initialClients: Client[] = [
   { 
     id: '1', 
-    name: 'Замовник А (ТОВ Едельвейс)', 
-    contact: 'Представник А', 
+    name: 'Замовник А (ТОВ "Едельвейс і К")', 
+    contact: 'Олександр Дмитрович', 
     phone: '+380671234567', 
-    email: 'client.a@example.com', 
+    email: 'edelveis@gmail.com', 
     discount: 10, 
     city: 'Вінниця',
-    tags: ['Важливий', 'Гурт'],
-    files: ['Договір_поставки_А.pdf', 'Макет_v2.ai'],
+    tags: ['Постійний', 'VIP', 'Друкарня'],
+    files: ['Договір_поставки_2026.pdf', 'Реквізити.pdf'],
     type: 'client'
   },
   { 
     id: '2', 
-    name: 'Замовник Б (ФОП Мельник)', 
-    contact: 'Представник Б', 
+    name: 'Замовник Б (ФОП Мельник - "Арома Кава")', 
+    contact: 'Ірина Мельник', 
     phone: '+380939876543', 
-    email: 'client.b@example.com', 
+    email: 'aroma.coffee@gmail.com', 
     discount: 5, 
     city: 'Вінниця',
-    tags: ['Постійний'],
-    files: ['Рахунок_45.pdf'],
+    tags: ['Постійний', 'Меню', 'Листівки'],
+    files: ['Макет_меню_v2.pdf'],
     type: 'client'
   },
   { 
     id: '3', 
-    name: 'Замовник В (Поліграф-Сервіс)', 
-    contact: 'Представник В', 
+    name: 'Замовник В (Мережа аптек "Поділля-Фарм")', 
+    contact: 'Сергій Миколайович', 
     phone: '+380501112233', 
-    email: 'client.c@example.com', 
+    email: 'pharm.podillya@ukr.net', 
+    discount: 8, 
+    city: 'Вінниця',
+    tags: ['Гурт', 'Буклети', 'Беджі'],
+    files: ['Брендбук_Аптека.pdf'],
+    type: 'client'
+  },
+  { 
+    id: '4', 
+    name: 'Видавництво "Подільська Книга"', 
+    contact: 'Олена Петрівна', 
+    phone: '+380975554433', 
+    email: 'books.podillya@gmail.com', 
+    discount: 12, 
+    city: 'Вінниця',
+    tags: ['Книги', 'Тверда обкладинка', 'VIP'],
+    files: ['Техзавдання_Книга_А5.pdf'],
+    type: 'client'
+  },
+  { 
+    id: '5', 
+    name: 'Студія краси "Beauty Zone"', 
+    contact: 'Марія Ковальчук', 
+    phone: '+380637778899', 
+    email: 'beauty.zone.vn@gmail.com', 
     discount: 0, 
     city: 'Вінниця',
-    tags: ['Новий'],
+    tags: ['Візитки', 'Новий'],
     files: [],
     type: 'lead'
+  },
+  { 
+    id: '6', 
+    name: 'ТОВ "Агро-Вінниця"', 
+    contact: 'Володимир Васильович', 
+    phone: '+380682223344', 
+    email: 'agro.vin@gmail.com', 
+    discount: 15, 
+    city: 'Вінниця',
+    tags: ['Календарі', 'Гурт', 'Папки'],
+    files: ['Договір_корпоративний.pdf'],
+    type: 'client'
+  },
+  { 
+    id: '7', 
+    name: 'Пивоварня "Вінницьке Крафтове"', 
+    contact: 'Андрій Шевченко', 
+    phone: '+380961239876', 
+    email: 'craft.beer.vn@gmail.com', 
+    discount: 5, 
+    city: 'Вінниця',
+    tags: ['Наліпки', 'Етикетка', 'Постійний'],
+    files: ['Етикетка_пляшка_330мл.ai'],
+    type: 'client'
   }
 ];
 
@@ -337,7 +385,19 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const [clients, setClients] = useState<Client[]>(() => {
     const saved = localStorage.getItem('crm_clients');
-    return saved ? JSON.parse(saved) : initialClients;
+    if (!saved) return initialClients;
+    try {
+      const parsed: Client[] = JSON.parse(saved);
+      return parsed.map((c) => {
+        if (c.name.includes('Контрагент А')) return { ...c, name: 'Замовник А (ТОВ "Едельвейс і К")' };
+        if (c.name.includes('Контрагент Б')) return { ...c, name: 'Замовник Б (ФОП Мельник)' };
+        if (c.name.includes('Контрагент В')) return { ...c, name: 'Замовник В (Поліграф-Сервіс)' };
+        if (c.name.startsWith('Контрагент')) return { ...c, name: c.name.replace('Контрагент', 'Замовник') };
+        return c;
+      });
+    } catch (e) {
+      return initialClients;
+    }
   });
   
   const [materials, setMaterials] = useState<Material[]>(() => {
