@@ -47,6 +47,8 @@ interface AppContextType {
   notifications: string[];
   npVolumeCalcEnabled: boolean;
   setNpVolumeCalcEnabled: (val: boolean) => void;
+  theme: 'light' | 'dark';
+  toggleTheme: () => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -451,6 +453,28 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const [notifications, setNotifications] = useState<string[]>([]);
 
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    return (localStorage.getItem('crm_theme') as 'light' | 'dark') || 'light';
+  });
+
+  const toggleTheme = () => {
+    setTheme(prev => {
+      const next = prev === 'light' ? 'dark' : 'light';
+      localStorage.setItem('crm_theme', next);
+      return next;
+    });
+  };
+
+  useEffect(() => {
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark-theme');
+      document.body.classList.add('dark-theme');
+    } else {
+      document.documentElement.classList.remove('dark-theme');
+      document.body.classList.remove('dark-theme');
+    }
+  }, [theme]);
+
   useEffect(() => {
     localStorage.setItem('crm_clients', JSON.stringify(clients));
   }, [clients]);
@@ -783,7 +807,9 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         addSystemNotification,
         notifications,
         npVolumeCalcEnabled,
-        setNpVolumeCalcEnabled
+        setNpVolumeCalcEnabled,
+        theme,
+        toggleTheme
       }}
     >
       {children}

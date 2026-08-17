@@ -16,7 +16,9 @@ import {
   Sliders, 
   Zap,
   Settings as SettingsIcon,
-  LogOut
+  LogOut,
+  Moon,
+  Sun
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -25,7 +27,7 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
-  const { currentUser, logout } = useApp();
+  const { currentUser, logout, theme, toggleTheme } = useApp();
   const role = currentUser?.role || 'operator';
 
   // KeepinCRM Modules List with role visibility guards
@@ -161,31 +163,65 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
         </div>
       </div>
 
-      {/* Logout button at the bottom */}
-      <button
-        onClick={logout}
-        type="button"
-        style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '12px',
-          width: '100%',
-          padding: '8px 12px',
-          backgroundColor: 'rgba(255, 59, 48, 0.08)',
-          color: 'var(--danger)',
-          border: 'none',
-          borderRadius: '8px',
-          cursor: 'pointer',
-          transition: 'all 0.15s ease',
-          fontSize: '12px',
-          fontWeight: '750'
-        }}
-        onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255, 59, 48, 0.15)'}
-        onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(255, 59, 48, 0.08)'}
-      >
-        <LogOut size={16} style={{ flexShrink: 0 }} />
-        <span>Вийти</span>
-      </button>
+      {/* Theme & Logout Buttons Footer */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '12px' }}>
+        <button
+          onClick={toggleTheme}
+          type="button"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            width: '100%',
+            padding: '8px 12px',
+            backgroundColor: theme === 'dark' ? '#334155' : 'rgba(120, 120, 128, 0.1)',
+            color: theme === 'dark' ? '#f8fafc' : 'var(--text-dark)',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            transition: 'all 0.15s ease',
+            fontSize: '12px',
+            fontWeight: '750'
+          }}
+        >
+          {theme === 'dark' ? (
+            <>
+              <Sun size={16} className="text-amber-400" style={{ flexShrink: 0 }} />
+              <span>Світла тема</span>
+            </>
+          ) : (
+            <>
+              <Moon size={16} className="text-indigo-600" style={{ flexShrink: 0 }} />
+              <span>Темна тема</span>
+            </>
+          )}
+        </button>
+
+        <button
+          onClick={logout}
+          type="button"
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '12px',
+            width: '100%',
+            padding: '8px 12px',
+            backgroundColor: 'rgba(255, 59, 48, 0.08)',
+            color: 'var(--danger)',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            transition: 'all 0.15s ease',
+            fontSize: '12px',
+            fontWeight: '750'
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255, 59, 48, 0.15)'}
+          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(255, 59, 48, 0.08)'}
+        >
+          <LogOut size={16} style={{ flexShrink: 0 }} />
+          <span>Вийти</span>
+        </button>
+      </div>
     </div>
   );
 };
