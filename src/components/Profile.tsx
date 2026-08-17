@@ -60,16 +60,16 @@ export const Profile: React.FC = () => {
   // Vacation modal & list state (GudHub Vacation Admin style)
   const [showVacationModal, setShowVacationModal] = useState(false);
   const [vacations, setVacations] = useState<VacationRecord[]>([
-    { id: 'V-1', user: 'Михайло Лаута', teamMember: 'Mike Lauta', type: 'Vacation', date: '25 Лист 2025', time: '18:12', hours: 3, project: 'Поліграфія CRM' },
-    { id: 'V-2', user: 'Марина Шаран', teamMember: 'Maryna Sharan', type: 'Remote', date: '25 Лист 2025', time: '15:00', hours: 1, project: 'Дизайн макетів' },
-    { id: 'V-3', user: 'Марина Шаран', teamMember: 'Maryna Sharan', type: 'Vacation', date: '25 Лист 2025', time: '13:00', hours: 2, project: 'Офсетний цех' },
-    { id: 'V-4', user: 'Дмитро Свінціцький', teamMember: 'Dmytro Svintsitskyi', type: 'Remote', date: '25 Лист 2025', time: '11:00', hours: 6, project: 'Поліграфія CRM' },
-    { id: 'V-5', user: 'Любов Шкавро', teamMember: 'Liubov Shkavro', type: 'Holidays', date: '25 Лист 2025', time: '09:32', hours: 16, project: 'Святкові дні' },
-    { id: 'V-6', user: 'Наталія Черевко', teamMember: 'Nataliia Cherevko', type: 'Unpaid', date: '25 Лист 2025', time: '09:00', hours: 1, project: 'Особисті справи' },
-    { id: 'V-7', user: 'Дмитро Свінціцький', teamMember: 'Dmytro Svintsitskyi', type: 'Vacation', date: '25 Лист 2025', time: '09:00', hours: 2, project: 'Поліграфія CRM' },
-    { id: 'V-8', user: 'Ірина Валькова', teamMember: 'Iryna Valkova', type: 'Remote', date: '25 Лист 2025', time: '09:00', hours: 8, project: 'Дистанційно' },
-    { id: 'V-9', user: 'Наталія Черевко', teamMember: 'Nataliia Cherevko', type: 'Remote', date: '25 Лист 2025', time: '09:00', hours: 7, project: 'Контроль тиражу' },
-    { id: 'V-10', user: 'Ярослав Суровцев', teamMember: 'Yaroslav Surovtsev', type: 'Vacation', date: '25 Лист 2025', time: '09:00', hours: 1, project: 'Відпустка' }
+    { id: 'V-1', user: 'Працівник №1', teamMember: 'employee_1', type: 'Vacation', date: '17 Серп 2026', time: '18:12', hours: 3, project: 'Поліграфія CRM' },
+    { id: 'V-2', user: 'Працівник №2', teamMember: 'employee_2', type: 'Remote', date: '17 Серп 2026', time: '15:00', hours: 1, project: 'Дизайн макетів' },
+    { id: 'V-3', user: 'Працівник №2', teamMember: 'employee_2', type: 'Vacation', date: '16 Серп 2026', time: '13:00', hours: 2, project: 'Офсетний цех' },
+    { id: 'V-4', user: 'Працівник №3', teamMember: 'employee_3', type: 'Remote', date: '16 Серп 2026', time: '11:00', hours: 6, project: 'Поліграфія CRM' },
+    { id: 'V-5', user: 'Працівник №4', teamMember: 'employee_4', type: 'Holidays', date: '15 Серп 2026', time: '09:32', hours: 16, project: 'Святкові дні' },
+    { id: 'V-6', user: 'Працівник №5', teamMember: 'employee_5', type: 'Unpaid', date: '15 Серп 2026', time: '09:00', hours: 1, project: 'Особисті справи' },
+    { id: 'V-7', user: 'Працівник №3', teamMember: 'employee_3', type: 'Vacation', date: '14 Серп 2026', time: '09:00', hours: 2, project: 'Поліграфія CRM' },
+    { id: 'V-8', user: 'Працівник №1', teamMember: 'employee_1', type: 'Remote', date: '14 Серп 2026', time: '09:00', hours: 8, project: 'Дистанційно' },
+    { id: 'V-9', user: 'Працівник №5', teamMember: 'employee_5', type: 'Remote', date: '12 Серп 2026', time: '09:00', hours: 7, project: 'Контроль тиражу' },
+    { id: 'V-10', user: 'Працівник №2', teamMember: 'employee_2', type: 'Vacation', date: '10 Серп 2026', time: '09:00', hours: 1, project: 'Відпустка' }
   ]);
 
   // New vacation form state
@@ -138,13 +138,13 @@ export const Profile: React.FC = () => {
   const getStatusBadge = (type: VacationRecord['type']) => {
     switch (type) {
       case 'Vacation':
-        return <span className="ios-badge" style={{ backgroundColor: '#ff3b30', color: '#ffffff', fontWeight: '800' }}>- Відпустка</span>;
+        return <span className="ios-badge ios-badge-red">- Відпустка</span>;
       case 'Remote':
-        return <span className="ios-badge" style={{ backgroundColor: '#ffcc00', color: '#000000', fontWeight: '800' }}>Дистанційно</span>;
+        return <span className="ios-badge ios-badge-orange">Дистанційно</span>;
       case 'Holidays':
-        return <span className="ios-badge" style={{ backgroundColor: '#34c759', color: '#ffffff', fontWeight: '800' }}>+ Свято / Вихідний</span>;
+        return <span className="ios-badge ios-badge-green">+ Свято / Вихідний</span>;
       case 'Unpaid':
-        return <span className="ios-badge" style={{ backgroundColor: '#ff9500', color: '#ffffff', fontWeight: '800' }}>За свій рахунок</span>;
+        return <span className="ios-badge ios-badge-blue">За свій рахунок</span>;
     }
   };
 
@@ -403,7 +403,7 @@ export const Profile: React.FC = () => {
           <div>
             <h3 style={{ fontSize: '16px', fontWeight: '800', color: '#0f172a', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
               <CalendarDays size={18} className="text-blue-500" />
-              Журнал відпусток та відсутностей (Vacation Admin)
+              Журнал відпусток та відсутностей
             </h3>
             <p style={{ fontSize: '11px', color: '#64748b', margin: '2px 0 0 0' }}>Облік лікарняних, графіку відпусток та дистанційної роботи команди</p>
           </div>
@@ -416,10 +416,10 @@ export const Profile: React.FC = () => {
           <table className="ios-table" style={{ width: '100%', fontSize: '12px' }}>
             <thead>
               <tr style={{ textAlign: 'left', borderBottom: '2px solid #e2e8f0' }}>
-                <th style={{ padding: '8px 12px' }}>Користувач (User)</th>
-                <th style={{ padding: '8px 12px' }}>Співробітник</th>
-                <th style={{ padding: '8px 12px' }}>Тип (Type)</th>
-                <th style={{ padding: '8px 12px' }}>Дата (Date)</th>
+                <th style={{ padding: '8px 12px' }}>Користувач</th>
+                <th style={{ padding: '8px 12px' }}>Логін</th>
+                <th style={{ padding: '8px 12px' }}>Тип відсутності</th>
+                <th style={{ padding: '8px 12px' }}>Дата</th>
                 <th style={{ padding: '8px 12px' }}>Час</th>
                 <th style={{ padding: '8px 12px' }}>Години</th>
                 <th style={{ padding: '8px 12px' }}>Проєкт / Примітка</th>
@@ -431,12 +431,12 @@ export const Profile: React.FC = () => {
                   <td style={{ padding: '10px 12px', fontWeight: '700' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <div style={{ width: '24px', height: '24px', borderRadius: '50%', backgroundColor: '#007aff', color: '#fff', fontSize: '10px', fontWeight: '800', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        {record.user.charAt(0)}
+                        {record.user.charAt(record.user.length - 1)}
                       </div>
                       {record.user}
                     </div>
                   </td>
-                  <td style={{ padding: '10px 12px', color: '#3b82f6', fontWeight: '600' }}>{record.teamMember}</td>
+                  <td style={{ padding: '10px 12px', color: '#007aff', fontWeight: '600', fontFamily: 'var(--font-mono)' }}>{record.teamMember}</td>
                   <td style={{ padding: '10px 12px' }}>{getStatusBadge(record.type)}</td>
                   <td style={{ padding: '10px 12px', fontFamily: 'var(--font-mono)' }}>{record.date}</td>
                   <td style={{ padding: '10px 12px', color: '#64748b', fontFamily: 'var(--font-mono)' }}>{record.time}</td>
@@ -455,7 +455,7 @@ export const Profile: React.FC = () => {
           <div>
             <h3 style={{ fontSize: '16px', fontWeight: '800', color: '#0f172a', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
               <FileText size={18} className="text-blue-500" />
-              Останні 10 завдань користувача (Tasks List)
+              Останні 10 завдань користувача
             </h3>
             <p style={{ fontSize: '11px', color: '#64748b', margin: '2px 0 0 0' }}>Оперативний перелік виконаних та поточних виробничих задач</p>
           </div>
@@ -519,10 +519,10 @@ export const Profile: React.FC = () => {
               <div className="ios-input-group">
                 <label className="ios-label">Тип відсутності *</label>
                 <select value={vacType} onChange={(e) => setVacType(e.target.value as any)}>
-                  <option value="Vacation">- Відпустка (Vacation)</option>
-                  <option value="Remote">Дистанційно (Remote)</option>
-                  <option value="Holidays">+ Свято / Вихідний (Holidays)</option>
-                  <option value="Unpaid">Відпустка за свій рахунок (Unpaid)</option>
+                  <option value="Vacation">- Відпустка</option>
+                  <option value="Remote">Дистанційна робота</option>
+                  <option value="Holidays">+ Свято / Вихідний</option>
+                  <option value="Unpaid">Відпустка за свій рахунок</option>
                 </select>
               </div>
 
