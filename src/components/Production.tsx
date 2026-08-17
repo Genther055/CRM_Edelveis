@@ -88,9 +88,34 @@ export const Production: React.FC = () => {
     const element = document.getElementById(`work-order-print-${order.id}`);
     if (!element) return;
 
+    const activeClient = clients.find(c => c.id === order.clientId);
+
+    const matchNum = (order.name || '').match(/№\s*(\d+)/);
+    const num = matchNum ? matchNum[1] : (order.id || '33811');
+
+    let rawProd = order.category || 'Бланки';
+    if (!order.category || (order.category as string) === 'Основна' || (order.category as string).includes('Угода')) {
+      if ((order.name || '').toLowerCase().includes('бланк')) {
+        rawProd = 'Бланки';
+      } else if ((order.name || '').toLowerCase().includes('листівк')) {
+        rawProd = 'Листівки';
+      } else {
+        rawProd = 'Бланки';
+      }
+    }
+    const safeProdName = rawProd.replace(/[\\/:*?"<>|]/g, '').trim().replace(/\s+/g, '_');
+
+    const rawClient = activeClient?.name || 'Замовник №1';
+    const safeClientName = rawClient.replace(/[\\/:*?"<>|]/g, '').trim().replace(/\s+/g, '_');
+
+    const paperShort = order.paperType === 'offset' ? 'Офс._70г' : order.paperType === 'gazetka' ? 'Газ._45г' : 'Крейда_130г';
+    const turnShort = order.isSamNaSebe ? 'сс' : 'без_обор';
+
+    const fileName = `№${num}_${safeProdName}_—_${safeClientName}_(${order.format || 'A4'},_${paperShort},_${order.colors || '1+0'},_${turnShort},_${order.quantity || 1000}_шт.).pdf`;
+
     const opt = {
       margin:       10,
-      filename:     `naryad-${order.id}-${order.name.replace(/\s+/g, '_')}.pdf`,
+      filename:     fileName,
       image:        { type: 'jpeg' as const, quality: 0.98 },
       html2canvas:  { scale: 2, useCORS: true },
       jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' as const }
