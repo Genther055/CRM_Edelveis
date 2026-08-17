@@ -138,10 +138,10 @@ export const Settings: React.FC = () => {
   };
 
   return (
-    <div className="main-content bg-[#f2f2f7]">
+    <div className="main-content" style={{ backgroundColor: 'var(--bg-system)' }}>
       <div className="header-title-container">
         <div>
-          <h1 className="page-title text-slate-900">Налаштування системи</h1>
+          <h1 className="page-title">Налаштування системи</h1>
           <p className="subtitle">Керування профілем друкарні, користувачами, філіями та інтеграціями маркетплейсів</p>
         </div>
       </div>

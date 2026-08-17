@@ -196,10 +196,10 @@ export const Deals: React.FC = () => {
   };
 
   return (
-    <div className="main-content bg-[#f2f2f7]">
+    <div className="main-content" style={{ backgroundColor: 'var(--bg-system)' }}>
       <div className="header-title-container">
         <div>
-          <h1 className="page-title text-slate-900">Угоди та Продажі</h1>
+          <h1 className="page-title">Угоди та Продажі</h1>
           <p className="subtitle">Керування воронками дистрибуції, B2B друком та роздрібними POS-чеками</p>
         </div>
         

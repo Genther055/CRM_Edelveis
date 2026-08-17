@@ -96,10 +96,10 @@ export const PM: React.FC = () => {
   });
 
   return (
-    <div className="main-content bg-[#f2f2f7]" style={{ height: '100%', overflowY: 'auto' }}>
+    <div className="main-content" style={{ backgroundColor: 'var(--bg-system)', height: '100%', overflowY: 'auto' }}>
       <div className="header-title-container">
         <div>
-          <h1 className="page-title text-slate-900">Дизайн та верстка (PM)</h1>
+          <h1 className="page-title">Дизайн та верстка (PM)</h1>
           <p className="subtitle">База замовлень на дизайн макетів, верстку та додрукарську підготовку</p>
         </div>
         
@@ -114,7 +114,7 @@ export const PM: React.FC = () => {
       </div>
 
       {/* Sub-tab navigation */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', borderBottom: '0.5px solid var(--border-light)', paddingBottom: '10px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', borderBottom: '1px solid var(--border-light)', paddingBottom: '10px' }}>
         <div style={{ display: 'flex', gap: '6px' }}>
           {(['current', 'all', 'done', 'review'] as const).map(tab => (
             <button
@@ -138,9 +138,9 @@ export const PM: React.FC = () => {
       </div>
 
       {/* Main Database Table Container */}
-      <div className="ios-card bg-white space-y-4">
+      <div className="ios-card space-y-4" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h3 style={{ fontSize: '14px', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <h3 style={{ fontSize: '14px', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--text-dark)' }}>
             <Layers size={16} style={{ color: 'var(--primary)' }} />
             Реєстр макетів та додрукарської підготовки
           </h3>
@@ -159,7 +159,7 @@ export const PM: React.FC = () => {
         <div className="ios-table-container">
           <table className="ios-table" style={{ fontSize: '12px' }}>
             <thead>
-              <tr style={{ backgroundColor: '#f8fafc' }}>
+              <tr>
                 <th style={{ width: '40px' }}>ID</th>
                 <th>Назва виробу / Макету</th>
                 <th>Контрагент</th>

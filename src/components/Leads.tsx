@@ -222,11 +222,11 @@ export const Leads: React.FC = () => {
   };
 
   return (
-    <div className="main-content bg-[#f2f2f7]">
+    <div className="main-content" style={{ backgroundColor: 'var(--bg-system)' }}>
       {/* Top Header */}
       <div className="header-title-container">
         <div>
-          <h1 className="page-title text-slate-900">Запити та звернення</h1>
+          <h1 className="page-title">Запити та звернення</h1>
           <p className="subtitle">Журнал вхідних запитів замовників з підключеними формулами</p>
         </div>
         <button 

@@ -97,10 +97,10 @@ export const Finance: React.FC = () => {
   };
 
   return (
-    <div className="main-content bg-[#f2f2f7]">
+    <div className="main-content" style={{ backgroundColor: 'var(--bg-system)' }}>
       <div className="header-title-container">
         <div>
-          <h1 className="page-title text-slate-900">Фінансовий облік</h1>
+          <h1 className="page-title">Фінансовий облік</h1>
           <p className="subtitle">Контроль кас, безготівкових рахунків та витрат друкарні</p>
         </div>
         <button 

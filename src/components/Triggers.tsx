@@ -307,10 +307,10 @@ export const Triggers: React.FC = () => {
   });
 
   return (
-    <div className="main-content bg-[#f2f2f7]">
+    <div className="main-content" style={{ backgroundColor: 'var(--bg-system)' }}>
       <div className="header-title-container">
         <div>
-          <h1 className="page-title text-slate-900">Автоматизація CRM</h1>
+          <h1 className="page-title">Автоматизація CRM</h1>
           <p className="subtitle">Конструктор автоматичних правил, Gmail пошти, сповіщень та авто-ТТН</p>
         </div>
       </div>

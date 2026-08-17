@@ -59,7 +59,7 @@ export const Employees: React.FC = () => {
   };
 
   return (
-    <div className="main-content bg-[#f8fafc]">
+    <div className="main-content" style={{ backgroundColor: 'var(--bg-system)' }}>
       {/* Top Header */}
       <div className="header-title-container">
         <div>

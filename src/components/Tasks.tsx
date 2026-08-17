@@ -128,10 +128,10 @@ export const Tasks: React.FC = () => {
   };
 
   return (
-    <div className="main-content bg-[#f2f2f7]" style={{ height: '100%', overflowY: 'auto' }}>
+    <div className="main-content" style={{ backgroundColor: 'var(--bg-system)', height: '100%', overflowY: 'auto' }}>
       <div className="header-title-container">
         <div>
-          <h1 className="page-title text-slate-900">Завдання та Чек-листи</h1>
+          <h1 className="page-title">Завдання та Чек-листи</h1>
           <p className="subtitle">Планування та контроль виробничих доручень</p>
         </div>
         <button 

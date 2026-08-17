@@ -229,10 +229,10 @@ export const Documents: React.FC = () => {
   };
 
   return (
-    <div className="main-content bg-[#f2f2f7]" style={{ height: '100%', overflowY: 'auto' }}>
+    <div className="main-content" style={{ backgroundColor: 'var(--bg-system)', height: '100%', overflowY: 'auto' }}>
       <div className="header-title-container">
         <div>
-          <h1 className="page-title text-slate-900">Документи та Реєстр нарядів</h1>
+          <h1 className="page-title">Документи та Реєстр нарядів</h1>
           <p className="subtitle">База розрахунків калькулятора, рахунки та шаблони договорів</p>
         </div>
       </div>

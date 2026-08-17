@@ -185,10 +185,10 @@ export const Delivery: React.FC = () => {
   });
 
   return (
-    <div className="main-content bg-[#f2f2f7]">
+    <div className="main-content" style={{ backgroundColor: 'var(--bg-system)' }}>
       <div className="header-title-container">
         <div>
-          <h1 className="page-title text-slate-900">Доставка замовлень</h1>
+          <h1 className="page-title">Доставка замовлень</h1>
           <p className="subtitle">Керування доставками: Нова Пошта, УкрПошта та Системні кур'єри</p>
         </div>
         <button

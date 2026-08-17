@@ -280,10 +280,10 @@ export const Warehouse: React.FC = () => {
   }, [materials, searchQuery, selectedCategory, selectedStockFilter]);
 
   return (
-    <div className="main-content bg-[#f2f2f7]">
+    <div className="main-content" style={{ backgroundColor: 'var(--bg-system)' }}>
       <div className="header-title-container">
         <div>
-          <h1 className="page-title text-slate-900">Склад матеріалів та номенклатури</h1>
+          <h1 className="page-title">Склад матеріалів та номенклатури</h1>
           <p className="subtitle">Повний контроль залишків, резервів, цін закупівлі та складських комірок</p>
         </div>
 

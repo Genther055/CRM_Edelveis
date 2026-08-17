@@ -728,13 +728,13 @@ export const Calculator: React.FC = () => {
   };
 
   return (
-    <div className="main-content bg-[#f2f2f7]">
+    <div className="main-content" style={{ backgroundColor: 'var(--bg-system)' }}>
       {step === 'catalog' ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           {/* Header */}
           <div className="header-title-container">
             <div>
-              <h2 className="page-title text-slate-900">Поліграфічний калькулятор</h2>
+              <h2 className="page-title">Поліграфічний калькулятор</h2>
               <p className="subtitle">Оберіть категорію продукції для детального прорахунку</p>
             </div>
             

@@ -125,7 +125,7 @@ export const Production: React.FC = () => {
   };
 
   return (
-    <div className="main-content bg-[#f2f2f7]" style={{ display: 'flex', flexDirection: 'column', height: '100%', overflowY: 'auto' }}>
+    <div className="main-content" style={{ backgroundColor: 'var(--bg-system)', display: 'flex', flexDirection: 'column', height: '100%', overflowY: 'auto' }}>
       {/* Title Header */}
       <div className="header-title-container">
         <div>

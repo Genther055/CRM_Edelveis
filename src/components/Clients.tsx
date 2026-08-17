@@ -582,7 +582,7 @@ export const Clients: React.FC = () => {
           {/* Title Header */}
           <div className="header-title-container">
             <div>
-              <h2 className="page-title text-slate-900">База контрагентів</h2>
+              <h2 className="page-title">База контрагентів</h2>
               <p className="subtitle">Сегментація лідів, клієнтів та користувацьких розділів</p>
             </div>
             
