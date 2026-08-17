@@ -433,7 +433,9 @@ export const Calculator: React.FC = () => {
 
     const passes = ['1+1', '4+4'].includes(colors) ? 2 : 1;
     const cuttingCost = numQty * norms.cuttingRate;
-    const packingCost = numPack * norms.packingRate;
+    const itemsPerPackage = numPack > 0 ? numPack : numQty;
+    const totalPackages = Math.ceil(numQty / itemsPerPackage);
+    const packingCost = totalPackages * norms.packingRate;
 
     let subtotal = 0;
     let printingCost = 0;
@@ -548,7 +550,8 @@ export const Calculator: React.FC = () => {
       finalPrice,
       unitPrice,
       cuttingCost,
-      packingCost
+      packingCost,
+      totalPackages
     };
   }, [quantity, paperType, colors, designCost, norms, packingCount, marginPercent, activeOps, opCustomRates, opVolumes, category, calcMode, selectedFormat, bindingType, laminationType, creaseCount]);
 
@@ -1655,7 +1658,7 @@ export const Calculator: React.FC = () => {
                     <span style={{ color: '#8E8E93' }}>Скріплення:</span> <strong>{bindingType === 'none' ? 'Без скріплення' : bindingType === 'staple' ? 'Скоба (шиття)' : bindingType === 'spring' ? 'Пружина' : bindingType === 'glue' ? 'Клей (КБС)' : 'Тверда палітурка'}</strong>
                   </div>
                   <div style={{ padding: '6px 10px', border: '1px solid #E5E5EA', borderRadius: '4px', backgroundColor: '#FAFAFC', gridColumn: 'span 2' }}>
-                    <span style={{ color: '#8E8E93' }}>Пакування та укладання:</span> <strong>{Number(packingCount) > 0 ? `У пачки по ${packingCount} шт.` : 'Стандартне пакування'}</strong>
+                    <span style={{ color: '#8E8E93' }}>Пакування та укладання:</span> <strong>{Number(packingCount) > 0 ? `${calculatedOps.totalPackages} пак. по ${packingCount} шт.` : 'Стандартне пакування'}</strong>
                   </div>
                 </div>
               </div>
