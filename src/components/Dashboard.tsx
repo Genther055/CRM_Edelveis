@@ -281,22 +281,35 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab }) => {
         
         {/* Sales Funnel widget */}
         <div className="ios-card space-y-4 lg:col-span-1" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)' }}>
-          <h3 style={{ fontSize: '14px', fontWeight: '800', color: 'var(--text-dark)', display: 'flex', alignItems: 'center', gap: '6px', borderBottom: '1px solid var(--border-light)', paddingBottom: '10px' }}>
-            <TrendingUp size={16} style={{ color: 'var(--primary)' }} />
-            Воронка продажів (Sales Funnel)
-          </h3>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-light)', paddingBottom: '10px' }}>
+            <h3 style={{ fontSize: '14px', fontWeight: '800', color: 'var(--text-dark)', display: 'flex', alignItems: 'center', gap: '6px', margin: 0 }}>
+              <TrendingUp size={16} style={{ color: 'var(--primary)' }} />
+              Воронка продажів (KeepinCRM)
+            </h3>
+            <button 
+              onClick={() => setActiveTab('deals')}
+              style={{ fontSize: '11px', color: 'var(--primary)', fontWeight: '750', background: 'transparent', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '2px' }}
+            >
+              Канбан угод <ChevronRight size={12} />
+            </button>
+          </div>
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
             {funnelStats.map((st, idx) => {
               const maxVal = Math.max(...funnelStats.map(s => s.amount)) || 1;
-              const barPercent = Math.max(15, (st.amount / maxVal) * 100);
+              const barPercent = Math.max(18, (st.amount / maxVal) * 100);
+              const stageColors = ['#475569', '#eab308', '#f97316', '#6366f1', '#10b981'];
+
               return (
                 <div key={idx} style={{ display: 'flex', flexDirection: 'column', gap: '3px' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px' }}>
-                    <span style={{ fontWeight: '600', color: 'var(--text-medium)' }}>{st.label}</span>
-                    <span style={{ fontWeight: '750', color: 'var(--text-dark)' }}>{st.amount.toLocaleString()} ₴ ({st.count} шт.)</span>
+                    <span style={{ fontWeight: '700', color: 'var(--text-dark)' }}>{idx + 1}. {st.label}</span>
+                    <span style={{ fontWeight: '800', color: stageColors[idx % stageColors.length], fontFamily: 'var(--font-mono)' }}>
+                      {st.amount.toLocaleString()} ₴ <span style={{ color: 'var(--text-medium)', fontWeight: 'normal' }}>({st.count} шт)</span>
+                    </span>
                   </div>
-                  <div style={{ width: '100%', height: '14px', backgroundColor: 'var(--border-light)', borderRadius: '4px', overflow: 'hidden', position: 'relative' }}>
-                    <div style={{ width: `${barPercent}%`, height: '100%', backgroundColor: 'var(--primary)', borderRadius: '4px', transition: 'width 0.3s ease' }} />
+                  <div style={{ width: '100%', height: '14px', backgroundColor: 'var(--bg-card-subtle)', borderRadius: '4px', overflow: 'hidden', border: '1px solid var(--border-light)' }}>
+                    <div style={{ width: `${barPercent}%`, height: '100%', backgroundColor: stageColors[idx % stageColors.length], borderRadius: '3px', transition: 'width 0.3s ease' }} />
                   </div>
                 </div>
               );
