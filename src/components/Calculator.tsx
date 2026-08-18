@@ -36,6 +36,7 @@ interface CalcTemplate {
   creaseCount?: number;
 }
 
+// Clean restored Calculator version 1.0.5
 export const Calculator: React.FC = () => {
   const { clients, materials, norms, addOrder, currentUser, updateNorms } = useApp();
 
