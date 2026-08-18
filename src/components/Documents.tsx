@@ -1,15 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useApp } from '../context/AppContext';
 import { 
   Download, 
   Plus, 
-  Trash,
+  Trash2,
   Settings,
   FileSignature,
   FileText,
   Search,
   Eye,
-  FileCode
+  FileCode,
+  Edit3,
+  Table as TableIcon,
+  Bold,
+  Italic,
+  Underline,
+  Strikethrough,
+  AlignLeft,
+  AlignCenter,
+  AlignRight,
+  AlignJustify,
+  List,
+  ListOrdered,
+  Printer,
+  Save
 } from 'lucide-react';
 import html2pdf from 'html2pdf.js';
 
@@ -18,19 +32,14 @@ interface DocTemplate {
   name: string;
   type: string;
   lastUsed: string;
+  content?: string;
 }
 
-interface GeneratedDoc {
-  id: string;
-  number: string;
-  client: string;
-  type: string;
-  date: string;
-}
+
 
 export const Documents: React.FC = () => {
   const { orders, clients } = useApp();
-  const [activeSubTab, setActiveSubTab] = useState<'registry' | 'templates'>('registry');
+  const [activeSubTab, setActiveSubTab] = useState<'registry' | 'templates' | 'editor' | 'autonumber'>('registry');
   const [searchQuery, setSearchQuery] = useState('');
 
   const [templates, setTemplates] = useState<DocTemplate[]>([
@@ -39,11 +48,7 @@ export const Documents: React.FC = () => {
     { id: '3', name: 'Договір про надання послуг друку', type: 'Contract', lastUsed: '2026-07-20' }
   ]);
 
-  const [docs] = useState<GeneratedDoc[]>([
-    { id: '1', number: '142', client: 'Контрагент А', type: 'Рахунок-фактура', date: '2026-07-24' },
-    { id: '2', number: '98', client: 'Контрагент Б', type: 'Акт виконаних робіт', date: '2026-07-23' },
-    { id: '3', number: '12', client: 'Контрагент В', type: 'Договір послуг', date: '2026-07-20' }
-  ]);
+
 
   const [prefix, setPrefix] = useState('INV-');
   const [nextNumber, setNextNumber] = useState(143);
@@ -52,10 +57,174 @@ export const Documents: React.FC = () => {
   // Selected order for detailed modal view
   const [selectedDocOrder, setSelectedDocOrder] = useState<any>(null);
 
+  // --- EDITOR STATE ---
+  const editorRef = useRef<HTMLDivElement>(null);
+  const [documentTitle, setDocumentTitle] = useState('Новий документ / Специфікація №143');
+  const [tableRows, setTableRows] = useState(3);
+  const [tableCols, setTableCols] = useState(4);
+  const [hasTableHeader] = useState(true);
+
+  // Default Initial Document Canvas HTML Template
+  const [editorContent] = useState<string>(`
+    <div style="font-family: Arial, sans-serif; font-size: 13px; color: #1e293b; line-height: 1.6;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #0f172a; padding-bottom: 12px; margin-bottom: 20px;">
+        <div>
+          <h2 style="font-size: 20px; font-weight: 800; color: #0f172a; margin: 0;">ДОГОВІР ПОЛІГРАФІЧНИХ ПОСЛУГ № {номер_документа}</h2>
+          <p style="font-size: 11px; color: #64748b; margin: 4px 0 0 0;">Поліграфічна компанія «Едельвейс і К»</p>
+        </div>
+        <div style="text-align: right; background-color: #f8fafc; padding: 8px 14px; border-radius: 6px; border: 1px solid #e2e8f0;">
+          <p style="margin: 0; font-weight: 700;">м. Вінниця</p>
+          <p style="margin: 2px 0 0 0; font-size: 11px; color: #64748b;">Дата: {дата}</p>
+        </div>
+      </div>
+
+      <p>Виконавець <strong>ТОВ «Едельвейс і К»</strong> з одного боку, та Замовник <strong>{назва_замовника}</strong> з іншого боку, уклали цей Договір про наступне:</p>
+
+      <h3 style="font-size: 14px; font-weight: 800; color: #007AFF; margin-top: 16px; border-bottom: 1px solid #cbd5e1; padding-bottom: 4px;">1. ПРЕДМЕТ ДОГОВОРУ ТА СПЕЦИФІКАЦІЯ</h3>
+      <p>Замовник доручає, а Виконавець бере на себе зобов'язання з виготовлення поліграфічної продукції:</p>
+
+      <table style="width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 12px;">
+        <thead>
+          <tr style="background-color: #f1f5f9; text-align: left;">
+            <th style="border: 1px solid #cbd5e1; padding: 8px 10px;">№</th>
+            <th style="border: 1px solid #cbd5e1; padding: 8px 10px;">Найменування поліграфії</th>
+            <th style="border: 1px solid #cbd5e1; padding: 8px 10px;">Тираж (шт)</th>
+            <th style="border: 1px solid #cbd5e1; padding: 8px 10px;">Папір & Формат</th>
+            <th style="border: 1px solid #cbd5e1; padding: 8px 10px; text-align: right;">Вартість (грн)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="border: 1px solid #cbd5e1; padding: 8px 10px;">1</td>
+            <td style="border: 1px solid #cbd5e1; padding: 8px 10px;">{назва_продукції}</td>
+            <td style="border: 1px solid #cbd5e1; padding: 8px 10px;">{тираж}</td>
+            <td style="border: 1px solid #cbd5e1; padding: 8px 10px;">{формат_паперу}, {кольоровість}</td>
+            <td style="border: 1px solid #cbd5e1; padding: 8px 10px; text-align: right; font-weight: 700;">{сума_загалом} ₴</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3 style="font-size: 14px; font-weight: 800; color: #007AFF; margin-top: 16px; border-bottom: 1px solid #cbd5e1; padding-bottom: 4px;">2. ПІДПИСИ ТА РЕКВІЗИТИ СТОРІН</h3>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px;">
+        <div style="border: 1px solid #e2e8f0; padding: 12px; border-radius: 6px; background-color: #fafafa;">
+          <h4 style="margin: 0 0 8px 0; font-size: 12px; font-weight: 800;">ВИКОНАВЕЦЬ:</h4>
+          <p style="margin: 0; font-size: 11px;">ТОВ «Едельвейс і К»<br/>Код ЄДРПОУ 38819201<br/>р/р UA31300001000002600112233<br/>{підпис_директора}</p>
+        </div>
+        <div style="border: 1px solid #e2e8f0; padding: 12px; border-radius: 6px; background-color: #fafafa;">
+          <h4 style="margin: 0 0 8px 0; font-size: 12px; font-weight: 800;">ЗАМОВНИК:</h4>
+          <p style="margin: 0; font-size: 11px;">{назва_замовника}<br/>Представник __________________<br/>М.П. / Підпис __________________</p>
+        </div>
+      </div>
+    </div>
+  `);
+
+  // Format command exec
+  const execFormat = (command: string, value: string | undefined = undefined) => {
+    document.execCommand(command, false, value);
+  };
+
+  // Insert Custom CRM Variable
+  const insertVariable = (variable: string) => {
+    if (!editorRef.current) return;
+    const selection = window.getSelection();
+    if (!selection || selection.rangeCount === 0) return;
+    const range = selection.getRangeAt(0);
+    const span = document.createElement('span');
+    span.style.color = '#007AFF';
+    span.style.fontWeight = '750';
+    span.style.backgroundColor = '#e0f2fe';
+    span.style.padding = '2px 6px';
+    span.style.borderRadius = '4px';
+    span.innerText = variable;
+    range.deleteContents();
+    range.insertNode(span);
+  };
+
+  // Insert Table into Editor
+  const insertTable = () => {
+    if (tableRows <= 0 || tableCols <= 0) return;
+    let tableHTML = `<table style="width: 100%; border-collapse: collapse; margin: 16px 0; font-size: 12px; border: 1px solid #cbd5e1;">`;
+    
+    if (hasTableHeader) {
+      tableHTML += `<thead style="background-color: #f1f5f9;"><tr>`;
+      for (let c = 1; c <= tableCols; c++) {
+        tableHTML += `<th style="border: 1px solid #cbd5e1; padding: 8px 10px; text-align: left;">Заголовок ${c}</th>`;
+      }
+      tableHTML += `</tr></thead>`;
+    }
+
+    tableHTML += `<tbody>`;
+    for (let r = 1; r <= tableRows; r++) {
+      tableHTML += `<tr>`;
+      for (let c = 1; c <= tableCols; c++) {
+        tableHTML += `<td style="border: 1px solid #cbd5e1; padding: 8px 10px;">Дані R${r}C${c}</td>`;
+      }
+      tableHTML += `</tr>`;
+    }
+    tableHTML += `</tbody></table>`;
+
+    if (editorRef.current) {
+      editorRef.current.innerHTML += tableHTML;
+    }
+  };
+
+  const exportEditorPDF = () => {
+    if (!editorRef.current) return;
+    const element = document.createElement('div');
+    element.style.padding = '36px';
+    element.style.backgroundColor = '#FFFFFF';
+    element.style.color = '#1E293B';
+    element.innerHTML = editorRef.current.innerHTML;
+
+    const opt = {
+      margin: 10,
+      filename: `${documentTitle.replace(/\s+/g, '_')}.pdf`,
+      image: { type: 'jpeg' as const, quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' as const }
+    };
+
+    html2pdf().from(element).set(opt).save();
+  };
+
+  const printEditorContent = () => {
+    if (!editorRef.current) return;
+    const printWindow = window.open('', '_blank');
+    if (!printWindow) return;
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>${documentTitle}</title>
+          <style>
+            body { font-family: Arial, sans-serif; padding: 40px; color: #1e293b; background: #ffffff; }
+            table { border-collapse: collapse; width: 100%; }
+            th, td { border: 1px solid #cbd5e1; padding: 8px; }
+          </style>
+        </head>
+        <body>${editorRef.current.innerHTML}</body>
+      </html>
+    `);
+    printWindow.document.close();
+    printWindow.print();
+  };
+
+  const saveAsTemplate = () => {
+    if (!editorRef.current) return;
+    const name = prompt('Введіть назву для нового шаблону:', documentTitle);
+    if (!name) return;
+    setTemplates([...templates, {
+      id: String(templates.length + 1),
+      name,
+      type: 'Custom',
+      lastUsed: new Date().toISOString().split('T')[0],
+      content: editorRef.current.innerHTML
+    }]);
+    alert(`Шаблон "${name}" успішно збережено в базі шаблонів CRM!`);
+  };
+
   const addTemplate = () => {
     const name = prompt('Введіть назву нового шаблону:');
     if (!name) return;
-
     setTemplates([...templates, {
       id: String(templates.length + 1),
       name,
@@ -81,7 +250,6 @@ export const Documents: React.FC = () => {
     element.style.color = '#1C1C1E';
     element.style.fontFamily = 'sans-serif';
     
-    // Extract 5-digit order number if present in title, otherwise fallback to order.id
     const matchNum = (order.name || '').match(/№\s*(\d+)/);
     const num = matchNum ? matchNum[1] : (order.id || '33811');
 
@@ -154,16 +322,7 @@ export const Documents: React.FC = () => {
 
       <div style="margin-bottom: 16px;">
         <h5 style="font-size: 11px; font-weight: 800; border-bottom: 1px solid #E5E5EA; padding-bottom: 4px; margin-bottom: 8px; color: #007AFF; text-transform: uppercase; margin: 0;">
-          3. Післядрукарська обробка (Післядрук)
-        </h5>
-        <div style="padding: 8px 12px; border: 1px solid #E5E5EA; border-radius: 6px; background-color: #FAFAFC; font-size: 11px;">
-          ${order.notes || 'Порізка в готовий формат, пакування в пачки.'}
-        </div>
-      </div>
-
-      <div>
-        <h5 style="font-size: 11px; font-weight: 800; border-bottom: 1px solid #E5E5EA; padding-bottom: 4px; margin-bottom: 8px; color: #007AFF; text-transform: uppercase; margin: 0;">
-          4. Фінансовий підсумок
+          3. Фінансовий підсумок
         </h5>
         <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
           <thead>
@@ -177,12 +336,12 @@ export const Documents: React.FC = () => {
             <tr style="border-bottom: 1px solid #E5E5EA;">
               <td style="padding: 6px 0;">Макет та переддрук</td>
               <td style="padding: 6px 0; text-align: center;">1 посл.</td>
-              <td style="padding: 6px 0; text-align: right;">${(order.designCost || 34).toFixed(2)} ₴</td>
+              <td style="padding: 6px 0; text-align: right;">{(order.designCost || 34).toFixed(2)} ₴</td>
             </tr>
             <tr style="border-bottom: 1px solid #E5E5EA;">
               <td style="padding: 6px 0;">Матеріали + Поліграфічний друк + Післядрукарські операції</td>
               <td style="padding: 6px 0; text-align: center;">${order.quantity} шт.</td>
-              <td style="padding: 6px 0; text-align: right;">${(order.finalPrice - (order.designCost || 34)).toFixed(2)} ₴</td>
+              <td style="padding: 6px 0; text-align: right;">{(order.finalPrice - (order.designCost || 34)).toFixed(2)} ₴</td>
             </tr>
           </tbody>
           <tfoot>
@@ -195,34 +354,13 @@ export const Documents: React.FC = () => {
       </div>
     `;
 
-    // Product name: use order.category or clean product name
-    let rawProd = order.category || 'Бланки';
-    if (!order.category || order.category === 'Основна' || order.category.includes('Угода')) {
-      if ((order.name || '').toLowerCase().includes('бланк')) {
-        rawProd = 'Бланки';
-      } else if ((order.name || '').toLowerCase().includes('листівк')) {
-        rawProd = 'Листівки';
-      } else {
-        rawProd = 'Бланки';
-      }
-    }
-    const safeProdName = rawProd.replace(/[\\/:*?"<>|]/g, '').trim().replace(/\s+/g, '_');
-
-    // Client name: use activeClient.name or fallback
-    const rawClient = activeClient?.name || 'Замовник №1';
-    const safeClientName = rawClient.replace(/[\\/:*?"<>|]/g, '').trim().replace(/\s+/g, '_');
-
-    const paperShort = order.paperType === 'offset' ? 'Офс._70г' : order.paperType === 'gazetka' ? 'Газ._45г' : 'Крейда_130г';
-    const turnShort = order.isSamNaSebe ? 'сс' : 'без_обор';
-
-    const fileName = `№${num}_${safeProdName}_—_${safeClientName}_(${order.format || 'A4'},_${paperShort},_${order.colors || '1+0'},_${turnShort},_${order.quantity || 1000}_шт.).pdf`;
-
+    const fileName = `Document_№${num}.pdf`;
     const opt = {
-      margin:       10,
-      filename:     fileName,
-      image:        { type: 'jpeg' as const, quality: 0.98 },
-      html2canvas:  { scale: 2 },
-      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'portrait' as const }
+      margin: 10,
+      filename: fileName,
+      image: { type: 'jpeg' as const, quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' as const }
     };
 
     html2pdf().from(element).set(opt).save();
@@ -230,10 +368,15 @@ export const Documents: React.FC = () => {
 
   return (
     <div className="main-content" style={{ backgroundColor: 'var(--bg-system)', height: '100%', overflowY: 'auto' }}>
-      <div className="header-title-container">
+      
+      {/* Header Banner */}
+      <div className="header-title-container" style={{ marginBottom: '16px' }}>
         <div>
-          <h1 className="page-title">Документи та Реєстр нарядів</h1>
-          <p className="subtitle">База розрахунків калькулятора, рахунки та шаблони договорів</p>
+          <h1 className="page-title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <FileText size={22} style={{ color: 'var(--primary)' }} />
+            Документи & Візуальний Редактор шаблонів
+          </h1>
+          <p className="subtitle">Створення специфікацій, конструктор таблиць, нумерація та друк документів A4</p>
         </div>
       </div>
 
@@ -242,23 +385,160 @@ export const Documents: React.FC = () => {
         <button
           onClick={() => setActiveSubTab('registry')}
           className={`ios-btn ${activeSubTab === 'registry' ? 'ios-btn-primary' : 'ios-btn-secondary'}`}
-          style={{ display: 'flex', alignItems: 'center', gap: '6px', height: '32px' }}
+          style={{ display: 'flex', alignItems: 'center', gap: '6px', height: '34px' }}
         >
-          <FileText size={14} />
+          <FileCode size={15} />
           База розрахунків (наряди)
         </button>
+
+        <button
+          onClick={() => setActiveSubTab('editor')}
+          className={`ios-btn ${activeSubTab === 'editor' ? 'ios-btn-primary' : 'ios-btn-secondary'}`}
+          style={{ display: 'flex', alignItems: 'center', gap: '6px', height: '34px', backgroundColor: activeSubTab === 'editor' ? '#10b981' : undefined, borderColor: activeSubTab === 'editor' ? '#10b981' : undefined }}
+        >
+          <Edit3 size={15} />
+          ✏️ Редактор документів & Конструктор таблиць
+        </button>
+
         <button
           onClick={() => setActiveSubTab('templates')}
           className={`ios-btn ${activeSubTab === 'templates' ? 'ios-btn-primary' : 'ios-btn-secondary'}`}
-          style={{ display: 'flex', alignItems: 'center', gap: '6px', height: '32px' }}
+          style={{ display: 'flex', alignItems: 'center', gap: '6px', height: '34px' }}
         >
-          <FileSignature size={14} />
+          <FileSignature size={15} />
           Шаблони та Договори
+        </button>
+
+        <button
+          onClick={() => setActiveSubTab('autonumber')}
+          className={`ios-btn ${activeSubTab === 'autonumber' ? 'ios-btn-primary' : 'ios-btn-secondary'}`}
+          style={{ display: 'flex', alignItems: 'center', gap: '6px', height: '34px' }}
+        >
+          <Settings size={15} />
+          Автонумерація
         </button>
       </div>
 
-      {activeSubTab === 'registry' ? (
-        /* DATABASE OF CALCULATED ORDERS (НАРЯДИ) */
+      {/* --- 1. EDITOR & TABLE BUILDER TAB --- */}
+      {activeSubTab === 'editor' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          
+          {/* Editor Header Bar & Actions */}
+          <div className="ios-card" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)', padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '14px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexGrow: 1, maxWidth: '400px' }}>
+              <Edit3 size={18} style={{ color: '#10b981' }} />
+              <input 
+                type="text" 
+                value={documentTitle}
+                onChange={(e) => setDocumentTitle(e.target.value)}
+                style={{ fontSize: '15px', fontWeight: '800', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)', borderRadius: '6px', padding: '6px 12px', width: '100%' }}
+              />
+            </div>
+
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <button onClick={saveAsTemplate} className="ios-btn ios-btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <Save size={14} /> Зберегти як шаблон
+              </button>
+              <button onClick={printEditorContent} className="ios-btn ios-btn-secondary" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <Printer size={14} /> Друк (Аркуш A4)
+              </button>
+              <button onClick={exportEditorPDF} className="ios-btn ios-btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '6px', backgroundColor: '#10b981', borderColor: '#10b981' }}>
+                <Download size={14} /> Завантажити в PDF
+              </button>
+            </div>
+          </div>
+
+          {/* Formatting & Insert Tools Bar */}
+          <div className="ios-card" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)', padding: '14px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            
+            {/* Toolbar Buttons Row */}
+            <div style={{ display: 'flex', gap: '6px', alignItems: 'center', flexWrap: 'wrap', borderBottom: '1px solid var(--border-light)', paddingBottom: '10px' }}>
+              <span style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-medium)', marginRight: '6px' }}>Форматування:</span>
+              <button onClick={() => execFormat('bold')} className="ios-btn ios-btn-secondary ios-btn-small" title="Жирний (Bold)"><Bold size={14} /></button>
+              <button onClick={() => execFormat('italic')} className="ios-btn ios-btn-secondary ios-btn-small" title="Курсив (Italic)"><Italic size={14} /></button>
+              <button onClick={() => execFormat('underline')} className="ios-btn ios-btn-secondary ios-btn-small" title="Підкреслений"><Underline size={14} /></button>
+              <button onClick={() => execFormat('strikeThrough')} className="ios-btn ios-btn-secondary ios-btn-small" title="Закреслений"><Strikethrough size={14} /></button>
+
+              <div style={{ width: '1px', height: '20px', backgroundColor: 'var(--border-light)', margin: '0 4px' }} />
+
+              <button onClick={() => execFormat('justifyLeft')} className="ios-btn ios-btn-secondary ios-btn-small" title="По лівому краю"><AlignLeft size={14} /></button>
+              <button onClick={() => execFormat('justifyCenter')} className="ios-btn ios-btn-secondary ios-btn-small" title="По центру"><AlignCenter size={14} /></button>
+              <button onClick={() => execFormat('justifyRight')} className="ios-btn ios-btn-secondary ios-btn-small" title="По правому краю"><AlignRight size={14} /></button>
+              <button onClick={() => execFormat('justifyFull')} className="ios-btn ios-btn-secondary ios-btn-small" title="По ширині"><AlignJustify size={14} /></button>
+
+              <div style={{ width: '1px', height: '20px', backgroundColor: 'var(--border-light)', margin: '0 4px' }} />
+
+              <button onClick={() => execFormat('insertUnorderedList')} className="ios-btn ios-btn-secondary ios-btn-small" title="Маркований список"><List size={14} /></button>
+              <button onClick={() => execFormat('insertOrderedList')} className="ios-btn ios-btn-secondary ios-btn-small" title="Нумерований список"><ListOrdered size={14} /></button>
+            </div>
+
+            {/* Table Builder & Dynamic Variables Bar */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', alignItems: 'center' }}>
+              
+              {/* Table Builder Controls */}
+              <div style={{ padding: '10px 14px', borderRadius: '8px', backgroundColor: 'var(--bg-card-subtle)', border: '1px solid var(--border-light)', display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap' }}>
+                <span style={{ fontSize: '11px', fontWeight: '750', color: 'var(--text-dark)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <TableIcon size={14} style={{ color: '#10b981' }} /> Конструктор таблиць:
+                </span>
+                <label style={{ fontSize: '11px', color: 'var(--text-medium)' }}>
+                  Рядки: <input type="number" min={1} max={20} value={tableRows} onChange={(e) => setTableRows(Number(e.target.value))} style={{ width: '45px', padding: '2px 4px', fontSize: '11px' }} />
+                </label>
+                <label style={{ fontSize: '11px', color: 'var(--text-medium)' }}>
+                  Стовпчики: <input type="number" min={1} max={10} value={tableCols} onChange={(e) => setTableCols(Number(e.target.value))} style={{ width: '45px', padding: '2px 4px', fontSize: '11px' }} />
+                </label>
+                <button onClick={insertTable} className="ios-btn ios-btn-primary ios-btn-small" style={{ backgroundColor: '#10b981', borderColor: '#10b981' }}>
+                  + Вставити таблицю
+                </button>
+              </div>
+
+              {/* Dynamic Variables Inserter */}
+              <div style={{ padding: '10px 14px', borderRadius: '8px', backgroundColor: 'var(--bg-card-subtle)', border: '1px solid var(--border-light)' }}>
+                <span style={{ fontSize: '11px', fontWeight: '750', color: 'var(--text-dark)', display: 'block', marginBottom: '6px' }}>
+                  ⚡ Динамічні змінні CRM (натисніть для вставки):
+                </span>
+                <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+                  {['{номер_документа}', '{дата}', '{назва_замовника}', '{назва_продукції}', '{тираж}', '{сума_загалом}', '{формат_паперу}'].map(v => (
+                    <button
+                      key={v}
+                      onClick={() => insertVariable(v)}
+                      style={{ fontSize: '10px', padding: '2px 6px', borderRadius: '4px', backgroundColor: '#e0f2fe', color: '#0369a1', border: '1px solid #bae6fd', cursor: 'pointer', fontWeight: '600' }}
+                    >
+                      {v}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+            </div>
+
+          </div>
+
+          {/* Interactive Live Editable Sheet Canvas (A4 Visual Page) */}
+          <div style={{ display: 'flex', justifyContent: 'center', backgroundColor: '#f1f5f9', padding: '30px', borderRadius: '12px', border: '1px solid var(--border-light)' }}>
+            <div 
+              ref={editorRef}
+              contentEditable
+              suppressContentEditableWarning
+              style={{ 
+                width: '210mm', 
+                minHeight: '297mm', 
+                backgroundColor: '#ffffff', 
+                color: '#1e293b', 
+                padding: '25mm 20mm', 
+                boxShadow: '0 10px 30px rgba(0,0,0,0.1)', 
+                borderRadius: '2px', 
+                outline: 'none',
+                boxSizing: 'border-box'
+              }}
+              dangerouslySetInnerHTML={{ __html: editorContent }}
+            />
+          </div>
+
+        </div>
+      )}
+
+      {/* --- 2. REGISTRY TAB (НАРЯДИ) --- */}
+      {activeSubTab === 'registry' && (
         <div className="ios-card" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)', padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
             <h2 style={{ fontSize: '14px', fontWeight: '800', color: 'var(--text-dark)', margin: 0, display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -266,7 +546,6 @@ export const Documents: React.FC = () => {
               База розрахованих нарядів (накопичувальна БД)
             </h2>
 
-            {/* Search */}
             <div style={{ position: 'relative', width: '250px' }}>
               <Search size={14} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-medium)' }} />
               <input
@@ -348,8 +627,10 @@ export const Documents: React.FC = () => {
             </table>
           </div>
         </div>
-      ) : (
-        /* ORIGINAL TEMPLATES & CONTRACTS INTERFACE WITH NEW iOS STYLING */
+      )}
+
+      {/* --- 3. TEMPLATES TAB --- */}
+      {activeSubTab === 'templates' && (
         <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '20px', alignItems: 'start' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
             <div className="ios-card" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)', padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -402,103 +683,67 @@ export const Documents: React.FC = () => {
                         padding: '4px'
                       }}
                     >
-                      <Trash size={12} />
+                      <Trash2 size={12} />
                     </button>
                   </div>
                 ))}
               </div>
             </div>
-
-            <div className="ios-card" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)', padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <h2 style={{ fontSize: '14px', fontWeight: '800', color: 'var(--text-dark)', borderBottom: '1px solid var(--border-light)', paddingBottom: '10px', margin: 0 }}>Реєстр створених документів</h2>
-              
-              <div className="ios-table-container">
-                <table className="ios-table">
-                  <thead>
-                    <tr>
-                      <th style={{ color: 'var(--text-medium)' }}>Номер</th>
-                      <th style={{ color: 'var(--text-medium)' }}>Тип документа</th>
-                      <th style={{ color: 'var(--text-medium)' }}>Замовник</th>
-                      <th style={{ color: 'var(--text-medium)' }}>Дата</th>
-                      <th style={{ textAlign: 'right', color: 'var(--text-medium)' }}>Дія</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {docs.map(doc => (
-                      <tr key={doc.id} style={{ borderBottom: '1px solid var(--border-light)' }}>
-                        <td style={{ fontWeight: '700', color: 'var(--primary)', fontFamily: 'var(--font-mono)' }}>{doc.number}</td>
-                        <td style={{ color: 'var(--text-dark)' }}>{doc.type}</td>
-                        <td style={{ color: 'var(--text-dark)' }}>{doc.client.replace(/Контрагент А/g, 'ТОВ «ФармаТрейд»').replace(/Контрагент Б/g, 'ПРАТ «ЕкоСок»')}</td>
-                        <td style={{ color: 'var(--text-medium)', fontFamily: 'var(--font-mono)' }}>{doc.date}</td>
-                        <td style={{ textAlign: 'right' }}>
-                          <button 
-                            type="button"
-                            onClick={() => alert(`Завантаження документа ${doc.number} у форматі PDF.`)}
-                            className="ios-btn ios-btn-secondary ios-btn-small"
-                            style={{ padding: '6px' }}
-                          >
-                            <Download size={12} />
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
           </div>
+        </div>
+      )}
 
-          {/* Auto Numbering settings */}
-          <div className="ios-card" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)', padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <h2 style={{ fontSize: '14px', fontWeight: '800', color: 'var(--text-dark)', borderBottom: '1px solid var(--border-light)', paddingBottom: '10px', margin: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
-              <Settings size={16} style={{ color: 'var(--primary)' }} />
-              Автонумерація
-            </h2>
+      {/* --- 4. AUTONUMBER TAB --- */}
+      {activeSubTab === 'autonumber' && (
+        <div className="ios-card" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)', padding: '20px', display: 'flex', flexDirection: 'column', gap: '16px', maxWidth: '480px' }}>
+          <h2 style={{ fontSize: '14px', fontWeight: '800', color: 'var(--text-dark)', borderBottom: '1px solid var(--border-light)', paddingBottom: '10px', margin: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <Settings size={16} style={{ color: 'var(--primary)' }} />
+            Автонумерація документів
+          </h2>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              <div className="ios-input-group" style={{ marginBottom: 0 }}>
-                <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Префікс номера</label>
-                <input 
-                  value={prefix}
-                  onChange={(e) => setPrefix(e.target.value)}
-                  placeholder="напр. INV-"
-                  style={{ backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
-                />
-              </div>
-
-              <div className="ios-input-group" style={{ marginBottom: 0 }}>
-                <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Наступний номер</label>
-                <input 
-                  type="number"
-                  value={nextNumber}
-                  onChange={(e) => setNextNumber(Number(e.target.value))}
-                  style={{ backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
-                />
-              </div>
-
-              <div className="ios-input-group" style={{ marginBottom: 0 }}>
-                <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Суфікс номера</label>
-                <input 
-                  value={suffix}
-                  onChange={(e) => setSuffix(e.target.value)}
-                  placeholder="напр. /2026"
-                  style={{ backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
-                />
-              </div>
-
-              <div style={{ padding: '12px', backgroundColor: 'var(--bg-card-subtle)', border: '1px solid var(--border-light)', borderRadius: 'var(--radius-md)', fontSize: '11px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <span style={{ fontSize: '9px', fontWeight: '750', color: 'var(--text-medium)', textTransform: 'uppercase' }}>Приклад генерації:</span>
-                <div style={{ fontSize: '14px', fontWeight: '800', color: 'var(--text-dark)', fontFamily: 'var(--font-mono)' }}>{prefix}{nextNumber}{suffix}</div>
-              </div>
-
-              <button 
-                type="button"
-                onClick={() => alert('Налаштування автонумератора збережено.')}
-                className="ios-btn ios-btn-primary w-full"
-              >
-                Зберегти правила
-              </button>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            <div className="ios-input-group" style={{ marginBottom: 0 }}>
+              <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Префікс номера</label>
+              <input 
+                value={prefix}
+                onChange={(e) => setPrefix(e.target.value)}
+                placeholder="напр. INV-"
+                style={{ backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
+              />
             </div>
+
+            <div className="ios-input-group" style={{ marginBottom: 0 }}>
+              <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Наступний номер</label>
+              <input 
+                type="number"
+                value={nextNumber}
+                onChange={(e) => setNextNumber(Number(e.target.value))}
+                style={{ backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
+              />
+            </div>
+
+            <div className="ios-input-group" style={{ marginBottom: 0 }}>
+              <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Суфікс номера</label>
+              <input 
+                value={suffix}
+                onChange={(e) => setSuffix(e.target.value)}
+                placeholder="напр. /2026"
+                style={{ backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
+              />
+            </div>
+
+            <div style={{ padding: '12px', backgroundColor: 'var(--bg-card-subtle)', border: '1px solid var(--border-light)', borderRadius: 'var(--radius-md)', fontSize: '11px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              <span style={{ fontSize: '9px', fontWeight: '750', color: 'var(--text-medium)', textTransform: 'uppercase' }}>Приклад генерації:</span>
+              <div style={{ fontSize: '14px', fontWeight: '800', color: 'var(--text-dark)', fontFamily: 'var(--font-mono)' }}>{prefix}{nextNumber}{suffix}</div>
+            </div>
+
+            <button 
+              type="button"
+              onClick={() => alert('Налаштування автонумератора збережено.')}
+              className="ios-btn ios-btn-primary w-full"
+            >
+              Зберегти правила
+            </button>
           </div>
         </div>
       )}
@@ -513,8 +758,6 @@ export const Documents: React.FC = () => {
             </div>
             
             <div className="ios-modal-body" id="invoice-preview-container" style={{ padding: '24px', backgroundColor: '#FFFFFF', color: '#1C1C1E', fontSize: '11px', lineHeight: '1.4' }}>
-              
-              {/* Document Header */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', borderBottom: '2px solid #000', paddingBottom: '12px', marginBottom: '16px', gap: '16px' }}>
                 <div style={{ flexShrink: 0 }}>
                   <h4 style={{ fontSize: '18px', fontWeight: '900', letterSpacing: '-0.5px', margin: 0 }}>
@@ -534,7 +777,6 @@ export const Documents: React.FC = () => {
                 </div>
               </div>
 
-              {/* Product Specification & Quantity Banner */}
               <div style={{ display: 'grid', gridTemplateColumns: '2.5fr 1fr', gap: '10px', marginBottom: '16px' }}>
                 <div style={{ backgroundColor: '#F2F2F7', padding: '10px 14px', borderRadius: '6px', border: '1px solid #E5E5EA' }}>
                   <span style={{ fontSize: '9px', fontWeight: '800', color: '#8E8E93', textTransform: 'uppercase', display: 'block', marginBottom: '2px' }}>Продукція / Специфікація</span>
@@ -546,64 +788,9 @@ export const Documents: React.FC = () => {
                 </div>
               </div>
 
-              {/* 1. Матеріали та сировина */}
-              <div style={{ marginBottom: '16px' }}>
-                <h5 style={{ fontSize: '11px', fontWeight: '800', borderBottom: '1px solid #E5E5EA', paddingBottom: '4px', marginBottom: '8px', color: '#007AFF', textTransform: 'uppercase', margin: 0 }}>
-                  1. Матеріали та сировина
-                </h5>
-                <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 1fr', gap: '10px', backgroundColor: '#FAFAFC', padding: '8px 12px', borderRadius: '6px', border: '1px solid #E5E5EA' }}>
-                  <div>
-                    <span style={{ color: '#8E8E93', display: 'block', fontSize: '10px' }}>Матеріал паперу:</span>
-                    <strong style={{ fontSize: '11px' }}>{selectedDocOrder.paperType === 'offset' ? 'Офсетний 70г' : selectedDocOrder.paperType === 'gazetka' ? 'Газетний 45г' : 'Крейдований 130г'}</strong>
-                  </div>
-                  <div>
-                    <span style={{ color: '#8E8E93', display: 'block', fontSize: '10px' }}>Розмір друкарського листа:</span>
-                    <strong style={{ fontSize: '11px' }}>{selectedDocOrder.format || 'A4'}</strong>
-                  </div>
-                  <div>
-                    <span style={{ color: '#8E8E93', display: 'block', fontSize: '10px' }}>Обсяг матеріалу:</span>
-                    <strong style={{ fontSize: '11px' }}>{selectedDocOrder.physicalSheets || 500} арк. (+{Math.ceil((selectedDocOrder.physicalSheets || 500) * 0.05)} тех. відх.)</strong>
-                  </div>
-                </div>
-              </div>
-
-              {/* 2. Процес друку */}
-              <div style={{ marginBottom: '16px' }}>
-                <h5 style={{ fontSize: '11px', fontWeight: '800', borderBottom: '1px solid #E5E5EA', paddingBottom: '4px', marginBottom: '8px', color: '#007AFF', textTransform: 'uppercase', margin: 0 }}>
-                  2. Процес друку (Друкарська машина & Параметри)
-                </h5>
-                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px', border: '1px solid #E5E5EA' }}>
-                  <tbody>
-                    <tr style={{ borderBottom: '1px solid #E5E5EA', backgroundColor: '#FAFAFC' }}>
-                      <td style={{ padding: '6px 10px', color: '#636366', width: '30%' }}>Друкарська машина:</td>
-                      <td style={{ padding: '6px 10px', fontWeight: '700', width: '20%' }}>{selectedDocOrder.machine || 'Опція 1'}</td>
-                      <td style={{ padding: '6px 10px', color: '#636366', width: '30%' }}>Красочність (кольоровість):</td>
-                      <td style={{ padding: '6px 10px', fontWeight: '700', width: '20%' }}>{selectedDocOrder.colors || '1+0'}</td>
-                    </tr>
-                    <tr style={{ borderBottom: '1px solid #E5E5EA' }}>
-                      <td style={{ padding: '6px 10px', color: '#636366' }}>Однотипних листів (на арк):</td>
-                      <td style={{ padding: '6px 10px', fontWeight: '700' }}>{selectedDocOrder.itemsPerSheet || 2} шт./арк</td>
-                      <td style={{ padding: '6px 10px', color: '#636366' }}>Спуск макету / оборот:</td>
-                      <td style={{ padding: '6px 10px', fontWeight: '700' }}>{selectedDocOrder.isSamNaSebe ? 'Сам на себе (с/с)' : 'Без обороту'}</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-
-              {/* 3. Післядрукарська обробка */}
-              <div style={{ marginBottom: '16px' }}>
-                <h5 style={{ fontSize: '11px', fontWeight: '800', borderBottom: '1px solid #E5E5EA', paddingBottom: '4px', marginBottom: '8px', color: '#007AFF', textTransform: 'uppercase', margin: 0 }}>
-                  3. Післядрукарська обробка (Післядрук)
-                </h5>
-                <div style={{ padding: '8px 12px', border: '1px solid #E5E5EA', borderRadius: '6px', backgroundColor: '#FAFAFC', fontSize: '11px' }}>
-                  {selectedDocOrder.notes || 'Порізка в готовий формат, пакування в пачки.'}
-                </div>
-              </div>
-
-              {/* 4. Фінансовий розрахунок */}
               <div>
                 <h5 style={{ fontSize: '11px', fontWeight: '800', borderBottom: '1px solid #E5E5EA', paddingBottom: '4px', marginBottom: '8px', color: '#007AFF', textTransform: 'uppercase', margin: 0 }}>
-                  4. Фінансовий підсумок
+                  Фінансовий підсумок
                 </h5>
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
                   <thead>
@@ -633,7 +820,6 @@ export const Documents: React.FC = () => {
                   </tfoot>
                 </table>
               </div>
-
             </div>
 
             <div className="ios-modal-footer">
@@ -643,6 +829,7 @@ export const Documents: React.FC = () => {
           </div>
         </div>
       )}
+
     </div>
   );
 };
