@@ -72,7 +72,88 @@ export const Settings: React.FC = () => {
     { code: 'EUR', symbol: '€', rate: 44.80, isBase: false }
   ]);
 
-  const [activeSubTab, setActiveSubTab] = useState<'profile' | 'branches' | 'users' | 'currencies' | 'customfields' | 'matrix_sla' | 'nova_poshta' | 'rozetka' | 'ukr_poshta'>('profile');
+  const [activeSubTab, setActiveSubTab] = useState<'profile' | 'branches' | 'users' | 'access_matrix' | 'currencies' | 'customfields' | 'matrix_sla' | 'nova_poshta' | 'rozetka' | 'ukr_poshta'>('access_matrix');
+  const [accessSubTab, setAccessSubTab] = useState<'branches' | 'users' | 'teams' | 'rights'>('rights');
+
+  // Role Access Permissions State (matching KeepinCRM screenshot)
+  const [rolePermissions, setRolePermissions] = useState<Record<string, Record<string, boolean>>>({
+    dev: {
+      g_unlimited: false, g_change_mgr_assignee: true, g_change_origin: false, g_change_deal_name: true, g_autofill: true,
+      g_change_source: false, g_print_docs: true, g_export_data: true, g_print_receipts: true, g_change_shops: true,
+      g_view_cash_log: true, g_view_my_actions: true, g_print_thermal: true,
+      p_print_checklist: true, p_view_finance_sum: true, p_view_total_funds: false, p_view_debts: false, p_export_ops: true,
+      c_view_phones: true, c_delete_leads: true, c_manual_deals: true, c_view_contacts: false, c_edit_my_orders: false,
+      c_edit_mgr_orders: false, c_delete_client_orders: false, c_view_client_orders: true, c_create_client_stage: false,
+      c_view_clients: true, c_unlimited: true, c_delete_supplier_orders: true,
+      d_change_deals: true, d_view_completed_points: false, d_view_deal_points: false, d_change_columns: false,
+      d_move_stages_assignee: true, d_edit_deal_name: false, d_unlimited_mgr_deals: true, d_change_order_assignee: true,
+      d_change_call_assignee: true, d_unlimited_client_orders: true, d_unlimited_mgr_orders: true, d_unlimited_leads: true, d_unlimited_client_deals: true,
+      t_change_tasks: true, t_edit_task_source: false, t_create_client_task: true, t_view_my_tasks: true,
+      w_manual_writeoff: false, w_view_stock: true, w_stock_writeoff: true, w_print_inventory: true, w_manual_stock_edit: false,
+      w_print_specs: true, w_manual_price_edit: true, w_change_order_price: true, w_print_acceptance: true, w_manual_name_edit: true,
+      w_print_waybill: true, w_view_output: true,
+      cs_manual_writeoff: true, cs_view_cashier_stock: false,
+      p_create_purchases: true, p_receive_purchase: true, p_buy_goods: true, p_view_purchase: true, p_buy_client_goods: true,
+      p_view_1c_order: true, p_writeoff_purchase_goods: true, p_export_purchases: true, p_view_waybill: true, p_create_act: true,
+      p_create_issue_act: true, p_writeoff_sum: true, p_writeoff_debt: true,
+      s_create_settings: false, s_export_systems: false, s_group_settings: false, s_funnel_settings: false, s_cash_settings: false,
+      s_validation_settings: false, s_automation_settings: false, s_sources_settings: false, s_fields_settings: false, s_clients_settings: false, s_stock_settings: false
+    },
+    op: {
+      g_unlimited: true, g_change_mgr_assignee: true, g_change_origin: true, g_change_deal_name: true, g_autofill: true,
+      g_change_source: true, g_print_docs: true, g_export_data: true, g_print_receipts: true, g_change_shops: true,
+      g_view_cash_log: true, g_view_my_actions: true, g_print_thermal: true,
+      p_print_checklist: true, p_view_finance_sum: true, p_view_total_funds: true, p_view_debts: true, p_export_ops: true,
+      c_view_phones: true, c_delete_leads: true, c_manual_deals: true, c_view_contacts: true, c_edit_my_orders: true,
+      c_edit_mgr_orders: true, c_delete_client_orders: true, c_view_client_orders: true, c_create_client_stage: true,
+      c_view_clients: true, c_unlimited: true, c_delete_supplier_orders: true,
+      d_change_deals: true, d_view_completed_points: true, d_view_deal_points: true, d_change_columns: true,
+      d_move_stages_assignee: true, d_edit_deal_name: true, d_unlimited_mgr_deals: true, d_change_order_assignee: true,
+      d_change_call_assignee: true, d_unlimited_client_orders: true, d_unlimited_mgr_orders: true, d_unlimited_leads: true, d_unlimited_client_deals: true,
+      t_change_tasks: true, t_edit_task_source: true, t_create_client_task: true, t_view_my_tasks: true,
+      w_manual_writeoff: true, w_view_stock: true, w_stock_writeoff: true, w_print_inventory: true, w_manual_stock_edit: true,
+      w_print_specs: true, w_manual_price_edit: true, w_change_order_price: true, w_print_acceptance: true, w_manual_name_edit: true,
+      w_print_waybill: true, w_view_output: true,
+      cs_manual_writeoff: true, cs_view_cashier_stock: true,
+      p_create_purchases: true, p_receive_purchase: true, p_buy_goods: true, p_view_purchase: true, p_buy_client_goods: true,
+      p_view_1c_order: true, p_writeoff_purchase_goods: true, p_export_purchases: true, p_view_waybill: true, p_create_act: true,
+      p_create_issue_act: true, p_writeoff_sum: true, p_writeoff_debt: true,
+      s_create_settings: false, s_export_systems: false, s_group_settings: false, s_funnel_settings: false, s_cash_settings: false,
+      s_validation_settings: false, s_automation_settings: false, s_sources_settings: false, s_fields_settings: false, s_clients_settings: false, s_stock_settings: false
+    },
+    printer: {
+      g_unlimited: false, g_change_mgr_assignee: true, g_change_origin: false, g_change_deal_name: true, g_autofill: true,
+      g_change_source: false, g_print_docs: true, g_export_data: true, g_print_receipts: true, g_change_shops: true,
+      g_view_cash_log: true, g_view_my_actions: true, g_print_thermal: true,
+      p_print_checklist: true, p_view_finance_sum: true, p_view_total_funds: false, p_view_debts: true, p_export_ops: true,
+      c_view_phones: true, c_delete_leads: true, c_manual_deals: true, c_view_contacts: false, c_edit_my_orders: false,
+      c_edit_mgr_orders: false, c_delete_client_orders: false, c_view_client_orders: true, c_create_client_stage: false,
+      c_view_clients: true, c_unlimited: true, c_delete_supplier_orders: true,
+      d_change_deals: true, d_view_completed_points: false, d_view_deal_points: false, d_change_columns: false,
+      d_move_stages_assignee: true, d_edit_deal_name: false, d_unlimited_mgr_deals: true, d_change_order_assignee: true,
+      d_change_call_assignee: true, d_unlimited_client_orders: true, d_unlimited_mgr_orders: true, d_unlimited_leads: true, d_unlimited_client_deals: true,
+      t_change_tasks: true, t_edit_task_source: false, t_create_client_task: true, t_view_my_tasks: false,
+      w_manual_writeoff: true, w_view_stock: true, w_stock_writeoff: true, w_print_inventory: true, w_manual_stock_edit: false,
+      w_print_specs: true, w_manual_price_edit: true, w_change_order_price: true, w_print_acceptance: true, w_manual_name_edit: true,
+      w_print_waybill: true, w_view_output: true,
+      cs_manual_writeoff: true, cs_view_cashier_stock: false,
+      p_create_purchases: true, p_receive_purchase: true, p_buy_goods: true, p_view_purchase: true, p_buy_client_goods: true,
+      p_view_1c_order: true, p_writeoff_purchase_goods: true, p_export_purchases: true, p_view_waybill: true, p_create_act: true,
+      p_create_issue_act: true, p_writeoff_sum: true, p_writeoff_debt: true,
+      s_create_settings: false, s_export_systems: false, s_group_settings: false, s_funnel_settings: false, s_cash_settings: false,
+      s_validation_settings: false, s_automation_settings: false, s_sources_settings: false, s_fields_settings: false, s_clients_settings: false, s_stock_settings: false
+    }
+  });
+
+  const togglePermission = (roleKey: string, permId: string) => {
+    setRolePermissions(prev => ({
+      ...prev,
+      [roleKey]: {
+        ...prev[roleKey],
+        [permId]: !prev[roleKey]?.[permId]
+      }
+    }));
+  };
 
   // Company Profile state - default to ТОВ Едельвейс і К
   const [companyName, setCompanyName] = useState('ТОВ Едельвейс і К');
@@ -163,6 +244,22 @@ export const Settings: React.FC = () => {
           >
             <Building2 size={14} />
             Профіль компанії
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveSubTab('access_matrix')}
+            className="ios-btn"
+            style={{
+              width: '100%',
+              textAlign: 'left',
+              justifyContent: 'flex-start',
+              backgroundColor: activeSubTab === 'access_matrix' ? 'var(--primary)' : 'rgba(120, 120, 128, 0.08)',
+              color: activeSubTab === 'access_matrix' ? '#ffffff' : 'var(--text-dark)'
+            }}
+          >
+            <UsersIcon size={14} />
+            Налаштування доступу
           </button>
           
           <button
@@ -343,6 +440,275 @@ export const Settings: React.FC = () => {
                 >
                   Скинути демо-дані
                 </button>
+              </div>
+            </div>
+          )}
+
+          {activeSubTab === 'access_matrix' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              
+              {/* Top sub-tabs: Філії, Користувачі, Команди, Доступи */}
+              <div style={{ display: 'flex', borderBottom: '1px solid var(--border-light)', gap: '16px', paddingBottom: '8px' }}>
+                <button
+                  type="button"
+                  onClick={() => setAccessSubTab('branches')}
+                  style={{
+                    border: 'none',
+                    background: 'transparent',
+                    fontSize: '13px',
+                    fontWeight: accessSubTab === 'branches' ? '800' : '600',
+                    color: accessSubTab === 'branches' ? '#10b981' : 'var(--text-medium)',
+                    borderBottom: accessSubTab === 'branches' ? '2px solid #10b981' : 'none',
+                    paddingBottom: '6px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Філії
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setAccessSubTab('users')}
+                  style={{
+                    border: 'none',
+                    background: 'transparent',
+                    fontSize: '13px',
+                    fontWeight: accessSubTab === 'users' ? '800' : '600',
+                    color: accessSubTab === 'users' ? '#10b981' : 'var(--text-medium)',
+                    borderBottom: accessSubTab === 'users' ? '2px solid #10b981' : 'none',
+                    paddingBottom: '6px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Користувачі
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setAccessSubTab('teams')}
+                  style={{
+                    border: 'none',
+                    background: 'transparent',
+                    fontSize: '13px',
+                    fontWeight: accessSubTab === 'teams' ? '800' : '600',
+                    color: accessSubTab === 'teams' ? '#10b981' : 'var(--text-medium)',
+                    borderBottom: accessSubTab === 'teams' ? '2px solid #10b981' : 'none',
+                    paddingBottom: '6px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Команди
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setAccessSubTab('rights')}
+                  style={{
+                    border: 'none',
+                    background: 'transparent',
+                    fontSize: '13px',
+                    fontWeight: accessSubTab === 'rights' ? '800' : '600',
+                    color: accessSubTab === 'rights' ? '#10b981' : 'var(--text-medium)',
+                    borderBottom: accessSubTab === 'rights' ? '2px solid #10b981' : 'none',
+                    paddingBottom: '6px',
+                    cursor: 'pointer'
+                  }}
+                >
+                  Доступи
+                </button>
+              </div>
+
+              {/* Notice Banner */}
+              <div style={{ backgroundColor: 'rgba(59, 130, 246, 0.05)', border: '1px solid rgba(59, 130, 246, 0.15)', padding: '12px 16px', borderRadius: '8px', fontSize: '12px', color: 'var(--text-dark)' }}>
+                Якщо відмічена галочка - то користувачам цієї ролі дозволено перегляд або дію у даній функції.
+              </div>
+
+              {/* Access Rights Table Matrix */}
+              <div style={{ overflowX: 'auto', border: '1px solid var(--border-light)', borderRadius: '8px' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
+                  <thead>
+                    <tr style={{ backgroundColor: 'var(--bg-card-subtle)', borderBottom: '1px solid var(--border-light)' }}>
+                      <th style={{ textAlign: 'left', padding: '10px 14px', color: 'var(--text-medium)' }}>Функція</th>
+                      <th style={{ textAlign: 'center', padding: '10px 14px', width: '180px', color: '#10b981', fontWeight: '800' }}>
+                        🟢 Розробник Маркетолог
+                      </th>
+                      <th style={{ textAlign: 'center', padding: '10px 14px', width: '180px', color: '#10b981', fontWeight: '800' }}>
+                        🟢 Працівник А Оператор
+                      </th>
+                      <th style={{ textAlign: 'center', padding: '10px 14px', width: '180px', color: '#10b981', fontWeight: '800' }}>
+                        🟢 Працівник Б Старший друкар
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {[
+                      {
+                        title: 'Загальні',
+                        items: [
+                          { id: 'g_unlimited', name: 'Без обмежень' },
+                          { id: 'g_change_mgr_assignee', name: 'Зміна відповідального у менеджерів' },
+                          { id: 'g_change_origin', name: 'Зміна звідки прийшов клієнт' },
+                          { id: 'g_change_deal_name', name: 'Зміна назви угод' },
+                          { id: 'g_autofill', name: 'Автозаповнення' },
+                          { id: 'g_change_source', name: 'Зміна джерела звернення клієнтів' },
+                          { id: 'g_print_docs', name: 'Друк документів' },
+                          { id: 'g_export_data', name: 'Експорт даних' },
+                          { id: 'g_print_receipts', name: 'Друк чеків' },
+                          { id: 'g_change_shops', name: 'Зміна Магазинів' },
+                          { id: 'g_view_cash_log', name: 'Перегляд касових дій' },
+                          { id: 'g_view_my_actions', name: 'Перегляд моїх дій' },
+                          { id: 'g_print_thermal', name: 'Друк чеків на термопринтері' },
+                        ]
+                      },
+                      {
+                        title: 'Оплати',
+                        items: [
+                          { id: 'p_print_checklist', name: 'Друк чек-листа' },
+                          { id: 'p_view_finance_sum', name: 'Перегляд суми у фінансах' },
+                          { id: 'p_view_total_funds', name: 'Перегляд загальних коштів' },
+                          { id: 'p_view_debts', name: 'Перегляд Заборгованостей' },
+                          { id: 'p_export_ops', name: 'Експорт операцій за періодами' },
+                        ]
+                      },
+                      {
+                        title: 'Контрагенти',
+                        items: [
+                          { id: 'c_view_phones', name: 'Перегляд контактних телефонів' },
+                          { id: 'c_delete_leads', name: 'Видалення звернень угод' },
+                          { id: 'c_manual_deals', name: 'Ручне створення угод' },
+                          { id: 'c_view_contacts', name: 'Перегляд контактів' },
+                          { id: 'c_edit_my_orders', name: 'Редагування моїх замовлень' },
+                          { id: 'c_edit_mgr_orders', name: 'Редагування замовлень менеджерів' },
+                          { id: 'c_delete_client_orders', name: 'Видалення замовлень покупців' },
+                          { id: 'c_view_client_orders', name: 'Перегляд замовлень покупців' },
+                          { id: 'c_create_client_stage', name: 'Ручне створення покупця на етапі' },
+                          { id: 'c_view_clients', name: 'Перегляд клієнтів' },
+                          { id: 'c_unlimited', name: 'Без обмежень' },
+                          { id: 'c_delete_supplier_orders', name: 'Видалення замовлень постачальників' },
+                        ]
+                      },
+                      {
+                        title: 'Угоди',
+                        items: [
+                          { id: 'd_change_deals', name: 'Зміна угод' },
+                          { id: 'd_view_completed_points', name: 'Перегляд виконаних балів' },
+                          { id: 'd_view_deal_points', name: 'Перегляд балів в угодах' },
+                          { id: 'd_change_columns', name: 'Зміна граф' },
+                          { id: 'd_move_stages_assignee', name: 'Переміщення по етапах залежно від відповідального' },
+                          { id: 'd_edit_deal_name', name: 'Редагування назви угод' },
+                          { id: 'd_unlimited_mgr_deals', name: 'Без обмежень у перегляді менеджерських угод' },
+                          { id: 'd_change_order_assignee', name: 'Зміна відповідального за замовлення' },
+                          { id: 'd_change_call_assignee', name: 'Зміна відповідального за дзвінки' },
+                          { id: 'd_unlimited_client_orders', name: 'Без обмежень замовлення покупців' },
+                          { id: 'd_unlimited_mgr_orders', name: 'Без обмежень замовлень менеджерів' },
+                          { id: 'd_unlimited_leads', name: 'Без обмежень звернень угод' },
+                          { id: 'd_unlimited_client_deals', name: 'Без обмежень покупця угод' },
+                        ]
+                      },
+                      {
+                        title: 'Завдання',
+                        items: [
+                          { id: 't_change_tasks', name: 'Зміна завдань' },
+                          { id: 't_edit_task_source', name: 'Редагування звідти завдання' },
+                          { id: 't_create_client_task', name: 'Створення завдання покупця' },
+                          { id: 't_view_my_tasks', name: 'Перегляд моїх завдань' },
+                        ]
+                      },
+                      {
+                        title: 'Товари',
+                        items: [
+                          { id: 'w_manual_writeoff', name: 'Ручний списання' },
+                          { id: 'w_view_stock', name: 'Перегляд залишків' },
+                          { id: 'w_stock_writeoff', name: 'Списання зі складу' },
+                          { id: 'w_print_inventory', name: 'Друк інвентаризації' },
+                          { id: 'w_manual_stock_edit', name: 'Ручне коригування залишків' },
+                          { id: 'w_print_specs', name: 'Друк Специфікацій' },
+                          { id: 'w_manual_price_edit', name: 'Ручне коригування цін' },
+                          { id: 'w_change_order_price', name: 'Зміна вартості у замовленнях' },
+                          { id: 'w_print_acceptance', name: 'Друк накладної та актів приймання' },
+                          { id: 'w_manual_name_edit', name: 'Ручне коригування найменувань' },
+                          { id: 'w_print_waybill', name: 'Друк накладної та супровідних листів' },
+                          { id: 'w_view_output', name: 'Перегляд виробітку' },
+                        ]
+                      },
+                      {
+                        title: 'Каса та Касири',
+                        items: [
+                          { id: 'cs_manual_writeoff', name: 'Ручний списання' },
+                          { id: 'cs_view_cashier_stock', name: 'Перегляд залишків касирів' },
+                        ]
+                      },
+                      {
+                        title: 'Купівлі та повернення постачальників',
+                        items: [
+                          { id: 'p_create_purchases', name: 'Створення закупівель' },
+                          { id: 'p_receive_purchase', name: 'Отримання закупівлі' },
+                          { id: 'p_buy_goods', name: 'Закупівлі товару' },
+                          { id: 'p_view_purchase', name: 'Перегляд закупівлі' },
+                          { id: 'p_buy_client_goods', name: 'Купівлі товарів покупця' },
+                          { id: 'p_view_1c_order', name: 'Перегляд замовлення 1С' },
+                          { id: 'p_writeoff_purchase_goods', name: 'Списання товару на закупівлі' },
+                          { id: 'p_export_purchases', name: 'Експорт закупівлі' },
+                          { id: 'p_view_waybill', name: 'Перегляд накладної' },
+                          { id: 'p_create_act', name: 'Створення акту' },
+                          { id: 'p_create_issue_act', name: 'Створення акту видачі' },
+                          { id: 'p_writeoff_sum', name: 'Списання суми' },
+                          { id: 'p_writeoff_debt', name: 'Списання боргу' },
+                        ]
+                      },
+                      {
+                        title: 'Розділ Налаштування',
+                        items: [
+                          { id: 's_create_settings', name: 'Створення налаштувань' },
+                          { id: 's_export_systems', name: 'Експорт систем' },
+                          { id: 's_group_settings', name: 'Налаштування груп' },
+                          { id: 's_funnel_settings', name: 'Налаштування Воронки угод' },
+                          { id: 's_cash_settings', name: 'Налаштування каси' },
+                          { id: 's_validation_settings', name: 'Налаштування Валідації' },
+                          { id: 's_automation_settings', name: 'Налаштування Автоматизації' },
+                          { id: 's_sources_settings', name: 'Налаштування Джерел' },
+                          { id: 's_fields_settings', name: 'Налаштування Полів' },
+                          { id: 's_clients_settings', name: 'Налаштування Контрагентів' },
+                          { id: 's_stock_settings', name: 'Налаштування Складу' },
+                        ]
+                      }
+                    ].map((group, gIdx) => (
+                      <React.Fragment key={gIdx}>
+                        <tr style={{ backgroundColor: '#e0f2fe', color: '#0369a1', fontWeight: '800' }}>
+                          <td colSpan={4} style={{ padding: '8px 14px', fontSize: '11px', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                            {group.title}
+                          </td>
+                        </tr>
+                        {group.items.map((item) => (
+                          <tr key={item.id} style={{ borderBottom: '1px solid var(--border-light)' }}>
+                            <td style={{ padding: '8px 14px', color: 'var(--text-dark)' }}>{item.name}</td>
+                            <td style={{ textAlign: 'center', padding: '8px' }}>
+                              <input
+                                type="checkbox"
+                                checked={!!rolePermissions['dev']?.[item.id]}
+                                onChange={() => togglePermission('dev', item.id)}
+                                style={{ accentColor: '#10b981', width: '16px', height: '16px', cursor: 'pointer' }}
+                              />
+                            </td>
+                            <td style={{ textAlign: 'center', padding: '8px' }}>
+                              <input
+                                type="checkbox"
+                                checked={!!rolePermissions['op']?.[item.id]}
+                                onChange={() => togglePermission('op', item.id)}
+                                style={{ accentColor: '#10b981', width: '16px', height: '16px', cursor: 'pointer' }}
+                              />
+                            </td>
+                            <td style={{ textAlign: 'center', padding: '8px' }}>
+                              <input
+                                type="checkbox"
+                                checked={!!rolePermissions['printer']?.[item.id]}
+                                onChange={() => togglePermission('printer', item.id)}
+                                style={{ accentColor: '#10b981', width: '16px', height: '16px', cursor: 'pointer' }}
+                              />
+                            </td>
+                          </tr>
+                        ))}
+                      </React.Fragment>
+                    ))}
+                  </tbody>
+                </table>
               </div>
             </div>
           )}
