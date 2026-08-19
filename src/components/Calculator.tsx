@@ -1668,12 +1668,16 @@ export const Calculator: React.FC = () => {
                             // Set custom width/height from preset
                             const presets: Record<string, [number, number]> = {
                               '1': [90, 50], '4': [45, 50], '3': [90, 100], '2': [180, 50],
-                              '5': [85, 55], '7': [85, 110], '6': [170, 55],
-                              '9': [100, 70], '12': [50, 70], '11': [100, 140], '10': [200, 70],
+                              '5': [50, 50], '7': [85, 110], '6': [170, 55],
+                              '9': [100, 70], '91': [100, 70], '90': [90, 60], '256': [70, 70],
+                              '12': [50, 70], '11': [100, 140], '10': [200, 70],
+                              '160': [210, 300], '161': [305, 134],
                               '17': [99, 210], '20': [99, 99], '18': [198, 210], '181': [420, 99],
-                              '21': [105, 148], '22': [148, 210], '23': [210, 297], '24': [297, 420], '15': [420, 594], '16': [594, 841],
-                              '25': [52, 148], '26': [74, 210], '27': [105, 297], '28': [148, 420],
-                              '31': [30, 50], '32': [90, 90]
+                              '21': [105, 148], '22': [148, 210], '23': [210, 297], '24': [99, 99], '25': [99, 210], '26': [198, 210],
+                              '27': [50, 70], '28': [70, 100], '29': [52, 148], '31': [74, 210], '32': [148, 210],
+                              '33': [105, 297], '34': [210, 297], '35': [148, 420], '36': [297, 420], '312': [105, 148],
+                              '15': [420, 594], '16': [594, 841],
+                              '37': [70, 70], '38': [90, 90], '39': [105, 105], '40': [145, 145], '41': [210, 210], '42': [295, 295]
                             };
                             if (presets[val]) {
                               setSheetCustomWidth(presets[val][0].toString());
@@ -1693,35 +1697,46 @@ export const Calculator: React.FC = () => {
                             <option value="7">85 × 110 (Подвійна євровізитка)</option>
                             <option value="6">170 × 55 (Подвійна євровізитка)</option>
                           </optgroup>
-                          <optgroup label="Календар">
-                            <option value="9">100 × 70 (Календар)</option>
+                          <optgroup label="Календарі кишенькові та настільні">
+                            <option value="91">100 × 70 (Календар кишеньковий)</option>
+                            <option value="90">90 × 60 (Календар)</option>
+                            <option value="256">70 × 70 (Квадратний календар)</option>
                             <option value="12">50 × 70 (Півкалендаря)</option>
                             <option value="11">100 × 140 (Подвійний календар)</option>
                             <option value="10">200 × 70 (Подвійний календар)</option>
+                            <option value="160">210 × 300 (Календар «Будинок»)</option>
+                            <option value="161">305 × 134 (Календар «Пірамідка»)</option>
                           </optgroup>
                           <optgroup label="Флаєр">
-                            <option value="17">99 × 210 (Флаєр)</option>
-                            <option value="20">99 × 99 (Півфлаєра)</option>
-                            <option value="18">198 × 210 (Подвійний флаєр)</option>
-                            <option value="181">420 × 99 (Подвійний флаєр)</option>
+                            <option value="25">99 × 210 (Єврофлаєр)</option>
+                            <option value="24">99 × 99 (1/2 Флаєра)</option>
+                            <option value="26">198 × 210 (Подвійний флаєр)</option>
+                            <option value="181">420 × 99 (Подвійний флаєр подовжений)</option>
                           </optgroup>
-                          <optgroup label="Листівка, плакат">
-                            <option value="21">105 × 148 (А6)</option>
-                            <option value="22">148 × 210 (А5)</option>
-                            <option value="23">210 × 297 (А4)</option>
-                            <option value="24">297 × 420 (А3)</option>
+                          <optgroup label="Листівки стандартні">
+                            <option value="28">70 × 100 (А7)</option>
+                            <option value="27">50 × 70 (1/2 А7)</option>
+                            <option value="312">105 × 148 (А6)</option>
+                            <option value="29">52 × 148 (1/2 А6)</option>
+                            <option value="32">148 × 210 (А5)</option>
+                            <option value="31">74 × 210 (1/2 А5)</option>
+                            <option value="34">210 × 297 (А4)</option>
+                            <option value="33">105 × 297 (1/2 А4)</option>
+                            <option value="36">297 × 420 (А3)</option>
+                            <option value="35">148 × 420 (1/2 А3)</option>
                             <option value="15">420 × 594 (А2)</option>
                             <option value="16">594 × 841 (А1)</option>
                           </optgroup>
-                          <optgroup label="Формати DL">
-                            <option value="25">52 × 148 (1/2 А6)</option>
-                            <option value="26">74 × 210 (1/2 А5)</option>
-                            <option value="27">105 × 297 (1/2 А4)</option>
-                            <option value="28">148 × 420 (1/2 А3)</option>
+                          <optgroup label="Квадратні листівки">
+                            <option value="5">50 × 50 мм</option>
+                            <option value="37">70 × 70 мм</option>
+                            <option value="38">90 × 90 мм</option>
+                            <option value="39">105 × 105 мм</option>
+                            <option value="40">145 × 145 мм</option>
+                            <option value="41">210 × 210 мм</option>
+                            <option value="42">295 × 295 мм</option>
                           </optgroup>
                           <optgroup label="Інші">
-                            <option value="31">30 × 50 (Євробірка)</option>
-                            <option value="32">90 × 90 (Кубарик)</option>
                             <option value="custom">Індивідуальний розмір</option>
                           </optgroup>
                         </select>
