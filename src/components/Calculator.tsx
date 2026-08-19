@@ -781,44 +781,48 @@ export const Calculator: React.FC = () => {
             )}
           </div>
 
-          {/* Top Main Category Switcher (Matching Sborka Navigation) */}
+          {/* Top Main Category Switcher (Exact Sborka Header Styling) */}
           <div style={{
             display: 'flex',
-            backgroundColor: 'var(--bg-card)',
-            padding: '6px',
-            borderRadius: '10px',
-            border: '1px solid var(--border-light)',
-            gap: '6px',
-            overflowX: 'auto'
+            backgroundColor: '#ffffff',
+            borderBottom: '2px solid #dddddd',
+            gap: '0px',
+            overflowX: 'auto',
+            marginBottom: '20px'
           }}>
             {[
-              { key: 'products', label: 'Продукти' },
-              { key: 'offset', label: 'Офсетний друк' },
-              { key: 'digital', label: 'Цифровий друк' },
-              { key: 'wide', label: 'Широкоформатний друк' },
-              { key: 'roll', label: 'Рулонний друк' },
-              { key: 'films', label: 'Кольорові плівки' }
-            ].map(tab => (
-              <button
-                key={tab.key}
-                type="button"
-                onClick={() => setMainCategoryTab(tab.key as any)}
-                style={{
-                  padding: '8px 16px',
-                  fontSize: '12px',
-                  fontWeight: mainCategoryTab === tab.key ? '800' : '600',
-                  backgroundColor: mainCategoryTab === tab.key ? 'var(--primary)' : 'transparent',
-                  color: mainCategoryTab === tab.key ? '#ffffff' : 'var(--text-dark)',
-                  border: 'none',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  whiteSpace: 'nowrap',
-                  transition: 'all 0.15s ease'
-                }}
-              >
-                {tab.label}
-              </button>
-            ))}
+              { key: 'products', label: 'ПРОДУКТИ' },
+              { key: 'offset', label: 'ОФСЕТНИЙ ДРУК' },
+              { key: 'digital', label: 'ЦИФРОВИЙ ДРУК' },
+              { key: 'wide', label: 'ШИРОКОФОРМАТНИЙ ДРУК' },
+              { key: 'roll', label: 'РУЛОННИЙ ДРУК', isRedBadge: true },
+              { key: 'films', label: 'КОЛЬОРОВІ ПЛІВКИ' }
+            ].map(tab => {
+              const isActive = mainCategoryTab === tab.key;
+              return (
+                <button
+                  key={tab.key}
+                  type="button"
+                  onClick={() => setMainCategoryTab(tab.key as any)}
+                  style={{
+                    padding: '10px 18px',
+                    fontSize: '13px',
+                    fontWeight: '700',
+                    backgroundColor: tab.isRedBadge ? '#c00' : isActive ? '#666666' : 'transparent',
+                    color: tab.isRedBadge ? '#ffffff' : isActive ? '#ffffff' : '#333333',
+                    border: 'none',
+                    borderBottom: isActive ? '3px solid #c00' : '3px solid transparent',
+                    borderRadius: '0px',
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap',
+                    transition: 'all 0.15s ease',
+                    textTransform: 'uppercase'
+                  }}
+                >
+                  {tab.label}
+                </button>
+              );
+            })}
           </div>
 
           {/* TAB 1: PRODUCTS (All Categories) */}
@@ -1115,171 +1119,376 @@ export const Calculator: React.FC = () => {
             </div>
           )}
 
-          {/* TAB 2: OFFSET PRINTING (Matching Sborka Structure) */}
+          {/* TAB 2: OFFSET PRINTING (Exact Sborka 4-Column Layout) */}
           {mainCategoryTab === 'offset' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-              {/* 4 Main Printing Technology Blocks */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '14px' }}>
-                <div onClick={() => handleSelectCategory('Листівки')} className="ios-card bg-white" style={{ padding: '16px', cursor: 'pointer', borderTop: '4px solid var(--primary)' }}>
-                  <h3 style={{ fontSize: '16px', fontWeight: '900', color: 'var(--text-dark)', marginBottom: '4px' }}>Листова</h3>
-                  <p style={{ fontSize: '11px', color: 'var(--text-medium)', margin: 0 }}>Візитівки, листівки, бланки, буклети, наліпки, плакати…</p>
-                </div>
-                <div onClick={() => handleSelectCategory('Наклейки')} className="ios-card bg-white" style={{ padding: '16px', cursor: 'pointer', borderTop: '4px solid #af52de' }}>
-                  <h3 style={{ fontSize: '16px', fontWeight: '900', color: 'var(--text-dark)', marginBottom: '4px' }}>Висічна</h3>
-                  <p style={{ fontSize: '11px', color: 'var(--text-medium)', margin: 0 }}>Фігурні наліпки, візитівки, листівки, підставки, хенгери…</p>
-                </div>
-                <div onClick={() => handleSelectCategory('Книги')} className="ios-card bg-white" style={{ padding: '16px', cursor: 'pointer', borderTop: '4px solid #34c759' }}>
-                  <h3 style={{ fontSize: '16px', fontWeight: '900', color: 'var(--text-dark)', marginBottom: '4px' }}>Багатосторінкова</h3>
-                  <p style={{ fontSize: '11px', color: 'var(--text-medium)', margin: 0 }}>Брошури, журнали, каталоги, меню, звіти…</p>
-                </div>
-                <div onClick={() => handleSelectCategory('Бланки')} className="ios-card bg-white" style={{ padding: '16px', cursor: 'pointer', borderTop: '4px solid #ff9500' }}>
-                  <h3 style={{ fontSize: '16px', fontWeight: '900', color: 'var(--text-dark)', marginBottom: '4px' }}>Індивідуальне</h3>
-                  <p style={{ fontSize: '11px', color: 'var(--text-medium)', margin: 0 }}>Замовити прорахунок комплексного або нестандартного замовлення</p>
-                </div>
+              {/* 4 Technology Header Columns */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '15px' }}>
+                {[
+                  { title: 'ЛИСТОВА', desc: 'Візитівки, листівки, бланки, буклети, наліпки, плакати…', cat: 'Листівки' },
+                  { title: 'ВИСІЧНА', desc: 'Фігурні наліпки, візитівки, листівки, підставки, хенгери…', cat: 'Наклейки' },
+                  { title: 'БАГАТОСТОРОННЯ', desc: 'Брошури, журнали, каталоги, меню, звіти…', cat: 'Книги' },
+                  { title: 'ІНДИВІДУАЛЬНЕ ЗАМОВЛЕННЯ', desc: 'Замовити прорахунок комплексного або нестандартного замовлення', cat: 'Бланки' }
+                ].map((item, i) => (
+                  <div
+                    key={i}
+                    onClick={() => handleSelectCategory(item.cat as any)}
+                    style={{
+                      cursor: 'pointer',
+                      border: '1px solid #c8c7c7',
+                      backgroundColor: '#f2f2f2',
+                      textAlign: 'center',
+                      borderRadius: '4px',
+                      overflow: 'hidden',
+                      transition: 'all 0.2s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      const h = e.currentTarget.querySelector('.type-hdr') as HTMLElement;
+                      if (h) { h.style.backgroundColor = '#666666'; h.style.color = '#ffffff'; }
+                    }}
+                    onMouseLeave={(e) => {
+                      const h = e.currentTarget.querySelector('.type-hdr') as HTMLElement;
+                      if (h) { h.style.backgroundColor = '#dddddd'; h.style.color = '#333333'; }
+                    }}
+                  >
+                    <div 
+                      className="type-hdr"
+                      style={{
+                        backgroundColor: '#dddddd',
+                        color: '#333333',
+                        fontWeight: '700',
+                        fontSize: '15px',
+                        padding: '12px 10px',
+                        textTransform: 'uppercase',
+                        letterSpacing: '0.5px',
+                        transition: 'all 0.2s ease'
+                      }}
+                    >
+                      {item.title}
+                    </div>
+                    <div style={{ padding: '14px 16px', fontSize: '11px', color: '#555555', lineHeight: '1.4' }}>
+                      {item.desc}
+                    </div>
+                  </div>
+                ))}
               </div>
 
-              {/* Quick Products Catalog Grid with formats */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(210px, 1fr))', gap: '14px' }}>
+              {/* 4-Column Sborka Product Cards Grid */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '15px' }}>
                 {/* 1. Візитівка */}
-                <div className="ios-card bg-white" style={{ padding: '16px', textAlign: 'center' }}>
-                  <h4 style={{ fontSize: '14px', fontWeight: '800', marginBottom: '8px' }}>Візитівка</h4>
-                  <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
+                  <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Візитівка</h4>
+                  <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
                     {['90х50', '85х55', '50х50', 'Кругла'].map(fmt => (
-                      <button key={fmt} type="button" onClick={() => { setSelectedFormat(fmt); handleSelectCategory('Візитки'); }} className="ios-badge ios-badge-blue" style={{ cursor: 'pointer', border: 'none' }}>
+                      <span
+                        key={fmt}
+                        onClick={() => { setSelectedFormat(fmt); handleSelectCategory('Візитки'); }}
+                        style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
+                        onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
+                        onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
+                      >
                         {fmt}
-                      </button>
+                      </span>
                     ))}
                   </div>
                 </div>
 
                 {/* 2. Календар */}
-                <div className="ios-card bg-white" style={{ padding: '16px', textAlign: 'center' }}>
-                  <h4 style={{ fontSize: '14px', fontWeight: '800', marginBottom: '8px' }}>Календар</h4>
-                  <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
+                  <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Календар</h4>
+                  <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
                     {['100х70', '90х60', '70х70'].map(fmt => (
-                      <button key={fmt} type="button" onClick={() => { setSelectedFormat(fmt); handleSelectCategory('Календарики кишенькові'); }} className="ios-badge ios-badge-red" style={{ cursor: 'pointer', border: 'none' }}>
+                      <span
+                        key={fmt}
+                        onClick={() => { setSelectedFormat(fmt); handleSelectCategory('Календарики кишенькові'); }}
+                        style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
+                        onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
+                        onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
+                      >
                         {fmt}
-                      </button>
+                      </span>
                     ))}
                   </div>
                 </div>
 
                 {/* 3. Флаєр */}
-                <div className="ios-card bg-white" style={{ padding: '16px', textAlign: 'center' }}>
-                  <h4 style={{ fontSize: '14px', fontWeight: '800', marginBottom: '8px' }}>Флаєр</h4>
-                  <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
+                  <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Флаєр</h4>
+                  <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
                     {['210х99', '210х198', '99х99'].map(fmt => (
-                      <button key={fmt} type="button" onClick={() => { setSelectedFormat(fmt); handleSelectCategory('Флаєри'); }} className="ios-badge ios-badge-orange" style={{ cursor: 'pointer', border: 'none' }}>
+                      <span
+                        key={fmt}
+                        onClick={() => { setSelectedFormat(fmt); handleSelectCategory('Флаєри'); }}
+                        style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
+                        onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
+                        onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
+                      >
                         {fmt}
-                      </button>
+                      </span>
                     ))}
                   </div>
                 </div>
 
                 {/* 4. Листівка */}
-                <div className="ios-card bg-white" style={{ padding: '16px', textAlign: 'center' }}>
-                  <h4 style={{ fontSize: '14px', fontWeight: '800', marginBottom: '8px' }}>Листівка</h4>
-                  <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap' }}>
-                    {['А7', 'А6', 'А5', 'А4', 'А3'].map(fmt => (
-                      <button key={fmt} type="button" onClick={() => { setSelectedFormat(fmt); handleSelectCategory('Листівки'); }} className="ios-badge ios-badge-green" style={{ cursor: 'pointer', border: 'none' }}>
+                <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
+                  <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Листівка</h4>
+                  <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
+                    {['А7', 'А6', 'А5', 'А4', 'А3', 'Кругла'].map(fmt => (
+                      <span
+                        key={fmt}
+                        onClick={() => { setSelectedFormat(fmt); handleSelectCategory('Листівки'); }}
+                        style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
+                        onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
+                        onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
+                      >
                         {fmt}
-                      </button>
+                      </span>
                     ))}
                   </div>
                 </div>
 
                 {/* 5. Плакати */}
-                <div className="ios-card bg-white" style={{ padding: '16px', textAlign: 'center' }}>
-                  <h4 style={{ fontSize: '14px', fontWeight: '800', marginBottom: '8px' }}>Плакати</h4>
-                  <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
+                  <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Плакати</h4>
+                  <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
                     {['А3', 'В3', 'А2', 'В2', 'А1', 'B1'].map(fmt => (
-                      <button key={fmt} type="button" onClick={() => { setSelectedFormat(fmt); handleSelectCategory('Плакати'); }} className="ios-badge ios-badge-blue" style={{ cursor: 'pointer', border: 'none' }}>
+                      <span
+                        key={fmt}
+                        onClick={() => { setSelectedFormat(fmt); handleSelectCategory('Плакати'); }}
+                        style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
+                        onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
+                        onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
+                      >
                         {fmt}
-                      </button>
+                      </span>
                     ))}
                   </div>
                 </div>
 
                 {/* 6. Сети */}
-                <div className="ios-card bg-white" style={{ padding: '16px', textAlign: 'center' }}>
-                  <h4 style={{ fontSize: '14px', fontWeight: '800', marginBottom: '8px' }}>Сети</h4>
-                  <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
+                  <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Сети</h4>
+                  <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
                     {['А3', 'В3'].map(fmt => (
-                      <button key={fmt} type="button" onClick={() => { setSelectedFormat(fmt); handleSelectCategory('Бланки'); }} className="ios-badge ios-badge-purple" style={{ cursor: 'pointer', border: 'none' }}>
+                      <span
+                        key={fmt}
+                        onClick={() => { setSelectedFormat(fmt); handleSelectCategory('Бланки'); }}
+                        style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
+                        onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
+                        onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
+                      >
                         {fmt}
-                      </button>
+                      </span>
                     ))}
                   </div>
                 </div>
 
                 {/* 7. Буклет */}
-                <div className="ios-card bg-white" style={{ padding: '16px', textAlign: 'center' }}>
-                  <h4 style={{ fontSize: '14px', fontWeight: '800', marginBottom: '8px' }}>Буклет</h4>
-                  <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
+                  <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Буклет</h4>
+                  <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
                     {['А4 в Євро', '2Євро в Євро', 'А6', 'А5', 'А4'].map(fmt => (
-                      <button key={fmt} type="button" onClick={() => { setSelectedFormat(fmt); handleSelectCategory('Буклети'); }} className="ios-badge ios-badge-orange" style={{ cursor: 'pointer', border: 'none' }}>
+                      <span
+                        key={fmt}
+                        onClick={() => { setSelectedFormat(fmt); handleSelectCategory('Буклети'); }}
+                        style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
+                        onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
+                        onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
+                      >
                         {fmt}
-                      </button>
+                      </span>
                     ))}
                   </div>
                 </div>
 
                 {/* 8. Каталог */}
-                <div className="ios-card bg-white" style={{ padding: '16px', textAlign: 'center' }}>
-                  <h4 style={{ fontSize: '14px', fontWeight: '800', marginBottom: '8px' }}>Каталог</h4>
-                  <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
+                  <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Каталог</h4>
+                  <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
                     {['Скоба', 'Пружина', 'Клей'].map(st => (
-                      <button key={st} type="button" onClick={() => { handleSelectCategory('Книги'); }} className="ios-badge ios-badge-green" style={{ cursor: 'pointer', border: 'none' }}>
+                      <span
+                        key={st}
+                        onClick={() => { handleSelectCategory('Книги'); }}
+                        style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
+                        onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
+                        onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
+                      >
                         {st}
-                      </button>
+                      </span>
                     ))}
                   </div>
                 </div>
 
                 {/* 9. Блокнот */}
-                <div className="ios-card bg-white" style={{ padding: '16px', textAlign: 'center' }}>
-                  <h4 style={{ fontSize: '14px', fontWeight: '800', marginBottom: '8px' }}>Блокнот</h4>
-                  <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
+                  <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Блокнот</h4>
+                  <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
                     {['А6', 'А5', 'А4'].map(fmt => (
-                      <button key={fmt} type="button" onClick={() => { setSelectedFormat(fmt); handleSelectCategory('Блокноти'); }} className="ios-badge ios-badge-purple" style={{ cursor: 'pointer', border: 'none' }}>
+                      <span
+                        key={fmt}
+                        onClick={() => { setSelectedFormat(fmt); handleSelectCategory('Блокноти'); }}
+                        style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
+                        onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
+                        onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
+                      >
                         {fmt}
-                      </button>
+                      </span>
                     ))}
                   </div>
                 </div>
 
                 {/* 10. Наліпка */}
-                <div className="ios-card bg-white" style={{ padding: '16px', textAlign: 'center' }}>
-                  <h4 style={{ fontSize: '14px', fontWeight: '800', marginBottom: '8px' }}>Наліпка</h4>
-                  <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
+                  <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Наліпка</h4>
+                  <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
                     {['90х50', '50х50', 'Кругла', 'Овальна'].map(fmt => (
-                      <button key={fmt} type="button" onClick={() => { setSelectedFormat(fmt); handleSelectCategory('Наклейки'); }} className="ios-badge ios-badge-blue" style={{ cursor: 'pointer', border: 'none' }}>
+                      <span
+                        key={fmt}
+                        onClick={() => { setSelectedFormat(fmt); handleSelectCategory('Наклейки'); }}
+                        style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
+                        onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
+                        onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
+                      >
                         {fmt}
-                      </button>
+                      </span>
                     ))}
                   </div>
                 </div>
 
                 {/* 11. Папка А4 */}
-                <div className="ios-card bg-white" style={{ padding: '16px', textAlign: 'center' }}>
-                  <h4 style={{ fontSize: '14px', fontWeight: '800', marginBottom: '8px' }}>Папка А4</h4>
-                  <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
+                  <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Папка А4</h4>
+                  <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
                     {['Без корінця', 'Корінець 5мм', 'З резинкою'].map(fmt => (
-                      <button key={fmt} type="button" onClick={() => { handleSelectCategory('Папки'); }} className="ios-badge ios-badge-red" style={{ cursor: 'pointer', border: 'none' }}>
+                      <span
+                        key={fmt}
+                        onClick={() => { handleSelectCategory('Папки'); }}
+                        style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
+                        onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
+                        onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
+                      >
                         {fmt}
-                      </button>
+                      </span>
                     ))}
                   </div>
                 </div>
 
-                {/* 12. Друк в листах */}
-                <div className="ios-card bg-white" style={{ padding: '16px', textAlign: 'center' }}>
-                  <h4 style={{ fontSize: '14px', fontWeight: '800', marginBottom: '8px' }}>Друк в листах</h4>
-                  <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap' }}>
-                    {['А2', 'В2', 'А1', 'В1'].map(fmt => (
-                      <button key={fmt} type="button" onClick={() => { setSelectedFormat(fmt); handleSelectCategory('Бланки'); }} className="ios-badge ios-badge-orange" style={{ cursor: 'pointer', border: 'none' }}>
+                {/* 12. Листівки вітальні */}
+                <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
+                  <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Листівка</h4>
+                  <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
+                    {['Одинарна', 'Складна', 'Кругла'].map(fmt => (
+                      <span
+                        key={fmt}
+                        onClick={() => { handleSelectCategory('Листівки'); }}
+                        style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
+                        onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
+                        onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
+                      >
                         {fmt}
-                      </button>
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 13. Календарні сітки */}
+                <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
+                  <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 8px' }}>Календарні сітки</h4>
+                  <div 
+                    onClick={() => handleSelectCategory('Календарі')}
+                    style={{ cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '6px' }}
+                  >
+                    <Calendar size={22} style={{ color: '#c00' }} />
+                    <span style={{ fontSize: '12px', fontWeight: '600', color: '#333' }}>Сітки 2026</span>
+                  </div>
+                </div>
+
+                {/* 14. Друк в листах */}
+                <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
+                  <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Друк в листах</h4>
+                  <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
+                    {['А2', 'В2', 'А1', 'В1'].map(fmt => (
+                      <span
+                        key={fmt}
+                        onClick={() => { setSelectedFormat(fmt); handleSelectCategory('Бланки'); }}
+                        style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
+                        onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
+                        onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
+                      >
+                        {fmt}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 15. Конверт */}
+                <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
+                  <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Конверт</h4>
+                  <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
+                    {['Євро', 'С6', 'С5', 'С4'].map(fmt => (
+                      <span
+                        key={fmt}
+                        onClick={() => { handleSelectCategory('Бланки'); }}
+                        style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
+                        onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
+                        onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
+                      >
+                        {fmt}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 16. Хенгери */}
+                <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
+                  <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Хенгери</h4>
+                  <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
+                    {['вид 1', 'вид 2'].map(v => (
+                      <span
+                        key={v}
+                        onClick={() => { handleSelectCategory('Наклейки'); }}
+                        style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
+                        onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
+                        onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
+                      >
+                        🔖 {v}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 17. Календарі висічні */}
+                <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
+                  <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Календарі висічні</h4>
+                  <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
+                    {['будинок', 'пірамідка'].map(v => (
+                      <span
+                        key={v}
+                        onClick={() => { handleSelectCategory('Календарі'); }}
+                        style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
+                        onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
+                        onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
+                      >
+                        🏠 {v}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 18. Пакувальний папір */}
+                <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
+                  <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Пакувальний папір</h4>
+                  <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
+                    {['А3', 'В3', 'А2', 'В2', 'А1', 'B1'].map(fmt => (
+                      <span
+                        key={fmt}
+                        onClick={() => { setSelectedFormat(fmt); handleSelectCategory('Бланки'); }}
+                        style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
+                        onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
+                        onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
+                      >
+                        {fmt}
+                      </span>
                     ))}
                   </div>
                 </div>
