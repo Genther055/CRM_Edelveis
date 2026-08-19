@@ -65,6 +65,19 @@ export const Calculator: React.FC = () => {
   const [fellingForm, setFellingForm] = useState<string>('1'); // '1': Стандартна, '2': Кругла, '3': Овальна, '4': Прямокутна, '5': Етикетка
   const [fellingStamp, setFellingStamp] = useState<string>('128'); // Default stamp '128' (Хенгер вид 1)
 
+  // Multipage Offset Calculator specific states
+  const [multiStitching, setMultiStitching] = useState<string>('1'); // '1': Скоба, '2': Пружина, '3': Клей, '4': Блокноти
+  const [multiSizePreset, setMultiSizePreset] = useState<string>('3'); // Default A5 (148x210)
+  const [multiCoverPages, setMultiCoverPages] = useState<string>('1'); // '0': Без обкладинки, '1': 4 стор, '2': 8 стор
+  const [multiCoverMaterial, setMultiCoverMaterial] = useState<string>('250');
+  const [multiCoverColor, setMultiCoverColor] = useState<string>('2'); // 4+4
+  const [multiBlockPages, setMultiBlockPages] = useState<string>('4'); // 16 стор
+  const [multiBlockMaterial, setMultiBlockMaterial] = useState<string>('130');
+  const [multiBlockColor, setMultiBlockColor] = useState<string>('2'); // 4+4
+  const [multiInsertPages, setMultiInsertPages] = useState<string>('0'); // Без вставки
+  const [multiInsertMaterial, setMultiInsertMaterial] = useState<string>('130');
+  const [multiInsertColor, setMultiInsertColor] = useState<string>('2');
+
   // Postpress options states
   const [showPostpressAccordion, setShowPostpressAccordion] = useState<boolean>(false);
   const [postPersonalization, setPostPersonalization] = useState<string>('0');
@@ -1172,13 +1185,15 @@ export const Calculator: React.FC = () => {
           {mainCategoryTab === 'offset' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
               {/* Offset Sub-Tab Navigation Header */}
-              {(offsetSubTab === 'sheets' || offsetSubTab === 'felling') ? (
+              {(offsetSubTab === 'sheets' || offsetSubTab === 'felling' || offsetSubTab === 'multipage') ? (
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#ffffff', padding: '12px 18px', borderRadius: '4px', border: '1px solid #ddd' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '14px', fontWeight: '700', color: '#333' }}>
                     <span onClick={() => setOffsetSubTab('overview')} style={{ color: '#c00', cursor: 'pointer' }}>Офсетний друк</span>
                     <span>/</span>
                     <span style={{ color: '#666' }}>
-                      {offsetSubTab === 'sheets' ? 'Листова (Збірні спуски)' : 'Висічна'}
+                      {offsetSubTab === 'sheets' && 'Листова (Збірні спуски)'}
+                      {offsetSubTab === 'felling' && 'Висічна'}
+                      {offsetSubTab === 'multipage' && 'Багатосторінкова'}
                     </span>
                   </div>
                   <button
@@ -2557,6 +2572,365 @@ export const Calculator: React.FC = () => {
                 </div>
               )}
 
+              {/* DETAILED MULTIPAGE CALCULATOR (Офсетний друк / Багатосторінкова) */}
+              {offsetSubTab === 'multipage' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                  {/* Top Information Buttons Bar */}
+                  <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap', backgroundColor: '#ffffff', padding: '12px 16px', borderRadius: '4px', border: '1px solid #ddd' }}>
+                    <button
+                      type="button"
+                      onClick={() => setActiveInfoModal('materials')}
+                      style={{ border: 'none', background: 'none', cursor: 'pointer', fontSize: '13px', fontWeight: '600', color: '#333', display: 'flex', alignItems: 'center', gap: '6px' }}
+                    >
+                      <Layers size={16} style={{ color: '#c00' }} />
+                      <span>Матеріали</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setActiveInfoModal('terms')}
+                      style={{ border: 'none', background: 'none', cursor: 'pointer', fontSize: '13px', fontWeight: '600', color: '#333', display: 'flex', alignItems: 'center', gap: '6px' }}
+                    >
+                      <Clock size={16} style={{ color: '#c00' }} />
+                      <span>Терміни друку</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setActiveInfoModal('tech_pur')}
+                      style={{ border: 'none', background: 'none', cursor: 'pointer', fontSize: '13px', fontWeight: '600', color: '#333', display: 'flex', alignItems: 'center', gap: '6px' }}
+                    >
+                      <BookOpen size={16} style={{ color: '#c00' }} />
+                      <span>Технічні вимоги</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setActiveInfoModal('instr')}
+                      style={{ border: 'none', background: 'none', cursor: 'pointer', fontSize: '13px', fontWeight: '600', color: '#333', display: 'flex', alignItems: 'center', gap: '6px' }}
+                    >
+                      <FileText size={16} style={{ color: '#c00' }} />
+                      <span>Інструкція по оформленню замовлення</span>
+                    </button>
+                  </div>
+
+                  {/* Stitching Type Selector */}
+                  <div style={{ backgroundColor: '#ffffff', padding: '16px 20px', borderRadius: '4px', border: '1px solid #ddd', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <h4 style={{ fontSize: '15px', fontWeight: '800', color: '#222', margin: 0 }}>Спосіб зшивання</h4>
+                    <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
+                      {[
+                        { id: '1', name: 'Скоба (8 — 64 стр)', img: 'https://sborka.ua/cside/img/skoba.png' },
+                        { id: '2', name: 'Пружина (4 — 524 стр)', img: 'https://sborka.ua/cside/img/pr_prujina.png' },
+                        { id: '3', name: 'Клей (30 — 608 стр)', img: 'https://sborka.ua/cside/img/pur_glue_img.png' },
+                        { id: '4', name: 'Блокноти (30 — 608 стр)', img: 'https://sborka.ua/cside/img/pr_bloknot.png' },
+                      ].map(stItem => {
+                        const isActive = multiStitching === stItem.id;
+                        return (
+                          <div
+                            key={stItem.id}
+                            onClick={() => setMultiStitching(stItem.id)}
+                            style={{
+                              cursor: 'pointer',
+                              border: isActive ? '2px solid #c00' : '1px solid #ddd',
+                              backgroundColor: isActive ? '#fff0f0' : '#f9f9f9',
+                              borderRadius: '6px',
+                              padding: '10px 16px',
+                              display: 'flex',
+                              flexDirection: 'column',
+                              alignItems: 'center',
+                              gap: '6px',
+                              minWidth: '130px',
+                              transition: 'all 0.15s ease'
+                            }}
+                          >
+                            <img src={stItem.img} alt={stItem.name} style={{ width: '70px', height: '45px', objectFit: 'contain' }} />
+                            <span style={{ fontSize: '12px', fontWeight: isActive ? '700' : '600', color: isActive ? '#c00' : '#333', textAlign: 'center' }}>
+                              {stItem.name}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Size Selection & Canvas Visual Preview */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
+                    {/* Left Column: Size presets & Custom inputs */}
+                    <div style={{ backgroundColor: '#ffffff', padding: '20px', borderRadius: '4px', border: '1px solid #ddd', display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                      <h4 style={{ fontSize: '16px', fontWeight: '800', color: '#222', margin: 0 }}>Розмір видання</h4>
+                      <div>
+                        <label style={{ fontSize: '12px', fontWeight: '700', color: '#444', display: 'block', marginBottom: '6px' }}>Оберіть стандартний:</label>
+                        <select
+                          value={multiSizePreset}
+                          onChange={(e) => setMultiSizePreset(e.target.value)}
+                          style={{ width: '100%', padding: '10px 12px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '13px', fontWeight: '600' }}
+                        >
+                          <option value="1">Євро (198 × 210 в 99 × 210 мм)</option>
+                          <option value="2">1/2 А4 (210 × 297 в 105 × 297 мм)</option>
+                          <option value="3">А5 (210 × 297 в 148 × 210 мм)</option>
+                          <option value="5">А4 (420 × 297 в 210 × 297 мм)</option>
+                          <option value="6">Квадрат А5 (296 × 148 в 148 × 148 мм)</option>
+                          <option value="7">Квадрат А4 (420 × 210 в 210 × 210 мм)</option>
+                          <option value="8">А6 (148 × 210 в 105 × 148 мм)</option>
+                        </select>
+                      </div>
+
+                      {/* Custom Dimensions */}
+                      <div>
+                        <label style={{ fontSize: '12px', fontWeight: '700', color: '#444', display: 'block', marginBottom: '6px' }}>Введіть свій розмір у розворот:</label>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <input
+                            type="number"
+                            value={sheetCustomWidth}
+                            onChange={(e) => setSheetCustomWidth(e.target.value)}
+                            placeholder="Ширина"
+                            style={{ flex: 1, padding: '8px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '13px' }}
+                          />
+                          <span>×</span>
+                          <input
+                            type="number"
+                            value={sheetCustomHeight}
+                            onChange={(e) => setSheetCustomHeight(e.target.value)}
+                            placeholder="Висота"
+                            style={{ flex: 1, padding: '8px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '13px' }}
+                          />
+                          <select
+                            value={sheetUnit}
+                            onChange={(e) => setSheetUnit(e.target.value as any)}
+                            style={{ padding: '8px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '13px' }}
+                          >
+                            <option value="mm">мм</option>
+                            <option value="cm">см</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      {/* Orientation */}
+                      <div style={{ display: 'flex', gap: '15px' }}>
+                        <label style={{ fontSize: '12px', fontWeight: '700', color: '#444', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
+                          <input type="radio" name="multi_orient" checked={sheetOrientation === 'vert'} onChange={() => setSheetOrientation('vert')} />
+                          Вертикально
+                        </label>
+                        <label style={{ fontSize: '12px', fontWeight: '700', color: '#444', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
+                          <input type="radio" name="multi_orient" checked={sheetOrientation === 'horiz'} onChange={() => setSheetOrientation('horiz')} />
+                          Горизонтально
+                        </label>
+                      </div>
+                    </div>
+
+                    {/* Right Column: Visual Preview Canvas */}
+                    <div style={{ backgroundColor: '#ffffff', padding: '20px', borderRadius: '4px', border: '1px solid #ddd', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
+                      <span style={{ fontSize: '13px', fontWeight: '700', color: '#666', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Вид готового виробу</span>
+                      <div style={{ width: '100%', height: '220px', border: '1px dashed #ccc', backgroundColor: '#fafafa', borderRadius: '6px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                        <div style={{ width: '120px', height: '160px', border: '2px solid #333', backgroundColor: '#ffffff', borderRadius: '2px', position: 'relative', boxShadow: '2px 4px 10px rgba(0,0,0,0.1)', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', padding: '8px' }}>
+                          <div style={{ width: '4px', height: '100%', backgroundColor: '#c00', position: 'absolute', left: 0, top: 0 }}></div>
+                          <span style={{ fontSize: '11px', fontWeight: '800', color: '#c00', textAlign: 'center', marginTop: '10px' }}>
+                            {multiSizePreset === '3' ? 'А5' : multiSizePreset === '5' ? 'А4' : 'Брошура'}
+                          </span>
+                          <span style={{ fontSize: '10px', color: '#666', textAlign: 'center' }}>
+                            {sheetOrientation === 'vert' ? '148 × 210 мм' : '210 × 148 мм'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Component Specification Options Breakdown */}
+                  <div style={{ backgroundColor: '#ffffff', padding: '20px', borderRadius: '4px', border: '1px solid #ddd', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    <h4 style={{ fontSize: '16px', fontWeight: '800', color: '#222', margin: 0 }}>Деталізація складників багатосторінкового видання</h4>
+
+                    {/* 1. Обкладинка */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px', alignItems: 'center', backgroundColor: '#f9f9f9', padding: '14px', borderRadius: '4px', border: '1px solid #eee' }}>
+                      <div style={{ fontWeight: '700', color: '#111', fontSize: '14px' }}>Обкладинка:</div>
+                      <div>
+                        <label style={{ fontSize: '11px', color: '#666', display: 'block', marginBottom: '2px' }}>Сторінок</label>
+                        <select value={multiCoverPages} onChange={(e) => setMultiCoverPages(e.target.value)} style={{ width: '100%', padding: '6px 8px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '12px' }}>
+                          <option value="0">Без обкладинки</option>
+                          <option value="1">4 стор (1 аркуш)</option>
+                          <option value="2">8 стор (2 аркуші)</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label style={{ fontSize: '11px', color: '#666', display: 'block', marginBottom: '2px' }}>Папір / Матеріал</label>
+                        <select value={multiCoverMaterial} onChange={(e) => setMultiCoverMaterial(e.target.value)} style={{ width: '100%', padding: '6px 8px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '12px' }}>
+                          <option value="80">Офсет 80</option>
+                          <option value="90">Крейд 90</option>
+                          <option value="115">Крейд 115</option>
+                          <option value="130">Крейд 130</option>
+                          <option value="150">Крейд 150</option>
+                          <option value="170">Крейд 170</option>
+                          <option value="200">Крейд 200</option>
+                          <option value="250">Крейд 250</option>
+                          <option value="2507">Крейд 250 + ГЛ лам 1+0</option>
+                          <option value="2509">Крейд 250 + МАТ лам 1+0</option>
+                          <option value="2508">Крейд 250 + ГЛ лам 1+1</option>
+                          <option value="25010">Крейд 250 + МАТ лам 1+1</option>
+                          <option value="300">Крейд 300</option>
+                          <option value="3007">Крейд 300 + ГЛ лам 1+0</option>
+                          <option value="3009">Крейд 300 + МАТ лам 1+0</option>
+                          <option value="3008">Крейд 300 + ГЛ лам 1+1</option>
+                          <option value="30010">Крейд 300 + МАТ лам 1+1</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label style={{ fontSize: '11px', color: '#666', display: 'block', marginBottom: '2px' }}>Кольоровість</label>
+                        <select value={multiCoverColor} onChange={(e) => setMultiCoverColor(e.target.value)} style={{ width: '100%', padding: '6px 8px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '12px' }}>
+                          <option value="1">4+0</option>
+                          <option value="2">4+4</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* 2. Внутрішній блок */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px', alignItems: 'center', backgroundColor: '#f9f9f9', padding: '14px', borderRadius: '4px', border: '1px solid #eee' }}>
+                      <div style={{ fontWeight: '700', color: '#111', fontSize: '14px' }}>Внутрішній блок:</div>
+                      <div>
+                        <label style={{ fontSize: '11px', color: '#666', display: 'block', marginBottom: '2px' }}>Сторінок</label>
+                        <select value={multiBlockPages} onChange={(e) => setMultiBlockPages(e.target.value)} style={{ width: '100%', padding: '6px 8px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '12px' }}>
+                          {[4,8,12,16,20,24,28,32,36,40,44,48,52,56,60,64].map((p, i) => (
+                            <option key={p} value={(i + 1).toString()}>{p} стр ({i + 1} {i === 0 ? 'аркуш' : 'аркуші'})</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label style={{ fontSize: '11px', color: '#666', display: 'block', marginBottom: '2px' }}>Папір / Матеріал</label>
+                        <select value={multiBlockMaterial} onChange={(e) => setMultiBlockMaterial(e.target.value)} style={{ width: '100%', padding: '6px 8px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '12px' }}>
+                          <option value="80">Офсет 80</option>
+                          <option value="90">Крейд 90</option>
+                          <option value="115">Крейд 115</option>
+                          <option value="130">Крейд 130</option>
+                          <option value="150">Крейд 150</option>
+                          <option value="170">Крейд 170</option>
+                          <option value="200">Крейд 200</option>
+                          <option value="250">Крейд 250</option>
+                          <option value="300">Крейд 300</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label style={{ fontSize: '11px', color: '#666', display: 'block', marginBottom: '2px' }}>Кольоровість</label>
+                        <select value={multiBlockColor} onChange={(e) => setMultiBlockColor(e.target.value)} style={{ width: '100%', padding: '6px 8px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '12px' }}>
+                          <option value="1">4+0</option>
+                          <option value="2">4+4</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* 3. Вставка */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px', alignItems: 'center', backgroundColor: '#f9f9f9', padding: '14px', borderRadius: '4px', border: '1px solid #eee' }}>
+                      <div style={{ fontWeight: '700', color: '#111', fontSize: '14px' }}>Вставка:</div>
+                      <div>
+                        <label style={{ fontSize: '11px', color: '#666', display: 'block', marginBottom: '2px' }}>Сторінок</label>
+                        <select value={multiInsertPages} onChange={(e) => setMultiInsertPages(e.target.value)} style={{ width: '100%', padding: '6px 8px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '12px' }}>
+                          <option value="0">Без вставки</option>
+                          <option value="1">4 стр (1 аркуш)</option>
+                          <option value="2">8 стор (2 аркуші)</option>
+                          <option value="3">12 стр (3 аркуші)</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label style={{ fontSize: '11px', color: '#666', display: 'block', marginBottom: '2px' }}>Папір / Матеріал</label>
+                        <select value={multiInsertMaterial} onChange={(e) => setMultiInsertMaterial(e.target.value)} style={{ width: '100%', padding: '6px 8px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '12px' }}>
+                          <option value="80">Офсет 80</option>
+                          <option value="130">Крейд 130</option>
+                          <option value="150">Крейд 150</option>
+                          <option value="200">Крейд 200</option>
+                          <option value="250">Крейд 250</option>
+                          <option value="300">Крейд 300</option>
+                        </select>
+                      </div>
+                      <div>
+                        <label style={{ fontSize: '11px', color: '#666', display: 'block', marginBottom: '2px' }}>Кольоровість</label>
+                        <select value={multiInsertColor} onChange={(e) => setMultiInsertColor(e.target.value)} style={{ width: '100%', padding: '6px 8px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '12px' }}>
+                          <option value="1">4+0</option>
+                          <option value="2">4+4</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Pricing Matrix Table for Multipage */}
+                  <div style={{ backgroundColor: '#ffffff', borderRadius: '4px', border: '1px solid #ddd', overflow: 'hidden' }}>
+                    <div style={{ padding: '16px 20px', backgroundColor: '#f8f9fa', borderBottom: '1px solid #ddd', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+                      <h4 style={{ fontSize: '16px', fontWeight: '800', color: '#222', margin: 0 }}>Специфікація розрахунків та прайс-лист багатосторінкової продукції</h4>
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                        <label style={{ fontSize: '12px', fontWeight: '600', color: '#444', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
+                          <input type="checkbox" checked={includeDelivery} onChange={(e) => setIncludeDelivery(e.target.checked)} />
+                          З доставкою
+                        </label>
+
+                        <div style={{ display: 'flex', border: '1px solid #ccc', borderRadius: '4px', overflow: 'hidden' }}>
+                          <button
+                            type="button"
+                            onClick={() => setPriceCostVar('per_tirazh')}
+                            style={{ border: 'none', padding: '4px 10px', fontSize: '11px', fontWeight: '700', backgroundColor: priceCostVar === 'per_tirazh' ? '#666' : '#fff', color: priceCostVar === 'per_tirazh' ? '#fff' : '#333', cursor: 'pointer' }}
+                          >
+                            За наклад
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setPriceCostVar('per_item')}
+                            style={{ border: 'none', padding: '4px 10px', fontSize: '11px', fontWeight: '700', backgroundColor: priceCostVar === 'per_item' ? '#666' : '#fff', color: priceCostVar === 'per_item' ? '#fff' : '#333', cursor: 'pointer' }}
+                          >
+                            За екземпляр
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div style={{ overflowX: 'auto' }}>
+                      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px', textAlign: 'center' }}>
+                        <thead>
+                          <tr style={{ backgroundColor: '#eeeeee', borderBottom: '1px solid #ccc' }}>
+                            <th style={{ padding: '10px', textAlign: 'left', borderRight: '1px solid #ddd' }}>Формат та параметри</th>
+                            <th style={{ padding: '10px', borderRight: '1px solid #ddd' }}>Зшивання</th>
+                            <th style={{ padding: '10px', borderRight: '1px solid #ddd' }}>Готовність</th>
+                            {[100, 250, 500, 1000, 2500, 5000, 10000].map(tir => (
+                              <th key={tir} style={{ padding: '10px', borderRight: '1px solid #ddd' }}>{tir} шт.</th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {[
+                            { fmt: 'А5 (16 стор, Крейд 130)', st: 'Скоба', time: '2-3 дні' },
+                            { fmt: 'А5 (32 стор, Крейд 115)', st: 'Пружина', time: '2-3 дні' },
+                            { fmt: 'А4 (16 стор, Крейд 150)', st: 'Скоба', time: '2-3 дні' },
+                            { fmt: 'А4 (48 стор, Крейд 115)', st: 'Клей (PUR)', time: '3-4 дні' },
+                          ].map((row, idx) => (
+                            <tr key={idx} style={{ borderBottom: '1px solid #eee', backgroundColor: idx % 2 === 0 ? '#ffffff' : '#fcfcfc' }}>
+                              <td style={{ padding: '10px', textAlign: 'left', fontWeight: '700', color: '#222', borderRight: '1px solid #ddd' }}>
+                                {row.fmt}
+                              </td>
+                              <td style={{ padding: '10px', fontWeight: '700', color: '#c00', borderRight: '1px solid #ddd' }}>{row.st}</td>
+                              <td style={{ padding: '10px', color: '#555', borderRight: '1px solid #ddd' }}>{row.time}</td>
+                              {[100, 250, 500, 1000, 2500, 5000, 10000].map(tir => {
+                                const baseCost = tir * (idx * 5 + 12) + 800;
+                                const itemVal = priceCostVar === 'per_item' ? (baseCost / tir).toFixed(2) : Math.round(baseCost).toString();
+                                return (
+                                  <td
+                                    key={tir}
+                                    onClick={() => {
+                                      setQuantity(tir);
+                                      setCategory('Буклети');
+                                      setStep('editor');
+                                    }}
+                                    style={{ padding: '10px', fontWeight: '700', color: '#111', cursor: 'pointer', borderRight: '1px solid #ddd', transition: 'background-color 0.15s ease' }}
+                                    onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#fff0f0'; e.currentTarget.style.color = '#c00'; }}
+                                    onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = '#111'; }}
+                                  >
+                                    {itemVal} грн
+                                  </td>
+                                );
+                              })}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {/* Active Info Modal Popup */}
               {activeInfoModal && (
                 <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
@@ -2591,6 +2965,14 @@ export const Calculator: React.FC = () => {
                         <h3 style={{ fontSize: '18px', fontWeight: '800', marginBottom: '12px', color: '#c00' }}>Матеріали</h3>
                         <p style={{ fontSize: '13px', color: '#444', lineHeight: '1.5' }}>
                           Доступні папери: Офсетний 80 г/м², Крейдований матовий та глянцевий від 90 до 450 г/м², а також дизайнерські картони (Льон, Tintoretto, Stardream).
+                        </p>
+                      </div>
+                    )}
+                    {activeInfoModal === 'tech_pur' && (
+                      <div>
+                        <h3 style={{ fontSize: '18px', fontWeight: '800', marginBottom: '12px', color: '#c00' }}>Технічні вимоги</h3>
+                        <p style={{ fontSize: '13px', color: '#444', lineHeight: '1.5' }}>
+                          Макет має бути у колірній моделі CMYK з роздільною здатністю 300 dpi. Виліти під порізку — 2 мм з кожного боку. Безпечне поле для важливих елементів та тексту — 5 мм від краю порізу.
                         </p>
                       </div>
                     )}
