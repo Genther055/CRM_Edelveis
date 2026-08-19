@@ -1606,9 +1606,9 @@ export const Calculator: React.FC = () => {
                     </button>
                   </div>
 
-                  {/* Business Card Kind Selection Bar (Вид візитівки) */}
+                  {/* Business Card & Calendar Kind Selection Bar */}
                   <div style={{ backgroundColor: '#ffffff', padding: '16px 20px', borderRadius: '4px', border: '1px solid #ddd', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                    <h4 style={{ fontSize: '15px', fontWeight: '800', color: '#222', margin: 0 }}>Вид візитівки / листової поліграфії</h4>
+                    <h4 style={{ fontSize: '15px', fontWeight: '800', color: '#222', margin: 0 }}>Вид візитівки / календаря / листової поліграфії</h4>
                     <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
                       {[
                         { id: '1', name: 'Стандартні', img: 'https://sborka.ua/cside/img/ico_size/products/viz.png', defaultSize: '1', w: '90', h: '50' },
