@@ -9,7 +9,12 @@ import {
   ArrowLeft,
   Save,
   FolderOpen,
-  Calendar
+  Calendar,
+  Download,
+  Clock,
+  Tag,
+  MessageSquare,
+  AlertTriangle
 } from 'lucide-react';
 import html2pdf from 'html2pdf.js';
 
@@ -55,6 +60,10 @@ export const Calculator: React.FC = () => {
   const [sheetCustomHeight, setSheetCustomHeight] = useState<string>('297');
   const [sheetUnit, setSheetUnit] = useState<'mm' | 'cm'>('mm');
   const [sheetOrientation, setSheetOrientation] = useState<'horiz' | 'vert'>('horiz');
+
+  // Die-cut (Felling) Offset Calculator specific states
+  const [fellingForm, setFellingForm] = useState<string>('1'); // '1': Стандартна, '2': Кругла, '3': Овальна, '4': Прямокутна, '5': Етикетка
+  const [fellingStamp, setFellingStamp] = useState<string>('128'); // Default stamp '128' (Хенгер вид 1)
 
   // Postpress options states
   const [showPostpressAccordion, setShowPostpressAccordion] = useState<boolean>(false);
@@ -1163,12 +1172,14 @@ export const Calculator: React.FC = () => {
           {mainCategoryTab === 'offset' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
               {/* Offset Sub-Tab Navigation Header */}
-              {offsetSubTab === 'sheets' ? (
+              {(offsetSubTab === 'sheets' || offsetSubTab === 'felling') ? (
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#ffffff', padding: '12px 18px', borderRadius: '4px', border: '1px solid #ddd' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '14px', fontWeight: '700', color: '#333' }}>
                     <span onClick={() => setOffsetSubTab('overview')} style={{ color: '#c00', cursor: 'pointer' }}>Офсетний друк</span>
                     <span>/</span>
-                    <span style={{ color: '#666' }}>Листова (Збірні спуски)</span>
+                    <span style={{ color: '#666' }}>
+                      {offsetSubTab === 'sheets' ? 'Листова (Збірні спуски)' : 'Висічна'}
+                    </span>
                   </div>
                   <button
                     type="button"
@@ -1183,9 +1194,9 @@ export const Calculator: React.FC = () => {
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '15px' }}>
                   {[
                     { title: 'ЛИСТОВА', desc: 'Візитівки, листівки, бланки, буклети, наліпки, плакати…', subTab: 'sheets' },
-                    { title: 'ВИСІЧНА', desc: 'Фігурні наліпки, візитівки, листівки, підставки, хенгери…', subTab: 'sheets' },
-                    { title: 'БАГАТОСТОРОННЯ', desc: 'Брошури, журнали, каталоги, меню, звіти…', subTab: 'sheets' },
-                    { title: 'ІНДИВІДУАЛЬНЕ ЗАМОВЛЕННЯ', desc: 'Замовити прорахунок комплексного або нестандартного замовлення', subTab: 'sheets' }
+                    { title: 'ВИСІЧНА', desc: 'Фігурні наліпки, візитівки, листівки, підставки, хенгери…', subTab: 'felling' },
+                    { title: 'БАГАТОСТОРОННЯ', desc: 'Брошури, журнали, каталоги, меню, звіти…', subTab: 'multipage' },
+                    { title: 'ІНДИВІДУАЛЬНЕ ЗАМОВЛЕННЯ', desc: 'Замовити прорахунок комплексного або нестандартного замовлення', subTab: 'custom' }
                   ].map((item, i) => (
                     <div
                       key={i}
@@ -2154,6 +2165,391 @@ export const Calculator: React.FC = () => {
                               })
                             )
                           )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* DETAILED DIE-CUT CALCULATOR (Офсетний друк / Висічна) */}
+              {offsetSubTab === 'felling' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                  {/* Top Information Buttons Bar */}
+                  <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap', backgroundColor: '#ffffff', padding: '12px 16px', borderRadius: '4px', border: '1px solid #ddd' }}>
+                    <button
+                      type="button"
+                      onClick={() => setActiveInfoModal('instr')}
+                      style={{ border: 'none', background: 'none', cursor: 'pointer', fontSize: '13px', fontWeight: '600', color: '#333', display: 'flex', alignItems: 'center', gap: '6px' }}
+                    >
+                      <FileText size={16} style={{ color: '#c00' }} />
+                      <span>Інструкція по оформленню замовлення</span>
+                    </button>
+
+                    <a
+                      href={
+                        {
+                          '128': 'https://sborka.ua/cside/img/shablon/henger1.pdf',
+                          '133': 'https://sborka.ua/cside/img/shablon/henger2.pdf',
+                          '160': 'https://sborka.ua/cside/img/shablon/domik.pdf',
+                          '161': 'https://sborka.ua/cside/img/shablon/piramid.pdf',
+                          '58': 'https://sborka.ua/cside/img/shablon/papka.pdf',
+                          '59': 'https://sborka.ua/cside/img/shablon/papka2.pdf'
+                        }[fellingStamp] || '#'
+                      }
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ textDecoration: 'none', fontSize: '13px', fontWeight: '600', color: '#333', display: 'flex', alignItems: 'center', gap: '6px' }}
+                    >
+                      <Download size={16} style={{ color: '#c00' }} />
+                      <span>Завантажити шаблон штампу</span>
+                    </a>
+
+                    <button
+                      type="button"
+                      onClick={() => setActiveInfoModal('terms')}
+                      style={{ border: 'none', background: 'none', cursor: 'pointer', fontSize: '13px', fontWeight: '600', color: '#333', display: 'flex', alignItems: 'center', gap: '6px' }}
+                    >
+                      <Clock size={16} style={{ color: '#c00' }} />
+                      <span>Терміни друку</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setActiveInfoModal('materials')}
+                      style={{ border: 'none', background: 'none', cursor: 'pointer', fontSize: '13px', fontWeight: '600', color: '#333', display: 'flex', alignItems: 'center', gap: '6px' }}
+                    >
+                      <Layers size={16} style={{ color: '#c00' }} />
+                      <span>Матеріали</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setActiveInfoModal('samples')}
+                      style={{ border: 'none', background: 'none', cursor: 'pointer', fontSize: '13px', fontWeight: '600', color: '#333', display: 'flex', alignItems: 'center', gap: '6px' }}
+                    >
+                      <Tag size={16} style={{ color: '#c00' }} />
+                      <span>Зразки матеріалів з друком</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setActiveInfoModal('review')}
+                      style={{ border: 'none', background: 'none', cursor: 'pointer', fontSize: '13px', fontWeight: '600', color: '#333', display: 'flex', alignItems: 'center', gap: '6px' }}
+                    >
+                      <MessageSquare size={16} style={{ color: '#c00' }} />
+                      <span>Ваш відгук</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setActiveInfoModal('bug')}
+                      style={{ border: 'none', background: 'none', cursor: 'pointer', fontSize: '13px', fontWeight: '600', color: '#333', display: 'flex', alignItems: 'center', gap: '6px' }}
+                    >
+                      <AlertTriangle size={16} style={{ color: '#c00' }} />
+                      <span>Знайшли помилку?</span>
+                    </button>
+                  </div>
+
+                  {/* Form Selector Header Bar */}
+                  <div style={{ backgroundColor: '#ffffff', padding: '16px 20px', borderRadius: '4px', border: '1px solid #ddd', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <h4 style={{ fontSize: '15px', fontWeight: '800', color: '#222', margin: 0 }}>Форма штампу</h4>
+                    <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap' }}>
+                      {[
+                        { id: '1', name: 'Стандартна', img: 'https://sborka.ua/cside/img/Standart/standart.png' },
+                        { id: '2', name: 'Кругла', img: 'https://sborka.ua/cside/img/Circle/s245_245.png' },
+                        { id: '3', name: 'Овальна', img: 'https://sborka.ua/cside/img/Oval/31_21_n108.png' },
+                        { id: '4', name: 'Прямокутна', img: 'https://sborka.ua/cside/img/Priam/119_89_n112.png' },
+                        { id: '5', name: 'Етикетка, кольєретка', img: 'https://sborka.ua/cside/img/Etiket/65_113_n56.png' },
+                      ].map(formItem => {
+                        const isActive = fellingForm === formItem.id;
+                        return (
+                          <div
+                            key={formItem.id}
+                            onClick={() => setFellingForm(formItem.id)}
+                            style={{
+                              cursor: 'pointer',
+                              border: isActive ? '2px solid #c00' : '1px solid #ddd',
+                              backgroundColor: isActive ? '#fff0f0' : '#f9f9f9',
+                              borderRadius: '6px',
+                              padding: '10px 16px',
+                              display: 'flex',
+                              flexDirection: 'column',
+                              alignItems: 'center',
+                              gap: '6px',
+                              minWidth: '100px',
+                              transition: 'all 0.15s ease'
+                            }}
+                          >
+                            <img src={formItem.img} alt={formItem.name} style={{ width: '60px', height: '40px', objectFit: 'contain' }} />
+                            <span style={{ fontSize: '12px', fontWeight: isActive ? '700' : '600', color: isActive ? '#c00' : '#333', textAlign: 'center' }}>
+                              {formItem.name}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Stamp Selection & Interactive Product Preview */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '20px' }}>
+                    {/* Left Column: Die-cut Stamp Selection */}
+                    <div style={{ backgroundColor: '#ffffff', padding: '20px', borderRadius: '4px', border: '1px solid #ddd', display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                      <h4 style={{ fontSize: '16px', fontWeight: '800', color: '#222', margin: 0 }}>Оберіть стандартний штамп</h4>
+                      <div>
+                        <label style={{ fontSize: '12px', fontWeight: '700', color: '#444', display: 'block', marginBottom: '6px' }}>Готовий штамп з каталогу:</label>
+                        <select
+                          value={fellingStamp}
+                          onChange={(e) => setFellingStamp(e.target.value)}
+                          style={{ width: '100%', padding: '10px 12px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '13px', fontWeight: '600' }}
+                        >
+                          <option value="128">Хенгер вид 1 90 х 200 мм</option>
+                          <option value="133">Хенгер вид 2 90 х 200 мм</option>
+                          <option value="160">Будинок 210 х 300 мм</option>
+                          <option value="161">Пірамідка 305 x 134 мм</option>
+                          <option value="58">Папка А4 корінець 5 мм</option>
+                          <option value="59">Папка А4 корінець 7 мм</option>
+                        </select>
+                      </div>
+
+                      {/* Selected Stamp Details */}
+                      {(() => {
+                        const stampInfo: Record<string, { title: string; w: number; h: number }> = {
+                          '128': { title: 'Хенгер вид 1', w: 90, h: 200 },
+                          '133': { title: 'Хенгер вид 2', w: 90, h: 200 },
+                          '160': { title: 'Будинок (Календар)', w: 210, h: 300 },
+                          '161': { title: 'Пірамідка', w: 305, h: 134 },
+                          '58': { title: 'Папка А4 (корінець 5мм)', w: 484, h: 377 },
+                          '59': { title: 'Папка А4 (корінець 7мм)', w: 544, h: 393 },
+                        };
+                        const info = stampInfo[fellingStamp] || { title: 'Стандартний штамп', w: 90, h: 200 };
+                        return (
+                          <div style={{ backgroundColor: '#f8f9fa', padding: '12px 14px', borderRadius: '4px', border: '1px solid #eee', fontSize: '13px' }}>
+                            <div style={{ fontWeight: '700', color: '#111', marginBottom: '4px' }}>{info.title}</div>
+                            <div style={{ color: '#666' }}>Габарити висічки: <strong style={{ color: '#c00' }}>{info.w} × {info.h} мм</strong></div>
+                          </div>
+                        );
+                      })()}
+                    </div>
+
+                    {/* Right Column: Visual Stamp Preview */}
+                    <div style={{ backgroundColor: '#ffffff', padding: '20px', borderRadius: '4px', border: '1px solid #ddd', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
+                      <span style={{ fontSize: '13px', fontWeight: '700', color: '#666', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Вид готового виробу</span>
+                      <div style={{ width: '100%', height: '200px', border: '1px dashed #ccc', backgroundColor: '#fafafa', borderRadius: '6px', display: 'flex', alignItems: 'center', justifyContent: 'center', position: 'relative' }}>
+                        {(() => {
+                          const stampImgs: Record<string, string> = {
+                            '128': 'https://sborka.ua/cside/img/Standart/henger1.png',
+                            '133': 'https://sborka.ua/cside/img/Standart/henger2.png',
+                            '160': 'https://sborka.ua/cside/img/Standart/domik.png',
+                            '161': 'https://sborka.ua/cside/img/Standart/piramid.png',
+                            '58': 'https://sborka.ua/cside/img/Standart/papka.png',
+                            '59': 'https://sborka.ua/cside/img/Standart/papka2.png',
+                          };
+                          const imgUrl = stampImgs[fellingStamp];
+                          return imgUrl ? (
+                            <img src={imgUrl} alt="Прев'ю штампу" style={{ maxHeight: '180px', maxWidth: '90%', objectFit: 'contain' }} />
+                          ) : (
+                            <div style={{ width: '140px', height: '140px', border: '2px dashed #c00', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#c00', fontWeight: '700' }}>
+                              Висічка
+                            </div>
+                          );
+                        })()}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Postpress Accordion section */}
+                  <div style={{ backgroundColor: '#ffffff', borderRadius: '4px', border: '1px solid #ddd', overflow: 'hidden' }}>
+                    <div
+                      onClick={() => setShowPostpressAccordion(!showPostpressAccordion)}
+                      style={{ padding: '14px 20px', backgroundColor: '#f8f9fa', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}
+                    >
+                      <span style={{ fontSize: '16px', fontWeight: '700', color: '#222' }}>
+                        {showPostpressAccordion ? '▼' : '►'} Післядрукарська обробка
+                      </span>
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setPostPersonalization('0');
+                          setPostLuvers('0');
+                          setPostLuversCount(1);
+                          setPostCorners('0');
+                          setPostGluing('0');
+                          setPostDrilling('0');
+                          setPostFolding('0');
+                          setPostCreasing('0');
+                          setPostPerforation('0');
+                          setPostPackingText('');
+                        }}
+                        style={{ border: 'none', background: 'none', color: '#c00', fontSize: '13px', fontWeight: '600', cursor: 'pointer' }}
+                      >
+                        ✕ Очистити
+                      </button>
+                    </div>
+
+                    {showPostpressAccordion && (
+                      <div style={{ padding: '20px', display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '16px', borderTop: '1px solid #eee' }}>
+                        <div>
+                          <label style={{ fontSize: '12px', fontWeight: '700', color: '#444', display: 'block', marginBottom: '4px' }}>Персоналізація</label>
+                          <select value={postPersonalization} onChange={(e) => setPostPersonalization(e.target.value)} style={{ width: '100%', padding: '6px 10px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '13px' }}>
+                            <option value="0">Ні</option>
+                            <option value="1">Є — нумерація, змінні дані</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label style={{ fontSize: '12px', fontWeight: '700', color: '#444', display: 'block', marginBottom: '4px' }}>Люверс</label>
+                          <select value={postLuvers} onChange={(e) => setPostLuvers(e.target.value)} style={{ width: '100%', padding: '6px 10px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '13px' }}>
+                            <option value="0">Ні</option>
+                            <option value="93">Золотий</option>
+                            <option value="92">Срібний</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label style={{ fontSize: '12px', fontWeight: '700', color: '#444', display: 'block', marginBottom: '4px' }}>Закруглення кутів</label>
+                          <select value={postCorners} onChange={(e) => setPostCorners(e.target.value)} style={{ width: '100%', padding: '6px 10px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '13px' }}>
+                            <option value="0">Ні</option>
+                            <option value="4">4 кути</option>
+                            <option value="1">1 кут</option>
+                            <option value="2">2 кути</option>
+                            <option value="3">3 кути</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label style={{ fontSize: '12px', fontWeight: '700', color: '#444', display: 'block', marginBottom: '4px' }}>Свердління</label>
+                          <select value={postDrilling} onChange={(e) => setPostDrilling(e.target.value)} style={{ width: '100%', padding: '6px 10px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '13px' }}>
+                            <option value="0">Ні</option>
+                            <option value="1">1 отвір</option>
+                            <option value="2">2 отвори</option>
+                            <option value="3">3 отвори</option>
+                            <option value="4">4 отвори</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label style={{ fontSize: '12px', fontWeight: '700', color: '#444', display: 'block', marginBottom: '4px' }}>Біговка</label>
+                          <select value={postCreasing} onChange={(e) => setPostCreasing(e.target.value)} style={{ width: '100%', padding: '6px 10px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '13px' }}>
+                            <option value="0">Ні</option>
+                            {[1,2,3,4,5,6,7,8,9,10].map(n => (
+                              <option key={n} value={n.toString()}>{n} {n === 1 ? 'біг' : 'біги'}</option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Sets Counter Bar */}
+                  <div style={{ backgroundColor: '#ffffff', padding: '14px 20px', borderRadius: '4px', border: '1px solid #ddd', display: 'flex', alignItems: 'center', gap: '20px' }}>
+                    <span style={{ fontSize: '14px', fontWeight: '700', color: '#222' }}>Комплектів:</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <button
+                        type="button"
+                        onClick={() => setSheetSetsCount(prev => Math.max(1, prev - 1))}
+                        style={{ width: '32px', height: '32px', border: '1px solid #ccc', backgroundColor: '#f2f2f2', borderRadius: '4px', fontWeight: '700', cursor: 'pointer' }}
+                      >
+                        -
+                      </button>
+                      <input
+                        type="number"
+                        value={sheetSetsCount}
+                        onChange={(e) => setSheetSetsCount(parseInt(e.target.value) || 1)}
+                        style={{ width: '50px', height: '32px', border: '1px solid #ccc', borderRadius: '4px', textAlign: 'center', fontWeight: '700' }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setSheetSetsCount(prev => prev + 1)}
+                        style={{ width: '32px', height: '32px', border: '1px solid #ccc', backgroundColor: '#f2f2f2', borderRadius: '4px', fontWeight: '700', cursor: 'pointer' }}
+                      >
+                        +
+                      </button>
+                    </div>
+                    <span style={{ fontSize: '12px', color: '#666' }}>
+                      (Замовлень з однаковими параметрами, але різними макетами)
+                    </span>
+                  </div>
+
+                  {/* Pricing Matrix Table for Die-cut */}
+                  <div style={{ backgroundColor: '#ffffff', borderRadius: '4px', border: '1px solid #ddd', overflow: 'hidden' }}>
+                    <div style={{ padding: '16px 20px', backgroundColor: '#f8f9fa', borderBottom: '1px solid #ddd', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+                      <h4 style={{ fontSize: '16px', fontWeight: '800', color: '#222', margin: 0 }}>Специфікація розрахунків та прайс-лист висічки</h4>
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                        <label style={{ fontSize: '12px', fontWeight: '600', color: '#444', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
+                          <input type="checkbox" checked={includeDelivery} onChange={(e) => setIncludeDelivery(e.target.checked)} />
+                          З доставкою
+                        </label>
+
+                        <div style={{ display: 'flex', border: '1px solid #ccc', borderRadius: '4px', overflow: 'hidden' }}>
+                          <button
+                            type="button"
+                            onClick={() => setPriceCostVar('per_tirazh')}
+                            style={{ border: 'none', padding: '4px 10px', fontSize: '11px', fontWeight: '700', backgroundColor: priceCostVar === 'per_tirazh' ? '#666' : '#fff', color: priceCostVar === 'per_tirazh' ? '#fff' : '#333', cursor: 'pointer' }}
+                          >
+                            За наклад
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setPriceCostVar('per_item')}
+                            style={{ border: 'none', padding: '4px 10px', fontSize: '11px', fontWeight: '700', backgroundColor: priceCostVar === 'per_item' ? '#666' : '#fff', color: priceCostVar === 'per_item' ? '#fff' : '#333', cursor: 'pointer' }}
+                          >
+                            За екземпляр
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div style={{ overflowX: 'auto' }}>
+                      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px', textAlign: 'center' }}>
+                        <thead>
+                          <tr style={{ backgroundColor: '#eeeeee', borderBottom: '1px solid #ccc' }}>
+                            <th style={{ padding: '10px', textAlign: 'left', borderRight: '1px solid #ddd' }}>Матеріал та покриття</th>
+                            <th style={{ padding: '10px', borderRight: '1px solid #ddd' }}>Друк</th>
+                            <th style={{ padding: '10px', borderRight: '1px solid #ddd' }}>Готовність</th>
+                            {[100, 250, 500, 1000, 2500, 5000, 10000].map(tir => (
+                              <th key={tir} style={{ padding: '10px', borderRight: '1px solid #ddd' }}>{tir} шт.</th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {[
+                            { mat: 'Льон Icelite 300', cov: 'Ні', color: '4+0', time: '1-2 дні' },
+                            { mat: 'Tintoretto crema 300', cov: 'Ні', color: '4+4', time: '1-2 дні' },
+                            { mat: 'Stardream opal 285', cov: 'Ні', color: '4+0', time: '1-2 дні' },
+                            { mat: 'Крейд МАТ 300', cov: 'ГЛ лам 1+0', color: '4+4', time: '1-2 дні' },
+                            { mat: 'Крейд МАТ 350', cov: 'МАТ лам 1+1', color: '4+4', time: '1-2 дні' },
+                            { mat: 'Крейд МАТ 450', cov: 'SOFT лам 1+1', color: '4+4', time: '1-2 дні' },
+                          ].map((row, idx) => (
+                            <tr key={idx} style={{ borderBottom: '1px solid #eee', backgroundColor: idx % 2 === 0 ? '#ffffff' : '#fcfcfc' }}>
+                              <td style={{ padding: '10px', textAlign: 'left', fontWeight: '700', color: '#222', borderRight: '1px solid #ddd' }}>
+                                {row.mat} <span style={{ fontWeight: '400', color: '#666' }}>({row.cov})</span>
+                              </td>
+                              <td style={{ padding: '10px', fontWeight: '700', color: '#c00', borderRight: '1px solid #ddd' }}>{row.color}</td>
+                              <td style={{ padding: '10px', color: '#555', borderRight: '1px solid #ddd' }}>{row.time}</td>
+                              {[100, 250, 500, 1000, 2500, 5000, 10000].map(tir => {
+                                const baseCost = tir * 2.5 + 250;
+                                const itemVal = priceCostVar === 'per_item' ? (baseCost / tir).toFixed(2) : Math.round(baseCost).toString();
+                                return (
+                                  <td
+                                    key={tir}
+                                    onClick={() => {
+                                      setQuantity(tir);
+                                      setCategory('Етикетки');
+                                      setStep('editor');
+                                    }}
+                                    style={{ padding: '10px', fontWeight: '700', color: '#111', cursor: 'pointer', borderRight: '1px solid #ddd', transition: 'background-color 0.15s ease' }}
+                                    onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#fff0f0'; e.currentTarget.style.color = '#c00'; }}
+                                    onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = '#111'; }}
+                                  >
+                                    {itemVal} грн
+                                  </td>
+                                );
+                              })}
+                            </tr>
+                          ))}
                         </tbody>
                       </table>
                     </div>
