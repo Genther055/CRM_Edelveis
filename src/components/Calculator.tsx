@@ -43,6 +43,9 @@ export const Calculator: React.FC = () => {
   // Selection step: 'catalog' | 'editor'
   const [step, setStep] = useState<'catalog' | 'editor'>('catalog');
   
+  // Main Category Tab: 'products' | 'offset' | 'digital' | 'wide' | 'roll' | 'films'
+  const [mainCategoryTab, setMainCategoryTab] = useState<'products' | 'offset' | 'digital' | 'wide' | 'roll' | 'films'>('products');
+
   // Calculation mode: 'auto' (Adapted Business Logic) | 'operations' (Pooperatsiyniy 1C)
   const [calcMode, setCalcMode] = useState<'auto' | 'operations'>('auto');
 
@@ -778,297 +781,570 @@ export const Calculator: React.FC = () => {
             )}
           </div>
 
-          {/* Grid Catalog Options - ERP Clean Accents */}
+          {/* Top Main Category Switcher (Matching Sborka Navigation) */}
           <div style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
-            gap: '16px'
+            display: 'flex',
+            backgroundColor: 'var(--bg-card)',
+            padding: '6px',
+            borderRadius: '10px',
+            border: '1px solid var(--border-light)',
+            gap: '6px',
+            overflowX: 'auto'
           }}>
-            {/* 1. Бланки та Листи */}
-            <div 
-              onClick={() => handleSelectCategory('Бланки')}
-              className="ios-card bg-white"
-              style={{ padding: '24px 20px', cursor: 'pointer', textAlign: 'center', transition: 'transform 0.2s' }}
-              onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
-              onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-            >
-              <FileText size={42} style={{ color: 'var(--primary)', margin: '0 auto 12px' }} />
-              <h4 style={{ fontSize: '15px', fontWeight: '800', marginBottom: '6px' }}>Бланки та Листи</h4>
-              <p style={{ fontSize: '11px', color: 'var(--text-medium)', opacity: 0.8, margin: 0 }}>
-                Друк бланкової продукції на офсетному та самокопіювальному папері.
-              </p>
-            </div>
-
-            {/* 2. Візитки */}
-            <div 
-              onClick={() => handleSelectCategory('Візитки')}
-              className="ios-card bg-white"
-              style={{ padding: '24px 20px', cursor: 'pointer', textAlign: 'center', transition: 'transform 0.2s' }}
-              onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
-              onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-            >
-              <Layout size={42} style={{ color: '#5856d6', margin: '0 auto 12px' }} />
-              <h4 style={{ fontSize: '15px', fontWeight: '800', marginBottom: '6px' }}>Візитки</h4>
-              <p style={{ fontSize: '11px', color: 'var(--text-medium)', opacity: 0.8, margin: 0 }}>
-                90х50 мм або євро-формат, ламінація SoftTouch та скруглiння кутів.
-              </p>
-            </div>
-
-            {/* 3. Буклети */}
-            <div 
-              onClick={() => handleSelectCategory('Буклети')}
-              className="ios-card bg-white"
-              style={{ padding: '24px 20px', cursor: 'pointer', textAlign: 'center', transition: 'transform 0.2s' }}
-              onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
-              onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-            >
-              <Layers size={42} style={{ color: '#ff9500', margin: '0 auto 12px' }} />
-              <h4 style={{ fontSize: '15px', fontWeight: '800', marginBottom: '6px' }}>Буклети</h4>
-              <p style={{ fontSize: '11px', color: 'var(--text-medium)', opacity: 0.8, margin: 0 }}>
-                Рекламні буклети з 1, 2 або 3 фальцями (згинами).
-              </p>
-            </div>
-
-            {/* 4. Дипломи випускні */}
-            <div 
-              onClick={() => handleSelectCategory('Дипломи випускні')}
-              className="ios-card bg-white"
-              style={{ padding: '24px 20px', cursor: 'pointer', textAlign: 'center', transition: 'transform 0.2s' }}
-              onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
-              onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-            >
-              <BookOpen size={42} style={{ color: '#eab308', margin: '0 auto 12px' }} />
-              <h4 style={{ fontSize: '15px', fontWeight: '800', marginBottom: '6px' }}>Дипломи випускні</h4>
-              <p style={{ fontSize: '11px', color: 'var(--text-medium)', opacity: 0.8, margin: 0 }}>
-                Святкові дипломи, почесні грамоти та сертифікати випускників.
-              </p>
-            </div>
-
-            {/* 5. Календарики кишенькові */}
-            <div 
-              onClick={() => handleSelectCategory('Календарики кишенькові')}
-              className="ios-card bg-white"
-              style={{ padding: '24px 20px', cursor: 'pointer', textAlign: 'center', transition: 'transform 0.2s' }}
-              onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
-              onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-            >
-              <Calendar size={42} style={{ color: '#ec4899', margin: '0 auto 12px' }} />
-              <h4 style={{ fontSize: '15px', fontWeight: '800', marginBottom: '6px' }}>Календарики кишенькові</h4>
-              <p style={{ fontSize: '11px', color: 'var(--text-medium)', opacity: 0.8, margin: 0 }}>
-                Кишенькові календарики 70х100мм з двосторонньою ламінацією.
-              </p>
-            </div>
-
-            {/* 6. Книги */}
-            <div 
-              onClick={() => handleSelectCategory('Книги')}
-              className="ios-card bg-white"
-              style={{ padding: '24px 20px', cursor: 'pointer', textAlign: 'center', transition: 'transform 0.2s' }}
-              onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
-              onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-            >
-              <BookOpen size={42} style={{ color: '#34c759', margin: '0 auto 12px' }} />
-              <h4 style={{ fontSize: '15px', fontWeight: '800', marginBottom: '6px' }}>Книги / Брошури</h4>
-              <p style={{ fontSize: '11px', color: 'var(--text-medium)', opacity: 0.8, margin: 0 }}>
-                Багатосторінкові книги на скобу, термоклей або м'яку обкладинку.
-              </p>
-            </div>
-
-            {/* 7. Листівки */}
-            <div 
-              onClick={() => handleSelectCategory('Листівки')}
-              className="ios-card bg-white"
-              style={{ padding: '24px 20px', cursor: 'pointer', textAlign: 'center', transition: 'transform 0.2s' }}
-              onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
-              onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-            >
-              <FileText size={42} style={{ color: '#06b6d4', margin: '0 auto 12px' }} />
-              <h4 style={{ fontSize: '15px', fontWeight: '800', marginBottom: '6px' }}>Листівки</h4>
-              <p style={{ fontSize: '11px', color: 'var(--text-medium)', opacity: 0.8, margin: 0 }}>
-                Рекламні листівки А6, А5, А4 на крейдованому папері.
-              </p>
-            </div>
-
-            {/* 8. Меню */}
-            <div 
-              onClick={() => handleSelectCategory('Меню')}
-              className="ios-card bg-white"
-              style={{ padding: '24px 20px', cursor: 'pointer', textAlign: 'center', transition: 'transform 0.2s' }}
-              onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
-              onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-            >
-              <Layers size={42} style={{ color: '#8b5cf6', margin: '0 auto 12px' }} />
-              <h4 style={{ fontSize: '15px', fontWeight: '800', marginBottom: '6px' }}>Меню для ресторанів</h4>
-              <p style={{ fontSize: '11px', color: 'var(--text-medium)', opacity: 0.8, margin: 0 }}>
-                Меню з цупкою ламінацією, скріпленням пружиною або болтами.
-              </p>
-            </div>
-
-            {/* 9. Наклейки */}
-            <div 
-              onClick={() => handleSelectCategory('Наклейки')}
-              className="ios-card bg-white"
-              style={{ padding: '24px 20px', cursor: 'pointer', textAlign: 'center', transition: 'transform 0.2s' }}
-              onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
-              onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-            >
-              <Layers size={42} style={{ color: '#af52de', margin: '0 auto 12px' }} />
-              <h4 style={{ fontSize: '15px', fontWeight: '800', marginBottom: '6px' }}>Наклейки та Стікери</h4>
-              <p style={{ fontSize: '11px', color: 'var(--text-medium)', opacity: 0.8, margin: 0 }}>
-                Самоклеючі наклейки з плотерною надсічкою на аркушах.
-              </p>
-            </div>
-
-            {/* 10. Плакати */}
-            <div 
-              onClick={() => handleSelectCategory('Плакати')}
-              className="ios-card bg-white"
-              style={{ padding: '24px 20px', cursor: 'pointer', textAlign: 'center', transition: 'transform 0.2s' }}
-              onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
-              onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-            >
-              <Layout size={42} style={{ color: '#3b82f6', margin: '0 auto 12px' }} />
-              <h4 style={{ fontSize: '15px', fontWeight: '800', marginBottom: '6px' }}>Плакати та Афіші</h4>
-              <p style={{ fontSize: '11px', color: 'var(--text-medium)', opacity: 0.8, margin: 0 }}>
-                Великоформатний друк плакатів А3, А2, А1 для інтер'єру та реклами.
-              </p>
-            </div>
-
-            {/* 11. Флаєри */}
-            <div 
-              onClick={() => handleSelectCategory('Флаєри')}
-              className="ios-card bg-white"
-              style={{ padding: '24px 20px', cursor: 'pointer', textAlign: 'center', transition: 'transform 0.2s' }}
-              onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
-              onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-            >
-              <FileText size={42} style={{ color: '#f59e0b', margin: '0 auto 12px' }} />
-              <h4 style={{ fontSize: '15px', fontWeight: '800', marginBottom: '6px' }}>Флаєри</h4>
-              <p style={{ fontSize: '11px', color: 'var(--text-medium)', opacity: 0.8, margin: 0 }}>
-                Єврофлаєри (99х210мм) яскравого Повноколірний 4+4 друку.
-              </p>
-            </div>
-
-            {/* 12. Нотаріальні книги */}
-            <div 
-              onClick={() => handleSelectCategory('Нотаріальні книги')}
-              className="ios-card bg-white"
-              style={{ padding: '24px 20px', cursor: 'pointer', textAlign: 'center', transition: 'transform 0.2s' }}
-              onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
-              onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-            >
-              <BookOpen size={42} style={{ color: '#64748b', margin: '0 auto 12px' }} />
-              <h4 style={{ fontSize: '15px', fontWeight: '800', marginBottom: '6px' }}>Нотаріальні книги</h4>
-              <p style={{ fontSize: '11px', color: 'var(--text-medium)', opacity: 0.8, margin: 0 }}>
-                Спеціалізовані нотаріальні реєстри у твердій прошивній палітурці.
-              </p>
-            </div>
-
-            {/* 13. Дипломи і палітурка */}
-            <div 
-              onClick={() => handleSelectCategory('Дипломи і палітурка')}
-              className="ios-card bg-white"
-              style={{ padding: '24px 20px', cursor: 'pointer', textAlign: 'center', transition: 'transform 0.2s' }}
-              onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
-              onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-            >
-              <BookOpen size={42} style={{ color: '#10b981', margin: '0 auto 12px' }} />
-              <h4 style={{ fontSize: '15px', fontWeight: '800', marginBottom: '6px' }}>Дипломи і палітурка</h4>
-              <p style={{ fontSize: '11px', color: 'var(--text-medium)', opacity: 0.8, margin: 0 }}>
-                Тверда палітурка дипломних робіт, дисертацій з тисненням фольгою.
-              </p>
-            </div>
-
-            {/* 14. Логотипи виготовлення */}
-            <div 
-              onClick={() => handleSelectCategory('Логотипи виготовлення')}
-              className="ios-card bg-white"
-              style={{ padding: '24px 20px', cursor: 'pointer', textAlign: 'center', transition: 'transform 0.2s' }}
-              onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
-              onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-            >
-              <Layout size={42} style={{ color: '#6366f1', margin: '0 auto 12px' }} />
-              <h4 style={{ fontSize: '15px', fontWeight: '800', marginBottom: '6px' }}>Логотипи виготовлення</h4>
-              <p style={{ fontSize: '11px', color: 'var(--text-medium)', opacity: 0.8, margin: 0 }}>
-                Брендування логотипів на фірмовій айдентиці та матеріалах.
-              </p>
-            </div>
-
-            {/* 15. Шкільні журнали */}
-            <div 
-              onClick={() => handleSelectCategory('Шкільні журнали')}
-              className="ios-card bg-white"
-              style={{ padding: '24px 20px', cursor: 'pointer', textAlign: 'center', transition: 'transform 0.2s' }}
-              onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
-              onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-            >
-              <BookOpen size={42} style={{ color: '#f43f5e', margin: '0 auto 12px' }} />
-              <h4 style={{ fontSize: '15px', fontWeight: '800', marginBottom: '6px' }}>Шкільні журнали</h4>
-              <p style={{ fontSize: '11px', color: 'var(--text-medium)', opacity: 0.8, margin: 0 }}>
-                Класні журнали успішності та шкільні облікові відомості.
-              </p>
-            </div>
-
-            {/* 16. Етикетки */}
-            <div 
-              onClick={() => handleSelectCategory('Етикетки')}
-              className="ios-card bg-white"
-              style={{ padding: '24px 20px', cursor: 'pointer', textAlign: 'center', transition: 'transform 0.2s' }}
-              onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
-              onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-            >
-              <Layers size={42} style={{ color: '#14b8a6', margin: '0 auto 12px' }} />
-              <h4 style={{ fontSize: '15px', fontWeight: '800', marginBottom: '6px' }}>Етикетки та Бірки</h4>
-              <p style={{ fontSize: '11px', color: 'var(--text-medium)', opacity: 0.8, margin: 0 }}>
-                Товарні етикетки, маркувальні ярлики та фасувальні стікери.
-              </p>
-            </div>
-
-            {/* 17. Календарі */}
-            <div 
-              onClick={() => handleSelectCategory('Календарі')}
-              className="ios-card bg-white"
-              style={{ padding: '24px 20px', cursor: 'pointer', textAlign: 'center', transition: 'transform 0.2s' }}
-              onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
-              onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-            >
-              <Calendar size={42} style={{ color: '#ff2d55', margin: '0 auto 12px' }} />
-              <h4 style={{ fontSize: '15px', fontWeight: '800', marginBottom: '6px' }}>Календарі</h4>
-              <p style={{ fontSize: '11px', color: 'var(--text-medium)', opacity: 0.8, margin: 0 }}>
-                Квартальні, настінні перекидні або будиночки на пружині.
-              </p>
-            </div>
-
-            {/* 18. Блокноти */}
-            <div 
-              onClick={() => handleSelectCategory('Блокноти')}
-              className="ios-card bg-white"
-              style={{ padding: '24px 20px', cursor: 'pointer', textAlign: 'center', transition: 'transform 0.2s' }}
-              onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
-              onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-            >
-              <BookOpen size={42} style={{ color: '#00c7be', margin: '0 auto 12px' }} />
-              <h4 style={{ fontSize: '15px', fontWeight: '800', marginBottom: '6px' }}>Блокноти</h4>
-              <p style={{ fontSize: '11px', color: 'var(--text-medium)', opacity: 0.8, margin: 0 }}>
-                Фірмові блокноти А5, А4 з пружиною та персоналізованою обкладинкою.
-              </p>
-            </div>
-
-            {/* 19. Папки */}
-            <div 
-              onClick={() => handleSelectCategory('Папки')}
-              className="ios-card bg-white"
-              style={{ padding: '24px 20px', cursor: 'pointer', textAlign: 'center', transition: 'transform 0.2s' }}
-              onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
-              onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
-            >
-              <FolderOpen size={42} style={{ color: '#8e8e93', margin: '0 auto 12px' }} />
-              <h4 style={{ fontSize: '15px', fontWeight: '800', marginBottom: '6px' }}>Фірмові Папки</h4>
-              <p style={{ fontSize: '11px', color: 'var(--text-medium)', opacity: 0.8, margin: 0 }}>
-                Корпоративні папки з висічним замком для документів.
-              </p>
-            </div>
+            {[
+              { key: 'products', label: 'Продукти' },
+              { key: 'offset', label: 'Офсетний друк' },
+              { key: 'digital', label: 'Цифровий друк' },
+              { key: 'wide', label: 'Широкоформатний друк' },
+              { key: 'roll', label: 'Рулонний друк' },
+              { key: 'films', label: 'Кольорові плівки' }
+            ].map(tab => (
+              <button
+                key={tab.key}
+                type="button"
+                onClick={() => setMainCategoryTab(tab.key as any)}
+                style={{
+                  padding: '8px 16px',
+                  fontSize: '12px',
+                  fontWeight: mainCategoryTab === tab.key ? '800' : '600',
+                  backgroundColor: mainCategoryTab === tab.key ? 'var(--primary)' : 'transparent',
+                  color: mainCategoryTab === tab.key ? '#ffffff' : 'var(--text-dark)',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap',
+                  transition: 'all 0.15s ease'
+                }}
+              >
+                {tab.label}
+              </button>
+            ))}
           </div>
+
+          {/* TAB 1: PRODUCTS (All Categories) */}
+          {mainCategoryTab === 'products' && (
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))',
+              gap: '16px'
+            }}>
+              {/* 1. Бланки та Листи */}
+              <div 
+                onClick={() => handleSelectCategory('Бланки')}
+                className="ios-card bg-white"
+                style={{ padding: '24px 20px', cursor: 'pointer', textAlign: 'center', transition: 'transform 0.2s' }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+              >
+                <FileText size={42} style={{ color: 'var(--primary)', margin: '0 auto 12px' }} />
+                <h4 style={{ fontSize: '15px', fontWeight: '800', marginBottom: '6px' }}>Бланки та Листи</h4>
+                <p style={{ fontSize: '11px', color: 'var(--text-medium)', opacity: 0.8, margin: 0 }}>
+                  Друк бланкової продукції на офсетному та самокопіювальному папері.
+                </p>
+              </div>
+
+              {/* 2. Візитки */}
+              <div 
+                onClick={() => handleSelectCategory('Візитки')}
+                className="ios-card bg-white"
+                style={{ padding: '24px 20px', cursor: 'pointer', textAlign: 'center', transition: 'transform 0.2s' }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+              >
+                <Layout size={42} style={{ color: '#5856d6', margin: '0 auto 12px' }} />
+                <h4 style={{ fontSize: '15px', fontWeight: '800', marginBottom: '6px' }}>Візитки</h4>
+                <p style={{ fontSize: '11px', color: 'var(--text-medium)', opacity: 0.8, margin: 0 }}>
+                  90х50 мм або євро-формат, ламінація SoftTouch та скруглiння кутів.
+                </p>
+              </div>
+
+              {/* 3. Буклети */}
+              <div 
+                onClick={() => handleSelectCategory('Буклети')}
+                className="ios-card bg-white"
+                style={{ padding: '24px 20px', cursor: 'pointer', textAlign: 'center', transition: 'transform 0.2s' }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+              >
+                <Layers size={42} style={{ color: '#ff9500', margin: '0 auto 12px' }} />
+                <h4 style={{ fontSize: '15px', fontWeight: '800', marginBottom: '6px' }}>Буклети</h4>
+                <p style={{ fontSize: '11px', color: 'var(--text-medium)', opacity: 0.8, margin: 0 }}>
+                  Рекламні буклети з 1, 2 або 3 фальцями (згинами).
+                </p>
+              </div>
+
+              {/* 4. Дипломи випускні */}
+              <div 
+                onClick={() => handleSelectCategory('Дипломи випускні')}
+                className="ios-card bg-white"
+                style={{ padding: '24px 20px', cursor: 'pointer', textAlign: 'center', transition: 'transform 0.2s' }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+              >
+                <BookOpen size={42} style={{ color: '#eab308', margin: '0 auto 12px' }} />
+                <h4 style={{ fontSize: '15px', fontWeight: '800', marginBottom: '6px' }}>Дипломи випускні</h4>
+                <p style={{ fontSize: '11px', color: 'var(--text-medium)', opacity: 0.8, margin: 0 }}>
+                  Святкові дипломи, почесні грамоти та сертифікати випускників.
+                </p>
+              </div>
+
+              {/* 5. Календарики кишенькові */}
+              <div 
+                onClick={() => handleSelectCategory('Календарики кишенькові')}
+                className="ios-card bg-white"
+                style={{ padding: '24px 20px', cursor: 'pointer', textAlign: 'center', transition: 'transform 0.2s' }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+              >
+                <Calendar size={42} style={{ color: '#ec4899', margin: '0 auto 12px' }} />
+                <h4 style={{ fontSize: '15px', fontWeight: '800', marginBottom: '6px' }}>Календарики кишенькові</h4>
+                <p style={{ fontSize: '11px', color: 'var(--text-medium)', opacity: 0.8, margin: 0 }}>
+                  Кишенькові календарики 70х100мм з двосторонньою ламінацією.
+                </p>
+              </div>
+
+              {/* 6. Книги */}
+              <div 
+                onClick={() => handleSelectCategory('Книги')}
+                className="ios-card bg-white"
+                style={{ padding: '24px 20px', cursor: 'pointer', textAlign: 'center', transition: 'transform 0.2s' }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+              >
+                <BookOpen size={42} style={{ color: '#34c759', margin: '0 auto 12px' }} />
+                <h4 style={{ fontSize: '15px', fontWeight: '800', marginBottom: '6px' }}>Книги / Брошури</h4>
+                <p style={{ fontSize: '11px', color: 'var(--text-medium)', opacity: 0.8, margin: 0 }}>
+                  Багатосторінкові книги на скобу, термоклей або м'яку обкладинку.
+                </p>
+              </div>
+
+              {/* 7. Листівки */}
+              <div 
+                onClick={() => handleSelectCategory('Листівки')}
+                className="ios-card bg-white"
+                style={{ padding: '24px 20px', cursor: 'pointer', textAlign: 'center', transition: 'transform 0.2s' }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+              >
+                <FileText size={42} style={{ color: '#06b6d4', margin: '0 auto 12px' }} />
+                <h4 style={{ fontSize: '15px', fontWeight: '800', marginBottom: '6px' }}>Листівки</h4>
+                <p style={{ fontSize: '11px', color: 'var(--text-medium)', opacity: 0.8, margin: 0 }}>
+                  Рекламні листівки А6, А5, А4 на крейдованому папері.
+                </p>
+              </div>
+
+              {/* 8. Меню */}
+              <div 
+                onClick={() => handleSelectCategory('Меню')}
+                className="ios-card bg-white"
+                style={{ padding: '24px 20px', cursor: 'pointer', textAlign: 'center', transition: 'transform 0.2s' }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+              >
+                <Layers size={42} style={{ color: '#8b5cf6', margin: '0 auto 12px' }} />
+                <h4 style={{ fontSize: '15px', fontWeight: '800', marginBottom: '6px' }}>Меню для ресторанів</h4>
+                <p style={{ fontSize: '11px', color: 'var(--text-medium)', opacity: 0.8, margin: 0 }}>
+                  Меню з цупкою ламінацією, скріпленням пружиною або болтами.
+                </p>
+              </div>
+
+              {/* 9. Наклейки */}
+              <div 
+                onClick={() => handleSelectCategory('Наклейки')}
+                className="ios-card bg-white"
+                style={{ padding: '24px 20px', cursor: 'pointer', textAlign: 'center', transition: 'transform 0.2s' }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+              >
+                <Layers size={42} style={{ color: '#af52de', margin: '0 auto 12px' }} />
+                <h4 style={{ fontSize: '15px', fontWeight: '800', marginBottom: '6px' }}>Наклейки та Стікери</h4>
+                <p style={{ fontSize: '11px', color: 'var(--text-medium)', opacity: 0.8, margin: 0 }}>
+                  Самоклеючі наклейки з плотерною надсічкою на аркушах.
+                </p>
+              </div>
+
+              {/* 10. Плакати */}
+              <div 
+                onClick={() => handleSelectCategory('Плакати')}
+                className="ios-card bg-white"
+                style={{ padding: '24px 20px', cursor: 'pointer', textAlign: 'center', transition: 'transform 0.2s' }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+              >
+                <Layout size={42} style={{ color: '#3b82f6', margin: '0 auto 12px' }} />
+                <h4 style={{ fontSize: '15px', fontWeight: '800', marginBottom: '6px' }}>Плакати та Афіші</h4>
+                <p style={{ fontSize: '11px', color: 'var(--text-medium)', opacity: 0.8, margin: 0 }}>
+                  Великоформатний друк плакатів А3, А2, А1 для інтер'єру та реклами.
+                </p>
+              </div>
+
+              {/* 11. Флаєри */}
+              <div 
+                onClick={() => handleSelectCategory('Флаєри')}
+                className="ios-card bg-white"
+                style={{ padding: '24px 20px', cursor: 'pointer', textAlign: 'center', transition: 'transform 0.2s' }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+              >
+                <FileText size={42} style={{ color: '#f59e0b', margin: '0 auto 12px' }} />
+                <h4 style={{ fontSize: '15px', fontWeight: '800', marginBottom: '6px' }}>Флаєри</h4>
+                <p style={{ fontSize: '11px', color: 'var(--text-medium)', opacity: 0.8, margin: 0 }}>
+                  Єврофлаєри (99х210мм) яскравого Повноколірний 4+4 друку.
+                </p>
+              </div>
+
+              {/* 12. Нотаріальні книги */}
+              <div 
+                onClick={() => handleSelectCategory('Нотаріальні книги')}
+                className="ios-card bg-white"
+                style={{ padding: '24px 20px', cursor: 'pointer', textAlign: 'center', transition: 'transform 0.2s' }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+              >
+                <BookOpen size={42} style={{ color: '#64748b', margin: '0 auto 12px' }} />
+                <h4 style={{ fontSize: '15px', fontWeight: '800', marginBottom: '6px' }}>Нотаріальні книги</h4>
+                <p style={{ fontSize: '11px', color: 'var(--text-medium)', opacity: 0.8, margin: 0 }}>
+                  Спеціалізовані нотаріальні реєстри у твердій прошивній палітурці.
+                </p>
+              </div>
+
+              {/* 13. Дипломи і палітурка */}
+              <div 
+                onClick={() => handleSelectCategory('Дипломи і палітурка')}
+                className="ios-card bg-white"
+                style={{ padding: '24px 20px', cursor: 'pointer', textAlign: 'center', transition: 'transform 0.2s' }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+              >
+                <BookOpen size={42} style={{ color: '#10b981', margin: '0 auto 12px' }} />
+                <h4 style={{ fontSize: '15px', fontWeight: '800', marginBottom: '6px' }}>Дипломи і палітурка</h4>
+                <p style={{ fontSize: '11px', color: 'var(--text-medium)', opacity: 0.8, margin: 0 }}>
+                  Тверда палітурка дипломних робіт, дисертацій з тисненням фольгою.
+                </p>
+              </div>
+
+              {/* 14. Логотипи виготовлення */}
+              <div 
+                onClick={() => handleSelectCategory('Логотипи виготовлення')}
+                className="ios-card bg-white"
+                style={{ padding: '24px 20px', cursor: 'pointer', textAlign: 'center', transition: 'transform 0.2s' }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+              >
+                <Layout size={42} style={{ color: '#6366f1', margin: '0 auto 12px' }} />
+                <h4 style={{ fontSize: '15px', fontWeight: '800', marginBottom: '6px' }}>Логотипи виготовлення</h4>
+                <p style={{ fontSize: '11px', color: 'var(--text-medium)', opacity: 0.8, margin: 0 }}>
+                  Брендування логотипів на фірмовій айдентиці та матеріалах.
+                </p>
+              </div>
+
+              {/* 15. Шкільні журнали */}
+              <div 
+                onClick={() => handleSelectCategory('Шкільні журнали')}
+                className="ios-card bg-white"
+                style={{ padding: '24px 20px', cursor: 'pointer', textAlign: 'center', transition: 'transform 0.2s' }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+              >
+                <BookOpen size={42} style={{ color: '#f43f5e', margin: '0 auto 12px' }} />
+                <h4 style={{ fontSize: '15px', fontWeight: '800', marginBottom: '6px' }}>Шкільні журнали</h4>
+                <p style={{ fontSize: '11px', color: 'var(--text-medium)', opacity: 0.8, margin: 0 }}>
+                  Класні журнали успішності та шкільні облікові відомості.
+                </p>
+              </div>
+
+              {/* 16. Етикетки */}
+              <div 
+                onClick={() => handleSelectCategory('Етикетки')}
+                className="ios-card bg-white"
+                style={{ padding: '24px 20px', cursor: 'pointer', textAlign: 'center', transition: 'transform 0.2s' }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+              >
+                <Layers size={42} style={{ color: '#14b8a6', margin: '0 auto 12px' }} />
+                <h4 style={{ fontSize: '15px', fontWeight: '800', marginBottom: '6px' }}>Етикетки та Бірки</h4>
+                <p style={{ fontSize: '11px', color: 'var(--text-medium)', opacity: 0.8, margin: 0 }}>
+                  Товарні етикетки, маркувальні ярлики та фасувальні стікери.
+                </p>
+              </div>
+
+              {/* 17. Календарі */}
+              <div 
+                onClick={() => handleSelectCategory('Календарі')}
+                className="ios-card bg-white"
+                style={{ padding: '24px 20px', cursor: 'pointer', textAlign: 'center', transition: 'transform 0.2s' }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+              >
+                <Calendar size={42} style={{ color: '#ff2d55', margin: '0 auto 12px' }} />
+                <h4 style={{ fontSize: '15px', fontWeight: '800', marginBottom: '6px' }}>Календарі</h4>
+                <p style={{ fontSize: '11px', color: 'var(--text-medium)', opacity: 0.8, margin: 0 }}>
+                  Квартальні, настінні перекидні або будиночки на пружині.
+                </p>
+              </div>
+
+              {/* 18. Блокноти */}
+              <div 
+                onClick={() => handleSelectCategory('Блокноти')}
+                className="ios-card bg-white"
+                style={{ padding: '24px 20px', cursor: 'pointer', textAlign: 'center', transition: 'transform 0.2s' }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+              >
+                <BookOpen size={42} style={{ color: '#00c7be', margin: '0 auto 12px' }} />
+                <h4 style={{ fontSize: '15px', fontWeight: '800', marginBottom: '6px' }}>Блокноти</h4>
+                <p style={{ fontSize: '11px', color: 'var(--text-medium)', opacity: 0.8, margin: 0 }}>
+                  Фірмові блокноти А5, А4 з пружиною та персоналізованою обкладинкою.
+                </p>
+              </div>
+
+              {/* 19. Папки */}
+              <div 
+                onClick={() => handleSelectCategory('Папки')}
+                className="ios-card bg-white"
+                style={{ padding: '24px 20px', cursor: 'pointer', textAlign: 'center', transition: 'transform 0.2s' }}
+                onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+                onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+              >
+                <FolderOpen size={42} style={{ color: '#8e8e93', margin: '0 auto 12px' }} />
+                <h4 style={{ fontSize: '15px', fontWeight: '800', marginBottom: '6px' }}>Фірмові Папки</h4>
+                <p style={{ fontSize: '11px', color: 'var(--text-medium)', opacity: 0.8, margin: 0 }}>
+                  Корпоративні папки з висічним замком для документів.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 2: OFFSET PRINTING (Matching Sborka Structure) */}
+          {mainCategoryTab === 'offset' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              {/* 4 Main Printing Technology Blocks */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '14px' }}>
+                <div onClick={() => handleSelectCategory('Листівки')} className="ios-card bg-white" style={{ padding: '16px', cursor: 'pointer', borderTop: '4px solid var(--primary)' }}>
+                  <h3 style={{ fontSize: '16px', fontWeight: '900', color: 'var(--text-dark)', marginBottom: '4px' }}>Листова</h3>
+                  <p style={{ fontSize: '11px', color: 'var(--text-medium)', margin: 0 }}>Візитівки, листівки, бланки, буклети, наліпки, плакати…</p>
+                </div>
+                <div onClick={() => handleSelectCategory('Наклейки')} className="ios-card bg-white" style={{ padding: '16px', cursor: 'pointer', borderTop: '4px solid #af52de' }}>
+                  <h3 style={{ fontSize: '16px', fontWeight: '900', color: 'var(--text-dark)', marginBottom: '4px' }}>Висічна</h3>
+                  <p style={{ fontSize: '11px', color: 'var(--text-medium)', margin: 0 }}>Фігурні наліпки, візитівки, листівки, підставки, хенгери…</p>
+                </div>
+                <div onClick={() => handleSelectCategory('Книги')} className="ios-card bg-white" style={{ padding: '16px', cursor: 'pointer', borderTop: '4px solid #34c759' }}>
+                  <h3 style={{ fontSize: '16px', fontWeight: '900', color: 'var(--text-dark)', marginBottom: '4px' }}>Багатосторінкова</h3>
+                  <p style={{ fontSize: '11px', color: 'var(--text-medium)', margin: 0 }}>Брошури, журнали, каталоги, меню, звіти…</p>
+                </div>
+                <div onClick={() => handleSelectCategory('Бланки')} className="ios-card bg-white" style={{ padding: '16px', cursor: 'pointer', borderTop: '4px solid #ff9500' }}>
+                  <h3 style={{ fontSize: '16px', fontWeight: '900', color: 'var(--text-dark)', marginBottom: '4px' }}>Індивідуальне</h3>
+                  <p style={{ fontSize: '11px', color: 'var(--text-medium)', margin: 0 }}>Замовити прорахунок комплексного або нестандартного замовлення</p>
+                </div>
+              </div>
+
+              {/* Quick Products Catalog Grid with formats */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(210px, 1fr))', gap: '14px' }}>
+                {/* 1. Візитівка */}
+                <div className="ios-card bg-white" style={{ padding: '16px', textAlign: 'center' }}>
+                  <h4 style={{ fontSize: '14px', fontWeight: '800', marginBottom: '8px' }}>Візитівка</h4>
+                  <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                    {['90х50', '85х55', '50х50', 'Кругла'].map(fmt => (
+                      <button key={fmt} type="button" onClick={() => { setSelectedFormat(fmt); handleSelectCategory('Візитки'); }} className="ios-badge ios-badge-blue" style={{ cursor: 'pointer', border: 'none' }}>
+                        {fmt}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 2. Календар */}
+                <div className="ios-card bg-white" style={{ padding: '16px', textAlign: 'center' }}>
+                  <h4 style={{ fontSize: '14px', fontWeight: '800', marginBottom: '8px' }}>Календар</h4>
+                  <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                    {['100х70', '90х60', '70х70'].map(fmt => (
+                      <button key={fmt} type="button" onClick={() => { setSelectedFormat(fmt); handleSelectCategory('Календарики кишенькові'); }} className="ios-badge ios-badge-red" style={{ cursor: 'pointer', border: 'none' }}>
+                        {fmt}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 3. Флаєр */}
+                <div className="ios-card bg-white" style={{ padding: '16px', textAlign: 'center' }}>
+                  <h4 style={{ fontSize: '14px', fontWeight: '800', marginBottom: '8px' }}>Флаєр</h4>
+                  <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                    {['210х99', '210х198', '99х99'].map(fmt => (
+                      <button key={fmt} type="button" onClick={() => { setSelectedFormat(fmt); handleSelectCategory('Флаєри'); }} className="ios-badge ios-badge-orange" style={{ cursor: 'pointer', border: 'none' }}>
+                        {fmt}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 4. Листівка */}
+                <div className="ios-card bg-white" style={{ padding: '16px', textAlign: 'center' }}>
+                  <h4 style={{ fontSize: '14px', fontWeight: '800', marginBottom: '8px' }}>Листівка</h4>
+                  <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                    {['А7', 'А6', 'А5', 'А4', 'А3'].map(fmt => (
+                      <button key={fmt} type="button" onClick={() => { setSelectedFormat(fmt); handleSelectCategory('Листівки'); }} className="ios-badge ios-badge-green" style={{ cursor: 'pointer', border: 'none' }}>
+                        {fmt}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 5. Плакати */}
+                <div className="ios-card bg-white" style={{ padding: '16px', textAlign: 'center' }}>
+                  <h4 style={{ fontSize: '14px', fontWeight: '800', marginBottom: '8px' }}>Плакати</h4>
+                  <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                    {['А3', 'В3', 'А2', 'В2', 'А1', 'B1'].map(fmt => (
+                      <button key={fmt} type="button" onClick={() => { setSelectedFormat(fmt); handleSelectCategory('Плакати'); }} className="ios-badge ios-badge-blue" style={{ cursor: 'pointer', border: 'none' }}>
+                        {fmt}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 6. Сети */}
+                <div className="ios-card bg-white" style={{ padding: '16px', textAlign: 'center' }}>
+                  <h4 style={{ fontSize: '14px', fontWeight: '800', marginBottom: '8px' }}>Сети</h4>
+                  <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                    {['А3', 'В3'].map(fmt => (
+                      <button key={fmt} type="button" onClick={() => { setSelectedFormat(fmt); handleSelectCategory('Бланки'); }} className="ios-badge ios-badge-purple" style={{ cursor: 'pointer', border: 'none' }}>
+                        {fmt}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 7. Буклет */}
+                <div className="ios-card bg-white" style={{ padding: '16px', textAlign: 'center' }}>
+                  <h4 style={{ fontSize: '14px', fontWeight: '800', marginBottom: '8px' }}>Буклет</h4>
+                  <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                    {['А4 в Євро', '2Євро в Євро', 'А6', 'А5', 'А4'].map(fmt => (
+                      <button key={fmt} type="button" onClick={() => { setSelectedFormat(fmt); handleSelectCategory('Буклети'); }} className="ios-badge ios-badge-orange" style={{ cursor: 'pointer', border: 'none' }}>
+                        {fmt}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 8. Каталог */}
+                <div className="ios-card bg-white" style={{ padding: '16px', textAlign: 'center' }}>
+                  <h4 style={{ fontSize: '14px', fontWeight: '800', marginBottom: '8px' }}>Каталог</h4>
+                  <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                    {['Скоба', 'Пружина', 'Клей'].map(st => (
+                      <button key={st} type="button" onClick={() => { handleSelectCategory('Книги'); }} className="ios-badge ios-badge-green" style={{ cursor: 'pointer', border: 'none' }}>
+                        {st}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 9. Блокнот */}
+                <div className="ios-card bg-white" style={{ padding: '16px', textAlign: 'center' }}>
+                  <h4 style={{ fontSize: '14px', fontWeight: '800', marginBottom: '8px' }}>Блокнот</h4>
+                  <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                    {['А6', 'А5', 'А4'].map(fmt => (
+                      <button key={fmt} type="button" onClick={() => { setSelectedFormat(fmt); handleSelectCategory('Блокноти'); }} className="ios-badge ios-badge-purple" style={{ cursor: 'pointer', border: 'none' }}>
+                        {fmt}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 10. Наліпка */}
+                <div className="ios-card bg-white" style={{ padding: '16px', textAlign: 'center' }}>
+                  <h4 style={{ fontSize: '14px', fontWeight: '800', marginBottom: '8px' }}>Наліпка</h4>
+                  <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                    {['90х50', '50х50', 'Кругла', 'Овальна'].map(fmt => (
+                      <button key={fmt} type="button" onClick={() => { setSelectedFormat(fmt); handleSelectCategory('Наклейки'); }} className="ios-badge ios-badge-blue" style={{ cursor: 'pointer', border: 'none' }}>
+                        {fmt}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 11. Папка А4 */}
+                <div className="ios-card bg-white" style={{ padding: '16px', textAlign: 'center' }}>
+                  <h4 style={{ fontSize: '14px', fontWeight: '800', marginBottom: '8px' }}>Папка А4</h4>
+                  <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                    {['Без корінця', 'Корінець 5мм', 'З резинкою'].map(fmt => (
+                      <button key={fmt} type="button" onClick={() => { handleSelectCategory('Папки'); }} className="ios-badge ios-badge-red" style={{ cursor: 'pointer', border: 'none' }}>
+                        {fmt}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* 12. Друк в листах */}
+                <div className="ios-card bg-white" style={{ padding: '16px', textAlign: 'center' }}>
+                  <h4 style={{ fontSize: '14px', fontWeight: '800', marginBottom: '8px' }}>Друк в листах</h4>
+                  <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap' }}>
+                    {['А2', 'В2', 'А1', 'В1'].map(fmt => (
+                      <button key={fmt} type="button" onClick={() => { setSelectedFormat(fmt); handleSelectCategory('Бланки'); }} className="ios-badge ios-badge-orange" style={{ cursor: 'pointer', border: 'none' }}>
+                        {fmt}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 3: DIGITAL PRINTING */}
+          {mainCategoryTab === 'digital' && (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '16px' }}>
+              <div onClick={() => handleSelectCategory('Візитки')} className="ios-card bg-white" style={{ padding: '24px', cursor: 'pointer', textAlign: 'center' }}>
+                <Layout size={40} style={{ color: 'var(--primary)', margin: '0 auto 10px' }} />
+                <h4 style={{ fontSize: '15px', fontWeight: '800' }}>Термінові Візитки</h4>
+                <p style={{ fontSize: '11px', color: 'var(--text-medium)', margin: 0 }}>Цифровий оперативний друк від 100 шт за 1 годину.</p>
+              </div>
+              <div onClick={() => handleSelectCategory('Листівки')} className="ios-card bg-white" style={{ padding: '24px', cursor: 'pointer', textAlign: 'center' }}>
+                <FileText size={40} style={{ color: '#06b6d4', margin: '0 auto 10px' }} />
+                <h4 style={{ fontSize: '15px', fontWeight: '800' }}>Цифрові Листівки SRA3</h4>
+                <p style={{ fontSize: '11px', color: 'var(--text-medium)', margin: 0 }}>Оперативний листовий друк на Xerox Versant 180.</p>
+              </div>
+              <div onClick={() => handleSelectCategory('Меню')} className="ios-card bg-white" style={{ padding: '24px', cursor: 'pointer', textAlign: 'center' }}>
+                <Layers size={40} style={{ color: '#8b5cf6', margin: '0 auto 10px' }} />
+                <h4 style={{ fontSize: '15px', fontWeight: '800' }}>Конвертна ламінація</h4>
+                <p style={{ fontSize: '11px', color: 'var(--text-medium)', margin: 0 }}>Захищені меню та бейджи з посиленим ламінуванням 125мкм.</p>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 4: WIDE FORMAT */}
+          {mainCategoryTab === 'wide' && (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '16px' }}>
+              <div onClick={() => handleSelectCategory('Плакати')} className="ios-card bg-white" style={{ padding: '24px', cursor: 'pointer', textAlign: 'center' }}>
+                <Layout size={40} style={{ color: '#3b82f6', margin: '0 auto 10px' }} />
+                <h4 style={{ fontSize: '15px', fontWeight: '800' }}>Банери та Тенти</h4>
+                <p style={{ fontSize: '11px', color: 'var(--text-medium)', margin: 0 }}>Литі та ламеновані банери для зовнішньої реклами з люверсами.</p>
+              </div>
+              <div onClick={() => handleSelectCategory('Наклейки')} className="ios-card bg-white" style={{ padding: '24px', cursor: 'pointer', textAlign: 'center' }}>
+                <Layers size={40} style={{ color: '#af52de', margin: '0 auto 10px' }} />
+                <h4 style={{ fontSize: '15px', fontWeight: '800' }}>Плівка ORAJET</h4>
+                <p style={{ fontSize: '11px', color: 'var(--text-medium)', margin: 0 }}>Широкоформатний друк на самоклейці для вітрин та авто.</p>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 5: ROLL PRINTING */}
+          {mainCategoryTab === 'roll' && (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '16px' }}>
+              <div onClick={() => handleSelectCategory('Етикетки')} className="ios-card bg-white" style={{ padding: '24px', cursor: 'pointer', textAlign: 'center' }}>
+                <Layers size={40} style={{ color: '#14b8a6', margin: '0 auto 10px' }} />
+                <h4 style={{ fontSize: '15px', fontWeight: '800' }}>Рулонна Етикетка</h4>
+                <p style={{ fontSize: '11px', color: 'var(--text-medium)', margin: 0 }}>Самоклеючі етикетки у бобінах та рулонах для маркування.</p>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 6: COLOR FILMS */}
+          {mainCategoryTab === 'films' && (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '16px' }}>
+              <div onClick={() => handleSelectCategory('Наклейки')} className="ios-card bg-white" style={{ padding: '24px', cursor: 'pointer', textAlign: 'center' }}>
+                <Layers size={40} style={{ color: '#ec4899', margin: '0 auto 10px' }} />
+                <h4 style={{ fontSize: '15px', fontWeight: '800' }}>Плотерна порізка плівок</h4>
+                <p style={{ fontSize: '11px', color: 'var(--text-medium)', margin: 0 }}>Порізка аплікацій з кольорових вінілових плівок ORACAL 641.</p>
+              </div>
+            </div>
+          )}
 
           {/* Templates list under catalog */}
           {templates.length > 0 && (
