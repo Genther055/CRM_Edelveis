@@ -1261,19 +1261,32 @@ export const Calculator: React.FC = () => {
               {/* OVERVIEW SUBTAB: Sborka 18-Card Product Grid */}
               {offsetSubTab === 'overview' && (
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '15px' }}>
+                  {/* Helper function to select size preset and navigate */}
                   {/* 1. Візитівка */}
                   <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
-                    <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Візитівка</h4>
+                    <h4
+                      onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset('1'); setSheetCustomWidth('90'); setSheetCustomHeight('50'); handleSelectCategory('Візитки'); }}
+                      style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px', cursor: 'pointer' }}
+                      onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
+                      onMouseLeave={(e) => e.currentTarget.style.color = '#222'}
+                    >
+                      Візитівка
+                    </h4>
                     <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
-                      {['90х50', '85х55', '50х50', 'Кругла'].map(fmt => (
+                      {[
+                        { name: '90х50', preset: '1', w: '90', h: '50', kind: '1' },
+                        { name: '85х55', preset: '5', w: '85', h: '55', kind: '1' },
+                        { name: '50х50', preset: '5', w: '50', h: '50', kind: '2' },
+                        { name: 'Кругла', preset: '5', w: '50', h: '50', kind: '7' }
+                      ].map(item => (
                         <span
-                          key={fmt}
-                          onClick={() => { setSelectedFormat(fmt); setOffsetSubTab('sheets'); handleSelectCategory('Візитки'); }}
+                          key={item.name}
+                          onClick={() => { setOffsetSubTab('sheets'); setCardKind(item.kind); setSheetSizePreset(item.preset); setSheetCustomWidth(item.w); setSheetCustomHeight(item.h); handleSelectCategory('Візитки'); }}
                           style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
                           onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
                           onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
                         >
-                          {fmt}
+                          {item.name}
                         </span>
                       ))}
                     </div>
@@ -1281,17 +1294,28 @@ export const Calculator: React.FC = () => {
 
                   {/* 2. Календар */}
                   <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
-                    <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Календар</h4>
+                    <h4
+                      onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset('91'); setSheetCustomWidth('100'); setSheetCustomHeight('70'); handleSelectCategory('Календарі кишенькові'); }}
+                      style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px', cursor: 'pointer' }}
+                      onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
+                      onMouseLeave={(e) => e.currentTarget.style.color = '#222'}
+                    >
+                      Календар
+                    </h4>
                     <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
-                      {['100х70', '90х60', '70х70'].map(fmt => (
+                      {[
+                        { name: '100х70', preset: '91', w: '100', h: '70', kind: '1' },
+                        { name: '90х60', preset: '90', w: '90', h: '60', kind: '1' },
+                        { name: '70х70', preset: '256', w: '70', h: '70', kind: '2' }
+                      ].map(item => (
                         <span
-                          key={fmt}
-                          onClick={() => { setSelectedFormat(fmt); setOffsetSubTab('sheets'); handleSelectCategory('Календарики кишенькові'); }}
+                          key={item.name}
+                          onClick={() => { setOffsetSubTab('sheets'); setCardKind(item.kind); setSheetSizePreset(item.preset); setSheetCustomWidth(item.w); setSheetCustomHeight(item.h); handleSelectCategory('Календарі кишенькові'); }}
                           style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
                           onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
                           onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
                         >
-                          {fmt}
+                          {item.name}
                         </span>
                       ))}
                     </div>
@@ -1299,17 +1323,28 @@ export const Calculator: React.FC = () => {
 
                   {/* 3. Флаєр */}
                   <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
-                    <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Флаєр</h4>
+                    <h4
+                      onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset('25'); setSheetCustomWidth('99'); setSheetCustomHeight('210'); handleSelectCategory('Флаєри'); }}
+                      style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px', cursor: 'pointer' }}
+                      onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
+                      onMouseLeave={(e) => e.currentTarget.style.color = '#222'}
+                    >
+                      Флаєр
+                    </h4>
                     <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
-                      {['210х99', '210х198', '99х99'].map(fmt => (
+                      {[
+                        { name: '210х99', preset: '25', w: '99', h: '210', kind: '1' },
+                        { name: '210х198', preset: '26', w: '198', h: '210', kind: '6' },
+                        { name: '99х99', preset: '24', w: '99', h: '99', kind: '2' }
+                      ].map(item => (
                         <span
-                          key={fmt}
-                          onClick={() => { setSelectedFormat(fmt); setOffsetSubTab('sheets'); handleSelectCategory('Флаєри'); }}
+                          key={item.name}
+                          onClick={() => { setOffsetSubTab('sheets'); setCardKind(item.kind); setSheetSizePreset(item.preset); setSheetCustomWidth(item.w); setSheetCustomHeight(item.h); handleSelectCategory('Флаєри'); }}
                           style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
                           onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
                           onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
                         >
-                          {fmt}
+                          {item.name}
                         </span>
                       ))}
                     </div>
@@ -1317,17 +1352,31 @@ export const Calculator: React.FC = () => {
 
                   {/* 4. Листівка */}
                   <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
-                    <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Листівка</h4>
+                    <h4
+                      onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset('28'); setSheetCustomWidth('70'); setSheetCustomHeight('100'); handleSelectCategory('Листівки'); }}
+                      style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px', cursor: 'pointer' }}
+                      onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
+                      onMouseLeave={(e) => e.currentTarget.style.color = '#222'}
+                    >
+                      Листівка
+                    </h4>
                     <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
-                      {['А7', 'А6', 'А5', 'А4', 'А3', 'Кругла'].map(fmt => (
+                      {[
+                        { name: 'А7', preset: '28', w: '70', h: '100', kind: '1' },
+                        { name: 'А6', preset: '312', w: '105', h: '148', kind: '1' },
+                        { name: 'А5', preset: '32', w: '148', h: '210', kind: '1' },
+                        { name: 'А4', preset: '34', w: '210', h: '297', kind: '1' },
+                        { name: 'А3', preset: '36', w: '297', h: '420', kind: '1' },
+                        { name: 'Кругла', preset: '37', w: '70', h: '70', kind: '7' }
+                      ].map(item => (
                         <span
-                          key={fmt}
-                          onClick={() => { setSelectedFormat(fmt); setOffsetSubTab('sheets'); handleSelectCategory('Листівки'); }}
+                          key={item.name}
+                          onClick={() => { setOffsetSubTab('sheets'); setCardKind(item.kind); setSheetSizePreset(item.preset); setSheetCustomWidth(item.w); setSheetCustomHeight(item.h); handleSelectCategory('Листівки'); }}
                           style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
                           onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
                           onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
                         >
-                          {fmt}
+                          {item.name}
                         </span>
                       ))}
                     </div>
@@ -1335,17 +1384,31 @@ export const Calculator: React.FC = () => {
 
                   {/* 5. Плакати */}
                   <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
-                    <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Плакати</h4>
+                    <h4
+                      onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset('36'); setSheetCustomWidth('297'); setSheetCustomHeight('420'); handleSelectCategory('Плакати'); }}
+                      style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px', cursor: 'pointer' }}
+                      onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
+                      onMouseLeave={(e) => e.currentTarget.style.color = '#222'}
+                    >
+                      Плакати
+                    </h4>
                     <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
-                      {['А3', 'В3', 'А2', 'В2', 'А1', 'B1'].map(fmt => (
+                      {[
+                        { name: 'А3', preset: '36', w: '297', h: '420', kind: '1' },
+                        { name: 'В3', preset: 'b3', w: '340', h: '490', kind: '1' },
+                        { name: 'А2', preset: '15', w: '420', h: '594', kind: '1' },
+                        { name: 'В2', preset: 'b2', w: '480', h: '690', kind: '1' },
+                        { name: 'А1', preset: '16', w: '594', h: '841', kind: '1' },
+                        { name: 'B1', preset: 'b1', w: '680', h: '980', kind: '1' }
+                      ].map(item => (
                         <span
-                          key={fmt}
-                          onClick={() => { setSelectedFormat(fmt); setOffsetSubTab('sheets'); handleSelectCategory('Плакати'); }}
+                          key={item.name}
+                          onClick={() => { setOffsetSubTab('sheets'); setCardKind(item.kind); setSheetSizePreset(item.preset); setSheetCustomWidth(item.w); setSheetCustomHeight(item.h); handleSelectCategory('Плакати'); }}
                           style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
                           onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
                           onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
                         >
-                          {fmt}
+                          {item.name}
                         </span>
                       ))}
                     </div>
@@ -1353,17 +1416,27 @@ export const Calculator: React.FC = () => {
 
                   {/* 6. Сети */}
                   <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
-                    <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Сети</h4>
+                    <h4
+                      onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset('sets_a3'); setSheetCustomWidth('420'); setSheetCustomHeight('297'); handleSelectCategory('Сети'); }}
+                      style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px', cursor: 'pointer' }}
+                      onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
+                      onMouseLeave={(e) => e.currentTarget.style.color = '#222'}
+                    >
+                      Сети
+                    </h4>
                     <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
-                      {['А3', 'В3'].map(fmt => (
+                      {[
+                        { name: 'А3', preset: 'sets_a3', w: '420', h: '297', kind: '1' },
+                        { name: 'В3', preset: 'sets_b3', w: '490', h: '340', kind: '1' }
+                      ].map(item => (
                         <span
-                          key={fmt}
-                          onClick={() => { setSelectedFormat(fmt); setOffsetSubTab('sheets'); handleSelectCategory('Бланки'); }}
+                          key={item.name}
+                          onClick={() => { setOffsetSubTab('sheets'); setCardKind(item.kind); setSheetSizePreset(item.preset); setSheetCustomWidth(item.w); setSheetCustomHeight(item.h); handleSelectCategory('Сети'); }}
                           style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
                           onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
                           onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
                         >
-                          {fmt}
+                          {item.name}
                         </span>
                       ))}
                     </div>
@@ -1371,17 +1444,30 @@ export const Calculator: React.FC = () => {
 
                   {/* 7. Буклет */}
                   <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
-                    <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Буклет</h4>
+                    <h4
+                      onClick={() => { setOffsetSubTab('sheets'); setCardKind('6'); setSheetSizePreset('34'); setSheetCustomWidth('210'); setSheetCustomHeight('297'); handleSelectCategory('Буклети'); }}
+                      style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px', cursor: 'pointer' }}
+                      onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
+                      onMouseLeave={(e) => e.currentTarget.style.color = '#222'}
+                    >
+                      Буклет
+                    </h4>
                     <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
-                      {['А4 в Євро', '2Євро в Євро', 'А6', 'А5', 'А4'].map(fmt => (
+                      {[
+                        { name: 'А4 в Євро', preset: '34', w: '210', h: '297', kind: '6' },
+                        { name: '2Євро в Євро', preset: '26', w: '198', h: '210', kind: '6' },
+                        { name: 'А6', preset: '312', w: '105', h: '148', kind: '6' },
+                        { name: 'А5', preset: '32', w: '148', h: '210', kind: '6' },
+                        { name: 'А4', preset: '34', w: '210', h: '297', kind: '6' }
+                      ].map(item => (
                         <span
-                          key={fmt}
-                          onClick={() => { setSelectedFormat(fmt); setOffsetSubTab('sheets'); handleSelectCategory('Буклети'); }}
+                          key={item.name}
+                          onClick={() => { setOffsetSubTab('sheets'); setCardKind(item.kind); setSheetSizePreset(item.preset); setSheetCustomWidth(item.w); setSheetCustomHeight(item.h); handleSelectCategory('Буклети'); }}
                           style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
                           onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
                           onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
                         >
-                          {fmt}
+                          {item.name}
                         </span>
                       ))}
                     </div>
@@ -1389,12 +1475,19 @@ export const Calculator: React.FC = () => {
 
                   {/* 8. Каталог */}
                   <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
-                    <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Каталог</h4>
+                    <h4
+                      onClick={() => { setOffsetSubTab('multipage'); handleSelectCategory('Книги'); }}
+                      style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px', cursor: 'pointer' }}
+                      onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
+                      onMouseLeave={(e) => e.currentTarget.style.color = '#222'}
+                    >
+                      Каталог
+                    </h4>
                     <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
                       {['Скоба', 'Пружина', 'Клей'].map(st => (
                         <span
                           key={st}
-                          onClick={() => { handleSelectCategory('Книги'); }}
+                          onClick={() => { setOffsetSubTab('multipage'); handleSelectCategory('Книги'); }}
                           style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
                           onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
                           onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
@@ -1407,17 +1500,28 @@ export const Calculator: React.FC = () => {
 
                   {/* 9. Блокнот */}
                   <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
-                    <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Блокнот</h4>
+                    <h4
+                      onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset('32'); setSheetCustomWidth('148'); setSheetCustomHeight('210'); handleSelectCategory('Блокноти'); }}
+                      style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px', cursor: 'pointer' }}
+                      onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
+                      onMouseLeave={(e) => e.currentTarget.style.color = '#222'}
+                    >
+                      Блокнот
+                    </h4>
                     <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
-                      {['А6', 'А5', 'А4'].map(fmt => (
+                      {[
+                        { name: 'А6', preset: '312', w: '105', h: '148' },
+                        { name: 'А5', preset: '32', w: '148', h: '210' },
+                        { name: 'А4', preset: '34', w: '210', h: '297' }
+                      ].map(item => (
                         <span
-                          key={fmt}
-                          onClick={() => { setSelectedFormat(fmt); setOffsetSubTab('sheets'); handleSelectCategory('Блокноти'); }}
+                          key={item.name}
+                          onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset(item.preset); setSheetCustomWidth(item.w); setSheetCustomHeight(item.h); handleSelectCategory('Блокноти'); }}
                           style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
                           onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
                           onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
                         >
-                          {fmt}
+                          {item.name}
                         </span>
                       ))}
                     </div>
@@ -1425,17 +1529,29 @@ export const Calculator: React.FC = () => {
 
                   {/* 10. Наліпка */}
                   <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
-                    <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Наліпка</h4>
+                    <h4
+                      onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset('1'); setSheetCustomWidth('90'); setSheetCustomHeight('50'); handleSelectCategory('Наклейки'); }}
+                      style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px', cursor: 'pointer' }}
+                      onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
+                      onMouseLeave={(e) => e.currentTarget.style.color = '#222'}
+                    >
+                      Наліпка
+                    </h4>
                     <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
-                      {['90х50', '50х50', 'Кругла', 'Овальна'].map(fmt => (
+                      {[
+                        { name: '90х50', preset: '1', w: '90', h: '50', kind: '1' },
+                        { name: '50х50', preset: '5', w: '50', h: '50', kind: '2' },
+                        { name: 'Кругла', preset: '5', w: '50', h: '50', kind: '7' },
+                        { name: 'Овальна', preset: '1', w: '90', h: '50', kind: '8' }
+                      ].map(item => (
                         <span
-                          key={fmt}
-                          onClick={() => { setSelectedFormat(fmt); setOffsetSubTab('sheets'); handleSelectCategory('Наклейки'); }}
+                          key={item.name}
+                          onClick={() => { setOffsetSubTab('sheets'); setCardKind(item.kind); setSheetSizePreset(item.preset); setSheetCustomWidth(item.w); setSheetCustomHeight(item.h); handleSelectCategory('Наклейки'); }}
                           style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
                           onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
                           onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
                         >
-                          {fmt}
+                          {item.name}
                         </span>
                       ))}
                     </div>
@@ -1443,12 +1559,19 @@ export const Calculator: React.FC = () => {
 
                   {/* 11. Папка А4 */}
                   <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
-                    <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Папка А4</h4>
+                    <h4
+                      onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset('34'); setSheetCustomWidth('210'); setSheetCustomHeight('297'); handleSelectCategory('Папки'); }}
+                      style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px', cursor: 'pointer' }}
+                      onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
+                      onMouseLeave={(e) => e.currentTarget.style.color = '#222'}
+                    >
+                      Папка А4
+                    </h4>
                     <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
                       {['Без корінця', 'Корінець 5мм', 'З резинкою'].map(fmt => (
                         <span
                           key={fmt}
-                          onClick={() => { handleSelectCategory('Папки'); }}
+                          onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset('34'); setSheetCustomWidth('210'); setSheetCustomHeight('297'); handleSelectCategory('Папки'); }}
                           style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
                           onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
                           onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
@@ -1459,19 +1582,30 @@ export const Calculator: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* 12. Листівка */}
+                  {/* 12. Листівка (проста/складна/кругла) */}
                   <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
-                    <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Листівка</h4>
+                    <h4
+                      onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset('32'); setSheetCustomWidth('148'); setSheetCustomHeight('210'); handleSelectCategory('Листівки'); }}
+                      style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px', cursor: 'pointer' }}
+                      onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
+                      onMouseLeave={(e) => e.currentTarget.style.color = '#222'}
+                    >
+                      Листівка
+                    </h4>
                     <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
-                      {['Одинарна', 'Складна', 'Кругла'].map(fmt => (
+                      {[
+                        { name: 'Одинарна', preset: '32', w: '148', h: '210', kind: '1' },
+                        { name: 'Складна', preset: '34', w: '210', h: '297', kind: '6' },
+                        { name: 'Кругла', preset: '37', w: '70', h: '70', kind: '7' }
+                      ].map(item => (
                         <span
-                          key={fmt}
-                          onClick={() => { setOffsetSubTab('sheets'); handleSelectCategory('Листівки'); }}
+                          key={item.name}
+                          onClick={() => { setOffsetSubTab('sheets'); setCardKind(item.kind); setSheetSizePreset(item.preset); setSheetCustomWidth(item.w); setSheetCustomHeight(item.h); handleSelectCategory('Листівки'); }}
                           style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
                           onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
                           onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
                         >
-                          {fmt}
+                          {item.name}
                         </span>
                       ))}
                     </div>
@@ -1479,9 +1613,16 @@ export const Calculator: React.FC = () => {
 
                   {/* 13. Календарні сітки */}
                   <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
-                    <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 8px' }}>Календарні сітки</h4>
+                    <h4
+                      onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset('34'); setSheetCustomWidth('210'); setSheetCustomHeight('297'); handleSelectCategory('Календарі кишенькові'); }}
+                      style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 8px', cursor: 'pointer' }}
+                      onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
+                      onMouseLeave={(e) => e.currentTarget.style.color = '#222'}
+                    >
+                      Календарні сітки
+                    </h4>
                     <div 
-                      onClick={() => { setOffsetSubTab('sheets'); handleSelectCategory('Календарі'); }}
+                      onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset('34'); setSheetCustomWidth('210'); setSheetCustomHeight('297'); handleSelectCategory('Календарі кишенькові'); }}
                       style={{ cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '6px' }}
                     >
                       <Calendar size={22} style={{ color: '#c00' }} />
@@ -1491,17 +1632,29 @@ export const Calculator: React.FC = () => {
 
                   {/* 14. Друк в листах */}
                   <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
-                    <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Друк в листах</h4>
+                    <h4
+                      onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset('15'); setSheetCustomWidth('420'); setSheetCustomHeight('594'); handleSelectCategory('Бланки'); }}
+                      style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px', cursor: 'pointer' }}
+                      onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
+                      onMouseLeave={(e) => e.currentTarget.style.color = '#222'}
+                    >
+                      Друк в листах
+                    </h4>
                     <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
-                      {['А2', 'В2', 'А1', 'В1'].map(fmt => (
+                      {[
+                        { name: 'А2', preset: '15', w: '420', h: '594' },
+                        { name: 'В2', preset: 'b2', w: '480', h: '690' },
+                        { name: 'А1', preset: '16', w: '594', h: '841' },
+                        { name: 'В1', preset: 'b1', w: '680', h: '980' }
+                      ].map(item => (
                         <span
-                          key={fmt}
-                          onClick={() => { setSelectedFormat(fmt); setOffsetSubTab('sheets'); handleSelectCategory('Бланки'); }}
+                          key={item.name}
+                          onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset(item.preset); setSheetCustomWidth(item.w); setSheetCustomHeight(item.h); handleSelectCategory('Бланки'); }}
                           style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
                           onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
                           onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
                         >
-                          {fmt}
+                          {item.name}
                         </span>
                       ))}
                     </div>
@@ -1509,17 +1662,29 @@ export const Calculator: React.FC = () => {
 
                   {/* 15. Конверт */}
                   <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
-                    <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Конверт</h4>
+                    <h4
+                      onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset('25'); setSheetCustomWidth('110'); setSheetCustomHeight('220'); handleSelectCategory('Бланки'); }}
+                      style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px', cursor: 'pointer' }}
+                      onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
+                      onMouseLeave={(e) => e.currentTarget.style.color = '#222'}
+                    >
+                      Конверт
+                    </h4>
                     <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
-                      {['Євро', 'С6', 'С5', 'С4'].map(fmt => (
+                      {[
+                        { name: 'Євро', preset: '25', w: '110', h: '220' },
+                        { name: 'С6', preset: '21', w: '114', h: '162' },
+                        { name: 'С5', preset: '32', w: '162', h: '229' },
+                        { name: 'С4', preset: '34', w: '229', h: '324' }
+                      ].map(item => (
                         <span
-                          key={fmt}
-                          onClick={() => { handleSelectCategory('Бланки'); }}
+                          key={item.name}
+                          onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset(item.preset); setSheetCustomWidth(item.w); setSheetCustomHeight(item.h); handleSelectCategory('Бланки'); }}
                           style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
                           onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
                           onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
                         >
-                          {fmt}
+                          {item.name}
                         </span>
                       ))}
                     </div>
@@ -1527,12 +1692,19 @@ export const Calculator: React.FC = () => {
 
                   {/* 16. Хенгери */}
                   <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
-                    <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Хенгери</h4>
+                    <h4
+                      onClick={() => { setOffsetSubTab('felling'); handleSelectCategory('Наклейки'); }}
+                      style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px', cursor: 'pointer' }}
+                      onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
+                      onMouseLeave={(e) => e.currentTarget.style.color = '#222'}
+                    >
+                      Хенгери
+                    </h4>
                     <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
                       {['вид 1', 'вид 2'].map(v => (
                         <span
                           key={v}
-                          onClick={() => { handleSelectCategory('Наклейки'); }}
+                          onClick={() => { setOffsetSubTab('felling'); handleSelectCategory('Наклейки'); }}
                           style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
                           onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
                           onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
@@ -1545,17 +1717,27 @@ export const Calculator: React.FC = () => {
 
                   {/* 17. Календарі висічні */}
                   <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
-                    <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Календарі висічні</h4>
+                    <h4
+                      onClick={() => { setOffsetSubTab('felling'); setSheetSizePreset('160'); setSheetCustomWidth('210'); setSheetCustomHeight('300'); handleSelectCategory('Календарі кишенькові'); }}
+                      style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px', cursor: 'pointer' }}
+                      onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
+                      onMouseLeave={(e) => e.currentTarget.style.color = '#222'}
+                    >
+                      Календарі висічні
+                    </h4>
                     <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
-                      {['будинок', 'пірамідка'].map(v => (
+                      {[
+                        { name: 'будинок', preset: '160', w: '210', h: '300' },
+                        { name: 'пірамідка', preset: '161', w: '305', h: '134' }
+                      ].map(item => (
                         <span
-                          key={v}
-                          onClick={() => { handleSelectCategory('Календарі'); }}
+                          key={item.name}
+                          onClick={() => { setOffsetSubTab('felling'); setSheetSizePreset(item.preset); setSheetCustomWidth(item.w); setSheetCustomHeight(item.h); handleSelectCategory('Календарі кишенькові'); }}
                           style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
                           onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
                           onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
                         >
-                          🏠 {v}
+                          🏠 {item.name}
                         </span>
                       ))}
                     </div>
@@ -1563,17 +1745,31 @@ export const Calculator: React.FC = () => {
 
                   {/* 18. Пакувальний папір */}
                   <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
-                    <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Пакувальний папір</h4>
+                    <h4
+                      onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset('36'); setSheetCustomWidth('297'); setSheetCustomHeight('420'); handleSelectCategory('Бланки'); }}
+                      style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px', cursor: 'pointer' }}
+                      onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
+                      onMouseLeave={(e) => e.currentTarget.style.color = '#222'}
+                    >
+                      Пакувальний папір
+                    </h4>
                     <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
-                      {['А3', 'В3', 'А2', 'В2', 'А1', 'B1'].map(fmt => (
+                      {[
+                        { name: 'А3', preset: '36', w: '297', h: '420' },
+                        { name: 'В3', preset: 'b3', w: '340', h: '490' },
+                        { name: 'А2', preset: '15', w: '420', h: '594' },
+                        { name: 'В2', preset: 'b2', w: '480', h: '690' },
+                        { name: 'А1', preset: '16', w: '594', h: '841' },
+                        { name: 'B1', preset: 'b1', w: '680', h: '980' }
+                      ].map(item => (
                         <span
-                          key={fmt}
-                          onClick={() => { setSelectedFormat(fmt); setOffsetSubTab('sheets'); handleSelectCategory('Бланки'); }}
+                          key={item.name}
+                          onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset(item.preset); setSheetCustomWidth(item.w); setSheetCustomHeight(item.h); handleSelectCategory('Бланки'); }}
                           style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
                           onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
                           onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
                         >
-                          {fmt}
+                          {item.name}
                         </span>
                       ))}
                     </div>
