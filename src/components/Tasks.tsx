@@ -464,16 +464,36 @@ export const Tasks: React.FC = () => {
                       <div style={{ width: `${progressPercent}%`, height: '100%', backgroundColor: progressPercent === 100 ? 'var(--success)' : 'var(--primary)', transition: 'width 0.3s ease' }} />
                     </div>
 
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                       {task.checklist.map(item => (
-                        <label key={item.id} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: item.checked ? 'var(--text-medium)' : 'var(--text-dark)', cursor: 'pointer' }}>
+                        <label 
+                          key={item.id} 
+                          style={{ 
+                            display: 'flex', 
+                            alignItems: 'center', 
+                            gap: '10px', 
+                            fontSize: '13px', 
+                            color: item.checked ? 'var(--text-medium)' : 'var(--text-dark)', 
+                            cursor: 'pointer',
+                            padding: '2px 0'
+                          }}
+                        >
                           <input 
                             type="checkbox"
                             checked={item.checked}
                             onChange={() => toggleChecklistItem(task.id, item.id)}
-                            style={{ cursor: 'pointer' }}
+                            style={{ 
+                              width: '16px', 
+                              height: '16px', 
+                              minWidth: '16px', 
+                              margin: 0, 
+                              cursor: 'pointer',
+                              accentColor: 'var(--primary)'
+                            }}
                           />
-                          <span style={{ textDecoration: item.checked ? 'line-through' : 'none' }}>{item.text}</span>
+                          <span style={{ textDecoration: item.checked ? 'line-through' : 'none', flexGrow: 1, lineHeight: '1.4' }}>
+                            {item.text}
+                          </span>
                         </label>
                       ))}
                     </div>

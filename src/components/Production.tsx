@@ -386,9 +386,6 @@ export const Production: React.FC = () => {
                     </td>
                   </tr>
                 
-              
-
-
                 ) : (
                   orders.map(order => {
                     const client = clients.find(c => c.id === order.clientId);
