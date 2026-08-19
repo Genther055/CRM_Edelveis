@@ -55,11 +55,12 @@ export const Calculator: React.FC = () => {
   const [offsetSubTab, setOffsetSubTab] = useState<'overview' | 'sheets' | 'felling' | 'multipage' | 'custom'>('overview');
 
   // Sheet Offset Calculator specific states
-  const [sheetSizePreset, setSheetSizePreset] = useState<string>('23'); // Default A4 (210x297)
-  const [sheetCustomWidth, setSheetCustomWidth] = useState<string>('210');
-  const [sheetCustomHeight, setSheetCustomHeight] = useState<string>('297');
+  const [sheetSizePreset, setSheetSizePreset] = useState<string>('1'); // Default Business Card 90x50
+  const [sheetCustomWidth, setSheetCustomWidth] = useState<string>('90');
+  const [sheetCustomHeight, setSheetCustomHeight] = useState<string>('50');
   const [sheetUnit, setSheetUnit] = useState<'mm' | 'cm'>('mm');
   const [sheetOrientation, setSheetOrientation] = useState<'horiz' | 'vert'>('horiz');
+  const [cardKind, setCardKind] = useState<string>('1'); // '1': Стандартні, '2': Квадратні, '6': Складні, '7': Круг, '8': Овал, '9': Заокругленні кути
 
   // Die-cut (Felling) Offset Calculator specific states
   const [fellingForm, setFellingForm] = useState<string>('1'); // '1': Стандартна, '2': Кругла, '3': Овальна, '4': Прямокутна, '5': Етикетка
@@ -1605,6 +1606,52 @@ export const Calculator: React.FC = () => {
                     </button>
                   </div>
 
+                  {/* Business Card Kind Selection Bar (Вид візитівки) */}
+                  <div style={{ backgroundColor: '#ffffff', padding: '16px 20px', borderRadius: '4px', border: '1px solid #ddd', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    <h4 style={{ fontSize: '15px', fontWeight: '800', color: '#222', margin: 0 }}>Вид візитівки / листової поліграфії</h4>
+                    <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                      {[
+                        { id: '1', name: 'Стандартні', img: 'https://sborka.ua/cside/img/ico_size/products/viz.png', defaultSize: '1', w: '90', h: '50' },
+                        { id: '2', name: 'Квадратні', img: 'https://sborka.ua/cside/img/ico_size/products/kvadr.png', defaultSize: '5', w: '50', h: '50' },
+                        { id: '6', name: 'Складні', img: 'https://sborka.ua/cside/img/ico_size/products/big.png', defaultSize: '161', w: '90', h: '50' },
+                        { id: '7', name: 'Круг', img: 'https://sborka.ua/cside/img/ico_size/products/circle.png', defaultSize: '1', w: '50', h: '50' },
+                        { id: '8', name: 'Овал', img: 'https://sborka.ua/cside/img/Oval/31_21_n108.png', defaultSize: '1', w: '90', h: '50' },
+                        { id: '9', name: 'Заокругленні кути', img: 'https://sborka.ua/cside/img/ico_size/products/cart.png', defaultSize: '1', w: '90', h: '50' },
+                      ].map(kindItem => {
+                        const isActive = cardKind === kindItem.id;
+                        return (
+                          <div
+                            key={kindItem.id}
+                            onClick={() => {
+                              setCardKind(kindItem.id);
+                              setSheetSizePreset(kindItem.defaultSize);
+                              setSheetCustomWidth(kindItem.w);
+                              setSheetCustomHeight(kindItem.h);
+                            }}
+                            style={{
+                              cursor: 'pointer',
+                              border: isActive ? '2px solid #c00' : '1px solid #ddd',
+                              backgroundColor: isActive ? '#fff0f0' : '#f9f9f9',
+                              borderRadius: '6px',
+                              padding: '8px 14px',
+                              display: 'flex',
+                              flexDirection: 'column',
+                              alignItems: 'center',
+                              gap: '6px',
+                              minWidth: '110px',
+                              transition: 'all 0.15s ease'
+                            }}
+                          >
+                            <img src={kindItem.img} alt={kindItem.name} style={{ width: '55px', height: '40px', objectFit: 'contain' }} />
+                            <span style={{ fontSize: '12px', fontWeight: isActive ? '700' : '600', color: isActive ? '#c00' : '#333', textAlign: 'center' }}>
+                              {kindItem.name}
+                            </span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
                   {/* Size Selector and Product Preview Block */}
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '20px', backgroundColor: '#ffffff', padding: '20px', borderRadius: '4px', border: '1px solid #ddd' }}>
                     {/* Left: Size Controls */}
@@ -1720,6 +1767,7 @@ export const Calculator: React.FC = () => {
                         height: sheetOrientation === 'horiz' ? '120px' : '180px',
                         border: '2px dashed #c00',
                         backgroundColor: '#ffffff',
+                        borderRadius: cardKind === '7' || cardKind === '8' ? '50%' : cardKind === '9' ? '16px' : '4px',
                         display: 'flex',
                         alignItems: 'center',
                         justifyContent: 'center',
