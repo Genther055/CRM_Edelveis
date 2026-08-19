@@ -46,6 +46,46 @@ export const Calculator: React.FC = () => {
   // Main Category Tab: 'products' | 'offset' | 'digital' | 'wide' | 'roll' | 'films'
   const [mainCategoryTab, setMainCategoryTab] = useState<'products' | 'offset' | 'digital' | 'wide' | 'roll' | 'films'>('products');
 
+  // Sub-tabs in Offset printing: 'overview' | 'sheets' | 'felling' | 'multipage' | 'custom'
+  const [offsetSubTab, setOffsetSubTab] = useState<'overview' | 'sheets' | 'felling' | 'multipage' | 'custom'>('overview');
+
+  // Sheet Offset Calculator specific states
+  const [sheetSizePreset, setSheetSizePreset] = useState<string>('23'); // Default A4 (210x297)
+  const [sheetCustomWidth, setSheetCustomWidth] = useState<string>('210');
+  const [sheetCustomHeight, setSheetCustomHeight] = useState<string>('297');
+  const [sheetUnit, setSheetUnit] = useState<'mm' | 'cm'>('mm');
+  const [sheetOrientation, setSheetOrientation] = useState<'horiz' | 'vert'>('horiz');
+
+  // Postpress options states
+  const [showPostpressAccordion, setShowPostpressAccordion] = useState<boolean>(false);
+  const [postPersonalization, setPostPersonalization] = useState<string>('0');
+  const [postLuvers, setPostLuvers] = useState<string>('0');
+  const [postLuversCount, setPostLuversCount] = useState<number>(1);
+  const [postCorners, setPostCorners] = useState<string>('0');
+  const [postGluing, setPostGluing] = useState<string>('0');
+  const [postGluingSide, setPostGluingSide] = useState<string>('1');
+  const [postDrilling, setPostDrilling] = useState<string>('0');
+  const [postDrillingDia, setPostDrillingDia] = useState<string>('5');
+  const [postFolding, setPostFolding] = useState<string>('0');
+  const [postFoldingOffset, setPostFoldingOffset] = useState<string>('0');
+  const [postCreasing, setPostCreasing] = useState<string>('0');
+  const [postPerforation, setPostPerforation] = useState<string>('0');
+  const [postPackingText, setPostPackingText] = useState<string>('');
+
+  const [sheetSetsCount, setSheetSetsCount] = useState<number>(1);
+
+  // Filters for Sheet Calculator
+  const [selectedMaterials, setSelectedMaterials] = useState<string[]>(['80', '130', '300']);
+  const [selectedCoverings, setSelectedCoverings] = useState<string[]>(['0', '7', '10']);
+  const [selectedPrintColors, setSelectedPrintColors] = useState<string[]>(['4+0', '4+4']);
+
+  // Table options
+  const [includeDelivery, setIncludeDelivery] = useState<boolean>(false);
+  const [priceCostVar, setPriceCostVar] = useState<'per_item' | 'per_tirazh'>('per_tirazh');
+
+  // Active info modal state ('instruction' | 'terms' | 'materials' | 'samples' | 'review' | 'bug' | null)
+  const [activeInfoModal, setActiveInfoModal] = useState<string | null>(null);
+
   // Calculation mode: 'auto' (Adapted Business Logic) | 'operations' (Pooperatsiyniy 1C)
   const [calcMode, setCalcMode] = useState<'auto' | 'operations'>('auto');
 
@@ -1119,380 +1159,1079 @@ export const Calculator: React.FC = () => {
             </div>
           )}
 
-          {/* TAB 2: OFFSET PRINTING (Exact Sborka 4-Column Layout) */}
+          {/* TAB 2: OFFSET PRINTING (Overview & Sheet Detailed Calculator) */}
           {mainCategoryTab === 'offset' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-              {/* 4 Technology Header Columns */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '15px' }}>
-                {[
-                  { title: 'ЛИСТОВА', desc: 'Візитівки, листівки, бланки, буклети, наліпки, плакати…', cat: 'Листівки' },
-                  { title: 'ВИСІЧНА', desc: 'Фігурні наліпки, візитівки, листівки, підставки, хенгери…', cat: 'Наклейки' },
-                  { title: 'БАГАТОСТОРОННЯ', desc: 'Брошури, журнали, каталоги, меню, звіти…', cat: 'Книги' },
-                  { title: 'ІНДИВІДУАЛЬНЕ ЗАМОВЛЕННЯ', desc: 'Замовити прорахунок комплексного або нестандартного замовлення', cat: 'Бланки' }
-                ].map((item, i) => (
-                  <div
-                    key={i}
-                    onClick={() => handleSelectCategory(item.cat as any)}
-                    style={{
-                      cursor: 'pointer',
-                      border: '1px solid #c8c7c7',
-                      backgroundColor: '#f2f2f2',
-                      textAlign: 'center',
-                      borderRadius: '4px',
-                      overflow: 'hidden',
-                      transition: 'all 0.2s ease'
-                    }}
-                    onMouseEnter={(e) => {
-                      const h = e.currentTarget.querySelector('.type-hdr') as HTMLElement;
-                      if (h) { h.style.backgroundColor = '#666666'; h.style.color = '#ffffff'; }
-                    }}
-                    onMouseLeave={(e) => {
-                      const h = e.currentTarget.querySelector('.type-hdr') as HTMLElement;
-                      if (h) { h.style.backgroundColor = '#dddddd'; h.style.color = '#333333'; }
-                    }}
+              {/* Offset Sub-Tab Navigation Header */}
+              {offsetSubTab === 'sheets' ? (
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#ffffff', padding: '12px 18px', borderRadius: '4px', border: '1px solid #ddd' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '14px', fontWeight: '700', color: '#333' }}>
+                    <span onClick={() => setOffsetSubTab('overview')} style={{ color: '#c00', cursor: 'pointer' }}>Офсетний друк</span>
+                    <span>/</span>
+                    <span style={{ color: '#666' }}>Листова (Збірні спуски)</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setOffsetSubTab('overview')}
+                    style={{ border: '1px solid #ccc', backgroundColor: '#f8f9fa', padding: '6px 14px', borderRadius: '4px', cursor: 'pointer', fontSize: '13px', fontWeight: '600' }}
                   >
-                    <div 
-                      className="type-hdr"
+                    ← Назад до категорій
+                  </button>
+                </div>
+              ) : (
+                /* 4 Technology Header Columns */
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '15px' }}>
+                  {[
+                    { title: 'ЛИСТОВА', desc: 'Візитівки, листівки, бланки, буклети, наліпки, плакати…', subTab: 'sheets' },
+                    { title: 'ВИСІЧНА', desc: 'Фігурні наліпки, візитівки, листівки, підставки, хенгери…', subTab: 'sheets' },
+                    { title: 'БАГАТОСТОРОННЯ', desc: 'Брошури, журнали, каталоги, меню, звіти…', subTab: 'sheets' },
+                    { title: 'ІНДИВІДУАЛЬНЕ ЗАМОВЛЕННЯ', desc: 'Замовити прорахунок комплексного або нестандартного замовлення', subTab: 'sheets' }
+                  ].map((item, i) => (
+                    <div
+                      key={i}
+                      onClick={() => setOffsetSubTab(item.subTab as any)}
                       style={{
-                        backgroundColor: '#dddddd',
-                        color: '#333333',
-                        fontWeight: '700',
-                        fontSize: '15px',
-                        padding: '12px 10px',
-                        textTransform: 'uppercase',
-                        letterSpacing: '0.5px',
+                        cursor: 'pointer',
+                        border: '1px solid #c8c7c7',
+                        backgroundColor: '#f2f2f2',
+                        textAlign: 'center',
+                        borderRadius: '4px',
+                        overflow: 'hidden',
                         transition: 'all 0.2s ease'
                       }}
+                      onMouseEnter={(e) => {
+                        const h = e.currentTarget.querySelector('.type-hdr') as HTMLElement;
+                        if (h) { h.style.backgroundColor = '#666666'; h.style.color = '#ffffff'; }
+                      }}
+                      onMouseLeave={(e) => {
+                        const h = e.currentTarget.querySelector('.type-hdr') as HTMLElement;
+                        if (h) { h.style.backgroundColor = '#dddddd'; h.style.color = '#333333'; }
+                      }}
                     >
-                      {item.title}
+                      <div 
+                        className="type-hdr"
+                        style={{
+                          backgroundColor: '#dddddd',
+                          color: '#333333',
+                          fontWeight: '700',
+                          fontSize: '15px',
+                          padding: '12px 10px',
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.5px',
+                          transition: 'all 0.2s ease'
+                        }}
+                      >
+                        {item.title}
+                      </div>
+                      <div style={{ padding: '14px 16px', fontSize: '11px', color: '#555555', lineHeight: '1.4' }}>
+                        {item.desc}
+                      </div>
                     </div>
-                    <div style={{ padding: '14px 16px', fontSize: '11px', color: '#555555', lineHeight: '1.4' }}>
-                      {item.desc}
+                  ))}
+                </div>
+              )}
+
+              {/* OVERVIEW SUBTAB: Sborka 18-Card Product Grid */}
+              {offsetSubTab === 'overview' && (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '15px' }}>
+                  {/* 1. Візитівка */}
+                  <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
+                    <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Візитівка</h4>
+                    <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
+                      {['90х50', '85х55', '50х50', 'Кругла'].map(fmt => (
+                        <span
+                          key={fmt}
+                          onClick={() => { setSelectedFormat(fmt); setOffsetSubTab('sheets'); handleSelectCategory('Візитки'); }}
+                          style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
+                          onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
+                          onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
+                        >
+                          {fmt}
+                        </span>
+                      ))}
                     </div>
                   </div>
-                ))}
-              </div>
 
-              {/* 4-Column Sborka Product Cards Grid */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '15px' }}>
-                {/* 1. Візитівка */}
-                <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
-                  <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Візитівка</h4>
-                  <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
-                    {['90х50', '85х55', '50х50', 'Кругла'].map(fmt => (
-                      <span
-                        key={fmt}
-                        onClick={() => { setSelectedFormat(fmt); handleSelectCategory('Візитки'); }}
-                        style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
-                        onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
-                        onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
+                  {/* 2. Календар */}
+                  <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
+                    <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Календар</h4>
+                    <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
+                      {['100х70', '90х60', '70х70'].map(fmt => (
+                        <span
+                          key={fmt}
+                          onClick={() => { setSelectedFormat(fmt); setOffsetSubTab('sheets'); handleSelectCategory('Календарики кишенькові'); }}
+                          style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
+                          onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
+                          onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
+                        >
+                          {fmt}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* 3. Флаєр */}
+                  <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
+                    <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Флаєр</h4>
+                    <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
+                      {['210х99', '210х198', '99х99'].map(fmt => (
+                        <span
+                          key={fmt}
+                          onClick={() => { setSelectedFormat(fmt); setOffsetSubTab('sheets'); handleSelectCategory('Флаєри'); }}
+                          style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
+                          onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
+                          onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
+                        >
+                          {fmt}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* 4. Листівка */}
+                  <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
+                    <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Листівка</h4>
+                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
+                      {['А7', 'А6', 'А5', 'А4', 'А3', 'Кругла'].map(fmt => (
+                        <span
+                          key={fmt}
+                          onClick={() => { setSelectedFormat(fmt); setOffsetSubTab('sheets'); handleSelectCategory('Листівки'); }}
+                          style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
+                          onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
+                          onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
+                        >
+                          {fmt}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* 5. Плакати */}
+                  <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
+                    <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Плакати</h4>
+                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
+                      {['А3', 'В3', 'А2', 'В2', 'А1', 'B1'].map(fmt => (
+                        <span
+                          key={fmt}
+                          onClick={() => { setSelectedFormat(fmt); setOffsetSubTab('sheets'); handleSelectCategory('Плакати'); }}
+                          style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
+                          onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
+                          onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
+                        >
+                          {fmt}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* 6. Сети */}
+                  <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
+                    <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Сети</h4>
+                    <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
+                      {['А3', 'В3'].map(fmt => (
+                        <span
+                          key={fmt}
+                          onClick={() => { setSelectedFormat(fmt); setOffsetSubTab('sheets'); handleSelectCategory('Бланки'); }}
+                          style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
+                          onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
+                          onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
+                        >
+                          {fmt}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* 7. Буклет */}
+                  <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
+                    <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Буклет</h4>
+                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
+                      {['А4 в Євро', '2Євро в Євро', 'А6', 'А5', 'А4'].map(fmt => (
+                        <span
+                          key={fmt}
+                          onClick={() => { setSelectedFormat(fmt); setOffsetSubTab('sheets'); handleSelectCategory('Буклети'); }}
+                          style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
+                          onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
+                          onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
+                        >
+                          {fmt}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* 8. Каталог */}
+                  <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
+                    <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Каталог</h4>
+                    <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
+                      {['Скоба', 'Пружина', 'Клей'].map(st => (
+                        <span
+                          key={st}
+                          onClick={() => { handleSelectCategory('Книги'); }}
+                          style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
+                          onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
+                          onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
+                        >
+                          {st}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* 9. Блокнот */}
+                  <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
+                    <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Блокнот</h4>
+                    <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
+                      {['А6', 'А5', 'А4'].map(fmt => (
+                        <span
+                          key={fmt}
+                          onClick={() => { setSelectedFormat(fmt); setOffsetSubTab('sheets'); handleSelectCategory('Блокноти'); }}
+                          style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
+                          onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
+                          onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
+                        >
+                          {fmt}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* 10. Наліпка */}
+                  <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
+                    <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Наліпка</h4>
+                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
+                      {['90х50', '50х50', 'Кругла', 'Овальна'].map(fmt => (
+                        <span
+                          key={fmt}
+                          onClick={() => { setSelectedFormat(fmt); setOffsetSubTab('sheets'); handleSelectCategory('Наклейки'); }}
+                          style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
+                          onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
+                          onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
+                        >
+                          {fmt}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* 11. Папка А4 */}
+                  <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
+                    <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Папка А4</h4>
+                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
+                      {['Без корінця', 'Корінець 5мм', 'З резинкою'].map(fmt => (
+                        <span
+                          key={fmt}
+                          onClick={() => { handleSelectCategory('Папки'); }}
+                          style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
+                          onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
+                          onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
+                        >
+                          {fmt}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* 12. Листівка */}
+                  <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
+                    <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Листівка</h4>
+                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
+                      {['Одинарна', 'Складна', 'Кругла'].map(fmt => (
+                        <span
+                          key={fmt}
+                          onClick={() => { setOffsetSubTab('sheets'); handleSelectCategory('Листівки'); }}
+                          style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
+                          onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
+                          onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
+                        >
+                          {fmt}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* 13. Календарні сітки */}
+                  <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
+                    <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 8px' }}>Календарні сітки</h4>
+                    <div 
+                      onClick={() => { setOffsetSubTab('sheets'); handleSelectCategory('Календарі'); }}
+                      style={{ cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '6px' }}
+                    >
+                      <Calendar size={22} style={{ color: '#c00' }} />
+                      <span style={{ fontSize: '12px', fontWeight: '600', color: '#333' }}>Сітки 2026</span>
+                    </div>
+                  </div>
+
+                  {/* 14. Друк в листах */}
+                  <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
+                    <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Друк в листах</h4>
+                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
+                      {['А2', 'В2', 'А1', 'В1'].map(fmt => (
+                        <span
+                          key={fmt}
+                          onClick={() => { setSelectedFormat(fmt); setOffsetSubTab('sheets'); handleSelectCategory('Бланки'); }}
+                          style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
+                          onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
+                          onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
+                        >
+                          {fmt}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* 15. Конверт */}
+                  <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
+                    <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Конверт</h4>
+                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
+                      {['Євро', 'С6', 'С5', 'С4'].map(fmt => (
+                        <span
+                          key={fmt}
+                          onClick={() => { handleSelectCategory('Бланки'); }}
+                          style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
+                          onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
+                          onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
+                        >
+                          {fmt}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* 16. Хенгери */}
+                  <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
+                    <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Хенгери</h4>
+                    <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
+                      {['вид 1', 'вид 2'].map(v => (
+                        <span
+                          key={v}
+                          onClick={() => { handleSelectCategory('Наклейки'); }}
+                          style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
+                          onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
+                          onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
+                        >
+                          🔖 {v}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* 17. Календарі висічні */}
+                  <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
+                    <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Календарі висічні</h4>
+                    <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
+                      {['будинок', 'пірамідка'].map(v => (
+                        <span
+                          key={v}
+                          onClick={() => { handleSelectCategory('Календарі'); }}
+                          style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
+                          onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
+                          onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
+                        >
+                          🏠 {v}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* 18. Пакувальний папір */}
+                  <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
+                    <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Пакувальний папір</h4>
+                    <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
+                      {['А3', 'В3', 'А2', 'В2', 'А1', 'B1'].map(fmt => (
+                        <span
+                          key={fmt}
+                          onClick={() => { setSelectedFormat(fmt); setOffsetSubTab('sheets'); handleSelectCategory('Бланки'); }}
+                          style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
+                          onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
+                          onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
+                        >
+                          {fmt}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* DETAILED SHEET CALCULATOR (Офсетний друк / Листова) */}
+              {offsetSubTab === 'sheets' && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                  {/* Top Information Buttons Bar */}
+                  <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap', backgroundColor: '#ffffff', padding: '12px 16px', borderRadius: '4px', border: '1px solid #ddd' }}>
+                    <button type="button" onClick={() => setActiveInfoModal('instr')} style={{ border: 'none', background: 'none', cursor: 'pointer', fontSize: '13px', fontWeight: '600', color: '#333', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      📄 Інструкція по оформленню замовлення
+                    </button>
+                    <button type="button" onClick={() => setActiveInfoModal('terms')} style={{ border: 'none', background: 'none', cursor: 'pointer', fontSize: '13px', fontWeight: '600', color: '#333', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      ⏱️ Терміни друку
+                    </button>
+                    <button type="button" onClick={() => setActiveInfoModal('materials')} style={{ border: 'none', background: 'none', cursor: 'pointer', fontSize: '13px', fontWeight: '600', color: '#333', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      📚 Матеріали
+                    </button>
+                    <button type="button" onClick={() => setActiveInfoModal('samples')} style={{ border: 'none', background: 'none', cursor: 'pointer', fontSize: '13px', fontWeight: '600', color: '#333', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      🏷️ Зразки матеріалів з друком
+                    </button>
+                    <button type="button" onClick={() => setActiveInfoModal('review')} style={{ border: 'none', background: 'none', cursor: 'pointer', fontSize: '13px', fontWeight: '600', color: '#333', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      💬 Ваш відгук
+                    </button>
+                    <button type="button" onClick={() => setActiveInfoModal('bug')} style={{ border: 'none', background: 'none', cursor: 'pointer', fontSize: '13px', fontWeight: '600', color: '#c00', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      ⚠️ Знайшли помилку?
+                    </button>
+                  </div>
+
+                  {/* Size Selector and Product Preview Block */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '20px', backgroundColor: '#ffffff', padding: '20px', borderRadius: '4px', border: '1px solid #ddd' }}>
+                    {/* Left: Size Controls */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                      <h4 style={{ fontSize: '16px', fontWeight: '800', color: '#222', margin: 0, borderBottom: '2px solid #c00', paddingBottom: '6px', display: 'inline-block' }}>Розмір</h4>
+                      
+                      <div>
+                        <label style={{ fontSize: '12px', fontWeight: '600', color: '#555', marginBottom: '6px', display: 'block' }}>Оберіть стандартний розмір:</label>
+                        <select
+                          value={sheetSizePreset}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setSheetSizePreset(val);
+                            // Set custom width/height from preset
+                            const presets: Record<string, [number, number]> = {
+                              '1': [90, 50], '4': [45, 50], '3': [90, 100], '2': [180, 50],
+                              '5': [85, 55], '7': [85, 110], '6': [170, 55],
+                              '9': [100, 70], '12': [50, 70], '11': [100, 140], '10': [200, 70],
+                              '17': [99, 210], '20': [99, 99], '18': [198, 210], '181': [420, 99],
+                              '21': [105, 148], '22': [148, 210], '23': [210, 297], '24': [297, 420], '15': [420, 594], '16': [594, 841],
+                              '25': [52, 148], '26': [74, 210], '27': [105, 297], '28': [148, 420],
+                              '31': [30, 50], '32': [90, 90]
+                            };
+                            if (presets[val]) {
+                              setSheetCustomWidth(presets[val][0].toString());
+                              setSheetCustomHeight(presets[val][1].toString());
+                            }
+                          }}
+                          style={{ width: '100%', padding: '8px 12px', borderRadius: '4px', border: '1px solid #ccc', fontSize: '13px', fontWeight: '600' }}
+                        >
+                          <optgroup label="Візитівка">
+                            <option value="1">90 × 50 (Візитка)</option>
+                            <option value="4">45 × 50 (Піввізитки)</option>
+                            <option value="3">90 × 100 (Подвійна візитка)</option>
+                            <option value="2">180 × 50 (Подвійна візитка)</option>
+                          </optgroup>
+                          <optgroup label="Євровізитівка">
+                            <option value="5">55 × 85 (Євровізитка)</option>
+                            <option value="7">85 × 110 (Подвійна євровізитка)</option>
+                            <option value="6">170 × 55 (Подвійна євровізитка)</option>
+                          </optgroup>
+                          <optgroup label="Календар">
+                            <option value="9">100 × 70 (Календар)</option>
+                            <option value="12">50 × 70 (Півкалендаря)</option>
+                            <option value="11">100 × 140 (Подвійний календар)</option>
+                            <option value="10">200 × 70 (Подвійний календар)</option>
+                          </optgroup>
+                          <optgroup label="Флаєр">
+                            <option value="17">99 × 210 (Флаєр)</option>
+                            <option value="20">99 × 99 (Півфлаєра)</option>
+                            <option value="18">198 × 210 (Подвійний флаєр)</option>
+                            <option value="181">420 × 99 (Подвійний флаєр)</option>
+                          </optgroup>
+                          <optgroup label="Листівка, плакат">
+                            <option value="21">105 × 148 (А6)</option>
+                            <option value="22">148 × 210 (А5)</option>
+                            <option value="23">210 × 297 (А4)</option>
+                            <option value="24">297 × 420 (А3)</option>
+                            <option value="15">420 × 594 (А2)</option>
+                            <option value="16">594 × 841 (А1)</option>
+                          </optgroup>
+                          <optgroup label="Формати DL">
+                            <option value="25">52 × 148 (1/2 А6)</option>
+                            <option value="26">74 × 210 (1/2 А5)</option>
+                            <option value="27">105 × 297 (1/2 А4)</option>
+                            <option value="28">148 × 420 (1/2 А3)</option>
+                          </optgroup>
+                          <optgroup label="Інші">
+                            <option value="31">30 × 50 (Євробірка)</option>
+                            <option value="32">90 × 90 (Кубарик)</option>
+                            <option value="custom">Індивідуальний розмір</option>
+                          </optgroup>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label style={{ fontSize: '12px', fontWeight: '600', color: '#555', marginBottom: '6px', display: 'block' }}>Введіть свій розмір:</label>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <input
+                            type="number"
+                            value={sheetCustomWidth}
+                            onChange={(e) => { setSheetCustomWidth(e.target.value); setSheetSizePreset('custom'); }}
+                            placeholder="Ширина"
+                            style={{ width: '90px', padding: '6px 10px', borderRadius: '4px', border: '1px solid #ccc', textAlign: 'center', fontSize: '13px' }}
+                          />
+                          <span style={{ fontWeight: '700', color: '#888' }}>×</span>
+                          <input
+                            type="number"
+                            value={sheetCustomHeight}
+                            onChange={(e) => { setSheetCustomHeight(e.target.value); setSheetSizePreset('custom'); }}
+                            placeholder="Висота"
+                            style={{ width: '90px', padding: '6px 10px', borderRadius: '4px', border: '1px solid #ccc', textAlign: 'center', fontSize: '13px' }}
+                          />
+                          <select
+                            value={sheetUnit}
+                            onChange={(e) => setSheetUnit(e.target.value as any)}
+                            style={{ padding: '6px 8px', borderRadius: '4px', border: '1px solid #ccc', fontSize: '13px' }}
+                          >
+                            <option value="mm">мм</option>
+                            <option value="cm">см</option>
+                          </select>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Right: Layout Preview Box */}
+                    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', backgroundColor: '#fafafa', border: '1px dashed #ccc', padding: '20px', borderRadius: '4px', textAlign: 'center' }}>
+                      <p style={{ fontSize: '13px', fontWeight: '700', color: '#666', marginBottom: '12px' }}>Вид готового виробу</p>
+                      
+                      {/* Visual scaled representation rectangle */}
+                      <div style={{
+                        width: sheetOrientation === 'horiz' ? '180px' : '120px',
+                        height: sheetOrientation === 'horiz' ? '120px' : '180px',
+                        border: '2px dashed #c00',
+                        backgroundColor: '#ffffff',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        margin: '0 auto 14px',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                        transition: 'all 0.3s ease'
+                      }}>
+                        <span style={{ fontSize: '12px', fontWeight: '700', color: '#333' }}>
+                          {sheetCustomWidth} × {sheetCustomHeight} {sheetUnit}
+                        </span>
+                      </div>
+
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '12px', fontWeight: '600' }}>
+                        <span style={{ color: sheetOrientation === 'horiz' ? '#c00' : '#666' }}>Горизонтальний</span>
+                        <button
+                          type="button"
+                          onClick={() => setSheetOrientation(prev => prev === 'horiz' ? 'vert' : 'horiz')}
+                          style={{ border: '1px solid #ccc', backgroundColor: '#fff', borderRadius: '50%', width: '30px', height: '30px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                          title="Повернути макет"
+                        >
+                          🔄
+                        </button>
+                        <span style={{ color: sheetOrientation === 'vert' ? '#c00' : '#666' }}>Вертикальний</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Postpress Accordion Section */}
+                  <div style={{ backgroundColor: '#ffffff', border: '1px solid #ddd', borderRadius: '4px', overflow: 'hidden' }}>
+                    <div
+                      onClick={() => setShowPostpressAccordion(!showPostpressAccordion)}
+                      style={{ padding: '14px 20px', backgroundColor: '#f2f2f2', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: showPostpressAccordion ? '1px solid #ddd' : 'none' }}
+                    >
+                      <h4 style={{ fontSize: '16px', fontWeight: '700', color: '#222', margin: 0 }}>Післядрукарська обробка</h4>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setPostPersonalization('0'); setPostLuvers('0'); setPostLuversCount(1);
+                            setPostCorners('0'); setPostGluing('0'); setPostDrilling('0');
+                            setPostFolding('0'); setPostCreasing('0'); setPostPerforation('0');
+                            setPostPackingText('');
+                          }}
+                          style={{ border: 'none', background: 'none', color: '#c00', cursor: 'pointer', fontSize: '12px', fontWeight: '600' }}
+                        >
+                          ✖ Очистити
+                        </button>
+                        <span style={{ fontSize: '14px', fontWeight: '700', color: '#666' }}>{showPostpressAccordion ? '▲' : '▼'}</span>
+                      </div>
+                    </div>
+
+                    {showPostpressAccordion && (
+                      <div style={{ padding: '20px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+                        {/* 1. Персоналізація */}
+                        <div>
+                          <label style={{ fontSize: '12px', fontWeight: '700', color: '#444', display: 'block', marginBottom: '4px' }}>Персоналізація</label>
+                          <select value={postPersonalization} onChange={(e) => setPostPersonalization(e.target.value)} style={{ width: '100%', padding: '6px 10px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '13px' }}>
+                            <option value="0">Ні</option>
+                            <option value="1">Є — нумерація, змінні дані</option>
+                          </select>
+                        </div>
+
+                        {/* 2. Люверс */}
+                        <div>
+                          <label style={{ fontSize: '12px', fontWeight: '700', color: '#444', display: 'block', marginBottom: '4px' }}>Люверс</label>
+                          <div style={{ display: 'flex', gap: '8px' }}>
+                            <select value={postLuvers} onChange={(e) => setPostLuvers(e.target.value)} style={{ flex: 1, padding: '6px 10px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '13px' }}>
+                              <option value="0">Ні</option>
+                              <option value="93">Золотий</option>
+                              <option value="92">Срібний</option>
+                            </select>
+                            {postLuvers !== '0' && (
+                              <input type="number" value={postLuversCount} onChange={(e) => setPostLuversCount(parseInt(e.target.value) || 1)} min={1} style={{ width: '60px', padding: '6px 8px', border: '1px solid #ccc', borderRadius: '4px', textAlign: 'center' }} />
+                            )}
+                          </div>
+                        </div>
+
+                        {/* 3. Закруглення кутів */}
+                        <div>
+                          <label style={{ fontSize: '12px', fontWeight: '700', color: '#444', display: 'block', marginBottom: '4px' }}>Закруглення кутів</label>
+                          <select value={postCorners} onChange={(e) => setPostCorners(e.target.value)} style={{ width: '100%', padding: '6px 10px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '13px' }}>
+                            <option value="0">Ні</option>
+                            <option value="4">4 кути</option>
+                            <option value="1">1 кут</option>
+                            <option value="2">2 кути</option>
+                            <option value="3">3 кути</option>
+                          </select>
+                        </div>
+
+                        {/* 4. Проклейка в блок */}
+                        <div>
+                          <label style={{ fontSize: '12px', fontWeight: '700', color: '#444', display: 'block', marginBottom: '4px' }}>Проклейка в блок</label>
+                          <div style={{ display: 'flex', gap: '8px' }}>
+                            <select value={postGluing} onChange={(e) => setPostGluing(e.target.value)} style={{ flex: 1, padding: '6px 10px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '13px' }}>
+                              <option value="0">Ні</option>
+                              <option value="25">25 листів</option>
+                              <option value="50">50 листів</option>
+                              <option value="100">100 листів</option>
+                              <option value="250">250 листів</option>
+                            </select>
+                            {postGluing !== '0' && (
+                              <select value={postGluingSide} onChange={(e) => setPostGluingSide(e.target.value)} style={{ width: '120px', padding: '6px 6px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '12px' }}>
+                                <option value="1">По короткій</option>
+                                <option value="2">По довгій</option>
+                              </select>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* 5. Свердління */}
+                        <div>
+                          <label style={{ fontSize: '12px', fontWeight: '700', color: '#444', display: 'block', marginBottom: '4px' }}>Свердління</label>
+                          <div style={{ display: 'flex', gap: '8px' }}>
+                            <select value={postDrilling} onChange={(e) => setPostDrilling(e.target.value)} style={{ flex: 1, padding: '6px 10px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '13px' }}>
+                              <option value="0">Ні</option>
+                              <option value="1">1 отвір</option>
+                              <option value="2">2 отвори</option>
+                              <option value="3">3 отвори</option>
+                              <option value="4">4 отвори</option>
+                            </select>
+                            {postDrilling !== '0' && (
+                              <select value={postDrillingDia} onChange={(e) => setPostDrillingDia(e.target.value)} style={{ width: '90px', padding: '6px 6px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '12px' }}>
+                                <option value="3">Ø 3 мм</option>
+                                <option value="4">Ø 4 мм</option>
+                                <option value="5">Ø 5 мм</option>
+                                <option value="6">Ø 6 мм</option>
+                              </select>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* 6. Згинання (Фальцовка) */}
+                        <div>
+                          <label style={{ fontSize: '12px', fontWeight: '700', color: '#444', display: 'block', marginBottom: '4px' }}>Згинання (Фальцовка)</label>
+                          <div style={{ display: 'flex', gap: '8px' }}>
+                            <select value={postFolding} onChange={(e) => setPostFolding(e.target.value)} style={{ flex: 1, padding: '6px 10px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '13px' }}>
+                              <option value="0">Ні</option>
+                              <option value="1">1 Згинання — навпіл</option>
+                              <option value="121">1 Згинання — асиметричне</option>
+                              <option value="21">2 Згинання — намотка</option>
+                              <option value="22">2 Згинання — гармошка</option>
+                              <option value="23">2 Згинання — вікно</option>
+                              <option value="34">2 Згинання — комбіноване</option>
+                              <option value="31">3 Згинання — намотка</option>
+                              <option value="32">3 Згинання — гармошка</option>
+                              <option value="33">3 Згинання — вікно</option>
+                              <option value="41">4 Згинання — намотка</option>
+                              <option value="42">4 Згинання — гармошка</option>
+                              <option value="52">5 Згинання — гармошка</option>
+                            </select>
+                            {postFolding === '121' && (
+                              <input
+                                type="number"
+                                value={postFoldingOffset}
+                                onChange={(e) => setPostFoldingOffset(e.target.value)}
+                                placeholder="мм"
+                                style={{ width: '60px', padding: '6px 8px', border: '1px solid #ccc', borderRadius: '4px', textAlign: 'center' }}
+                              />
+                            )}
+                          </div>
+                        </div>
+
+                        {/* 7. Біговка */}
+                        <div>
+                          <label style={{ fontSize: '12px', fontWeight: '700', color: '#444', display: 'block', marginBottom: '4px' }}>Біговка</label>
+                          <select value={postCreasing} onChange={(e) => setPostCreasing(e.target.value)} style={{ width: '100%', padding: '6px 10px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '13px' }}>
+                            <option value="0">Ні</option>
+                            {[1,2,3,4,5,6,7,8,9,10].map(n => (
+                              <option key={n} value={n.toString()}>{n} {n === 1 ? 'біг' : 'біги'}</option>
+                            ))}
+                          </select>
+                        </div>
+
+                        {/* 8. Перфорація */}
+                        <div>
+                          <label style={{ fontSize: '12px', fontWeight: '700', color: '#444', display: 'block', marginBottom: '4px' }}>Перфорація</label>
+                          <select value={postPerforation} onChange={(e) => setPostPerforation(e.target.value)} style={{ width: '100%', padding: '6px 10px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '13px' }}>
+                            <option value="0">Ні</option>
+                            {[1,2,3,4,5,6,7,8,9,10].map(n => (
+                              <option key={n} value={n.toString()}>{n} {n === 1 ? 'прохід' : 'проходи'}</option>
+                            ))}
+                          </select>
+                        </div>
+
+                        {/* 9. Розфасовка */}
+                        <div>
+                          <label style={{ fontSize: '12px', fontWeight: '700', color: '#444', display: 'block', marginBottom: '4px' }}>Розфасовка</label>
+                          <input
+                            type="text"
+                            value={postPackingText}
+                            onChange={(e) => setPostPackingText(e.target.value)}
+                            placeholder="наприклад: 100, 200, 350"
+                            style={{ width: '100%', padding: '6px 10px', border: '1px solid #ccc', borderRadius: '4px', fontSize: '13px' }}
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Sets Counter Bar */}
+                  <div style={{ backgroundColor: '#ffffff', padding: '14px 20px', borderRadius: '4px', border: '1px solid #ddd', display: 'flex', alignItems: 'center', gap: '20px' }}>
+                    <span style={{ fontSize: '14px', fontWeight: '700', color: '#222' }}>Комплектів:</span>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <button
+                        type="button"
+                        onClick={() => setSheetSetsCount(prev => Math.max(1, prev - 1))}
+                        style={{ width: '32px', height: '32px', border: '1px solid #ccc', backgroundColor: '#f2f2f2', borderRadius: '4px', fontWeight: '700', cursor: 'pointer' }}
                       >
-                        {fmt}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                {/* 2. Календар */}
-                <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
-                  <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Календар</h4>
-                  <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
-                    {['100х70', '90х60', '70х70'].map(fmt => (
-                      <span
-                        key={fmt}
-                        onClick={() => { setSelectedFormat(fmt); handleSelectCategory('Календарики кишенькові'); }}
-                        style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
-                        onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
-                        onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
+                        -
+                      </button>
+                      <input
+                        type="number"
+                        value={sheetSetsCount}
+                        onChange={(e) => setSheetSetsCount(parseInt(e.target.value) || 1)}
+                        style={{ width: '50px', height: '32px', border: '1px solid #ccc', borderRadius: '4px', textAlign: 'center', fontWeight: '700' }}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setSheetSetsCount(prev => prev + 1)}
+                        style={{ width: '32px', height: '32px', border: '1px solid #ccc', backgroundColor: '#f2f2f2', borderRadius: '4px', fontWeight: '700', cursor: 'pointer' }}
                       >
-                        {fmt}
-                      </span>
-                    ))}
+                        +
+                      </button>
+                    </div>
+                    <span style={{ fontSize: '12px', color: '#666' }}>
+                      (Замовлень з однаковими параметрами, але різними макетами)
+                    </span>
                   </div>
-                </div>
 
-                {/* 3. Флаєр */}
-                <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
-                  <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Флаєр</h4>
-                  <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
-                    {['210х99', '210х198', '99х99'].map(fmt => (
-                      <span
-                        key={fmt}
-                        onClick={() => { setSelectedFormat(fmt); handleSelectCategory('Флаєри'); }}
-                        style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
-                        onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
-                        onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
-                      >
-                        {fmt}
-                      </span>
-                    ))}
-                  </div>
-                </div>
+                  {/* Filter Options (Materials, Coating, Color Printing) */}
+                  <div style={{ backgroundColor: '#ffffff', padding: '20px', borderRadius: '4px', border: '1px solid #ddd', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    <h4 style={{ fontSize: '16px', fontWeight: '800', color: '#222', margin: 0 }}>Фільтр специфікацій та матеріалів</h4>
 
-                {/* 4. Листівка */}
-                <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
-                  <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Листівка</h4>
-                  <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
-                    {['А7', 'А6', 'А5', 'А4', 'А3', 'Кругла'].map(fmt => (
-                      <span
-                        key={fmt}
-                        onClick={() => { setSelectedFormat(fmt); handleSelectCategory('Листівки'); }}
-                        style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
-                        onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
-                        onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
-                      >
-                        {fmt}
-                      </span>
-                    ))}
-                  </div>
-                </div>
+                    {/* Material Options */}
+                    <div>
+                      <span style={{ fontSize: '13px', fontWeight: '700', color: '#555', display: 'block', marginBottom: '8px' }}>Матеріал паперу:</span>
+                      <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                        {[
+                          { id: '80', label: 'Офсет 80г' },
+                          { id: '90', label: 'Крейд 90г' },
+                          { id: '115', label: 'Крейд 115г' },
+                          { id: '130', label: 'Крейд 130г' },
+                          { id: '150', label: 'Крейд 150г' },
+                          { id: '170', label: 'Крейд 170г' },
+                          { id: '250', label: 'Крейд 250г' },
+                          { id: '300', label: 'Крейд 300г' },
+                          { id: '350', label: 'Крейд 350г' },
+                          { id: 'kraft', label: 'Крафт 80г' }
+                        ].map(mat => {
+                          const isSel = selectedMaterials.includes(mat.id);
+                          return (
+                            <button
+                              key={mat.id}
+                              type="button"
+                              onClick={() => {
+                                setSelectedMaterials(prev => 
+                                  prev.includes(mat.id) ? prev.filter(x => x !== mat.id) : [...prev, mat.id]
+                                );
+                              }}
+                              style={{
+                                padding: '6px 12px',
+                                fontSize: '12px',
+                                fontWeight: '600',
+                                borderRadius: '4px',
+                                border: isSel ? '1px solid #c00' : '1px solid #ccc',
+                                backgroundColor: isSel ? '#fff0f0' : '#f8f9fa',
+                                color: isSel ? '#c00' : '#333',
+                                cursor: 'pointer'
+                              }}
+                            >
+                              {mat.label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
 
-                {/* 5. Плакати */}
-                <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
-                  <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Плакати</h4>
-                  <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
-                    {['А3', 'В3', 'А2', 'В2', 'А1', 'B1'].map(fmt => (
-                      <span
-                        key={fmt}
-                        onClick={() => { setSelectedFormat(fmt); handleSelectCategory('Плакати'); }}
-                        style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
-                        onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
-                        onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
-                      >
-                        {fmt}
-                      </span>
-                    ))}
-                  </div>
-                </div>
+                    {/* Coating Options */}
+                    <div>
+                      <span style={{ fontSize: '13px', fontWeight: '700', color: '#555', display: 'block', marginBottom: '8px' }}>Покриття (Ламінація / Лак):</span>
+                      <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                        {[
+                          { id: '0', label: 'Без покриття' },
+                          { id: '7', label: 'ГЛ лам 1+0' },
+                          { id: '8', label: 'ГЛ лам 1+1' },
+                          { id: '9', label: 'МАТ лам 1+0' },
+                          { id: '10', label: 'МАТ лам 1+1' },
+                          { id: '30', label: 'SOFT лам 1+0' },
+                          { id: '31', label: 'SOFT лам 1+1' }
+                        ].map(cov => {
+                          const isSel = selectedCoverings.includes(cov.id);
+                          return (
+                            <button
+                              key={cov.id}
+                              type="button"
+                              onClick={() => {
+                                setSelectedCoverings(prev => 
+                                  prev.includes(cov.id) ? prev.filter(x => x !== cov.id) : [...prev, cov.id]
+                                );
+                              }}
+                              style={{
+                                padding: '6px 12px',
+                                fontSize: '12px',
+                                fontWeight: '600',
+                                borderRadius: '4px',
+                                border: isSel ? '1px solid #c00' : '1px solid #ccc',
+                                backgroundColor: isSel ? '#fff0f0' : '#f8f9fa',
+                                color: isSel ? '#c00' : '#333',
+                                cursor: 'pointer'
+                              }}
+                            >
+                              {cov.label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
 
-                {/* 6. Сети */}
-                <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
-                  <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Сети</h4>
-                  <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
-                    {['А3', 'В3'].map(fmt => (
-                      <span
-                        key={fmt}
-                        onClick={() => { setSelectedFormat(fmt); handleSelectCategory('Бланки'); }}
-                        style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
-                        onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
-                        onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
-                      >
-                        {fmt}
-                      </span>
-                    ))}
+                    {/* Color Printing Options */}
+                    <div>
+                      <span style={{ fontSize: '13px', fontWeight: '700', color: '#555', display: 'block', marginBottom: '8px' }}>Кольоровість друку:</span>
+                      <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                        {['4+0', '4+4', '1+0', '1+1'].map(col => {
+                          const isSel = selectedPrintColors.includes(col);
+                          return (
+                            <button
+                              key={col}
+                              type="button"
+                              onClick={() => {
+                                setSelectedPrintColors(prev => 
+                                  prev.includes(col) ? prev.filter(x => x !== col) : [...prev, col]
+                                );
+                              }}
+                              style={{
+                                padding: '6px 12px',
+                                fontSize: '12px',
+                                fontWeight: '600',
+                                borderRadius: '4px',
+                                border: isSel ? '1px solid #c00' : '1px solid #ccc',
+                                backgroundColor: isSel ? '#fff0f0' : '#f8f9fa',
+                                color: isSel ? '#c00' : '#333',
+                                cursor: 'pointer'
+                              }}
+                            >
+                              {col}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
                   </div>
-                </div>
 
-                {/* 7. Буклет */}
-                <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
-                  <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Буклет</h4>
-                  <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
-                    {['А4 в Євро', '2Євро в Євро', 'А6', 'А5', 'А4'].map(fmt => (
-                      <span
-                        key={fmt}
-                        onClick={() => { setSelectedFormat(fmt); handleSelectCategory('Буклети'); }}
-                        style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
-                        onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
-                        onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
-                      >
-                        {fmt}
-                      </span>
-                    ))}
-                  </div>
-                </div>
+                  {/* Price Calculation Matrix Table */}
+                  <div style={{ backgroundColor: '#ffffff', borderRadius: '4px', border: '1px solid #ddd', overflow: 'hidden' }}>
+                    <div style={{ padding: '16px 20px', backgroundColor: '#f8f9fa', borderBottom: '1px solid #ddd', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+                      <h4 style={{ fontSize: '16px', fontWeight: '800', color: '#222', margin: 0 }}>Специфікація розрахунків та прайс-лист</h4>
 
-                {/* 8. Каталог */}
-                <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
-                  <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Каталог</h4>
-                  <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
-                    {['Скоба', 'Пружина', 'Клей'].map(st => (
-                      <span
-                        key={st}
-                        onClick={() => { handleSelectCategory('Книги'); }}
-                        style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
-                        onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
-                        onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
-                      >
-                        {st}
-                      </span>
-                    ))}
-                  </div>
-                </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                        <label style={{ fontSize: '12px', fontWeight: '600', color: '#444', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
+                          <input type="checkbox" checked={includeDelivery} onChange={(e) => setIncludeDelivery(e.target.checked)} />
+                          З доставкою
+                        </label>
 
-                {/* 9. Блокнот */}
-                <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
-                  <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Блокнот</h4>
-                  <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
-                    {['А6', 'А5', 'А4'].map(fmt => (
-                      <span
-                        key={fmt}
-                        onClick={() => { setSelectedFormat(fmt); handleSelectCategory('Блокноти'); }}
-                        style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
-                        onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
-                        onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
-                      >
-                        {fmt}
-                      </span>
-                    ))}
-                  </div>
-                </div>
+                        <div style={{ display: 'flex', border: '1px solid #ccc', borderRadius: '4px', overflow: 'hidden' }}>
+                          <button
+                            type="button"
+                            onClick={() => setPriceCostVar('per_tirazh')}
+                            style={{ border: 'none', padding: '4px 10px', fontSize: '11px', fontWeight: '700', backgroundColor: priceCostVar === 'per_tirazh' ? '#666' : '#fff', color: priceCostVar === 'per_tirazh' ? '#fff' : '#333', cursor: 'pointer' }}
+                          >
+                            За наклад
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setPriceCostVar('per_item')}
+                            style={{ border: 'none', padding: '4px 10px', fontSize: '11px', fontWeight: '700', backgroundColor: priceCostVar === 'per_item' ? '#666' : '#fff', color: priceCostVar === 'per_item' ? '#fff' : '#333', cursor: 'pointer' }}
+                          >
+                            За екземпляр
+                          </button>
+                        </div>
+                      </div>
+                    </div>
 
-                {/* 10. Наліпка */}
-                <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
-                  <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Наліпка</h4>
-                  <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
-                    {['90х50', '50х50', 'Кругла', 'Овальна'].map(fmt => (
-                      <span
-                        key={fmt}
-                        onClick={() => { setSelectedFormat(fmt); handleSelectCategory('Наклейки'); }}
-                        style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
-                        onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
-                        onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
-                      >
-                        {fmt}
-                      </span>
-                    ))}
-                  </div>
-                </div>
+                    <div style={{ overflowX: 'auto' }}>
+                      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px', textAlign: 'center' }}>
+                        <thead>
+                          <tr style={{ backgroundColor: '#666666', color: '#ffffff', fontWeight: '700' }}>
+                            <th style={{ padding: '10px', border: '1px solid #555' }}>Матеріал та покриття</th>
+                            <th style={{ padding: '10px', border: '1px solid #555' }}>Друк</th>
+                            <th style={{ padding: '10px', border: '1px solid #555' }}>Готовність</th>
+                            {[100, 250, 500, 1000, 1500, 2500, 5000, 10000].map(tir => (
+                              <th key={tir} style={{ padding: '10px', border: '1px solid #555' }}>{tir} шт.</th>
+                            ))}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {selectedMaterials.flatMap(matId => 
+                            selectedCoverings.flatMap(covId => 
+                              selectedPrintColors.map((colStr, rowIdx) => {
+                                const matLabels: Record<string, string> = {
+                                  '80': 'Офсетний 80 г/м²', '90': 'Крейд ГЛ 90 г/м²', '115': 'Крейд ГЛ 115 г/м²',
+                                  '130': 'Крейд ГЛ 130 г/м²', '150': 'Крейд ГЛ 150 г/м²', '170': 'Крейд ГЛ 170 г/м²',
+                                  '250': 'Крейд МАТ 250 г/м²', '300': 'Крейд МАТ 300 г/м²', '350': 'Крейд МАТ 350 г/м²', 'kraft': 'Крафт 80 г/м²'
+                                };
+                                const covLabels: Record<string, string> = {
+                                  '0': 'Без покриття', '7': 'ГЛ лам 1+0', '8': 'ГЛ лам 1+1',
+                                  '9': 'МАТ лам 1+0', '10': 'МАТ лам 1+1', '30': 'SOFT лам 1+0', '31': 'SOFT лам 1+1'
+                                };
+                                const matName = matLabels[matId] || `Папір ${matId}г`;
+                                const covName = covLabels[covId] || '';
+                                const fullMatCover = covName ? `${matName} (${covName})` : matName;
 
-                {/* 11. Папка А4 */}
-                <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
-                  <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Папка А4</h4>
-                  <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
-                    {['Без корінця', 'Корінець 5мм', 'З резинкою'].map(fmt => (
-                      <span
-                        key={fmt}
-                        onClick={() => { handleSelectCategory('Папки'); }}
-                        style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
-                        onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
-                        onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
-                      >
-                        {fmt}
-                      </span>
-                    ))}
-                  </div>
-                </div>
+                                // Base rate per sheet
+                                const matDensity = parseInt(matId) || 130;
+                                const areaM2 = (parseFloat(sheetCustomWidth) / 1000) * (parseFloat(sheetCustomHeight) / 1000);
+                                const isDouble = colStr === '4+4' || colStr === '1+1';
 
-                {/* 12. Листівки вітальні */}
-                <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
-                  <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Листівка</h4>
-                  <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
-                    {['Одинарна', 'Складна', 'Кругла'].map(fmt => (
-                      <span
-                        key={fmt}
-                        onClick={() => { handleSelectCategory('Листівки'); }}
-                        style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
-                        onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
-                        onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
-                      >
-                        {fmt}
-                      </span>
-                    ))}
-                  </div>
-                </div>
+                                return (
+                                  <tr key={`${matId}-${covId}-${colStr}-${rowIdx}`} style={{ backgroundColor: rowIdx % 2 === 0 ? '#ffffff' : '#f9f9f9', borderBottom: '1px solid #eee' }}>
+                                    <td style={{ padding: '10px', textAlign: 'left', fontWeight: '600', color: '#333', borderRight: '1px solid #ddd' }}>
+                                      {fullMatCover}
+                                    </td>
+                                    <td style={{ padding: '10px', fontWeight: '700', color: '#c00', borderRight: '1px solid #ddd' }}>
+                                      {colStr}
+                                    </td>
+                                    <td style={{ padding: '10px', fontSize: '11px', color: '#666', borderRight: '1px solid #ddd' }}>
+                                      1-2 дні
+                                    </td>
+                                    {[100, 250, 500, 1000, 1500, 2500, 5000, 10000].map(tir => {
+                                      const basePaperCost = areaM2 * (matDensity * 0.08) * tir;
+                                      const printCost = (isDouble ? 0.35 : 0.20) * tir + 120;
+                                      const lamCost = covId !== '0' ? areaM2 * 0.45 * tir : 0;
+                                      const deliveryCost = includeDelivery ? 80 : 0;
+                                      const rawTotal = (basePaperCost + printCost + lamCost + deliveryCost) * (marginPercent / 100);
+                                      const itemCost = rawTotal / tir;
+                                      const displayVal = priceCostVar === 'per_item' ? itemCost.toFixed(2) : Math.round(rawTotal).toString();
 
-                {/* 13. Календарні сітки */}
-                <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
-                  <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 8px' }}>Календарні сітки</h4>
-                  <div 
-                    onClick={() => handleSelectCategory('Календарі')}
-                    style={{ cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '6px' }}
-                  >
-                    <Calendar size={22} style={{ color: '#c00' }} />
-                    <span style={{ fontSize: '12px', fontWeight: '600', color: '#333' }}>Сітки 2026</span>
+                                      return (
+                                        <td
+                                          key={tir}
+                                          onClick={() => {
+                                            setQuantity(tir);
+                                            setPaperType(matId === '80' ? 'offset' : 'coated');
+                                            setColors(colStr);
+                                            setCategory('Листівки');
+                                            setStep('editor');
+                                          }}
+                                          style={{ padding: '10px', fontWeight: '700', color: '#111', cursor: 'pointer', borderRight: '1px solid #ddd', transition: 'background-color 0.15s ease' }}
+                                          onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#fff0f0'; e.currentTarget.style.color = '#c00'; }}
+                                          onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = '#111'; }}
+                                        >
+                                          {displayVal} грн
+                                        </td>
+                                      );
+                                    })}
+                                  </tr>
+                                );
+                              })
+                            )
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
                   </div>
                 </div>
+              )}
 
-                {/* 14. Друк в листах */}
-                <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
-                  <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Друк в листах</h4>
-                  <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
-                    {['А2', 'В2', 'А1', 'В1'].map(fmt => (
-                      <span
-                        key={fmt}
-                        onClick={() => { setSelectedFormat(fmt); handleSelectCategory('Бланки'); }}
-                        style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
-                        onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
-                        onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
-                      >
-                        {fmt}
-                      </span>
-                    ))}
+              {/* Active Info Modal Popup */}
+              {activeInfoModal && (
+                <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 9999, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+                  <div style={{ backgroundColor: '#ffffff', borderRadius: '8px', maxWidth: '550px', width: '100%', padding: '24px', boxShadow: '0 10px 25px rgba(0,0,0,0.2)', position: 'relative' }}>
+                    <button
+                      type="button"
+                      onClick={() => setActiveInfoModal(null)}
+                      style={{ position: 'absolute', top: '14px', right: '16px', border: 'none', background: 'none', fontSize: '20px', cursor: 'pointer', color: '#999' }}
+                    >
+                      ✕
+                    </button>
+                    {activeInfoModal === 'instr' && (
+                      <div>
+                        <h3 style={{ fontSize: '18px', fontWeight: '800', marginBottom: '12px', color: '#c00' }}>Інструкція по оформленню замовлення</h3>
+                        <p style={{ fontSize: '13px', color: '#444', lineHeight: '1.5' }}>
+                          1. Оберіть стандартний розмір виробу або введіть свій у міліметрах.<br/>
+                          2. За потреби відкрийте блок «Післядрукарська обробка» та оберіть фальцовку, біговку, свердління тощо.<br/>
+                          3. У таблиці розрахунків оберіть бажаний матеріал та тираж — клікніть на комірку з ціною для автоматичного формування замовлення.
+                        </p>
+                      </div>
+                    )}
+                    {activeInfoModal === 'terms' && (
+                      <div>
+                        <h3 style={{ fontSize: '18px', fontWeight: '800', marginBottom: '12px', color: '#c00' }}>Терміни друку</h3>
+                        <p style={{ fontSize: '13px', color: '#444', lineHeight: '1.5' }}>
+                          Стандартний термін виконання збірного офсетного тиражу — 1-2 робочих дні. Для термінових замовлень скористайтесь розділом «Цифровий друк».
+                        </p>
+                      </div>
+                    )}
+                    {activeInfoModal === 'materials' && (
+                      <div>
+                        <h3 style={{ fontSize: '18px', fontWeight: '800', marginBottom: '12px', color: '#c00' }}>Матеріали</h3>
+                        <p style={{ fontSize: '13px', color: '#444', lineHeight: '1.5' }}>
+                          Доступні папери: Офсетний 80 г/м², Крейдований матовий та глянцевий від 90 до 450 г/м², а також дизайнерські картони (Льон, Tintoretto, Stardream).
+                        </p>
+                      </div>
+                    )}
+                    {activeInfoModal === 'samples' && (
+                      <div>
+                        <h3 style={{ fontSize: '18px', fontWeight: '800', marginBottom: '12px', color: '#c00' }}>Зразки матеріалів з друком</h3>
+                        <p style={{ fontSize: '13px', color: '#444', lineHeight: '1.5' }}>
+                          Ви можете замовити комплект зразків у розділі «Зразки матеріалів» для точної оцінки щільності та фактури паперу.
+                        </p>
+                      </div>
+                    )}
+                    {activeInfoModal === 'review' && (
+                      <div>
+                        <h3 style={{ fontSize: '18px', fontWeight: '800', marginBottom: '12px', color: '#c00' }}>Ваш відгук</h3>
+                        <p style={{ fontSize: '13px', color: '#444', lineHeight: '1.5' }}>
+                          Дякуємо за допомогу в розвитку системи! Залиште ваші побажання або зауваження до інтерфейсу калькулятора.
+                        </p>
+                      </div>
+                    )}
+                    {activeInfoModal === 'bug' && (
+                      <div>
+                        <h3 style={{ fontSize: '18px', fontWeight: '800', marginBottom: '12px', color: '#c00' }}>Знайшли помилку?</h3>
+                        <p style={{ fontSize: '13px', color: '#444', lineHeight: '1.5' }}>
+                          Опишіть ситуацію, у якій виникла помилка, або невідповідність у розрахунку ціни, і ми оперативно її виправимо.
+                        </p>
+                      </div>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setActiveInfoModal(null)}
+                      style={{ marginTop: '16px', backgroundColor: '#666', color: '#fff', border: 'none', padding: '8px 18px', borderRadius: '4px', cursor: 'pointer', fontWeight: '700' }}
+                    >
+                      Зрозуміло
+                    </button>
                   </div>
                 </div>
-
-                {/* 15. Конверт */}
-                <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
-                  <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Конверт</h4>
-                  <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
-                    {['Євро', 'С6', 'С5', 'С4'].map(fmt => (
-                      <span
-                        key={fmt}
-                        onClick={() => { handleSelectCategory('Бланки'); }}
-                        style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
-                        onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
-                        onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
-                      >
-                        {fmt}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                {/* 16. Хенгери */}
-                <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
-                  <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Хенгери</h4>
-                  <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
-                    {['вид 1', 'вид 2'].map(v => (
-                      <span
-                        key={v}
-                        onClick={() => { handleSelectCategory('Наклейки'); }}
-                        style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
-                        onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
-                        onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
-                      >
-                        🔖 {v}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                {/* 17. Календарі висічні */}
-                <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
-                  <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Календарі висічні</h4>
-                  <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
-                    {['будинок', 'пірамідка'].map(v => (
-                      <span
-                        key={v}
-                        onClick={() => { handleSelectCategory('Календарі'); }}
-                        style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
-                        onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
-                        onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
-                      >
-                        🏠 {v}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-
-                {/* 18. Пакувальний папір */}
-                <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
-                  <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px' }}>Пакувальний папір</h4>
-                  <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
-                    {['А3', 'В3', 'А2', 'В2', 'А1', 'B1'].map(fmt => (
-                      <span
-                        key={fmt}
-                        onClick={() => { setSelectedFormat(fmt); handleSelectCategory('Бланки'); }}
-                        style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
-                        onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
-                        onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
-                      >
-                        {fmt}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
+              )}
             </div>
           )}
 
