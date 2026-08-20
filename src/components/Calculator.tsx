@@ -319,6 +319,9 @@ export const Calculator: React.FC = () => {
       setLaminationType('none');
       setName('Бланки А4');
       setSubCategory('Бланки');
+      setSelectedMaterials(['80', 'kraft']);
+      setSelectedCoverings(['0']);
+      setSelectedPrintColors(['1+0', '4+0']);
     } else if (cat === 'Візитки') {
       setQuantity(100);
       setPaperType('coated');
@@ -326,6 +329,9 @@ export const Calculator: React.FC = () => {
       setSelectedFormat('90x50 мм');
       setBindingType('none');
       setLaminationType('matte');
+      setSelectedMaterials(['350', '300', 'linen', 'kraft']);
+      setSelectedCoverings(['0', '7', '9', '30']);
+      setSelectedPrintColors(['4+4', '4+0']);
     } else if (cat === 'Буклети') {
       setQuantity(500);
       setPaperType('coated');
@@ -334,6 +340,9 @@ export const Calculator: React.FC = () => {
       setBindingType('none');
       setLaminationType('none');
       setCreaseCount(2);
+      setSelectedMaterials(['130', '150', '170']);
+      setSelectedCoverings(['0']);
+      setSelectedPrintColors(['4+4']);
     } else if (cat === 'Дипломи випускні') {
       setQuantity(50);
       setPaperType('coated');
@@ -341,13 +350,19 @@ export const Calculator: React.FC = () => {
       setSelectedFormat('A4');
       setBindingType('none');
       setLaminationType('gloss');
-    } else if (cat === 'Календарики кишенькові') {
+      setSelectedMaterials(['300', '350']);
+      setSelectedCoverings(['7', '9']);
+      setSelectedPrintColors(['4+0']);
+    } else if (cat === 'Календарі кишенькові') {
       setQuantity(500);
       setPaperType('coated');
       setColors('4+4');
       setSelectedFormat('70x100 мм');
       setBindingType('none');
       setLaminationType('gloss');
+      setSelectedMaterials(['350', '450']);
+      setSelectedCoverings(['8', '10']);
+      setSelectedPrintColors(['4+4']);
     } else if (cat === 'Книги') {
       setQuantity(200);
       setPaperType('offset');
@@ -355,6 +370,9 @@ export const Calculator: React.FC = () => {
       setSelectedFormat('A5');
       setBindingType('staple');
       setLaminationType('gloss');
+      setSelectedMaterials(['80', '130']);
+      setSelectedCoverings(['0', '7']);
+      setSelectedPrintColors(['1+1', '4+4']);
     } else if (cat === 'Листівки') {
       setQuantity(1000);
       setPaperType('coated');
@@ -362,6 +380,39 @@ export const Calculator: React.FC = () => {
       setSelectedFormat('A5');
       setBindingType('none');
       setLaminationType('none');
+      setSelectedMaterials(['130', '150', '90', '115', '300']);
+      setSelectedCoverings(['0', '7', '9']);
+      setSelectedPrintColors(['4+4', '4+0']);
+    } else if (cat === 'Сети') {
+      setQuantity(1000);
+      setPaperType('offset');
+      setColors('1+0');
+      setSelectedFormat('A3');
+      setBindingType('none');
+      setLaminationType('none');
+      setSelectedMaterials(['80', 'kraft', '250']);
+      setSelectedCoverings(['0']);
+      setSelectedPrintColors(['1+0', '4+0']);
+    } else if (cat === 'Папки') {
+      setQuantity(100);
+      setPaperType('coated');
+      setColors('4+0');
+      setSelectedFormat('A4');
+      setBindingType('none');
+      setLaminationType('matte');
+      setSelectedMaterials(['350', '300', 'karton_250']);
+      setSelectedCoverings(['0', '9', '30']);
+      setSelectedPrintColors(['4+0', '4+4']);
+    } else if (cat === 'Блокноти') {
+      setQuantity(100);
+      setPaperType('offset');
+      setColors('4+0');
+      setSelectedFormat('A5');
+      setBindingType('spring');
+      setLaminationType('none');
+      setSelectedMaterials(['300', '350', '80']);
+      setSelectedCoverings(['0', '7', '9']);
+      setSelectedPrintColors(['4+0', '4+4', '1+0']);
     } else if (cat === 'Меню') {
       setQuantity(30);
       setPaperType('coated');
@@ -376,6 +427,9 @@ export const Calculator: React.FC = () => {
       setSelectedFormat('A4');
       setBindingType('none');
       setLaminationType('gloss');
+      setSelectedMaterials(['sk_kreyd_pros', 'sk_kreyd_bez', 'sk_ofset_pros']);
+      setSelectedCoverings(['0', '7', '9']);
+      setSelectedPrintColors(['4+0']);
     } else if (cat === 'Плакати') {
       setQuantity(100);
       setPaperType('coated');
@@ -383,6 +437,9 @@ export const Calculator: React.FC = () => {
       setSelectedFormat('A3');
       setBindingType('none');
       setLaminationType('none');
+      setSelectedMaterials(['130', '115', '150', '90', '80', 'kraft']);
+      setSelectedCoverings(['0']);
+      setSelectedPrintColors(['4+0']);
     } else if (cat === 'Флаєри') {
       setQuantity(1000);
       setPaperType('coated');
@@ -390,6 +447,9 @@ export const Calculator: React.FC = () => {
       setSelectedFormat('Euro');
       setBindingType('none');
       setLaminationType('none');
+      setSelectedMaterials(['130', '150', '90', '115', '250']);
+      setSelectedCoverings(['0', '7', '9']);
+      setSelectedPrintColors(['4+4', '4+0']);
     } else if (cat === 'Нотаріальні книги') {
       setQuantity(10);
       setPaperType('offset');
@@ -2250,7 +2310,7 @@ export const Calculator: React.FC = () => {
                     {/* Material Options */}
                     <div>
                       <span style={{ fontSize: '13px', fontWeight: '700', color: '#555', display: 'block', marginBottom: '8px' }}>Матеріал паперу:</span>
-                      <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
                         {[
                           { id: '80', label: 'Офсет 80г' },
                           { id: '90', label: 'Крейд 90г' },
@@ -2261,7 +2321,18 @@ export const Calculator: React.FC = () => {
                           { id: '250', label: 'Крейд 250г' },
                           { id: '300', label: 'Крейд 300г' },
                           { id: '350', label: 'Крейд 350г' },
-                          { id: 'kraft', label: 'Крафт 80г' }
+                          { id: '450', label: 'Крейд 450г' },
+                          { id: 'kraft', label: 'Крафт 80г' },
+                          { id: 'linen', label: 'Льон 300г' },
+                          { id: 'tintoretto_crema', label: 'Tintoretto Crema 300г' },
+                          { id: 'tintoretto_gesso', label: 'Tintoretto Gesso 300г' },
+                          { id: 'stardream', label: 'Stardream Opal 285г' },
+                          { id: 'touch', label: 'Тач Кавер 301г' },
+                          { id: 'sk_kreyd_pros', label: 'С/к Крейд з просічками' },
+                          { id: 'sk_kreyd_bez', label: 'С/к Крейд без просічок' },
+                          { id: 'sk_ofset_pros', label: 'С/к Офсет з просічками' },
+                          { id: 'karton_220', label: 'Картон крем 220г' },
+                          { id: 'karton_250', label: 'Картон крем 250г' }
                         ].map(mat => {
                           const isSel = selectedMaterials.includes(mat.id);
                           return (
@@ -2274,14 +2345,15 @@ export const Calculator: React.FC = () => {
                                 );
                               }}
                               style={{
-                                padding: '6px 12px',
+                                padding: '5px 10px',
                                 fontSize: '12px',
                                 fontWeight: '600',
                                 borderRadius: '4px',
                                 border: isSel ? '1px solid #c00' : '1px solid #ccc',
                                 backgroundColor: isSel ? '#fff0f0' : '#f8f9fa',
                                 color: isSel ? '#c00' : '#333',
-                                cursor: 'pointer'
+                                cursor: 'pointer',
+                                transition: 'all 0.15s ease'
                               }}
                             >
                               {mat.label}
