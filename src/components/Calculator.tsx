@@ -1882,50 +1882,128 @@ export const Calculator: React.FC = () => {
                     </button>
                   </div>
 
-                  {/* Business Card & Calendar Kind Selection Bar */}
-                  <div style={{ backgroundColor: '#ffffff', padding: '16px 20px', borderRadius: '4px', border: '1px solid #ddd', display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                    <h4 style={{ fontSize: '15px', fontWeight: '800', color: '#222', margin: 0 }}>Вид візитівки / календаря / листової поліграфії</h4>
-                    <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-                      {[
-                        { id: '1', name: 'Стандартні', img: 'https://sborka.ua/cside/img/ico_size/products/viz.png', defaultSize: '1', w: '90', h: '50' },
-                        { id: '2', name: 'Квадратні', img: 'https://sborka.ua/cside/img/ico_size/products/kvadr.png', defaultSize: '5', w: '50', h: '50' },
-                        { id: '6', name: 'Складні', img: 'https://sborka.ua/cside/img/ico_size/products/big.png', defaultSize: '161', w: '90', h: '50' },
-                        { id: '7', name: 'Круг', img: 'https://sborka.ua/cside/img/ico_size/products/circle.png', defaultSize: '1', w: '50', h: '50' },
-                        { id: '8', name: 'Овал', img: 'https://sborka.ua/cside/img/Oval/31_21_n108.png', defaultSize: '1', w: '90', h: '50' },
-                        { id: '9', name: 'Заокругленні кути', img: 'https://sborka.ua/cside/img/ico_size/products/cart.png', defaultSize: '1', w: '90', h: '50' },
-                      ].map(kindItem => {
-                        const isActive = cardKind === kindItem.id;
-                        return (
-                          <div
-                            key={kindItem.id}
-                            onClick={() => {
-                              setCardKind(kindItem.id);
-                              setSheetSizePreset(kindItem.defaultSize);
-                              setSheetCustomWidth(kindItem.w);
-                              setSheetCustomHeight(kindItem.h);
-                            }}
-                            style={{
-                              cursor: 'pointer',
-                              border: isActive ? '2px solid #c00' : '1px solid #ddd',
-                              backgroundColor: isActive ? '#fff0f0' : '#f9f9f9',
-                              borderRadius: '6px',
-                              padding: '8px 14px',
-                              display: 'flex',
-                              flexDirection: 'column',
-                              alignItems: 'center',
-                              gap: '6px',
-                              minWidth: '110px',
-                              transition: 'all 0.15s ease'
-                            }}
-                          >
-                            <img src={kindItem.img} alt={kindItem.name} style={{ width: '55px', height: '40px', objectFit: 'contain' }} />
-                            <span style={{ fontSize: '12px', fontWeight: isActive ? '700' : '600', color: isActive ? '#c00' : '#333', textAlign: 'center' }}>
-                              {kindItem.name}
-                            </span>
-                          </div>
-                        );
-                      })}
-                    </div>
+                  {/* Product Kind / Folding Type Selection Bar */}
+                  <div style={{ backgroundColor: '#ffffff', padding: '16px 20px', borderRadius: '4px', border: '1px solid #ddd', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                    <h4 style={{ fontSize: '15px', fontWeight: '800', color: '#222', margin: 0 }}>
+                      {(category as string) === 'Буклети' ? 'Вид складання (фальцовки / біговки)' :
+                       (category as string) === 'Візитки' ? 'Вид візитівки' :
+                       (category as string) === 'Календарики кишенькові' || (category as string) === 'Календарі' ? 'Вид календаря' :
+                       (category as string) === 'Наклейки' ? 'Вид наклейки' :
+                       (category as string) === 'Папки' ? 'Конструкція папки А4' :
+                       'Вид виробу'}
+                    </h4>
+
+                    {/* 1. Буклети: 12 Folding styles from sborka.ua */}
+                    {category === 'Буклети' && (
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(115px, 1fr))', gap: '10px' }}>
+                        {[
+                          { id: '1', name: 'Книжка', sub: '1 складання', folding: '1', creases: 1 },
+                          { id: '121', name: 'Асиметричний', sub: '1 складання', folding: '121', creases: 1 },
+                          { id: '21', name: 'Намотування', sub: '2 складання', folding: '21', creases: 2 },
+                          { id: '23', name: 'Вікно', sub: '2 складання', folding: '23', creases: 2 },
+                          { id: '22', name: 'Гармошка', sub: '2 складання', folding: '22', creases: 2 },
+                          { id: '34', name: 'Комбінований', sub: '2 складання', folding: '34', creases: 2 },
+                          { id: '31', name: 'Намотування', sub: '3 складання', folding: '31', creases: 3 },
+                          { id: '32', name: 'Гармошка', sub: '3 складання', folding: '32', creases: 3 },
+                          { id: '33', name: 'Вікно', sub: '3 складання', folding: '33', creases: 3 },
+                          { id: '41', name: 'Намотування', sub: '4 складання', folding: '41', creases: 4 },
+                          { id: '42', name: 'Гармошка', sub: '4 складання', folding: '42', creases: 4 },
+                          { id: '52', name: 'Гармошка', sub: '5 складань', folding: '52', creases: 5 },
+                        ].map(fold => {
+                          const isActive = postFolding === fold.folding || cardKind === fold.id;
+                          return (
+                            <div
+                              key={fold.id + fold.name}
+                              onClick={() => {
+                                setCardKind('6');
+                                setPostFolding(fold.folding);
+                                setPostCreasing(fold.creases.toString());
+                              }}
+                              style={{
+                                cursor: 'pointer',
+                                border: isActive ? '2px solid #c00' : '1px solid #ddd',
+                                backgroundColor: isActive ? '#fff0f0' : '#f9f9f9',
+                                borderRadius: '4px',
+                                padding: '10px 6px',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                gap: '4px',
+                                textAlign: 'center',
+                                transition: 'all 0.15s ease'
+                              }}
+                            >
+                              <div style={{
+                                width: '36px',
+                                height: '42px',
+                                border: isActive ? '1.5px solid #c00' : '1px solid #666',
+                                borderRadius: '2px',
+                                backgroundColor: '#fff',
+                                display: 'flex',
+                                justifyContent: 'space-between',
+                                padding: '2px',
+                                boxSizing: 'border-box'
+                              }}>
+                                <div style={{ flex: 1, borderRight: '1px dashed #aaa', height: '100%' }}></div>
+                                {fold.creases >= 2 && <div style={{ flex: 1, borderRight: '1px dashed #aaa', height: '100%' }}></div>}
+                                {fold.creases >= 3 && <div style={{ flex: 1, borderRight: '1px dashed #aaa', height: '100%' }}></div>}
+                              </div>
+                              <span style={{ fontSize: '11px', fontWeight: isActive ? '700' : '600', color: isActive ? '#c00' : '#222', lineHeight: '1.2' }}>
+                                {fold.name}
+                              </span>
+                              <span style={{ fontSize: '10px', color: isActive ? '#c00' : '#666' }}>
+                                {fold.sub}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    {/* 2. Візитки & Інші продукти */}
+                    {category !== 'Буклети' && (
+                      <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+                        {[
+                          { id: '1', name: 'Стандартні', img: 'https://sborka.ua/cside/img/ico_size/products/viz.png', defaultSize: '1', w: '90', h: '50' },
+                          { id: '2', name: 'Квадратні', img: 'https://sborka.ua/cside/img/ico_size/products/kvadr.png', defaultSize: '5', w: '50', h: '50' },
+                          { id: '6', name: 'Складні', img: 'https://sborka.ua/cside/img/ico_size/products/big.png', defaultSize: '161', w: '90', h: '50' },
+                          { id: '7', name: 'Круг', img: 'https://sborka.ua/cside/img/ico_size/products/circle.png', defaultSize: '1', w: '50', h: '50' },
+                          { id: '8', name: 'Овал', img: 'https://sborka.ua/cside/img/Oval/31_21_n108.png', defaultSize: '1', w: '90', h: '50' },
+                          { id: '9', name: 'Заокругленні кути', img: 'https://sborka.ua/cside/img/ico_size/products/cart.png', defaultSize: '1', w: '90', h: '50' },
+                        ].map(kindItem => {
+                          const isActive = cardKind === kindItem.id;
+                          return (
+                            <div
+                              key={kindItem.id}
+                              onClick={() => {
+                                setCardKind(kindItem.id);
+                                setSheetSizePreset(kindItem.defaultSize);
+                                setSheetCustomWidth(kindItem.w);
+                                setSheetCustomHeight(kindItem.h);
+                              }}
+                              style={{
+                                cursor: 'pointer',
+                                border: isActive ? '2px solid #c00' : '1px solid #ddd',
+                                backgroundColor: isActive ? '#fff0f0' : '#f9f9f9',
+                                borderRadius: '6px',
+                                padding: '8px 14px',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                gap: '6px',
+                                minWidth: '110px',
+                                transition: 'all 0.15s ease'
+                              }}
+                            >
+                              <img src={kindItem.img} alt={kindItem.name} style={{ width: '55px', height: '40px', objectFit: 'contain' }} />
+                              <span style={{ fontSize: '12px', fontWeight: isActive ? '700' : '600', color: isActive ? '#c00' : '#333', textAlign: 'center' }}>
+                                {kindItem.name}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
 
                   {/* Size Selector and Product Preview Block */}
