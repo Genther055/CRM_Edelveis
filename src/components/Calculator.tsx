@@ -1261,33 +1261,34 @@ export const Calculator: React.FC = () => {
               {/* OVERVIEW SUBTAB: Sborka 18-Card Product Grid */}
               {offsetSubTab === 'overview' && (
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '15px' }}>
-                  {/* Helper function to select size preset and navigate */}
+                  {/* Common button style helper */}
                   {/* 1. Візитівка */}
                   <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
                     <h4
                       onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset('1'); setSheetCustomWidth('90'); setSheetCustomHeight('50'); handleSelectCategory('Візитки'); }}
-                      style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px', cursor: 'pointer' }}
+                      style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 12px', cursor: 'pointer', transition: 'color 0.15s ease' }}
                       onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
                       onMouseLeave={(e) => e.currentTarget.style.color = '#222'}
                     >
                       Візитівка
                     </h4>
-                    <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
+                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px' }}>
                       {[
                         { name: '90х50', preset: '1', w: '90', h: '50', kind: '1' },
                         { name: '85х55', preset: '5', w: '85', h: '55', kind: '1' },
                         { name: '50х50', preset: '5', w: '50', h: '50', kind: '2' },
                         { name: 'Кругла', preset: '5', w: '50', h: '50', kind: '7' }
                       ].map(item => (
-                        <span
+                        <button
                           key={item.name}
+                          type="button"
                           onClick={() => { setOffsetSubTab('sheets'); setCardKind(item.kind); setSheetSizePreset(item.preset); setSheetCustomWidth(item.w); setSheetCustomHeight(item.h); handleSelectCategory('Візитки'); }}
-                          style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
-                          onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
-                          onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
+                          style={{ cursor: 'pointer', fontWeight: '600', padding: '4px 10px', borderRadius: '4px', backgroundColor: '#ffffff', border: '1px solid #ccc', color: '#333', fontSize: '12px', transition: 'all 0.15s ease' }}
+                          onMouseEnter={(e) => { e.currentTarget.style.color = '#c00'; e.currentTarget.style.borderColor = '#c00'; }}
+                          onMouseLeave={(e) => { e.currentTarget.style.color = '#333'; e.currentTarget.style.borderColor = '#ccc'; }}
                         >
                           {item.name}
-                        </span>
+                        </button>
                       ))}
                     </div>
                   </div>
@@ -1296,27 +1297,28 @@ export const Calculator: React.FC = () => {
                   <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
                     <h4
                       onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset('91'); setSheetCustomWidth('100'); setSheetCustomHeight('70'); handleSelectCategory('Календарі кишенькові'); }}
-                      style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px', cursor: 'pointer' }}
+                      style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 12px', cursor: 'pointer', transition: 'color 0.15s ease' }}
                       onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
                       onMouseLeave={(e) => e.currentTarget.style.color = '#222'}
                     >
                       Календар
                     </h4>
-                    <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
+                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px' }}>
                       {[
                         { name: '100х70', preset: '91', w: '100', h: '70', kind: '1' },
                         { name: '90х60', preset: '90', w: '90', h: '60', kind: '1' },
                         { name: '70х70', preset: '256', w: '70', h: '70', kind: '2' }
                       ].map(item => (
-                        <span
+                        <button
                           key={item.name}
+                          type="button"
                           onClick={() => { setOffsetSubTab('sheets'); setCardKind(item.kind); setSheetSizePreset(item.preset); setSheetCustomWidth(item.w); setSheetCustomHeight(item.h); handleSelectCategory('Календарі кишенькові'); }}
-                          style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
-                          onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
-                          onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
+                          style={{ cursor: 'pointer', fontWeight: '600', padding: '4px 10px', borderRadius: '4px', backgroundColor: '#ffffff', border: '1px solid #ccc', color: '#333', fontSize: '12px', transition: 'all 0.15s ease' }}
+                          onMouseEnter={(e) => { e.currentTarget.style.color = '#c00'; e.currentTarget.style.borderColor = '#c00'; }}
+                          onMouseLeave={(e) => { e.currentTarget.style.color = '#333'; e.currentTarget.style.borderColor = '#ccc'; }}
                         >
                           {item.name}
-                        </span>
+                        </button>
                       ))}
                     </div>
                   </div>
@@ -1325,27 +1327,28 @@ export const Calculator: React.FC = () => {
                   <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
                     <h4
                       onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset('25'); setSheetCustomWidth('99'); setSheetCustomHeight('210'); handleSelectCategory('Флаєри'); }}
-                      style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px', cursor: 'pointer' }}
+                      style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 12px', cursor: 'pointer', transition: 'color 0.15s ease' }}
                       onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
                       onMouseLeave={(e) => e.currentTarget.style.color = '#222'}
                     >
                       Флаєр
                     </h4>
-                    <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
+                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px' }}>
                       {[
                         { name: '210х99', preset: '25', w: '99', h: '210', kind: '1' },
                         { name: '210х198', preset: '26', w: '198', h: '210', kind: '6' },
                         { name: '99х99', preset: '24', w: '99', h: '99', kind: '2' }
                       ].map(item => (
-                        <span
+                        <button
                           key={item.name}
+                          type="button"
                           onClick={() => { setOffsetSubTab('sheets'); setCardKind(item.kind); setSheetSizePreset(item.preset); setSheetCustomWidth(item.w); setSheetCustomHeight(item.h); handleSelectCategory('Флаєри'); }}
-                          style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
-                          onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
-                          onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
+                          style={{ cursor: 'pointer', fontWeight: '600', padding: '4px 10px', borderRadius: '4px', backgroundColor: '#ffffff', border: '1px solid #ccc', color: '#333', fontSize: '12px', transition: 'all 0.15s ease' }}
+                          onMouseEnter={(e) => { e.currentTarget.style.color = '#c00'; e.currentTarget.style.borderColor = '#c00'; }}
+                          onMouseLeave={(e) => { e.currentTarget.style.color = '#333'; e.currentTarget.style.borderColor = '#ccc'; }}
                         >
                           {item.name}
-                        </span>
+                        </button>
                       ))}
                     </div>
                   </div>
@@ -1354,13 +1357,13 @@ export const Calculator: React.FC = () => {
                   <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
                     <h4
                       onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset('28'); setSheetCustomWidth('70'); setSheetCustomHeight('100'); handleSelectCategory('Листівки'); }}
-                      style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px', cursor: 'pointer' }}
+                      style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 12px', cursor: 'pointer', transition: 'color 0.15s ease' }}
                       onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
                       onMouseLeave={(e) => e.currentTarget.style.color = '#222'}
                     >
                       Листівка
                     </h4>
-                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
+                    <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px' }}>
                       {[
                         { name: 'А7', preset: '28', w: '70', h: '100', kind: '1' },
                         { name: 'А6', preset: '312', w: '105', h: '148', kind: '1' },
@@ -1369,15 +1372,16 @@ export const Calculator: React.FC = () => {
                         { name: 'А3', preset: '36', w: '297', h: '420', kind: '1' },
                         { name: 'Кругла', preset: '37', w: '70', h: '70', kind: '7' }
                       ].map(item => (
-                        <span
+                        <button
                           key={item.name}
+                          type="button"
                           onClick={() => { setOffsetSubTab('sheets'); setCardKind(item.kind); setSheetSizePreset(item.preset); setSheetCustomWidth(item.w); setSheetCustomHeight(item.h); handleSelectCategory('Листівки'); }}
-                          style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
-                          onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
-                          onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
+                          style={{ cursor: 'pointer', fontWeight: '600', padding: '4px 8px', borderRadius: '4px', backgroundColor: '#ffffff', border: '1px solid #ccc', color: '#333', fontSize: '12px', transition: 'all 0.15s ease' }}
+                          onMouseEnter={(e) => { e.currentTarget.style.color = '#c00'; e.currentTarget.style.borderColor = '#c00'; }}
+                          onMouseLeave={(e) => { e.currentTarget.style.color = '#333'; e.currentTarget.style.borderColor = '#ccc'; }}
                         >
                           {item.name}
-                        </span>
+                        </button>
                       ))}
                     </div>
                   </div>
@@ -1386,13 +1390,13 @@ export const Calculator: React.FC = () => {
                   <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
                     <h4
                       onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset('36'); setSheetCustomWidth('297'); setSheetCustomHeight('420'); handleSelectCategory('Плакати'); }}
-                      style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px', cursor: 'pointer' }}
+                      style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 12px', cursor: 'pointer', transition: 'color 0.15s ease' }}
                       onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
                       onMouseLeave={(e) => e.currentTarget.style.color = '#222'}
                     >
                       Плакати
                     </h4>
-                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
+                    <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px' }}>
                       {[
                         { name: 'А3', preset: '36', w: '297', h: '420', kind: '1' },
                         { name: 'В3', preset: 'b3', w: '340', h: '490', kind: '1' },
@@ -1401,15 +1405,16 @@ export const Calculator: React.FC = () => {
                         { name: 'А1', preset: '16', w: '594', h: '841', kind: '1' },
                         { name: 'B1', preset: 'b1', w: '680', h: '980', kind: '1' }
                       ].map(item => (
-                        <span
+                        <button
                           key={item.name}
+                          type="button"
                           onClick={() => { setOffsetSubTab('sheets'); setCardKind(item.kind); setSheetSizePreset(item.preset); setSheetCustomWidth(item.w); setSheetCustomHeight(item.h); handleSelectCategory('Плакати'); }}
-                          style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
-                          onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
-                          onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
+                          style={{ cursor: 'pointer', fontWeight: '600', padding: '4px 8px', borderRadius: '4px', backgroundColor: '#ffffff', border: '1px solid #ccc', color: '#333', fontSize: '12px', transition: 'all 0.15s ease' }}
+                          onMouseEnter={(e) => { e.currentTarget.style.color = '#c00'; e.currentTarget.style.borderColor = '#c00'; }}
+                          onMouseLeave={(e) => { e.currentTarget.style.color = '#333'; e.currentTarget.style.borderColor = '#ccc'; }}
                         >
                           {item.name}
-                        </span>
+                        </button>
                       ))}
                     </div>
                   </div>
@@ -1418,26 +1423,27 @@ export const Calculator: React.FC = () => {
                   <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
                     <h4
                       onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset('sets_a3'); setSheetCustomWidth('420'); setSheetCustomHeight('297'); handleSelectCategory('Сети'); }}
-                      style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px', cursor: 'pointer' }}
+                      style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 12px', cursor: 'pointer', transition: 'color 0.15s ease' }}
                       onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
                       onMouseLeave={(e) => e.currentTarget.style.color = '#222'}
                     >
                       Сети
                     </h4>
-                    <div style={{ display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
+                    <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px' }}>
                       {[
                         { name: 'А3', preset: 'sets_a3', w: '420', h: '297', kind: '1' },
                         { name: 'В3', preset: 'sets_b3', w: '490', h: '340', kind: '1' }
                       ].map(item => (
-                        <span
+                        <button
                           key={item.name}
+                          type="button"
                           onClick={() => { setOffsetSubTab('sheets'); setCardKind(item.kind); setSheetSizePreset(item.preset); setSheetCustomWidth(item.w); setSheetCustomHeight(item.h); handleSelectCategory('Сети'); }}
-                          style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
-                          onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
-                          onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
+                          style={{ cursor: 'pointer', fontWeight: '600', padding: '4px 12px', borderRadius: '4px', backgroundColor: '#ffffff', border: '1px solid #ccc', color: '#333', fontSize: '12px', transition: 'all 0.15s ease' }}
+                          onMouseEnter={(e) => { e.currentTarget.style.color = '#c00'; e.currentTarget.style.borderColor = '#c00'; }}
+                          onMouseLeave={(e) => { e.currentTarget.style.color = '#333'; e.currentTarget.style.borderColor = '#ccc'; }}
                         >
                           {item.name}
-                        </span>
+                        </button>
                       ))}
                     </div>
                   </div>
@@ -1446,13 +1452,13 @@ export const Calculator: React.FC = () => {
                   <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
                     <h4
                       onClick={() => { setOffsetSubTab('sheets'); setCardKind('6'); setSheetSizePreset('34'); setSheetCustomWidth('210'); setSheetCustomHeight('297'); handleSelectCategory('Буклети'); }}
-                      style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px', cursor: 'pointer' }}
+                      style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 12px', cursor: 'pointer', transition: 'color 0.15s ease' }}
                       onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
                       onMouseLeave={(e) => e.currentTarget.style.color = '#222'}
                     >
                       Буклет
                     </h4>
-                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
+                    <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px' }}>
                       {[
                         { name: 'А4 в Євро', preset: '34', w: '210', h: '297', kind: '6' },
                         { name: '2Євро в Євро', preset: '26', w: '198', h: '210', kind: '6' },
@@ -1460,15 +1466,16 @@ export const Calculator: React.FC = () => {
                         { name: 'А5', preset: '32', w: '148', h: '210', kind: '6' },
                         { name: 'А4', preset: '34', w: '210', h: '297', kind: '6' }
                       ].map(item => (
-                        <span
+                        <button
                           key={item.name}
+                          type="button"
                           onClick={() => { setOffsetSubTab('sheets'); setCardKind(item.kind); setSheetSizePreset(item.preset); setSheetCustomWidth(item.w); setSheetCustomHeight(item.h); handleSelectCategory('Буклети'); }}
-                          style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
-                          onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
-                          onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
+                          style={{ cursor: 'pointer', fontWeight: '600', padding: '4px 8px', borderRadius: '4px', backgroundColor: '#ffffff', border: '1px solid #ccc', color: '#333', fontSize: '12px', transition: 'all 0.15s ease' }}
+                          onMouseEnter={(e) => { e.currentTarget.style.color = '#c00'; e.currentTarget.style.borderColor = '#c00'; }}
+                          onMouseLeave={(e) => { e.currentTarget.style.color = '#333'; e.currentTarget.style.borderColor = '#ccc'; }}
                         >
                           {item.name}
-                        </span>
+                        </button>
                       ))}
                     </div>
                   </div>
@@ -1477,23 +1484,24 @@ export const Calculator: React.FC = () => {
                   <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
                     <h4
                       onClick={() => { setOffsetSubTab('multipage'); handleSelectCategory('Книги'); }}
-                      style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px', cursor: 'pointer' }}
+                      style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 12px', cursor: 'pointer', transition: 'color 0.15s ease' }}
                       onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
                       onMouseLeave={(e) => e.currentTarget.style.color = '#222'}
                     >
                       Каталог
                     </h4>
-                    <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
+                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px' }}>
                       {['Скоба', 'Пружина', 'Клей'].map(st => (
-                        <span
+                        <button
                           key={st}
+                          type="button"
                           onClick={() => { setOffsetSubTab('multipage'); handleSelectCategory('Книги'); }}
-                          style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
-                          onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
-                          onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
+                          style={{ cursor: 'pointer', fontWeight: '600', padding: '4px 10px', borderRadius: '4px', backgroundColor: '#ffffff', border: '1px solid #ccc', color: '#333', fontSize: '12px', transition: 'all 0.15s ease' }}
+                          onMouseEnter={(e) => { e.currentTarget.style.color = '#c00'; e.currentTarget.style.borderColor = '#c00'; }}
+                          onMouseLeave={(e) => { e.currentTarget.style.color = '#333'; e.currentTarget.style.borderColor = '#ccc'; }}
                         >
                           {st}
-                        </span>
+                        </button>
                       ))}
                     </div>
                   </div>
@@ -1502,27 +1510,28 @@ export const Calculator: React.FC = () => {
                   <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
                     <h4
                       onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset('32'); setSheetCustomWidth('148'); setSheetCustomHeight('210'); handleSelectCategory('Блокноти'); }}
-                      style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px', cursor: 'pointer' }}
+                      style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 12px', cursor: 'pointer', transition: 'color 0.15s ease' }}
                       onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
                       onMouseLeave={(e) => e.currentTarget.style.color = '#222'}
                     >
                       Блокнот
                     </h4>
-                    <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
+                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px' }}>
                       {[
                         { name: 'А6', preset: '312', w: '105', h: '148' },
                         { name: 'А5', preset: '32', w: '148', h: '210' },
                         { name: 'А4', preset: '34', w: '210', h: '297' }
                       ].map(item => (
-                        <span
+                        <button
                           key={item.name}
+                          type="button"
                           onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset(item.preset); setSheetCustomWidth(item.w); setSheetCustomHeight(item.h); handleSelectCategory('Блокноти'); }}
-                          style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
-                          onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
-                          onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
+                          style={{ cursor: 'pointer', fontWeight: '600', padding: '4px 10px', borderRadius: '4px', backgroundColor: '#ffffff', border: '1px solid #ccc', color: '#333', fontSize: '12px', transition: 'all 0.15s ease' }}
+                          onMouseEnter={(e) => { e.currentTarget.style.color = '#c00'; e.currentTarget.style.borderColor = '#c00'; }}
+                          onMouseLeave={(e) => { e.currentTarget.style.color = '#333'; e.currentTarget.style.borderColor = '#ccc'; }}
                         >
                           {item.name}
-                        </span>
+                        </button>
                       ))}
                     </div>
                   </div>
@@ -1531,28 +1540,29 @@ export const Calculator: React.FC = () => {
                   <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
                     <h4
                       onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset('1'); setSheetCustomWidth('90'); setSheetCustomHeight('50'); handleSelectCategory('Наклейки'); }}
-                      style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px', cursor: 'pointer' }}
+                      style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 12px', cursor: 'pointer', transition: 'color 0.15s ease' }}
                       onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
                       onMouseLeave={(e) => e.currentTarget.style.color = '#222'}
                     >
                       Наліпка
                     </h4>
-                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
+                    <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px' }}>
                       {[
                         { name: '90х50', preset: '1', w: '90', h: '50', kind: '1' },
                         { name: '50х50', preset: '5', w: '50', h: '50', kind: '2' },
                         { name: 'Кругла', preset: '5', w: '50', h: '50', kind: '7' },
                         { name: 'Овальна', preset: '1', w: '90', h: '50', kind: '8' }
                       ].map(item => (
-                        <span
+                        <button
                           key={item.name}
+                          type="button"
                           onClick={() => { setOffsetSubTab('sheets'); setCardKind(item.kind); setSheetSizePreset(item.preset); setSheetCustomWidth(item.w); setSheetCustomHeight(item.h); handleSelectCategory('Наклейки'); }}
-                          style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
-                          onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
-                          onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
+                          style={{ cursor: 'pointer', fontWeight: '600', padding: '4px 8px', borderRadius: '4px', backgroundColor: '#ffffff', border: '1px solid #ccc', color: '#333', fontSize: '12px', transition: 'all 0.15s ease' }}
+                          onMouseEnter={(e) => { e.currentTarget.style.color = '#c00'; e.currentTarget.style.borderColor = '#c00'; }}
+                          onMouseLeave={(e) => { e.currentTarget.style.color = '#333'; e.currentTarget.style.borderColor = '#ccc'; }}
                         >
                           {item.name}
-                        </span>
+                        </button>
                       ))}
                     </div>
                   </div>
@@ -1561,52 +1571,54 @@ export const Calculator: React.FC = () => {
                   <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
                     <h4
                       onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset('34'); setSheetCustomWidth('210'); setSheetCustomHeight('297'); handleSelectCategory('Папки'); }}
-                      style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px', cursor: 'pointer' }}
+                      style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 12px', cursor: 'pointer', transition: 'color 0.15s ease' }}
                       onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
                       onMouseLeave={(e) => e.currentTarget.style.color = '#222'}
                     >
                       Папка А4
                     </h4>
-                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
+                    <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px' }}>
                       {['Без корінця', 'Корінець 5мм', 'З резинкою'].map(fmt => (
-                        <span
+                        <button
                           key={fmt}
+                          type="button"
                           onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset('34'); setSheetCustomWidth('210'); setSheetCustomHeight('297'); handleSelectCategory('Папки'); }}
-                          style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
-                          onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
-                          onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
+                          style={{ cursor: 'pointer', fontWeight: '600', padding: '4px 8px', borderRadius: '4px', backgroundColor: '#ffffff', border: '1px solid #ccc', color: '#333', fontSize: '12px', transition: 'all 0.15s ease' }}
+                          onMouseEnter={(e) => { e.currentTarget.style.color = '#c00'; e.currentTarget.style.borderColor = '#c00'; }}
+                          onMouseLeave={(e) => { e.currentTarget.style.color = '#333'; e.currentTarget.style.borderColor = '#ccc'; }}
                         >
                           {fmt}
-                        </span>
+                        </button>
                       ))}
                     </div>
                   </div>
 
-                  {/* 12. Листівка (проста/складна/кругла) */}
+                  {/* 12. Листівка (Одинарна/Складна/Кругла) */}
                   <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
                     <h4
                       onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset('32'); setSheetCustomWidth('148'); setSheetCustomHeight('210'); handleSelectCategory('Листівки'); }}
-                      style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px', cursor: 'pointer' }}
+                      style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 12px', cursor: 'pointer', transition: 'color 0.15s ease' }}
                       onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
                       onMouseLeave={(e) => e.currentTarget.style.color = '#222'}
                     >
                       Листівка
                     </h4>
-                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
+                    <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px' }}>
                       {[
                         { name: 'Одинарна', preset: '32', w: '148', h: '210', kind: '1' },
                         { name: 'Складна', preset: '34', w: '210', h: '297', kind: '6' },
                         { name: 'Кругла', preset: '37', w: '70', h: '70', kind: '7' }
                       ].map(item => (
-                        <span
+                        <button
                           key={item.name}
+                          type="button"
                           onClick={() => { setOffsetSubTab('sheets'); setCardKind(item.kind); setSheetSizePreset(item.preset); setSheetCustomWidth(item.w); setSheetCustomHeight(item.h); handleSelectCategory('Листівки'); }}
-                          style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
-                          onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
-                          onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
+                          style={{ cursor: 'pointer', fontWeight: '600', padding: '4px 8px', borderRadius: '4px', backgroundColor: '#ffffff', border: '1px solid #ccc', color: '#333', fontSize: '12px', transition: 'all 0.15s ease' }}
+                          onMouseEnter={(e) => { e.currentTarget.style.color = '#c00'; e.currentTarget.style.borderColor = '#c00'; }}
+                          onMouseLeave={(e) => { e.currentTarget.style.color = '#333'; e.currentTarget.style.borderColor = '#ccc'; }}
                         >
                           {item.name}
-                        </span>
+                        </button>
                       ))}
                     </div>
                   </div>
@@ -1615,47 +1627,51 @@ export const Calculator: React.FC = () => {
                   <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
                     <h4
                       onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset('34'); setSheetCustomWidth('210'); setSheetCustomHeight('297'); handleSelectCategory('Календарі кишенькові'); }}
-                      style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 8px', cursor: 'pointer' }}
+                      style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px', cursor: 'pointer', transition: 'color 0.15s ease' }}
                       onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
                       onMouseLeave={(e) => e.currentTarget.style.color = '#222'}
                     >
                       Календарні сітки
                     </h4>
-                    <div 
+                    <button
+                      type="button"
                       onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset('34'); setSheetCustomWidth('210'); setSheetCustomHeight('297'); handleSelectCategory('Календарі кишенькові'); }}
-                      style={{ cursor: 'pointer', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '6px' }}
+                      style={{ cursor: 'pointer', fontWeight: '600', padding: '6px 12px', borderRadius: '4px', backgroundColor: '#ffffff', border: '1px solid #ccc', color: '#333', fontSize: '12px', transition: 'all 0.15s ease', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+                      onMouseEnter={(e) => { e.currentTarget.style.color = '#c00'; e.currentTarget.style.borderColor = '#c00'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.color = '#333'; e.currentTarget.style.borderColor = '#ccc'; }}
                     >
-                      <Calendar size={22} style={{ color: '#c00' }} />
-                      <span style={{ fontSize: '12px', fontWeight: '600', color: '#333' }}>Сітки 2026</span>
-                    </div>
+                      <Calendar size={16} style={{ color: '#c00' }} />
+                      <span>Сітки 2026</span>
+                    </button>
                   </div>
 
                   {/* 14. Друк в листах */}
                   <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
                     <h4
                       onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset('15'); setSheetCustomWidth('420'); setSheetCustomHeight('594'); handleSelectCategory('Бланки'); }}
-                      style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px', cursor: 'pointer' }}
+                      style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 12px', cursor: 'pointer', transition: 'color 0.15s ease' }}
                       onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
                       onMouseLeave={(e) => e.currentTarget.style.color = '#222'}
                     >
                       Друк в листах
                     </h4>
-                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
+                    <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px' }}>
                       {[
                         { name: 'А2', preset: '15', w: '420', h: '594' },
                         { name: 'В2', preset: 'b2', w: '480', h: '690' },
                         { name: 'А1', preset: '16', w: '594', h: '841' },
-                        { name: 'В1', preset: 'b1', w: '680', h: '980' }
+                        { name: 'B1', preset: 'b1', w: '680', h: '980' }
                       ].map(item => (
-                        <span
+                        <button
                           key={item.name}
+                          type="button"
                           onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset(item.preset); setSheetCustomWidth(item.w); setSheetCustomHeight(item.h); handleSelectCategory('Бланки'); }}
-                          style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
-                          onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
-                          onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
+                          style={{ cursor: 'pointer', fontWeight: '600', padding: '4px 8px', borderRadius: '4px', backgroundColor: '#ffffff', border: '1px solid #ccc', color: '#333', fontSize: '12px', transition: 'all 0.15s ease' }}
+                          onMouseEnter={(e) => { e.currentTarget.style.color = '#c00'; e.currentTarget.style.borderColor = '#c00'; }}
+                          onMouseLeave={(e) => { e.currentTarget.style.color = '#333'; e.currentTarget.style.borderColor = '#ccc'; }}
                         >
                           {item.name}
-                        </span>
+                        </button>
                       ))}
                     </div>
                   </div>
@@ -1664,28 +1680,29 @@ export const Calculator: React.FC = () => {
                   <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
                     <h4
                       onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset('25'); setSheetCustomWidth('110'); setSheetCustomHeight('220'); handleSelectCategory('Бланки'); }}
-                      style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px', cursor: 'pointer' }}
+                      style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 12px', cursor: 'pointer', transition: 'color 0.15s ease' }}
                       onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
                       onMouseLeave={(e) => e.currentTarget.style.color = '#222'}
                     >
                       Конверт
                     </h4>
-                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
+                    <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px' }}>
                       {[
                         { name: 'Євро', preset: '25', w: '110', h: '220' },
                         { name: 'С6', preset: '21', w: '114', h: '162' },
                         { name: 'С5', preset: '32', w: '162', h: '229' },
                         { name: 'С4', preset: '34', w: '229', h: '324' }
                       ].map(item => (
-                        <span
+                        <button
                           key={item.name}
+                          type="button"
                           onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset(item.preset); setSheetCustomWidth(item.w); setSheetCustomHeight(item.h); handleSelectCategory('Бланки'); }}
-                          style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
-                          onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
-                          onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
+                          style={{ cursor: 'pointer', fontWeight: '600', padding: '4px 8px', borderRadius: '4px', backgroundColor: '#ffffff', border: '1px solid #ccc', color: '#333', fontSize: '12px', transition: 'all 0.15s ease' }}
+                          onMouseEnter={(e) => { e.currentTarget.style.color = '#c00'; e.currentTarget.style.borderColor = '#c00'; }}
+                          onMouseLeave={(e) => { e.currentTarget.style.color = '#333'; e.currentTarget.style.borderColor = '#ccc'; }}
                         >
                           {item.name}
-                        </span>
+                        </button>
                       ))}
                     </div>
                   </div>
@@ -1694,23 +1711,24 @@ export const Calculator: React.FC = () => {
                   <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
                     <h4
                       onClick={() => { setOffsetSubTab('felling'); handleSelectCategory('Наклейки'); }}
-                      style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px', cursor: 'pointer' }}
+                      style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 12px', cursor: 'pointer', transition: 'color 0.15s ease' }}
                       onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
                       onMouseLeave={(e) => e.currentTarget.style.color = '#222'}
                     >
                       Хенгери
                     </h4>
-                    <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
+                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px' }}>
                       {['вид 1', 'вид 2'].map(v => (
-                        <span
+                        <button
                           key={v}
+                          type="button"
                           onClick={() => { setOffsetSubTab('felling'); handleSelectCategory('Наклейки'); }}
-                          style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
-                          onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
-                          onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
+                          style={{ cursor: 'pointer', fontWeight: '600', padding: '4px 10px', borderRadius: '4px', backgroundColor: '#ffffff', border: '1px solid #ccc', color: '#333', fontSize: '12px', transition: 'all 0.15s ease' }}
+                          onMouseEnter={(e) => { e.currentTarget.style.color = '#c00'; e.currentTarget.style.borderColor = '#c00'; }}
+                          onMouseLeave={(e) => { e.currentTarget.style.color = '#333'; e.currentTarget.style.borderColor = '#ccc'; }}
                         >
                           🔖 {v}
-                        </span>
+                        </button>
                       ))}
                     </div>
                   </div>
@@ -1719,26 +1737,27 @@ export const Calculator: React.FC = () => {
                   <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
                     <h4
                       onClick={() => { setOffsetSubTab('felling'); setSheetSizePreset('160'); setSheetCustomWidth('210'); setSheetCustomHeight('300'); handleSelectCategory('Календарі кишенькові'); }}
-                      style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px', cursor: 'pointer' }}
+                      style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 12px', cursor: 'pointer', transition: 'color 0.15s ease' }}
                       onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
                       onMouseLeave={(e) => e.currentTarget.style.color = '#222'}
                     >
                       Календарі висічні
                     </h4>
-                    <div style={{ display: 'flex', gap: '10px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
+                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px' }}>
                       {[
                         { name: 'будинок', preset: '160', w: '210', h: '300' },
                         { name: 'пірамідка', preset: '161', w: '305', h: '134' }
                       ].map(item => (
-                        <span
+                        <button
                           key={item.name}
+                          type="button"
                           onClick={() => { setOffsetSubTab('felling'); setSheetSizePreset(item.preset); setSheetCustomWidth(item.w); setSheetCustomHeight(item.h); handleSelectCategory('Календарі кишенькові'); }}
-                          style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
-                          onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
-                          onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
+                          style={{ cursor: 'pointer', fontWeight: '600', padding: '4px 10px', borderRadius: '4px', backgroundColor: '#ffffff', border: '1px solid #ccc', color: '#333', fontSize: '12px', transition: 'all 0.15s ease' }}
+                          onMouseEnter={(e) => { e.currentTarget.style.color = '#c00'; e.currentTarget.style.borderColor = '#c00'; }}
+                          onMouseLeave={(e) => { e.currentTarget.style.color = '#333'; e.currentTarget.style.borderColor = '#ccc'; }}
                         >
                           🏠 {item.name}
-                        </span>
+                        </button>
                       ))}
                     </div>
                   </div>
@@ -1747,13 +1766,13 @@ export const Calculator: React.FC = () => {
                   <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
                     <h4
                       onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset('36'); setSheetCustomWidth('297'); setSheetCustomHeight('420'); handleSelectCategory('Бланки'); }}
-                      style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px', cursor: 'pointer' }}
+                      style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 12px', cursor: 'pointer', transition: 'color 0.15s ease' }}
                       onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
                       onMouseLeave={(e) => e.currentTarget.style.color = '#222'}
                     >
                       Пакувальний папір
                     </h4>
-                    <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px', color: '#333' }}>
+                    <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px' }}>
                       {[
                         { name: 'А3', preset: '36', w: '297', h: '420' },
                         { name: 'В3', preset: 'b3', w: '340', h: '490' },
@@ -1762,15 +1781,16 @@ export const Calculator: React.FC = () => {
                         { name: 'А1', preset: '16', w: '594', h: '841' },
                         { name: 'B1', preset: 'b1', w: '680', h: '980' }
                       ].map(item => (
-                        <span
+                        <button
                           key={item.name}
+                          type="button"
                           onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset(item.preset); setSheetCustomWidth(item.w); setSheetCustomHeight(item.h); handleSelectCategory('Бланки'); }}
-                          style={{ cursor: 'pointer', fontWeight: '600', transition: 'color 0.15s ease' }}
-                          onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
-                          onMouseLeave={(e) => e.currentTarget.style.color = '#333'}
+                          style={{ cursor: 'pointer', fontWeight: '600', padding: '4px 8px', borderRadius: '4px', backgroundColor: '#ffffff', border: '1px solid #ccc', color: '#333', fontSize: '12px', transition: 'all 0.15s ease' }}
+                          onMouseEnter={(e) => { e.currentTarget.style.color = '#c00'; e.currentTarget.style.borderColor = '#c00'; }}
+                          onMouseLeave={(e) => { e.currentTarget.style.color = '#333'; e.currentTarget.style.borderColor = '#ccc'; }}
                         >
                           {item.name}
-                        </span>
+                        </button>
                       ))}
                     </div>
                   </div>
