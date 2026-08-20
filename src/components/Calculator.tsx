@@ -1960,48 +1960,118 @@ export const Calculator: React.FC = () => {
                       </div>
                     )}
 
-                    {/* 2. Візитки & Інші продукти */}
+                    {/* 2. Category-Specific Format & Sub-Kind Buttons */}
                     {category !== 'Буклети' && (
-                      <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-                        {[
-                          { id: '1', name: 'Стандартні', img: 'https://sborka.ua/cside/img/ico_size/products/viz.png', defaultSize: '1', w: '90', h: '50' },
-                          { id: '2', name: 'Квадратні', img: 'https://sborka.ua/cside/img/ico_size/products/kvadr.png', defaultSize: '5', w: '50', h: '50' },
-                          { id: '6', name: 'Складні', img: 'https://sborka.ua/cside/img/ico_size/products/big.png', defaultSize: '161', w: '90', h: '50' },
-                          { id: '7', name: 'Круг', img: 'https://sborka.ua/cside/img/ico_size/products/circle.png', defaultSize: '1', w: '50', h: '50' },
-                          { id: '8', name: 'Овал', img: 'https://sborka.ua/cside/img/Oval/31_21_n108.png', defaultSize: '1', w: '90', h: '50' },
-                          { id: '9', name: 'Заокругленні кути', img: 'https://sborka.ua/cside/img/ico_size/products/cart.png', defaultSize: '1', w: '90', h: '50' },
-                        ].map(kindItem => {
-                          const isActive = cardKind === kindItem.id;
-                          return (
-                            <div
-                              key={kindItem.id}
-                              onClick={() => {
-                                setCardKind(kindItem.id);
-                                setSheetSizePreset(kindItem.defaultSize);
-                                setSheetCustomWidth(kindItem.w);
-                                setSheetCustomHeight(kindItem.h);
-                              }}
-                              style={{
-                                cursor: 'pointer',
-                                border: isActive ? '2px solid #c00' : '1px solid #ddd',
-                                backgroundColor: isActive ? '#fff0f0' : '#f9f9f9',
-                                borderRadius: '6px',
-                                padding: '8px 14px',
-                                display: 'flex',
-                                flexDirection: 'column',
-                                alignItems: 'center',
-                                gap: '6px',
-                                minWidth: '110px',
-                                transition: 'all 0.15s ease'
-                              }}
-                            >
-                              <img src={kindItem.img} alt={kindItem.name} style={{ width: '55px', height: '40px', objectFit: 'contain' }} />
-                              <span style={{ fontSize: '12px', fontWeight: isActive ? '700' : '600', color: isActive ? '#c00' : '#333', textAlign: 'center' }}>
-                                {kindItem.name}
-                              </span>
-                            </div>
-                          );
-                        })}
+                      <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+                        {(() => {
+                          const catStr = category as string;
+                          let items: Array<{ id: string; name: string; preset: string; w: string; h: string; img?: string }> = [];
+
+                          if (catStr === 'Візитки') {
+                            items = [
+                              { id: '1', name: 'Стандартні (90×50)', preset: '1', w: '90', h: '50', img: 'https://sborka.ua/cside/img/ico_size/products/viz.png' },
+                              { id: '2', name: 'Квадратні (50×50)', preset: '5', w: '50', h: '50', img: 'https://sborka.ua/cside/img/ico_size/products/kvadr.png' },
+                              { id: '6', name: 'Складні (90×100)', preset: '3', w: '90', h: '100', img: 'https://sborka.ua/cside/img/ico_size/products/big.png' },
+                              { id: '7', name: 'Круг (Ø50)', preset: '5', w: '50', h: '50', img: 'https://sborka.ua/cside/img/ico_size/products/circle.png' },
+                              { id: '8', name: 'Овал (90×50)', preset: '1', w: '90', h: '50', img: 'https://sborka.ua/cside/img/Oval/31_21_n108.png' },
+                              { id: '9', name: 'Заокруглені кути', preset: '1', w: '90', h: '50', img: 'https://sborka.ua/cside/img/ico_size/products/cart.png' }
+                            ];
+                          } else if (catStr === 'Календарики кишенькові' || catStr === 'Календарі') {
+                            items = [
+                              { id: '1', name: 'Кишеньковий (100×70)', preset: '91', w: '100', h: '70' },
+                              { id: '2', name: 'Календар (90×60)', preset: '90', w: '90', h: '60' },
+                              { id: '3', name: 'Квадратний (70×70)', preset: '256', w: '70', h: '70' },
+                              { id: '4', name: 'Календар «Будинок» (210×300)', preset: '160', w: '210', h: '300' },
+                              { id: '5', name: 'Календар «Пірамідка» (305×134)', preset: '161', w: '305', h: '134' }
+                            ];
+                          } else if (catStr === 'Плакати') {
+                            items = [
+                              { id: '1', name: 'Плакат А3 (297×420)', preset: '36', w: '297', h: '420' },
+                              { id: '2', name: 'Плакат В3 (340×490)', preset: 'b3', w: '340', h: '490' },
+                              { id: '3', name: 'Плакат А2 (420×594)', preset: '15', w: '420', h: '594' },
+                              { id: '4', name: 'Плакат В2 (480×690)', preset: 'b2', w: '480', h: '690' },
+                              { id: '5', name: 'Плакат А1 (594×841)', preset: '16', w: '594', h: '841' },
+                              { id: '6', name: 'Плакат В1 (680×980)', preset: 'b1', w: '680', h: '980' }
+                            ];
+                          } else if (catStr === 'Сети') {
+                            items = [
+                              { id: '1', name: 'Сети А3 (420×297)', preset: 'sets_a3', w: '420', h: '297' },
+                              { id: '2', name: 'Сети В3 (490×340)', preset: 'sets_b3', w: '490', h: '340' }
+                            ];
+                          } else if (catStr === 'Наклейки') {
+                            items = [
+                              { id: '1', name: 'Стікер 50×50 мм', preset: '5', w: '50', h: '50' },
+                              { id: '2', name: 'Стікер 90×50 мм', preset: '1', w: '90', h: '50' },
+                              { id: '3', name: 'Єврофлаєр стікер (99×210)', preset: '25', w: '99', h: '210' },
+                              { id: '4', name: 'Наклейка А6 (105×148)', preset: '312', w: '105', h: '148' },
+                              { id: '5', name: 'Наклейка А5 (148×210)', preset: '32', w: '148', h: '210' },
+                              { id: '6', name: 'Наклейка А4 (210×297)', preset: '34', w: '210', h: '297' }
+                            ];
+                          } else if (catStr === 'Папки') {
+                            items = [
+                              { id: '1', name: 'Без корінця (2 клапани)', preset: '34', w: '210', h: '297' },
+                              { id: '2', name: 'Корінець 5 мм (2 клапани)', preset: '34', w: '210', h: '297' },
+                              { id: '3', name: 'Корінець 5 мм (3 клапани з резинкою)', preset: '34', w: '210', h: '297' }
+                            ];
+                          } else if (catStr === 'Флаєри' || catStr === 'Листівки') {
+                            items = [
+                              { id: '1', name: 'Єврофлаєр (99×210)', preset: '25', w: '99', h: '210' },
+                              { id: '2', name: '1/2 Флаєра (99×99)', preset: '24', w: '99', h: '99' },
+                              { id: '3', name: 'Листівка А7 (70×100)', preset: '28', w: '70', h: '100' },
+                              { id: '4', name: 'Подвійний флаєр (198×210)', preset: '26', w: '198', h: '210' },
+                              { id: '5', name: 'Листівка А6 (105×148)', preset: '312', w: '105', h: '148' },
+                              { id: '6', name: 'Листівка А5 (148×210)', preset: '32', w: '148', h: '210' },
+                              { id: '7', name: 'Листівка А4 (210×297)', preset: '34', w: '210', h: '297' }
+                            ];
+                          } else if (catStr === 'Блокноти') {
+                            items = [
+                              { id: '1', name: 'Блокнот А6 (105×148)', preset: '312', w: '105', h: '148' },
+                              { id: '2', name: 'Блокнот А5 (148×210)', preset: '32', w: '148', h: '210' },
+                              { id: '3', name: 'Блокнот А4 (210×297)', preset: '34', w: '210', h: '297' }
+                            ];
+                          } else {
+                            items = [
+                              { id: '1', name: 'Формат А4 (210×297)', preset: '34', w: '210', h: '297' },
+                              { id: '2', name: 'Формат А3 (297×420)', preset: '36', w: '297', h: '420' },
+                              { id: '3', name: 'Формат А2 (420×594)', preset: '15', w: '420', h: '594' },
+                              { id: '4', name: 'Формат В3 (340×490)', preset: 'b3', w: '340', h: '490' }
+                            ];
+                          }
+
+                          return items.map(kindItem => {
+                            const isActive = sheetSizePreset === kindItem.preset || cardKind === kindItem.id;
+                            return (
+                              <div
+                                key={kindItem.id + kindItem.name}
+                                onClick={() => {
+                                  setCardKind(kindItem.id);
+                                  setSheetSizePreset(kindItem.preset);
+                                  setSheetCustomWidth(kindItem.w);
+                                  setSheetCustomHeight(kindItem.h);
+                                }}
+                                style={{
+                                  cursor: 'pointer',
+                                  border: isActive ? '2px solid #c00' : '1px solid #ddd',
+                                  backgroundColor: isActive ? '#fff0f0' : '#f9f9f9',
+                                  borderRadius: '6px',
+                                  padding: '8px 14px',
+                                  display: 'flex',
+                                  flexDirection: 'column',
+                                  alignItems: 'center',
+                                  justifyContent: 'center',
+                                  gap: '6px',
+                                  minWidth: '100px',
+                                  transition: 'all 0.15s ease'
+                                }}
+                              >
+                                {kindItem.img && <img src={kindItem.img} alt={kindItem.name} style={{ width: '45px', height: '35px', objectFit: 'contain' }} />}
+                                <span style={{ fontSize: '12px', fontWeight: isActive ? '700' : '600', color: isActive ? '#c00' : '#333', textAlign: 'center' }}>
+                                  {kindItem.name}
+                                </span>
+                              </div>
+                            );
+                          });
+                        })()}
                       </div>
                     )}
                   </div>
