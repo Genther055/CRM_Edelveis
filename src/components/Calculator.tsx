@@ -795,6 +795,7 @@ export const Calculator: React.FC = () => {
     setStep('editor');
     alert(`Завантажено шаблон: ${tpl.name}`);
   };
+  void handleLoadTemplate;
 
   const generatePDF = () => {
     const element = document.getElementById('invoice-preview-container');
@@ -896,12 +897,6 @@ export const Calculator: React.FC = () => {
               <h2 className="page-title">Поліграфічний калькулятор</h2>
               <p className="subtitle">Оберіть категорію продукції для детального прорахунку</p>
             </div>
-            
-            {templates.length > 0 && (
-              <span className="ios-badge ios-badge-blue">
-                {templates.length} збережених шаблонів
-              </span>
-            )}
           </div>
 
           {/* Top Main Category Switcher (Exact Sborka Header Styling) */}
@@ -1270,7 +1265,7 @@ export const Calculator: React.FC = () => {
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '15px' }}>
                   {[
                     { title: 'ЛИСТОВА', desc: 'Візитівки, листівки, бланки, буклети, наліпки, плакати…', subTab: 'sheets' },
-                    { title: 'ВИСІЧНА', desc: 'Фігурні наліпки, візитівки, листівки, підставки, хенгери…', subTab: 'felling' },
+                    { title: 'ВИСІЧНА', desc: 'Фігурні наліпки, візитівки, листівки, підставки, календарі…', subTab: 'felling' },
                     { title: 'БАГАТОСТОРОННЯ', desc: 'Брошури, журнали, каталоги, меню, звіти…', subTab: 'multipage' },
                     { title: 'ІНДИВІДУАЛЬНЕ ЗАМОВЛЕННЯ', desc: 'Замовити прорахунок комплексного або нестандартного замовлення', subTab: 'custom' }
                   ].map((item, i) => (
@@ -1767,33 +1762,7 @@ export const Calculator: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* 16. Хенгери */}
-                  <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
-                    <h4
-                      onClick={() => { setOffsetSubTab('felling'); handleSelectCategory('Наклейки'); }}
-                      style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 12px', cursor: 'pointer', transition: 'color 0.15s ease' }}
-                      onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
-                      onMouseLeave={(e) => e.currentTarget.style.color = '#222'}
-                    >
-                      Хенгери
-                    </h4>
-                    <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px' }}>
-                      {['вид 1', 'вид 2'].map(v => (
-                        <button
-                          key={v}
-                          type="button"
-                          onClick={() => { setOffsetSubTab('felling'); handleSelectCategory('Наклейки'); }}
-                          style={{ cursor: 'pointer', fontWeight: '600', padding: '4px 10px', borderRadius: '4px', backgroundColor: '#ffffff', border: '1px solid #ccc', color: '#333', fontSize: '12px', transition: 'all 0.15s ease' }}
-                          onMouseEnter={(e) => { e.currentTarget.style.color = '#c00'; e.currentTarget.style.borderColor = '#c00'; }}
-                          onMouseLeave={(e) => { e.currentTarget.style.color = '#333'; e.currentTarget.style.borderColor = '#ccc'; }}
-                        >
-                          🔖 {v}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* 17. Календарі висічні */}
+                  {/* 16. Календарі висічні */}
                   <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
                     <h4
                       onClick={() => { setOffsetSubTab('felling'); setSheetSizePreset('160'); setSheetCustomWidth('210'); setSheetCustomHeight('300'); handleSelectCategory('Календарі кишенькові'); }}
@@ -3581,35 +3550,6 @@ export const Calculator: React.FC = () => {
                 <Layers size={40} style={{ color: '#ec4899', margin: '0 auto 10px' }} />
                 <h4 style={{ fontSize: '15px', fontWeight: '800' }}>Плотерна порізка плівок</h4>
                 <p style={{ fontSize: '11px', color: 'var(--text-medium)', margin: 0 }}>Порізка аплікацій з кольорових вінілових плівок ORACAL 641.</p>
-              </div>
-            </div>
-          )}
-
-          {/* Templates list under catalog */}
-          {templates.length > 0 && (
-            <div className="ios-card bg-white space-y-3">
-              <h3 style={{ fontSize: '14px', fontWeight: '800', color: 'var(--text-dark)', display: 'flex', alignItems: 'center', gap: '6px', borderBottom: '1px solid #f1f5f9', paddingBottom: '8px' }}>
-                <FolderOpen size={16} style={{ color: 'var(--primary)' }} />
-                Шаблони розрахунків
-              </h3>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '10px' }}>
-                {templates.map((tpl, idx) => (
-                  <div 
-                    key={idx}
-                    onClick={() => handleLoadTemplate(tpl)}
-                    style={{ 
-                      padding: '10px 12px', 
-                      borderRadius: '8px', 
-                      border: '0.5px solid var(--border-light)', 
-                      backgroundColor: 'var(--bg-card-subtle)',
-                      cursor: 'pointer',
-                      fontSize: '12px'
-                    }}
-                  >
-                    <strong style={{ display: 'block', marginBottom: '2px' }}>{tpl.name}</strong>
-                    <span style={{ color: 'var(--primary)', fontWeight: '600' }}>{tpl.category} | {tpl.quantity} шт</span>
-                  </div>
-                ))}
               </div>
             </div>
           )}
