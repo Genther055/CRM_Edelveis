@@ -79,6 +79,63 @@ export const Calculator: React.FC = () => {
   const [multiInsertMaterial, setMultiInsertMaterial] = useState<string>('130');
   const [multiInsertColor, setMultiInsertColor] = useState<string>('2');
 
+  // Notepad specific states
+  const [notepadSpringColor, setNotepadSpringColor] = useState<'white' | 'black' | 'silver'>('white');
+  const [notepadBindingEdge, setNotepadBindingEdge] = useState<'short' | 'long'>('short');
+  const [notepadCoverPaper, setNotepadCoverPaper] = useState<string>('250');
+  const [notepadCoverLam, setNotepadCoverLam] = useState<string>('none');
+  const [notepadPodkladka, setNotepadPodkladka] = useState<string>('250');
+  const [notepadBlockPages, setNotepadBlockPages] = useState<number>(50);
+  const [notepadBlockRuling, setNotepadBlockRuling] = useState<'blank' | 'grid_1_0' | 'grid_1_1' | 'lines_1_0' | 'custom_4_4'>('grid_1_0');
+
+  // Folder A4 specific states
+  const [folderSpine, setFolderSpine] = useState<'0' | '5' | '7'>('5');
+  const [folderRezinka, setFolderRezinka] = useState<'none' | 'blue' | 'red' | 'white' | 'black'>('none');
+  const [folderFinish, setFolderFinish] = useState<'sheets' | 'assembled'>('sheets');
+  const [folderVizSlot, setFolderVizSlot] = useState<boolean>(true);
+
+  // Envelope specific states
+  const [envelopeFormat, setEnvelopeFormat] = useState<'E65' | 'C6' | 'C5' | 'C4'>('E65');
+  const [envelopeWindow, setEnvelopeWindow] = useState<boolean>(false);
+
+  // Calendar Grids specific states
+  const [gridType, setGridType] = useState<'standart' | 'gold' | 'metallic' | '3in1'>('standart');
+  const [gridYear, setGridYear] = useState<'2026' | '2027'>('2026');
+  const [gridCursor, setGridCursor] = useState<boolean>(true);
+
+  // Helper to transition into specific offset product calculator
+  const openOffsetProduct = (params: {
+    category: any;
+    subCategory?: string;
+    subTab?: 'sheets' | 'felling' | 'multipage' | 'custom';
+    preset?: string;
+    w?: string;
+    h?: string;
+    kind?: string;
+    stitching?: string;
+    stamp?: string;
+    folderSpine?: '0' | '5' | '7';
+    folderRezinka?: 'none' | 'blue' | 'red' | 'white' | 'black';
+    envelopeFormat?: 'E65' | 'C6' | 'C5' | 'C4';
+  }) => {
+    setMainCategoryTab('offset');
+    setOffsetSubTab(params.subTab || 'sheets');
+    setCategory(params.category);
+    if (params.subCategory) {
+      setSubCategory(params.subCategory as any);
+      setName(`${params.subCategory} ${params.w ? `${params.w}×${params.h} мм` : ''}`);
+    }
+    if (params.preset) setSheetSizePreset(params.preset);
+    if (params.w) setSheetCustomWidth(params.w);
+    if (params.h) setSheetCustomHeight(params.h);
+    if (params.kind) setCardKind(params.kind);
+    if (params.stitching) setMultiStitching(params.stitching);
+    if (params.stamp) setFellingStamp(params.stamp);
+    if (params.folderSpine) setFolderSpine(params.folderSpine);
+    if (params.folderRezinka) setFolderRezinka(params.folderRezinka);
+    if (params.envelopeFormat) setEnvelopeFormat(params.envelopeFormat);
+  };
+
   // Postpress options states
   const [showPostpressAccordion, setShowPostpressAccordion] = useState<boolean>(false);
   const [postPersonalization, setPostPersonalization] = useState<string>('0');
@@ -1313,14 +1370,13 @@ export const Calculator: React.FC = () => {
                 </div>
               )}
 
-              {/* OVERVIEW SUBTAB: Sborka 18-Card Product Grid */}
+              {/* OVERVIEW SUBTAB: Sborka 16-Card Product Grid */}
               {offsetSubTab === 'overview' && (
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(220px, 1fr))', gap: '15px' }}>
-                  {/* Common button style helper */}
                   {/* 1. Візитівка */}
                   <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
                     <h4
-                      onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset('1'); setSheetCustomWidth('90'); setSheetCustomHeight('50'); handleSelectCategory('Візитки'); }}
+                      onClick={() => openOffsetProduct({ category: 'Візитки', subCategory: 'Візитівка', subTab: 'sheets', preset: '1', w: '90', h: '50', kind: '1' })}
                       style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 12px', cursor: 'pointer', transition: 'color 0.15s ease' }}
                       onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
                       onMouseLeave={(e) => e.currentTarget.style.color = '#222'}
@@ -1337,7 +1393,7 @@ export const Calculator: React.FC = () => {
                         <button
                           key={item.name}
                           type="button"
-                          onClick={() => { setOffsetSubTab('sheets'); setCardKind(item.kind); setSheetSizePreset(item.preset); setSheetCustomWidth(item.w); setSheetCustomHeight(item.h); handleSelectCategory('Візитки'); }}
+                          onClick={() => openOffsetProduct({ category: 'Візитки', subCategory: 'Візитівка', subTab: 'sheets', preset: item.preset, w: item.w, h: item.h, kind: item.kind })}
                           style={{ cursor: 'pointer', fontWeight: '600', padding: '4px 10px', borderRadius: '4px', backgroundColor: '#ffffff', border: '1px solid #ccc', color: '#333', fontSize: '12px', transition: 'all 0.15s ease' }}
                           onMouseEnter={(e) => { e.currentTarget.style.color = '#c00'; e.currentTarget.style.borderColor = '#c00'; }}
                           onMouseLeave={(e) => { e.currentTarget.style.color = '#333'; e.currentTarget.style.borderColor = '#ccc'; }}
@@ -1351,7 +1407,7 @@ export const Calculator: React.FC = () => {
                   {/* 2. Календар */}
                   <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
                     <h4
-                      onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset('91'); setSheetCustomWidth('100'); setSheetCustomHeight('70'); handleSelectCategory('Календарі кишенькові'); }}
+                      onClick={() => openOffsetProduct({ category: 'Календарі кишенькові', subCategory: 'Календар', subTab: 'sheets', preset: '91', w: '100', h: '70', kind: '1' })}
                       style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 12px', cursor: 'pointer', transition: 'color 0.15s ease' }}
                       onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
                       onMouseLeave={(e) => e.currentTarget.style.color = '#222'}
@@ -1367,7 +1423,7 @@ export const Calculator: React.FC = () => {
                         <button
                           key={item.name}
                           type="button"
-                          onClick={() => { setOffsetSubTab('sheets'); setCardKind(item.kind); setSheetSizePreset(item.preset); setSheetCustomWidth(item.w); setSheetCustomHeight(item.h); handleSelectCategory('Календарі кишенькові'); }}
+                          onClick={() => openOffsetProduct({ category: 'Календарі кишенькові', subCategory: 'Календар', subTab: 'sheets', preset: item.preset, w: item.w, h: item.h, kind: item.kind })}
                           style={{ cursor: 'pointer', fontWeight: '600', padding: '4px 10px', borderRadius: '4px', backgroundColor: '#ffffff', border: '1px solid #ccc', color: '#333', fontSize: '12px', transition: 'all 0.15s ease' }}
                           onMouseEnter={(e) => { e.currentTarget.style.color = '#c00'; e.currentTarget.style.borderColor = '#c00'; }}
                           onMouseLeave={(e) => { e.currentTarget.style.color = '#333'; e.currentTarget.style.borderColor = '#ccc'; }}
@@ -1381,7 +1437,7 @@ export const Calculator: React.FC = () => {
                   {/* 3. Флаєр */}
                   <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
                     <h4
-                      onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset('25'); setSheetCustomWidth('99'); setSheetCustomHeight('210'); handleSelectCategory('Флаєри'); }}
+                      onClick={() => openOffsetProduct({ category: 'Флаєри', subCategory: 'Флаєр', subTab: 'sheets', preset: '25', w: '99', h: '210', kind: '1' })}
                       style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 12px', cursor: 'pointer', transition: 'color 0.15s ease' }}
                       onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
                       onMouseLeave={(e) => e.currentTarget.style.color = '#222'}
@@ -1397,7 +1453,7 @@ export const Calculator: React.FC = () => {
                         <button
                           key={item.name}
                           type="button"
-                          onClick={() => { setOffsetSubTab('sheets'); setCardKind(item.kind); setSheetSizePreset(item.preset); setSheetCustomWidth(item.w); setSheetCustomHeight(item.h); handleSelectCategory('Флаєри'); }}
+                          onClick={() => openOffsetProduct({ category: 'Флаєри', subCategory: 'Флаєр', subTab: 'sheets', preset: item.preset, w: item.w, h: item.h, kind: item.kind })}
                           style={{ cursor: 'pointer', fontWeight: '600', padding: '4px 10px', borderRadius: '4px', backgroundColor: '#ffffff', border: '1px solid #ccc', color: '#333', fontSize: '12px', transition: 'all 0.15s ease' }}
                           onMouseEnter={(e) => { e.currentTarget.style.color = '#c00'; e.currentTarget.style.borderColor = '#c00'; }}
                           onMouseLeave={(e) => { e.currentTarget.style.color = '#333'; e.currentTarget.style.borderColor = '#ccc'; }}
@@ -1411,7 +1467,7 @@ export const Calculator: React.FC = () => {
                   {/* 4. Листівка */}
                   <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
                     <h4
-                      onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset('28'); setSheetCustomWidth('70'); setSheetCustomHeight('100'); handleSelectCategory('Листівки'); }}
+                      onClick={() => openOffsetProduct({ category: 'Листівки', subCategory: 'Листівка', subTab: 'sheets', preset: '28', w: '70', h: '100', kind: '1' })}
                       style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 12px', cursor: 'pointer', transition: 'color 0.15s ease' }}
                       onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
                       onMouseLeave={(e) => e.currentTarget.style.color = '#222'}
@@ -1430,7 +1486,7 @@ export const Calculator: React.FC = () => {
                         <button
                           key={item.name}
                           type="button"
-                          onClick={() => { setOffsetSubTab('sheets'); setCardKind(item.kind); setSheetSizePreset(item.preset); setSheetCustomWidth(item.w); setSheetCustomHeight(item.h); handleSelectCategory('Листівки'); }}
+                          onClick={() => openOffsetProduct({ category: 'Листівки', subCategory: 'Листівка', subTab: 'sheets', preset: item.preset, w: item.w, h: item.h, kind: item.kind })}
                           style={{ cursor: 'pointer', fontWeight: '600', padding: '4px 8px', borderRadius: '4px', backgroundColor: '#ffffff', border: '1px solid #ccc', color: '#333', fontSize: '12px', transition: 'all 0.15s ease' }}
                           onMouseEnter={(e) => { e.currentTarget.style.color = '#c00'; e.currentTarget.style.borderColor = '#c00'; }}
                           onMouseLeave={(e) => { e.currentTarget.style.color = '#333'; e.currentTarget.style.borderColor = '#ccc'; }}
@@ -1444,7 +1500,7 @@ export const Calculator: React.FC = () => {
                   {/* 5. Плакати */}
                   <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
                     <h4
-                      onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset('36'); setSheetCustomWidth('297'); setSheetCustomHeight('420'); handleSelectCategory('Плакати'); }}
+                      onClick={() => openOffsetProduct({ category: 'Плакати', subCategory: 'Плакати', subTab: 'sheets', preset: '36', w: '297', h: '420', kind: '1' })}
                       style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 12px', cursor: 'pointer', transition: 'color 0.15s ease' }}
                       onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
                       onMouseLeave={(e) => e.currentTarget.style.color = '#222'}
@@ -1463,7 +1519,7 @@ export const Calculator: React.FC = () => {
                         <button
                           key={item.name}
                           type="button"
-                          onClick={() => { setOffsetSubTab('sheets'); setCardKind(item.kind); setSheetSizePreset(item.preset); setSheetCustomWidth(item.w); setSheetCustomHeight(item.h); handleSelectCategory('Плакати'); }}
+                          onClick={() => openOffsetProduct({ category: 'Плакати', subCategory: 'Плакати', subTab: 'sheets', preset: item.preset, w: item.w, h: item.h, kind: item.kind })}
                           style={{ cursor: 'pointer', fontWeight: '600', padding: '4px 8px', borderRadius: '4px', backgroundColor: '#ffffff', border: '1px solid #ccc', color: '#333', fontSize: '12px', transition: 'all 0.15s ease' }}
                           onMouseEnter={(e) => { e.currentTarget.style.color = '#c00'; e.currentTarget.style.borderColor = '#c00'; }}
                           onMouseLeave={(e) => { e.currentTarget.style.color = '#333'; e.currentTarget.style.borderColor = '#ccc'; }}
@@ -1477,7 +1533,7 @@ export const Calculator: React.FC = () => {
                   {/* 6. Сети */}
                   <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
                     <h4
-                      onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset('sets_a3'); setSheetCustomWidth('420'); setSheetCustomHeight('297'); handleSelectCategory('Сети'); }}
+                      onClick={() => openOffsetProduct({ category: 'Сети', subCategory: 'Сети', subTab: 'sheets', preset: 'sets_a3', w: '420', h: '297', kind: '1' })}
                       style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 12px', cursor: 'pointer', transition: 'color 0.15s ease' }}
                       onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
                       onMouseLeave={(e) => e.currentTarget.style.color = '#222'}
@@ -1492,7 +1548,7 @@ export const Calculator: React.FC = () => {
                         <button
                           key={item.name}
                           type="button"
-                          onClick={() => { setOffsetSubTab('sheets'); setCardKind(item.kind); setSheetSizePreset(item.preset); setSheetCustomWidth(item.w); setSheetCustomHeight(item.h); handleSelectCategory('Сети'); }}
+                          onClick={() => openOffsetProduct({ category: 'Сети', subCategory: 'Сети', subTab: 'sheets', preset: item.preset, w: item.w, h: item.h, kind: item.kind })}
                           style={{ cursor: 'pointer', fontWeight: '600', padding: '4px 12px', borderRadius: '4px', backgroundColor: '#ffffff', border: '1px solid #ccc', color: '#333', fontSize: '12px', transition: 'all 0.15s ease' }}
                           onMouseEnter={(e) => { e.currentTarget.style.color = '#c00'; e.currentTarget.style.borderColor = '#c00'; }}
                           onMouseLeave={(e) => { e.currentTarget.style.color = '#333'; e.currentTarget.style.borderColor = '#ccc'; }}
@@ -1506,7 +1562,7 @@ export const Calculator: React.FC = () => {
                   {/* 7. Буклет */}
                   <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
                     <h4
-                      onClick={() => { setOffsetSubTab('sheets'); setCardKind('6'); setSheetSizePreset('34'); setSheetCustomWidth('210'); setSheetCustomHeight('297'); handleSelectCategory('Буклети'); }}
+                      onClick={() => openOffsetProduct({ category: 'Буклети', subCategory: 'Буклет', subTab: 'sheets', preset: '34', w: '210', h: '297', kind: '6' })}
                       style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 12px', cursor: 'pointer', transition: 'color 0.15s ease' }}
                       onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
                       onMouseLeave={(e) => e.currentTarget.style.color = '#222'}
@@ -1524,7 +1580,7 @@ export const Calculator: React.FC = () => {
                         <button
                           key={item.name}
                           type="button"
-                          onClick={() => { setOffsetSubTab('sheets'); setCardKind(item.kind); setSheetSizePreset(item.preset); setSheetCustomWidth(item.w); setSheetCustomHeight(item.h); handleSelectCategory('Буклети'); }}
+                          onClick={() => openOffsetProduct({ category: 'Буклети', subCategory: 'Буклет', subTab: 'sheets', preset: item.preset, w: item.w, h: item.h, kind: item.kind })}
                           style={{ cursor: 'pointer', fontWeight: '600', padding: '4px 8px', borderRadius: '4px', backgroundColor: '#ffffff', border: '1px solid #ccc', color: '#333', fontSize: '12px', transition: 'all 0.15s ease' }}
                           onMouseEnter={(e) => { e.currentTarget.style.color = '#c00'; e.currentTarget.style.borderColor = '#c00'; }}
                           onMouseLeave={(e) => { e.currentTarget.style.color = '#333'; e.currentTarget.style.borderColor = '#ccc'; }}
@@ -1538,7 +1594,7 @@ export const Calculator: React.FC = () => {
                   {/* 8. Каталог */}
                   <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
                     <h4
-                      onClick={() => { setOffsetSubTab('multipage'); handleSelectCategory('Книги'); }}
+                      onClick={() => openOffsetProduct({ category: 'Книги', subCategory: 'Каталог', subTab: 'multipage', stitching: '1' })}
                       style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 12px', cursor: 'pointer', transition: 'color 0.15s ease' }}
                       onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
                       onMouseLeave={(e) => e.currentTarget.style.color = '#222'}
@@ -1546,16 +1602,20 @@ export const Calculator: React.FC = () => {
                       Каталог
                     </h4>
                     <div style={{ display: 'flex', gap: '8px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px' }}>
-                      {['Скоба', 'Пружина', 'Клей'].map(st => (
+                      {[
+                        { label: 'Скоба', id: '1' },
+                        { label: 'Пружина', id: '2' },
+                        { label: 'Клей', id: '3' }
+                      ].map(st => (
                         <button
-                          key={st}
+                          key={st.label}
                           type="button"
-                          onClick={() => { setOffsetSubTab('multipage'); handleSelectCategory('Книги'); }}
+                          onClick={() => openOffsetProduct({ category: 'Книги', subCategory: 'Каталог', subTab: 'multipage', stitching: st.id })}
                           style={{ cursor: 'pointer', fontWeight: '600', padding: '4px 10px', borderRadius: '4px', backgroundColor: '#ffffff', border: '1px solid #ccc', color: '#333', fontSize: '12px', transition: 'all 0.15s ease' }}
                           onMouseEnter={(e) => { e.currentTarget.style.color = '#c00'; e.currentTarget.style.borderColor = '#c00'; }}
                           onMouseLeave={(e) => { e.currentTarget.style.color = '#333'; e.currentTarget.style.borderColor = '#ccc'; }}
                         >
-                          {st}
+                          {st.label}
                         </button>
                       ))}
                     </div>
@@ -1564,7 +1624,7 @@ export const Calculator: React.FC = () => {
                   {/* 9. Блокнот */}
                   <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
                     <h4
-                      onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset('32'); setSheetCustomWidth('148'); setSheetCustomHeight('210'); handleSelectCategory('Блокноти'); }}
+                      onClick={() => openOffsetProduct({ category: 'Блокноти', subCategory: 'Блокнот', subTab: 'sheets', preset: '32', w: '148', h: '210', kind: '1' })}
                       style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 12px', cursor: 'pointer', transition: 'color 0.15s ease' }}
                       onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
                       onMouseLeave={(e) => e.currentTarget.style.color = '#222'}
@@ -1580,7 +1640,7 @@ export const Calculator: React.FC = () => {
                         <button
                           key={item.name}
                           type="button"
-                          onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset(item.preset); setSheetCustomWidth(item.w); setSheetCustomHeight(item.h); handleSelectCategory('Блокноти'); }}
+                          onClick={() => openOffsetProduct({ category: 'Блокноти', subCategory: 'Блокнот', subTab: 'sheets', preset: item.preset, w: item.w, h: item.h, kind: '1' })}
                           style={{ cursor: 'pointer', fontWeight: '600', padding: '4px 10px', borderRadius: '4px', backgroundColor: '#ffffff', border: '1px solid #ccc', color: '#333', fontSize: '12px', transition: 'all 0.15s ease' }}
                           onMouseEnter={(e) => { e.currentTarget.style.color = '#c00'; e.currentTarget.style.borderColor = '#c00'; }}
                           onMouseLeave={(e) => { e.currentTarget.style.color = '#333'; e.currentTarget.style.borderColor = '#ccc'; }}
@@ -1594,7 +1654,7 @@ export const Calculator: React.FC = () => {
                   {/* 10. Наліпка */}
                   <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
                     <h4
-                      onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset('1'); setSheetCustomWidth('90'); setSheetCustomHeight('50'); handleSelectCategory('Наклейки'); }}
+                      onClick={() => openOffsetProduct({ category: 'Наклейки', subCategory: 'Наліпка', subTab: 'sheets', preset: '1', w: '90', h: '50', kind: '1' })}
                       style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 12px', cursor: 'pointer', transition: 'color 0.15s ease' }}
                       onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
                       onMouseLeave={(e) => e.currentTarget.style.color = '#222'}
@@ -1611,7 +1671,7 @@ export const Calculator: React.FC = () => {
                         <button
                           key={item.name}
                           type="button"
-                          onClick={() => { setOffsetSubTab('sheets'); setCardKind(item.kind); setSheetSizePreset(item.preset); setSheetCustomWidth(item.w); setSheetCustomHeight(item.h); handleSelectCategory('Наклейки'); }}
+                          onClick={() => openOffsetProduct({ category: 'Наклейки', subCategory: 'Наліпка', subTab: 'sheets', preset: item.preset, w: item.w, h: item.h, kind: item.kind })}
                           style={{ cursor: 'pointer', fontWeight: '600', padding: '4px 8px', borderRadius: '4px', backgroundColor: '#ffffff', border: '1px solid #ccc', color: '#333', fontSize: '12px', transition: 'all 0.15s ease' }}
                           onMouseEnter={(e) => { e.currentTarget.style.color = '#c00'; e.currentTarget.style.borderColor = '#c00'; }}
                           onMouseLeave={(e) => { e.currentTarget.style.color = '#333'; e.currentTarget.style.borderColor = '#ccc'; }}
@@ -1625,7 +1685,7 @@ export const Calculator: React.FC = () => {
                   {/* 11. Папка А4 */}
                   <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
                     <h4
-                      onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset('34'); setSheetCustomWidth('210'); setSheetCustomHeight('297'); handleSelectCategory('Папки'); }}
+                      onClick={() => openOffsetProduct({ category: 'Папки', subCategory: 'Папка А4', subTab: 'sheets', preset: '34', w: '210', h: '297', folderSpine: '5' })}
                       style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 12px', cursor: 'pointer', transition: 'color 0.15s ease' }}
                       onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
                       onMouseLeave={(e) => e.currentTarget.style.color = '#222'}
@@ -1633,16 +1693,20 @@ export const Calculator: React.FC = () => {
                       Папка А4
                     </h4>
                     <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px' }}>
-                      {['Без корінця', 'Корінець 5мм', 'З резинкою'].map(fmt => (
+                      {[
+                        { name: 'Без корінця', spine: '0' as const, rezinka: 'none' as const },
+                        { name: 'Корінець 5мм', spine: '5' as const, rezinka: 'none' as const },
+                        { name: 'З резинкою', spine: '5' as const, rezinka: 'blue' as const }
+                      ].map(fmt => (
                         <button
-                          key={fmt}
+                          key={fmt.name}
                           type="button"
-                          onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset('34'); setSheetCustomWidth('210'); setSheetCustomHeight('297'); handleSelectCategory('Папки'); }}
+                          onClick={() => openOffsetProduct({ category: 'Папки', subCategory: 'Папка А4', subTab: 'sheets', preset: '34', w: '210', h: '297', folderSpine: fmt.spine, folderRezinka: fmt.rezinka })}
                           style={{ cursor: 'pointer', fontWeight: '600', padding: '4px 8px', borderRadius: '4px', backgroundColor: '#ffffff', border: '1px solid #ccc', color: '#333', fontSize: '12px', transition: 'all 0.15s ease' }}
                           onMouseEnter={(e) => { e.currentTarget.style.color = '#c00'; e.currentTarget.style.borderColor = '#c00'; }}
                           onMouseLeave={(e) => { e.currentTarget.style.color = '#333'; e.currentTarget.style.borderColor = '#ccc'; }}
                         >
-                          {fmt}
+                          {fmt.name}
                         </button>
                       ))}
                     </div>
@@ -1651,7 +1715,7 @@ export const Calculator: React.FC = () => {
                   {/* 12. Листівка (Одинарна/Складна/Кругла) */}
                   <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
                     <h4
-                      onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset('32'); setSheetCustomWidth('148'); setSheetCustomHeight('210'); handleSelectCategory('Листівки'); }}
+                      onClick={() => openOffsetProduct({ category: 'Листівки', subCategory: 'Листівка', subTab: 'sheets', preset: '32', w: '148', h: '210', kind: '1' })}
                       style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 12px', cursor: 'pointer', transition: 'color 0.15s ease' }}
                       onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
                       onMouseLeave={(e) => e.currentTarget.style.color = '#222'}
@@ -1667,7 +1731,7 @@ export const Calculator: React.FC = () => {
                         <button
                           key={item.name}
                           type="button"
-                          onClick={() => { setOffsetSubTab('sheets'); setCardKind(item.kind); setSheetSizePreset(item.preset); setSheetCustomWidth(item.w); setSheetCustomHeight(item.h); handleSelectCategory('Листівки'); }}
+                          onClick={() => openOffsetProduct({ category: 'Листівки', subCategory: 'Листівка', subTab: 'sheets', preset: item.preset, w: item.w, h: item.h, kind: item.kind })}
                           style={{ cursor: 'pointer', fontWeight: '600', padding: '4px 8px', borderRadius: '4px', backgroundColor: '#ffffff', border: '1px solid #ccc', color: '#333', fontSize: '12px', transition: 'all 0.15s ease' }}
                           onMouseEnter={(e) => { e.currentTarget.style.color = '#c00'; e.currentTarget.style.borderColor = '#c00'; }}
                           onMouseLeave={(e) => { e.currentTarget.style.color = '#333'; e.currentTarget.style.borderColor = '#ccc'; }}
@@ -1681,7 +1745,7 @@ export const Calculator: React.FC = () => {
                   {/* 13. Календарні сітки */}
                   <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
                     <h4
-                      onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset('34'); setSheetCustomWidth('210'); setSheetCustomHeight('297'); handleSelectCategory('Календарі кишенькові'); }}
+                      onClick={() => openOffsetProduct({ category: 'Календарі кишенькові', subCategory: 'Календарні сітки', subTab: 'sheets', preset: '34', w: '210', h: '297', kind: '1' })}
                       style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 10px', cursor: 'pointer', transition: 'color 0.15s ease' }}
                       onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
                       onMouseLeave={(e) => e.currentTarget.style.color = '#222'}
@@ -1690,7 +1754,7 @@ export const Calculator: React.FC = () => {
                     </h4>
                     <button
                       type="button"
-                      onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset('34'); setSheetCustomWidth('210'); setSheetCustomHeight('297'); handleSelectCategory('Календарі кишенькові'); }}
+                      onClick={() => openOffsetProduct({ category: 'Календарі кишенькові', subCategory: 'Календарні сітки', subTab: 'sheets', preset: '34', w: '210', h: '297', kind: '1' })}
                       style={{ cursor: 'pointer', fontWeight: '600', padding: '6px 12px', borderRadius: '4px', backgroundColor: '#ffffff', border: '1px solid #ccc', color: '#333', fontSize: '12px', transition: 'all 0.15s ease', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
                       onMouseEnter={(e) => { e.currentTarget.style.color = '#c00'; e.currentTarget.style.borderColor = '#c00'; }}
                       onMouseLeave={(e) => { e.currentTarget.style.color = '#333'; e.currentTarget.style.borderColor = '#ccc'; }}
@@ -1703,7 +1767,7 @@ export const Calculator: React.FC = () => {
                   {/* 14. Друк в листах */}
                   <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
                     <h4
-                      onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset('15'); setSheetCustomWidth('420'); setSheetCustomHeight('594'); handleSelectCategory('Бланки'); }}
+                      onClick={() => openOffsetProduct({ category: 'Бланки', subCategory: 'Друк в листах', subTab: 'sheets', preset: '15', w: '420', h: '594', kind: '1' })}
                       style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 12px', cursor: 'pointer', transition: 'color 0.15s ease' }}
                       onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
                       onMouseLeave={(e) => e.currentTarget.style.color = '#222'}
@@ -1720,7 +1784,7 @@ export const Calculator: React.FC = () => {
                         <button
                           key={item.name}
                           type="button"
-                          onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset(item.preset); setSheetCustomWidth(item.w); setSheetCustomHeight(item.h); handleSelectCategory('Бланки'); }}
+                          onClick={() => openOffsetProduct({ category: 'Бланки', subCategory: 'Друк в листах', subTab: 'sheets', preset: item.preset, w: item.w, h: item.h, kind: '1' })}
                           style={{ cursor: 'pointer', fontWeight: '600', padding: '4px 8px', borderRadius: '4px', backgroundColor: '#ffffff', border: '1px solid #ccc', color: '#333', fontSize: '12px', transition: 'all 0.15s ease' }}
                           onMouseEnter={(e) => { e.currentTarget.style.color = '#c00'; e.currentTarget.style.borderColor = '#c00'; }}
                           onMouseLeave={(e) => { e.currentTarget.style.color = '#333'; e.currentTarget.style.borderColor = '#ccc'; }}
@@ -1734,7 +1798,7 @@ export const Calculator: React.FC = () => {
                   {/* 15. Конверт */}
                   <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
                     <h4
-                      onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset('25'); setSheetCustomWidth('110'); setSheetCustomHeight('220'); handleSelectCategory('Бланки'); }}
+                      onClick={() => openOffsetProduct({ category: 'Бланки', subCategory: 'Конверт', subTab: 'sheets', preset: '25', w: '110', h: '220', envelopeFormat: 'E65' })}
                       style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 12px', cursor: 'pointer', transition: 'color 0.15s ease' }}
                       onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
                       onMouseLeave={(e) => e.currentTarget.style.color = '#222'}
@@ -1743,15 +1807,15 @@ export const Calculator: React.FC = () => {
                     </h4>
                     <div style={{ display: 'flex', gap: '6px', justifyContent: 'center', flexWrap: 'wrap', fontSize: '12px' }}>
                       {[
-                        { name: 'Євро', preset: '25', w: '110', h: '220' },
-                        { name: 'С6', preset: '21', w: '114', h: '162' },
-                        { name: 'С5', preset: '32', w: '162', h: '229' },
-                        { name: 'С4', preset: '34', w: '229', h: '324' }
+                        { name: 'Євро', preset: '25', w: '110', h: '220', fmt: 'E65' as const },
+                        { name: 'С6', preset: '21', w: '114', h: '162', fmt: 'C6' as const },
+                        { name: 'С5', preset: '32', w: '162', h: '229', fmt: 'C5' as const },
+                        { name: 'С4', preset: '34', w: '229', h: '324', fmt: 'C4' as const }
                       ].map(item => (
                         <button
                           key={item.name}
                           type="button"
-                          onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset(item.preset); setSheetCustomWidth(item.w); setSheetCustomHeight(item.h); handleSelectCategory('Бланки'); }}
+                          onClick={() => openOffsetProduct({ category: 'Бланки', subCategory: 'Конверт', subTab: 'sheets', preset: item.preset, w: item.w, h: item.h, envelopeFormat: item.fmt })}
                           style={{ cursor: 'pointer', fontWeight: '600', padding: '4px 8px', borderRadius: '4px', backgroundColor: '#ffffff', border: '1px solid #ccc', color: '#333', fontSize: '12px', transition: 'all 0.15s ease' }}
                           onMouseEnter={(e) => { e.currentTarget.style.color = '#c00'; e.currentTarget.style.borderColor = '#c00'; }}
                           onMouseLeave={(e) => { e.currentTarget.style.color = '#333'; e.currentTarget.style.borderColor = '#ccc'; }}
@@ -1765,7 +1829,7 @@ export const Calculator: React.FC = () => {
                   {/* 16. Календарі висічні */}
                   <div style={{ backgroundColor: '#f2f2f2', border: '1px solid #ddd', padding: '16px 12px', textAlign: 'center', borderRadius: '4px' }}>
                     <h4
-                      onClick={() => { setOffsetSubTab('felling'); setSheetSizePreset('160'); setSheetCustomWidth('210'); setSheetCustomHeight('300'); handleSelectCategory('Календарі кишенькові'); }}
+                      onClick={() => openOffsetProduct({ category: 'Календарі кишенькові', subCategory: 'Календарі висічні', subTab: 'felling', preset: '160', w: '210', h: '300', stamp: '160' })}
                       style={{ fontSize: '15px', fontWeight: '700', color: '#222', margin: '0 0 12px', cursor: 'pointer', transition: 'color 0.15s ease' }}
                       onMouseEnter={(e) => e.currentTarget.style.color = '#c00'}
                       onMouseLeave={(e) => e.currentTarget.style.color = '#222'}
@@ -1780,7 +1844,7 @@ export const Calculator: React.FC = () => {
                         <button
                           key={item.name}
                           type="button"
-                          onClick={() => { setOffsetSubTab('felling'); setSheetSizePreset(item.preset); setSheetCustomWidth(item.w); setSheetCustomHeight(item.h); handleSelectCategory('Календарі кишенькові'); }}
+                          onClick={() => openOffsetProduct({ category: 'Календарі кишенькові', subCategory: 'Календарі висічні', subTab: 'felling', preset: item.preset, w: item.w, h: item.h, stamp: item.preset })}
                           style={{ cursor: 'pointer', fontWeight: '600', padding: '4px 10px', borderRadius: '4px', backgroundColor: '#ffffff', border: '1px solid #ccc', color: '#333', fontSize: '12px', transition: 'all 0.15s ease' }}
                           onMouseEnter={(e) => { e.currentTarget.style.color = '#c00'; e.currentTarget.style.borderColor = '#c00'; }}
                           onMouseLeave={(e) => { e.currentTarget.style.color = '#333'; e.currentTarget.style.borderColor = '#ccc'; }}
@@ -2041,6 +2105,203 @@ export const Calculator: React.FC = () => {
                             );
                           });
                         })()}
+                      </div>
+                    )}
+                    {/* Specialized Product Options Configurator */}
+                    {category === 'Папки' && (
+                      <div style={{ backgroundColor: '#fcfcfc', border: '1px solid #e2e8f0', borderRadius: '6px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                        <h4 style={{ fontSize: '14px', fontWeight: '800', color: '#c00', margin: 0 }}>📁 Параметри висічної папки А4</h4>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px' }}>
+                          <div>
+                            <label style={{ fontSize: '12px', fontWeight: '700', color: '#444', display: 'block', marginBottom: '4px' }}>Штамп та корінець:</label>
+                            <select value={folderSpine} onChange={(e) => setFolderSpine(e.target.value as any)} style={{ width: '100%', padding: '6px 10px', borderRadius: '4px', border: '1px solid #ccc', fontSize: '12px', fontWeight: '600' }}>
+                              <option value="0">Без корінця (штамп №57)</option>
+                              <option value="5">Корінець 5 мм (штамп №58)</option>
+                              <option value="7">Корінець 7 мм (штамп №59)</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label style={{ fontSize: '12px', fontWeight: '700', color: '#444', display: 'block', marginBottom: '4px' }}>Фіксуюча резинка:</label>
+                            <select value={folderRezinka} onChange={(e) => setFolderRezinka(e.target.value as any)} style={{ width: '100%', padding: '6px 10px', borderRadius: '4px', border: '1px solid #ccc', fontSize: '12px', fontWeight: '600' }}>
+                              <option value="none">Без резинки</option>
+                              <option value="blue">🔵 Синя резинка</option>
+                              <option value="red">🔴 Червона резинка</option>
+                              <option value="white">⚪ Біла резинка</option>
+                              <option value="black">⚫ Чорна резинка</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label style={{ fontSize: '12px', fontWeight: '700', color: '#444', display: 'block', marginBottom: '4px' }}>Вигляд відвантаження:</label>
+                            <select value={folderFinish} onChange={(e) => setFolderFinish(e.target.value as any)} style={{ width: '100%', padding: '6px 10px', borderRadius: '4px', border: '1px solid #ccc', fontSize: '12px', fontWeight: '600' }}>
+                              <option value="sheets">В листах (розгортка в пачках)</option>
+                              <option value="assembled">Скласти та упакувати (+1.00 грн/шт)</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label style={{ fontSize: '12px', fontWeight: '700', color: '#444', display: 'block', marginBottom: '4px' }}>Прорізи для візитки:</label>
+                            <select value={folderVizSlot ? 'yes' : 'no'} onChange={(e) => setFolderVizSlot(e.target.value === 'yes')} style={{ width: '100%', padding: '6px 10px', borderRadius: '4px', border: '1px solid #ccc', fontSize: '12px', fontWeight: '600' }}>
+                              <option value="yes">Є прорізи на клапані</option>
+                              <option value="no">Без прорізів</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {category === 'Блокноти' && (
+                      <div style={{ backgroundColor: '#fcfcfc', border: '1px solid #e2e8f0', borderRadius: '6px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                        <h4 style={{ fontSize: '14px', fontWeight: '800', color: '#c00', margin: 0 }}>📓 Конфігуратор фірмових блокнотів на пружині</h4>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px' }}>
+                          <div>
+                            <label style={{ fontSize: '12px', fontWeight: '700', color: '#444', display: 'block', marginBottom: '4px' }}>Колір металевої пружини:</label>
+                            <select value={notepadSpringColor} onChange={(e) => setNotepadSpringColor(e.target.value as any)} style={{ width: '100%', padding: '6px 10px', borderRadius: '4px', border: '1px solid #ccc', fontSize: '12px', fontWeight: '600' }}>
+                              <option value="white">⚪ Біла пружина</option>
+                              <option value="black">⚫ Чорна пружина</option>
+                              <option value="silver">🔘 Срібна пружина</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label style={{ fontSize: '12px', fontWeight: '700', color: '#444', display: 'block', marginBottom: '4px' }}>Сторона перепліту:</label>
+                            <select value={notepadBindingEdge} onChange={(e) => setNotepadBindingEdge(e.target.value as any)} style={{ width: '100%', padding: '6px 10px', borderRadius: '4px', border: '1px solid #ccc', fontSize: '12px', fontWeight: '600' }}>
+                              <option value="short">По короткій стороні (зверху)</option>
+                              <option value="long">По довгій стороні (збоку)</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label style={{ fontSize: '12px', fontWeight: '700', color: '#444', display: 'block', marginBottom: '4px' }}>Аркушів у внутрішньому блоці:</label>
+                            <select value={notepadBlockPages} onChange={(e) => setNotepadBlockPages(parseInt(e.target.value) || 50)} style={{ width: '100%', padding: '6px 10px', borderRadius: '4px', border: '1px solid #ccc', fontSize: '12px', fontWeight: '600' }}>
+                              <option value="25">25 аркушів (50 сторінок)</option>
+                              <option value="50">50 аркушів (100 сторінок)</option>
+                              <option value="75">75 аркушів (150 сторінок)</option>
+                              <option value="100">100 аркушів (200 сторінок)</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label style={{ fontSize: '12px', fontWeight: '700', color: '#444', display: 'block', marginBottom: '4px' }}>Лініювання аркушів блоку:</label>
+                            <select value={notepadBlockRuling} onChange={(e) => setNotepadBlockRuling(e.target.value as any)} style={{ width: '100%', padding: '6px 10px', borderRadius: '4px', border: '1px solid #ccc', fontSize: '12px', fontWeight: '600' }}>
+                              <option value="grid_1_0">Клітинка 1+0 (офсет 80г)</option>
+                              <option value="grid_1_1">Клітинка 1+1 (двосторонній)</option>
+                              <option value="lines_1_0">Лінійка 1+0</option>
+                              <option value="blank">Без друку (чисті білі)</option>
+                              <option value="custom_4_4">Індивідуальний друк з логотипом 4+4</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label style={{ fontSize: '12px', fontWeight: '700', color: '#444', display: 'block', marginBottom: '4px' }}>Папір обкладинки:</label>
+                            <select value={notepadCoverPaper} onChange={(e) => setNotepadCoverPaper(e.target.value)} style={{ width: '100%', padding: '6px 10px', borderRadius: '4px', border: '1px solid #ccc', fontSize: '12px', fontWeight: '600' }}>
+                              <option value="250">Крейда 250г</option>
+                              <option value="300">Крейда 300г</option>
+                              <option value="350">Крейда 350г цупка</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label style={{ fontSize: '12px', fontWeight: '700', color: '#444', display: 'block', marginBottom: '4px' }}>Ламінація обкладинки:</label>
+                            <select value={notepadCoverLam} onChange={(e) => setNotepadCoverLam(e.target.value)} style={{ width: '100%', padding: '6px 10px', borderRadius: '4px', border: '1px solid #ccc', fontSize: '12px', fontWeight: '600' }}>
+                              <option value="none">Без покриття</option>
+                              <option value="gloss">Глянцева ламінація 1+0</option>
+                              <option value="matte">Матова ламінація 1+0</option>
+                              <option value="softtouch">Soft-Touch оксамит 1+0</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label style={{ fontSize: '12px', fontWeight: '700', color: '#444', display: 'block', marginBottom: '4px' }}>Задня підкладка:</label>
+                            <select value={notepadPodkladka} onChange={(e) => setNotepadPodkladka(e.target.value)} style={{ width: '100%', padding: '6px 10px', borderRadius: '4px', border: '1px solid #ccc', fontSize: '12px', fontWeight: '600' }}>
+                              <option value="250">Крейда 250г без друку</option>
+                              <option value="350">Крейда 350г цупка</option>
+                              <option value="cardboard">Палітурний щільний картон 1.5 мм</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {((subCategory as string) === 'Конверт' || (name || '').includes('Конверт')) && (
+                      <div style={{ backgroundColor: '#fcfcfc', border: '1px solid #e2e8f0', borderRadius: '6px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                        <h4 style={{ fontSize: '14px', fontWeight: '800', color: '#c00', margin: 0 }}>✉️ Параметри фірмових конвертів</h4>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px' }}>
+                          <div>
+                            <label style={{ fontSize: '12px', fontWeight: '700', color: '#444', display: 'block', marginBottom: '4px' }}>Формат конверта:</label>
+                            <select value={envelopeFormat} onChange={(e) => setEnvelopeFormat(e.target.value as any)} style={{ width: '100%', padding: '6px 10px', borderRadius: '4px', border: '1px solid #ccc', fontSize: '12px', fontWeight: '600' }}>
+                              <option value="E65">Євро DL (110 × 220 мм)</option>
+                              <option value="C6">С6 (114 × 162 мм)</option>
+                              <option value="C5">С5 (162 × 229 мм)</option>
+                              <option value="C4">С4 (229 × 324 мм під А4)</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label style={{ fontSize: '12px', fontWeight: '700', color: '#444', display: 'block', marginBottom: '4px' }}>Прозоре віконце під адресу:</label>
+                            <select value={envelopeWindow ? 'yes' : 'no'} onChange={(e) => setEnvelopeWindow(e.target.value === 'yes')} style={{ width: '100%', padding: '6px 10px', borderRadius: '4px', border: '1px solid #ccc', fontSize: '12px', fontWeight: '600' }}>
+                              <option value="no">Без вікна (суцільний)</option>
+                              <option value="yes">З правим вікном (45 × 90 мм)</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label style={{ fontSize: '12px', fontWeight: '700', color: '#444', display: 'block', marginBottom: '4px' }}>Клейовий шар клапана:</label>
+                            <div style={{ padding: '8px 10px', backgroundColor: '#f1f5f9', borderRadius: '4px', fontSize: '12px', fontWeight: '600', color: '#334155' }}>
+                              Силіконова захисна стрічка (СКЛ / Peel & Seal)
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {((subCategory as string) === 'Календарні сітки' || (name || '').includes('сітки')) && (
+                      <div style={{ backgroundColor: '#fcfcfc', border: '1px solid #e2e8f0', borderRadius: '6px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                        <h4 style={{ fontSize: '14px', fontWeight: '800', color: '#c00', margin: 0 }}>📅 Календарні сітки 2026 / 2027</h4>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px' }}>
+                          <div>
+                            <label style={{ fontSize: '12px', fontWeight: '700', color: '#444', display: 'block', marginBottom: '4px' }}>Дизайн та колір сітки:</label>
+                            <select value={gridType} onChange={(e) => setGridType(e.target.value as any)} style={{ width: '100%', padding: '6px 10px', borderRadius: '4px', border: '1px solid #ccc', fontSize: '12px', fontWeight: '600' }}>
+                              <option value="standart">Стандартна трисекційна 3в1</option>
+                              <option value="gold">Золота преміум серія</option>
+                              <option value="metallic">Срібло / Металік</option>
+                              <option value="3in1">Міні-сітка компакт</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label style={{ fontSize: '12px', fontWeight: '700', color: '#444', display: 'block', marginBottom: '4px' }}>Рік випуску:</label>
+                            <select value={gridYear} onChange={(e) => setGridYear(e.target.value as any)} style={{ width: '100%', padding: '6px 10px', borderRadius: '4px', border: '1px solid #ccc', fontSize: '12px', fontWeight: '600' }}>
+                              <option value="2026">2026 рік</option>
+                              <option value="2027">2027 рік</option>
+                            </select>
+                          </div>
+                          <div>
+                            <label style={{ fontSize: '12px', fontWeight: '700', color: '#444', display: 'block', marginBottom: '4px' }}>Курсор з віконцем (бігунок):</label>
+                            <select value={gridCursor ? 'yes' : 'no'} onChange={(e) => setGridCursor(e.target.value === 'yes')} style={{ width: '100%', padding: '6px 10px', borderRadius: '4px', border: '1px solid #ccc', fontSize: '12px', fontWeight: '600' }}>
+                              <option value="yes">В комплекті з прозорою стрічкою</option>
+                              <option value="no">Без курсора</option>
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {((category as string) === 'Сети') && (
+                      <div style={{ backgroundColor: '#fcfcfc', border: '1px solid #e2e8f0', borderRadius: '6px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                        <h4 style={{ fontSize: '14px', fontWeight: '800', color: '#c00', margin: 0 }}>🍽️ Паперові сети та плейсмати для ресторанів</h4>
+                        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '12px' }}>
+                          <div>
+                            <label style={{ fontSize: '12px', fontWeight: '700', color: '#444', display: 'block', marginBottom: '4px' }}>Тип еко-паперу:</label>
+                            <div style={{ padding: '8px 10px', backgroundColor: '#f1f5f9', borderRadius: '4px', fontSize: '12px', fontWeight: '600', color: '#334155' }}>
+                              Крафт бурий 70г / Офсет 80г (самонаклад)
+                            </div>
+                          </div>
+                          <div>
+                            <label style={{ fontSize: '12px', fontWeight: '700', color: '#444', display: 'block', marginBottom: '4px' }}>Кольоровість друку:</label>
+                            <div style={{ padding: '8px 10px', backgroundColor: '#f1f5f9', borderRadius: '4px', fontSize: '12px', fontWeight: '600', color: '#334155' }}>
+                              1+0 (монохром чорний / коричневий) або 4+0 повноколір
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {((subCategory as string) === 'Друк в листах' || (name || '').includes('листах')) && (
+                      <div style={{ backgroundColor: '#fcfcfc', border: '1px solid #e2e8f0', borderRadius: '6px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                        <h4 style={{ fontSize: '14px', fontWeight: '800', color: '#c00', margin: 0 }}>📄 Офсетний друк у листах без порізки</h4>
+                        <p style={{ fontSize: '12px', color: '#64748b', margin: 0 }}>
+                          Продукція відвантажується на палетах у повних друкарських листах з приладними шкалами, мітками різу та хрестами суміщення для власної висічки або післядруку.
+                        </p>
                       </div>
                     )}
                   </div>
