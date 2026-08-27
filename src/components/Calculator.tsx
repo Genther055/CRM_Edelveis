@@ -1893,40 +1893,65 @@ export const Calculator: React.FC = () => {
               {/* DETAILED SHEET CALCULATOR (Офсетний друк / Листова) */}
               {offsetSubTab === 'sheets' && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                  {/* Top Information Buttons Bar */}
-                  <div style={{ display: 'flex', gap: '15px', flexWrap: 'wrap', backgroundColor: '#ffffff', padding: '12px 16px', borderRadius: '4px', border: '1px solid #ddd' }}>
-                    <button type="button" onClick={() => setActiveInfoModal('instr')} style={{ border: 'none', background: 'none', cursor: 'pointer', fontSize: '13px', fontWeight: '600', color: '#333', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      📄 Інструкція по оформленню замовлення
-                    </button>
-                    <button type="button" onClick={() => setActiveInfoModal('terms')} style={{ border: 'none', background: 'none', cursor: 'pointer', fontSize: '13px', fontWeight: '600', color: '#333', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      ⏱️ Терміни друку
-                    </button>
-                    <button type="button" onClick={() => setActiveInfoModal('materials')} style={{ border: 'none', background: 'none', cursor: 'pointer', fontSize: '13px', fontWeight: '600', color: '#333', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      📚 Матеріали
-                    </button>
-                    <button type="button" onClick={() => setActiveInfoModal('samples')} style={{ border: 'none', background: 'none', cursor: 'pointer', fontSize: '13px', fontWeight: '600', color: '#333', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      🏷️ Зразки матеріалів з друком
-                    </button>
-                    <button type="button" onClick={() => setActiveInfoModal('review')} style={{ border: 'none', background: 'none', cursor: 'pointer', fontSize: '13px', fontWeight: '600', color: '#333', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      💬 Ваш відгук
-                    </button>
-                    <button type="button" onClick={() => setActiveInfoModal('bug')} style={{ border: 'none', background: 'none', cursor: 'pointer', fontSize: '13px', fontWeight: '600', color: '#c00', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                      ⚠️ Знайшли помилку?
-                    </button>
+                  {/* Top Product Header & Quick Links Bar (Matching Sborka / Edelveis) */}
+                  <div style={{ backgroundColor: '#ffffff', padding: '16px 20px', borderRadius: '4px', border: '1px solid #ddd', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #eee', paddingBottom: '12px' }}>
+                      <h3 style={{ fontSize: '20px', fontWeight: '800', color: '#222', margin: 0 }}>
+                        {(category as string) || 'Візитівки'}
+                      </h3>
+                      <button
+                        type="button"
+                        onClick={() => setOffsetSubTab('overview')}
+                        style={{ border: '1px solid #ccc', backgroundColor: '#f8f9fa', padding: '6px 14px', borderRadius: '4px', cursor: 'pointer', fontSize: '13px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '6px' }}
+                      >
+                        ← Назад до категорій
+                      </button>
+                    </div>
+
+                    {/* 2 Rows of Red Quick Info Links (Exact Sborka layout) */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '10px 20px', fontSize: '13px' }}>
+                      {/* Row 1 */}
+                      <button type="button" onClick={() => setActiveInfoModal('instr')} style={{ border: 'none', background: 'none', cursor: 'pointer', fontWeight: '600', color: '#333', display: 'flex', alignItems: 'center', gap: '8px', padding: 0, textAlign: 'left' }}>
+                        <FileText size={15} style={{ color: '#c00', flexShrink: 0 }} />
+                        <span>Інструкція по оформленню замовлення</span>
+                      </button>
+                      <button type="button" onClick={() => setActiveInfoModal('materials')} style={{ border: 'none', background: 'none', cursor: 'pointer', fontWeight: '600', color: '#333', display: 'flex', alignItems: 'center', gap: '8px', padding: 0, textAlign: 'left' }}>
+                        <Layers size={15} style={{ color: '#c00', flexShrink: 0 }} />
+                        <span>Матеріали</span>
+                      </button>
+                      <button type="button" onClick={() => setActiveInfoModal('review')} style={{ border: 'none', background: 'none', cursor: 'pointer', fontWeight: '600', color: '#333', display: 'flex', alignItems: 'center', gap: '8px', padding: 0, textAlign: 'left' }}>
+                        <MessageSquare size={15} style={{ color: '#c00', flexShrink: 0 }} />
+                        <span>Ваш відгук</span>
+                      </button>
+
+                      {/* Row 2 */}
+                      <button type="button" onClick={() => setActiveInfoModal('terms')} style={{ border: 'none', background: 'none', cursor: 'pointer', fontWeight: '600', color: '#333', display: 'flex', alignItems: 'center', gap: '8px', padding: 0, textAlign: 'left' }}>
+                        <Clock size={15} style={{ color: '#c00', flexShrink: 0 }} />
+                        <span>Термін друку</span>
+                      </button>
+                      <button type="button" onClick={() => setActiveInfoModal('samples')} style={{ border: 'none', background: 'none', cursor: 'pointer', fontWeight: '600', color: '#333', display: 'flex', alignItems: 'center', gap: '8px', padding: 0, textAlign: 'left' }}>
+                        <Tag size={15} style={{ color: '#c00', flexShrink: 0 }} />
+                        <span>Зразки матеріалів з друком</span>
+                      </button>
+                      <button type="button" onClick={() => setActiveInfoModal('bug')} style={{ border: 'none', background: 'none', cursor: 'pointer', fontWeight: '600', color: '#c00', display: 'flex', alignItems: 'center', gap: '8px', padding: 0, textAlign: 'left' }}>
+                        <AlertTriangle size={15} style={{ color: '#c00', flexShrink: 0 }} />
+                        <span>Знайшли помилку?</span>
+                      </button>
+                    </div>
                   </div>
 
                   {/* Product Kind / Folding Type Selection Bar */}
                   <div style={{ backgroundColor: '#ffffff', padding: '16px 20px', borderRadius: '4px', border: '1px solid #ddd', display: 'flex', flexDirection: 'column', gap: '12px' }}>
-                    <h4 style={{ fontSize: '15px', fontWeight: '800', color: '#222', margin: 0 }}>
-                      {(category as string) === 'Буклети' ? 'Вид складання (фальцовки / біговки)' :
-                       (category as string) === 'Візитки' ? 'Вид візитівки' :
-                       (category as string) === 'Календарики кишенькові' || (category as string) === 'Календарі' ? 'Вид календаря' :
-                       (category as string) === 'Наклейки' ? 'Вид наклейки' :
-                       (category as string) === 'Папки' ? 'Конструкція папки А4' :
-                       'Вид виробу'}
+                    <h4 style={{ fontSize: '14px', fontWeight: '800', color: '#333', margin: 0, textTransform: 'uppercase' }}>
+                      {(category as string) === 'Буклети' ? 'Вид складання' :
+                       (category as string) === 'Візитки' ? 'Вид' :
+                       (category as string) === 'Календарики кишенькові' || (category as string) === 'Календарі' ? 'Вид' :
+                       (category as string) === 'Наклейки' ? 'Вид' :
+                       (category as string) === 'Папки' ? 'Конструкція' :
+                       'Вид'}
                     </h4>
 
-                    {/* 1. Буклети: 12 Folding styles from sborka.ua */}
+                    {/* 1. Буклети: 12 Folding styles */}
                     {category === 'Буклети' && (
                       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(115px, 1fr))', gap: '10px' }}>
                         {[
@@ -1955,7 +1980,7 @@ export const Calculator: React.FC = () => {
                               style={{
                                 cursor: 'pointer',
                                 border: isActive ? '2px solid #c00' : '1px solid #ddd',
-                                backgroundColor: isActive ? '#fff0f0' : '#f9f9f9',
+                                backgroundColor: isActive ? '#ffffff' : '#f9f9f9',
                                 borderRadius: '4px',
                                 padding: '10px 6px',
                                 display: 'flex',
@@ -1993,23 +2018,135 @@ export const Calculator: React.FC = () => {
                       </div>
                     )}
 
-                    {/* 2. Category-Specific Format & Sub-Kind Buttons */}
-                    {category !== 'Буклети' && (
+                    {/* 2. Візитівки: 6 Visual SVG Cards (Exact Sborka Image 1 Match) */}
+                    {(category as string) === 'Візитки' && (
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '12px' }}>
+                        {[
+                          {
+                            id: '1',
+                            name: 'Стандартні',
+                            preset: '1',
+                            w: '90',
+                            h: '50',
+                            renderSvg: (active: boolean) => (
+                              <svg width="64" height="42" viewBox="0 0 64 42" fill="none">
+                                <rect x="4" y="6" width="56" height="30" rx="2" stroke={active ? '#c00' : '#999'} strokeWidth="1.5" fill="#fff" />
+                                <rect x="27" y="16" width="10" height="10" stroke="#c00" strokeWidth="1.2" fill="none" />
+                              </svg>
+                            )
+                          },
+                          {
+                            id: '2',
+                            name: 'Квадратні',
+                            preset: '5',
+                            w: '50',
+                            h: '50',
+                            renderSvg: (active: boolean) => (
+                              <svg width="64" height="42" viewBox="0 0 64 42" fill="none">
+                                <rect x="17" y="6" width="30" height="30" rx="2" stroke={active ? '#c00' : '#999'} strokeWidth="1.5" fill="#fff" />
+                                <rect x="27" y="16" width="10" height="10" stroke="#c00" strokeWidth="1.2" fill="none" />
+                              </svg>
+                            )
+                          },
+                          {
+                            id: '6',
+                            name: 'Складні',
+                            preset: '3',
+                            w: '90',
+                            h: '100',
+                            renderSvg: (active: boolean) => (
+                              <svg width="64" height="42" viewBox="0 0 64 42" fill="none">
+                                <rect x="10" y="4" width="32" height="34" rx="2" stroke="#bbb" strokeWidth="1.2" fill="#fafafa" />
+                                <rect x="20" y="8" width="34" height="28" rx="2" stroke={active ? '#c00' : '#777'} strokeWidth="1.5" fill="#fff" />
+                                <line x1="20" y1="22" x2="54" y2="22" stroke="#c00" strokeDasharray="2 2" strokeWidth="1.2" />
+                                <rect x="32" y="12" width="10" height="8" stroke="#c00" strokeWidth="1" fill="none" />
+                              </svg>
+                            )
+                          },
+                          {
+                            id: '7',
+                            name: 'Круг',
+                            preset: '5',
+                            w: '50',
+                            h: '50',
+                            renderSvg: (active: boolean) => (
+                              <svg width="64" height="42" viewBox="0 0 64 42" fill="none">
+                                <circle cx="32" cy="21" r="16" stroke={active ? '#c00' : '#999'} strokeWidth="1.5" fill="#fff" />
+                                <rect x="27" y="16" width="10" height="10" stroke="#c00" strokeWidth="1.2" fill="none" />
+                              </svg>
+                            )
+                          },
+                          {
+                            id: '8',
+                            name: 'Овал',
+                            preset: '1',
+                            w: '90',
+                            h: '50',
+                            renderSvg: (active: boolean) => (
+                              <svg width="64" height="42" viewBox="0 0 64 42" fill="none">
+                                <ellipse cx="32" cy="21" rx="26" ry="16" stroke={active ? '#c00' : '#999'} strokeWidth="1.5" fill="#fff" />
+                                <rect x="27" y="16" width="10" height="10" stroke="#c00" strokeWidth="1.2" fill="none" />
+                              </svg>
+                            )
+                          },
+                          {
+                            id: '9',
+                            name: 'Заокруглені кути',
+                            preset: '1',
+                            w: '90',
+                            h: '50',
+                            renderSvg: (active: boolean) => (
+                              <svg width="64" height="42" viewBox="0 0 64 42" fill="none">
+                                <rect x="4" y="6" width="56" height="30" rx="8" stroke={active ? '#c00' : '#999'} strokeWidth="1.5" fill="#fff" />
+                                <rect x="27" y="16" width="10" height="10" stroke="#c00" strokeWidth="1.2" fill="none" />
+                              </svg>
+                            )
+                          }
+                        ].map(item => {
+                          const isActive = cardKind === item.id;
+                          return (
+                            <div
+                              key={item.id}
+                              onClick={() => {
+                                setCardKind(item.id);
+                                setSheetSizePreset(item.preset);
+                                setSheetCustomWidth(item.w);
+                                setSheetCustomHeight(item.h);
+                              }}
+                              style={{
+                                cursor: 'pointer',
+                                border: isActive ? '2px solid #c00' : '1px solid #d5d5d5',
+                                backgroundColor: '#ffffff',
+                                borderRadius: '4px',
+                                padding: '12px 8px',
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                gap: '8px',
+                                transition: 'all 0.15s ease'
+                              }}
+                              onMouseEnter={(e) => { if (!isActive) e.currentTarget.style.borderColor = '#999'; }}
+                              onMouseLeave={(e) => { if (!isActive) e.currentTarget.style.borderColor = '#d5d5d5'; }}
+                            >
+                              {item.renderSvg(isActive)}
+                              <span style={{ fontSize: '12px', fontWeight: isActive ? '700' : '600', color: isActive ? '#c00' : '#333', textAlign: 'center' }}>
+                                {item.name}
+                              </span>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    )}
+
+                    {/* 3. Other Categories Format Buttons */}
+                    {category !== 'Буклети' && (category as string) !== 'Візитки' && (
                       <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
                         {(() => {
                           const catStr = category as string;
-                          let items: Array<{ id: string; name: string; preset: string; w: string; h: string; img?: string }> = [];
+                          let items: Array<{ id: string; name: string; preset: string; w: string; h: string }> = [];
 
-                          if (catStr === 'Візитки') {
-                            items = [
-                              { id: '1', name: 'Стандартні (90×50)', preset: '1', w: '90', h: '50', img: 'https://sborka.ua/cside/img/ico_size/products/viz.png' },
-                              { id: '2', name: 'Квадратні (50×50)', preset: '5', w: '50', h: '50', img: 'https://sborka.ua/cside/img/ico_size/products/kvadr.png' },
-                              { id: '6', name: 'Складні (90×100)', preset: '3', w: '90', h: '100', img: 'https://sborka.ua/cside/img/ico_size/products/big.png' },
-                              { id: '7', name: 'Круг (Ø50)', preset: '5', w: '50', h: '50', img: 'https://sborka.ua/cside/img/ico_size/products/circle.png' },
-                              { id: '8', name: 'Овал (90×50)', preset: '1', w: '90', h: '50', img: 'https://sborka.ua/cside/img/Oval/31_21_n108.png' },
-                              { id: '9', name: 'Заокруглені кути', preset: '1', w: '90', h: '50', img: 'https://sborka.ua/cside/img/ico_size/products/cart.png' }
-                            ];
-                          } else if (catStr === 'Календарики кишенькові' || catStr === 'Календарі') {
+                          if (catStr === 'Календарики кишенькові' || catStr === 'Календарі') {
                             items = [
                               { id: '1', name: 'Кишеньковий (100×70)', preset: '91', w: '100', h: '70' },
                               { id: '2', name: 'Календар (90×60)', preset: '90', w: '90', h: '60' },
@@ -2097,7 +2234,6 @@ export const Calculator: React.FC = () => {
                                   transition: 'all 0.15s ease'
                                 }}
                               >
-                                {kindItem.img && <img src={kindItem.img} alt={kindItem.name} style={{ width: '45px', height: '35px', objectFit: 'contain' }} />}
                                 <span style={{ fontSize: '12px', fontWeight: isActive ? '700' : '600', color: isActive ? '#c00' : '#333', textAlign: 'center' }}>
                                   {kindItem.name}
                                 </span>
@@ -2107,6 +2243,7 @@ export const Calculator: React.FC = () => {
                         })()}
                       </div>
                     )}
+
                     {/* Specialized Product Options Configurator */}
                     {category === 'Папки' && (
                       <div style={{ backgroundColor: '#fcfcfc', border: '1px solid #e2e8f0', borderRadius: '6px', padding: '16px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
@@ -2680,167 +2817,187 @@ export const Calculator: React.FC = () => {
                       (Замовлень з однаковими параметрами, але різними макетами)
                     </span>
                   </div>
-
-                  {/* Filter Options (Materials, Coating, Color Printing) */}
-                  <div style={{ backgroundColor: '#ffffff', padding: '20px', borderRadius: '4px', border: '1px solid #ddd', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                    <h4 style={{ fontSize: '16px', fontWeight: '800', color: '#222', margin: 0 }}>Фільтр специфікацій та матеріалів</h4>
-
-                    {/* Material Options */}
-                    <div>
-                      <span style={{ fontSize: '13px', fontWeight: '700', color: '#555', display: 'block', marginBottom: '8px' }}>Матеріал паперу:</span>
-                      <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
-                        {[
-                          { id: '80', label: 'Офсет 80г' },
-                          { id: '90', label: 'Крейд 90г' },
-                          { id: '115', label: 'Крейд 115г' },
-                          { id: '130', label: 'Крейд 130г' },
-                          { id: '150', label: 'Крейд 150г' },
-                          { id: '170', label: 'Крейд 170г' },
-                          { id: '250', label: 'Крейд 250г' },
-                          { id: '300', label: 'Крейд 300г' },
-                          { id: '350', label: 'Крейд 350г' },
-                          { id: '450', label: 'Крейд 450г' },
-                          { id: 'kraft', label: 'Крафт 80г' },
-                          { id: 'linen', label: 'Льон 300г' },
-                          { id: 'tintoretto_crema', label: 'Tintoretto Crema 300г' },
-                          { id: 'tintoretto_gesso', label: 'Tintoretto Gesso 300г' },
-                          { id: 'stardream', label: 'Stardream Opal 285г' },
-                          { id: 'touch', label: 'Тач Кавер 301г' },
-                          { id: 'sk_kreyd_pros', label: 'С/к Крейд з просічками' },
-                          { id: 'sk_kreyd_bez', label: 'С/к Крейд без просічок' },
-                          { id: 'sk_ofset_pros', label: 'С/к Офсет з просічками' },
-                          { id: 'karton_220', label: 'Картон крем 220г' },
-                          { id: 'karton_250', label: 'Картон крем 250г' }
-                        ].map(mat => {
-                          const isSel = selectedMaterials.includes(mat.id);
-                          return (
-                            <button
-                              key={mat.id}
-                              type="button"
-                              onClick={() => {
-                                setSelectedMaterials(prev => 
-                                  prev.includes(mat.id) ? prev.filter(x => x !== mat.id) : [...prev, mat.id]
-                                );
-                              }}
-                              style={{
-                                padding: '5px 10px',
-                                fontSize: '12px',
-                                fontWeight: '600',
-                                borderRadius: '4px',
-                                border: isSel ? '1px solid #c00' : '1px solid #ccc',
-                                backgroundColor: isSel ? '#fff0f0' : '#f8f9fa',
-                                color: isSel ? '#c00' : '#333',
-                                cursor: 'pointer',
-                                transition: 'all 0.15s ease'
-                              }}
-                            >
-                              {mat.label}
-                            </button>
-                          );
-                        })}
-                      </div>
+                                     {/* Filter Options (Materials, Coating, Color Printing) Matching Sborka Matrix */}
+                  <div style={{ backgroundColor: '#ffffff', border: '1px solid #ddd', borderRadius: '4px', overflow: 'hidden' }}>
+                    <div style={{ padding: '12px 20px', backgroundColor: '#f5f5f5', borderBottom: '1px solid #ddd' }}>
+                      <h4 style={{ fontSize: '15px', fontWeight: '800', color: '#222', margin: 0 }}>
+                        Фільтр (вибір, порівняння)
+                      </h4>
                     </div>
 
-                    {/* Coating Options */}
-                    <div>
-                      <span style={{ fontSize: '13px', fontWeight: '700', color: '#555', display: 'block', marginBottom: '8px' }}>Покриття (Ламінація / Лак):</span>
-                      <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                        {[
-                          { id: '0', label: 'Без покриття' },
-                          { id: '7', label: 'ГЛ лам 1+0' },
-                          { id: '8', label: 'ГЛ лам 1+1' },
-                          { id: '9', label: 'МАТ лам 1+0' },
-                          { id: '10', label: 'МАТ лам 1+1' },
-                          { id: '30', label: 'SOFT лам 1+0' },
-                          { id: '31', label: 'SOFT лам 1+1' }
-                        ].map(cov => {
-                          const isSel = selectedCoverings.includes(cov.id);
-                          return (
-                            <button
-                              key={cov.id}
-                              type="button"
-                              onClick={() => {
-                                setSelectedCoverings(prev => 
-                                  prev.includes(cov.id) ? prev.filter(x => x !== cov.id) : [...prev, cov.id]
-                                );
-                              }}
-                              style={{
-                                padding: '6px 12px',
-                                fontSize: '12px',
-                                fontWeight: '600',
-                                borderRadius: '4px',
-                                border: isSel ? '1px solid #c00' : '1px solid #ccc',
-                                backgroundColor: isSel ? '#fff0f0' : '#f8f9fa',
-                                color: isSel ? '#c00' : '#333',
-                                cursor: 'pointer'
-                              }}
-                            >
-                              {cov.label}
-                            </button>
-                          );
-                        })}
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                      {/* Row 1: Material Options */}
+                      <div style={{ display: 'flex', borderBottom: '1px solid #e5e5e5' }}>
+                        <div style={{ width: '130px', flexShrink: 0, backgroundColor: '#f0f0f0', borderRight: '1px solid #e0e0e0', padding: '12px 14px', fontSize: '12px', fontWeight: '800', color: '#444', display: 'flex', alignItems: 'center' }}>
+                          МАТЕРІАЛ:
+                        </div>
+                        <div style={{ flex: 1, padding: '10px 14px', display: 'flex', gap: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
+                          {[
+                            { id: 'kraft_70', label: 'Крафт бурий 70' },
+                            { id: '80', label: 'Офсет 80' },
+                            { id: 'linen_300', label: 'Льон білий 300' },
+                            { id: 'tintoretto_crema', label: 'Tintoretto crema 300' },
+                            { id: 'tintoretto_gesso', label: 'Tintoretto gesso 300' },
+                            { id: 'stardream_opal', label: 'Stardream opal 285' },
+                            { id: 'stardream_diamond', label: 'Stardream diamond 285' },
+                            { id: 'stardream_topaz', label: 'Stardream topaz 285' },
+                            { id: '90', label: 'Крейда МАТ 90' },
+                            { id: '115', label: 'Крейда МАТ 115' },
+                            { id: '130', label: 'Крейда МАТ 130' },
+                            { id: '150', label: 'Крейда МАТ 150' },
+                            { id: '170', label: 'Крейда МАТ 170' },
+                            { id: '250', label: 'Крейда МАТ 250' },
+                            { id: '300', label: 'Крейда МАТ 300' },
+                            { id: '350', label: 'Крейда МАТ 350' },
+                            { id: '450', label: 'Крейда МАТ 450' }
+                          ].map(mat => {
+                            const isSel = selectedMaterials.includes(mat.id);
+                            return (
+                              <button
+                                key={mat.id}
+                                type="button"
+                                onClick={() => {
+                                  setSelectedMaterials(prev => 
+                                    prev.includes(mat.id) ? prev.filter(x => x !== mat.id) : [...prev, mat.id]
+                                  );
+                                }}
+                                style={{
+                                  padding: '4px 10px',
+                                  fontSize: '12px',
+                                  fontWeight: isSel ? '700' : '500',
+                                  borderRadius: '3px',
+                                  border: isSel ? '1px solid #c00' : '1px solid #d5d5d5',
+                                  backgroundColor: isSel ? '#ffffff' : '#f8f8f8',
+                                  color: isSel ? '#c00' : '#333',
+                                  cursor: 'pointer',
+                                  transition: 'all 0.1s ease'
+                                }}
+                              >
+                                {mat.label}
+                              </button>
+                            );
+                          })}
+                        </div>
                       </div>
-                    </div>
 
-                    {/* Color Printing Options */}
-                    <div>
-                      <span style={{ fontSize: '13px', fontWeight: '700', color: '#555', display: 'block', marginBottom: '8px' }}>Кольоровість друку:</span>
-                      <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-                        {['4+0', '4+4', '1+0', '1+1'].map(col => {
-                          const isSel = selectedPrintColors.includes(col);
-                          return (
-                            <button
-                              key={col}
-                              type="button"
-                              onClick={() => {
-                                setSelectedPrintColors(prev => 
-                                  prev.includes(col) ? prev.filter(x => x !== col) : [...prev, col]
-                                );
-                              }}
-                              style={{
-                                padding: '6px 12px',
-                                fontSize: '12px',
-                                fontWeight: '600',
-                                borderRadius: '4px',
-                                border: isSel ? '1px solid #c00' : '1px solid #ccc',
-                                backgroundColor: isSel ? '#fff0f0' : '#f8f9fa',
-                                color: isSel ? '#c00' : '#333',
-                                cursor: 'pointer'
-                              }}
-                            >
-                              {col}
-                            </button>
-                          );
-                        })}
+                      {/* Row 2: Coating Options */}
+                      <div style={{ display: 'flex', borderBottom: '1px solid #e5e5e5' }}>
+                        <div style={{ width: '130px', flexShrink: 0, backgroundColor: '#f0f0f0', borderRight: '1px solid #e0e0e0', padding: '12px 14px', fontSize: '12px', fontWeight: '800', color: '#444', display: 'flex', alignItems: 'center' }}>
+                          ПОКРИТТЯ:
+                        </div>
+                        <div style={{ flex: 1, padding: '10px 14px', display: 'flex', gap: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
+                          {[
+                            { id: '0', label: 'БП' },
+                            { id: '7', label: 'ГЛ лам 1+0' },
+                            { id: '8', label: 'ГЛ лам 1+1' },
+                            { id: '9', label: 'МАТ лам 1+0' },
+                            { id: '10', label: 'МАТ лам 1+1' },
+                            { id: '30', label: 'SOFT лам 1+0' },
+                            { id: '31', label: 'SOFT лам 1+1' },
+                            { id: 'uv_10', label: 'УФ ЛАК 1+0' },
+                            { id: 'uv_11', label: 'УФ ЛАК 1+1' },
+                            { id: 'gibrid_10', label: 'Гібрид 1+0' }
+                          ].map(cov => {
+                            const isSel = selectedCoverings.includes(cov.id);
+                            return (
+                              <button
+                                key={cov.id}
+                                type="button"
+                                onClick={() => {
+                                  setSelectedCoverings(prev => 
+                                    prev.includes(cov.id) ? prev.filter(x => x !== cov.id) : [...prev, cov.id]
+                                  );
+                                }}
+                                style={{
+                                  padding: '4px 10px',
+                                  fontSize: '12px',
+                                  fontWeight: isSel ? '700' : '500',
+                                  borderRadius: '3px',
+                                  border: isSel ? '1px solid #c00' : '1px solid #d5d5d5',
+                                  backgroundColor: isSel ? '#ffffff' : '#f8f8f8',
+                                  color: isSel ? '#c00' : '#333',
+                                  cursor: 'pointer',
+                                  transition: 'all 0.1s ease'
+                                }}
+                              >
+                                {cov.label}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Row 3: Color Printing Options */}
+                      <div style={{ display: 'flex' }}>
+                        <div style={{ width: '130px', flexShrink: 0, backgroundColor: '#f0f0f0', borderRight: '1px solid #e0e0e0', padding: '12px 14px', fontSize: '12px', fontWeight: '800', color: '#444', display: 'flex', alignItems: 'center' }}>
+                          ДРУК:
+                        </div>
+                        <div style={{ flex: 1, padding: '10px 14px', display: 'flex', gap: '6px', flexWrap: 'wrap', alignItems: 'center' }}>
+                          {[
+                            { id: '4+0', label: 'Односторонній 4+0' },
+                            { id: '4+4', label: 'Двосторонній 4+4' },
+                            { id: '1+0', label: 'Одноколірний 1+0' },
+                            { id: '1+1', label: 'Одноколірний 1+1' }
+                          ].map(col => {
+                            const isSel = selectedPrintColors.includes(col.id);
+                            return (
+                              <button
+                                key={col.id}
+                                type="button"
+                                onClick={() => {
+                                  setSelectedPrintColors(prev => 
+                                    prev.includes(col.id) ? prev.filter(x => x !== col.id) : [...prev, col.id]
+                                  );
+                                }}
+                                style={{
+                                  padding: '4px 10px',
+                                  fontSize: '12px',
+                                  fontWeight: isSel ? '700' : '500',
+                                  borderRadius: '3px',
+                                  border: isSel ? '1px solid #c00' : '1px solid #d5d5d5',
+                                  backgroundColor: isSel ? '#ffffff' : '#f8f8f8',
+                                  color: isSel ? '#c00' : '#333',
+                                  cursor: 'pointer',
+                                  transition: 'all 0.1s ease'
+                                }}
+                              >
+                                {col.label}
+                              </button>
+                            );
+                          })}
+                        </div>
                       </div>
                     </div>
                   </div>
 
-                  {/* Price Calculation Matrix Table */}
+                  {/* Price Calculation Matrix Table (Solid Crimson Red Header matching Sborka / Edelveis) */}
                   <div style={{ backgroundColor: '#ffffff', borderRadius: '4px', border: '1px solid #ddd', overflow: 'hidden' }}>
-                    <div style={{ padding: '16px 20px', backgroundColor: '#f8f9fa', borderBottom: '1px solid #ddd', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-                      <h4 style={{ fontSize: '16px', fontWeight: '800', color: '#222', margin: 0 }}>Специфікація розрахунків та прайс-лист</h4>
+                    {/* Banner Controls Bar */}
+                    <div style={{ backgroundColor: '#b30000', color: '#ffffff', padding: '10px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+                      <span style={{ fontSize: '14px', fontWeight: '800', letterSpacing: '0.3px' }}>
+                        ВАРТІСТЬ ТА СТРОКИ ВИГОТОВЛЕННЯ
+                      </span>
 
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                        <label style={{ fontSize: '12px', fontWeight: '600', color: '#444', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                        <label style={{ fontSize: '12px', fontWeight: '600', color: '#ffffff', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
                           <input type="checkbox" checked={includeDelivery} onChange={(e) => setIncludeDelivery(e.target.checked)} />
-                          З доставкою
+                          {includeDelivery ? 'З урахуванням доставки' : 'Без урахування доставки'}
                         </label>
 
-                        <div style={{ display: 'flex', border: '1px solid #ccc', borderRadius: '4px', overflow: 'hidden' }}>
+                        <div style={{ display: 'flex', border: '1px solid rgba(255,255,255,0.4)', borderRadius: '3px', overflow: 'hidden' }}>
                           <button
                             type="button"
                             onClick={() => setPriceCostVar('per_tirazh')}
-                            style={{ border: 'none', padding: '4px 10px', fontSize: '11px', fontWeight: '700', backgroundColor: priceCostVar === 'per_tirazh' ? '#666' : '#fff', color: priceCostVar === 'per_tirazh' ? '#fff' : '#333', cursor: 'pointer' }}
+                            style={{ border: 'none', padding: '3px 9px', fontSize: '11px', fontWeight: '700', backgroundColor: priceCostVar === 'per_tirazh' ? '#ffffff' : 'transparent', color: priceCostVar === 'per_tirazh' ? '#b30000' : '#ffffff', cursor: 'pointer' }}
                           >
-                            За наклад
+                            за наклад
                           </button>
                           <button
                             type="button"
                             onClick={() => setPriceCostVar('per_item')}
-                            style={{ border: 'none', padding: '4px 10px', fontSize: '11px', fontWeight: '700', backgroundColor: priceCostVar === 'per_item' ? '#666' : '#fff', color: priceCostVar === 'per_item' ? '#fff' : '#333', cursor: 'pointer' }}
+                            style={{ border: 'none', padding: '3px 9px', fontSize: '11px', fontWeight: '700', backgroundColor: priceCostVar === 'per_item' ? '#ffffff' : 'transparent', color: priceCostVar === 'per_item' ? '#b30000' : '#ffffff', cursor: 'pointer' }}
                           >
-                            За екземпляр
+                            за екземпляр
                           </button>
                         </div>
                       </div>
@@ -2849,78 +3006,116 @@ export const Calculator: React.FC = () => {
                     <div style={{ overflowX: 'auto' }}>
                       <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px', textAlign: 'center' }}>
                         <thead>
-                          <tr style={{ backgroundColor: '#666666', color: '#ffffff', fontWeight: '700' }}>
-                            <th style={{ padding: '10px', border: '1px solid #555' }}>Матеріал та покриття</th>
-                            <th style={{ padding: '10px', border: '1px solid #555' }}>Друк</th>
-                            <th style={{ padding: '10px', border: '1px solid #555' }}>Готовність</th>
+                          <tr style={{ backgroundColor: '#c00000', color: '#ffffff', fontWeight: '700' }}>
+                            <th style={{ padding: '9px 12px', border: '1px solid #a00000', textAlign: 'left' }}>Матеріал та покриття</th>
+                            <th style={{ padding: '9px 8px', border: '1px solid #a00000' }}>Друк</th>
+                            <th style={{ padding: '9px 8px', border: '1px solid #a00000' }}>Готовність</th>
                             {[100, 250, 500, 1000, 1500, 2500, 5000, 10000].map(tir => (
-                              <th key={tir} style={{ padding: '10px', border: '1px solid #555' }}>{tir} шт.</th>
+                              <th key={tir} style={{ padding: '9px 8px', border: '1px solid #a00000' }}>{tir}</th>
                             ))}
                           </tr>
                         </thead>
                         <tbody>
-                          {selectedMaterials.flatMap(matId => 
-                            selectedCoverings.flatMap(covId => 
-                              selectedPrintColors.map((colStr, rowIdx) => {
-                                const matLabels: Record<string, string> = {
-                                  '80': 'Офсетний 80 г/м²', '90': 'Крейд ГЛ 90 г/м²', '115': 'Крейд ГЛ 115 г/м²',
-                                  '130': 'Крейд ГЛ 130 г/м²', '150': 'Крейд ГЛ 150 г/м²', '170': 'Крейд ГЛ 170 г/м²',
-                                  '250': 'Крейд МАТ 250 г/м²', '300': 'Крейд МАТ 300 г/м²', '350': 'Крейд МАТ 350 г/м²', 'kraft': 'Крафт 80 г/м²'
-                                };
-                                const covLabels: Record<string, string> = {
-                                  '0': 'Без покриття', '7': 'ГЛ лам 1+0', '8': 'ГЛ лам 1+1',
-                                  '9': 'МАТ лам 1+0', '10': 'МАТ лам 1+1', '30': 'SOFT лам 1+0', '31': 'SOFT лам 1+1'
-                                };
-                                const matName = matLabels[matId] || `Папір ${matId}г`;
-                                const covName = covLabels[covId] || '';
-                                const fullMatCover = covName ? `${matName} (${covName})` : matName;
+                          {selectedMaterials.length === 0 || selectedCoverings.length === 0 || selectedPrintColors.length === 0 ? (
+                            <tr>
+                              <td colSpan={11} style={{ padding: '30px', color: '#888', fontStyle: 'italic', backgroundColor: '#fafafa' }}>
+                                Щоб сформувати прайс оберіть матеріал, покриття, тип друку у фільтрі вище
+                              </td>
+                            </tr>
+                          ) : (
+                            selectedMaterials.flatMap(matId => 
+                              selectedCoverings.flatMap(covId => 
+                                selectedPrintColors.map((colStr, rowIdx) => {
+                                  const matLabels: Record<string, string> = {
+                                    'kraft_70': 'Крафт бурий 70г',
+                                    '80': 'Офсет 80г',
+                                    'linen_300': 'Льон білий 300г',
+                                    'tintoretto_crema': 'Tintoretto crema 300г',
+                                    'tintoretto_gesso': 'Tintoretto gesso 300г',
+                                    'stardream_opal': 'Stardream opal 285г',
+                                    'stardream_diamond': 'Stardream diamond 285г',
+                                    'stardream_topaz': 'Stardream topaz 285г',
+                                    '90': 'Крейда МАТ 90г',
+                                    '115': 'Крейда МАТ 115г',
+                                    '130': 'Крейда МАТ 130г',
+                                    '150': 'Крейда МАТ 150г',
+                                    '170': 'Крейда МАТ 170г',
+                                    '250': 'Крейда МАТ 250г',
+                                    '300': 'Крейда МАТ 300г',
+                                    '350': 'Крейда МАТ 350г',
+                                    '450': 'Крейда МАТ 450г'
+                                  };
+                                  const covLabels: Record<string, string> = {
+                                    '0': 'БП',
+                                    '7': 'ГЛ лам 1+0',
+                                    '8': 'ГЛ лам 1+1',
+                                    '9': 'МАТ лам 1+0',
+                                    '10': 'МАТ лам 1+1',
+                                    '30': 'SOFT лам 1+0',
+                                    '31': 'SOFT лам 1+1',
+                                    'uv_10': 'УФ ЛАК 1+0',
+                                    'uv_11': 'УФ ЛАК 1+1',
+                                    'gibrid_10': 'Гібрид 1+0'
+                                  };
+                                  const matName = matLabels[matId] || `Папір ${matId}г`;
+                                  const covName = covLabels[covId] || 'БП';
+                                  const fullMatCover = covName && covName !== 'БП' ? `${matName} (${covName})` : matName;
 
-                                // Base rate per sheet
-                                const matDensity = parseInt(matId) || 130;
-                                const areaM2 = (parseFloat(sheetCustomWidth) / 1000) * (parseFloat(sheetCustomHeight) / 1000);
-                                const isDouble = colStr === '4+4' || colStr === '1+1';
+                                  // Base calculations
+                                  const matDensity = parseInt(matId.replace(/\D/g, '')) || 300;
+                                  const areaM2 = (parseFloat(sheetCustomWidth) / 1000) * (parseFloat(sheetCustomHeight) / 1000);
+                                  const isDouble = colStr === '4+4' || colStr === '1+1';
 
-                                return (
-                                  <tr key={`${matId}-${covId}-${colStr}-${rowIdx}`} style={{ backgroundColor: rowIdx % 2 === 0 ? '#ffffff' : '#f9f9f9', borderBottom: '1px solid #eee' }}>
-                                    <td style={{ padding: '10px', textAlign: 'left', fontWeight: '600', color: '#333', borderRight: '1px solid #ddd' }}>
-                                      {fullMatCover}
-                                    </td>
-                                    <td style={{ padding: '10px', fontWeight: '700', color: '#c00', borderRight: '1px solid #ddd' }}>
-                                      {colStr}
-                                    </td>
-                                    <td style={{ padding: '10px', fontSize: '11px', color: '#666', borderRight: '1px solid #ddd' }}>
-                                      1-2 дні
-                                    </td>
-                                    {[100, 250, 500, 1000, 1500, 2500, 5000, 10000].map(tir => {
-                                      const basePaperCost = areaM2 * (matDensity * 0.08) * tir;
-                                      const printCost = (isDouble ? 0.35 : 0.20) * tir + 120;
-                                      const lamCost = covId !== '0' ? areaM2 * 0.45 * tir : 0;
-                                      const deliveryCost = includeDelivery ? 80 : 0;
-                                      const rawTotal = (basePaperCost + printCost + lamCost + deliveryCost) * (marginPercent / 100);
-                                      const itemCost = rawTotal / tir;
-                                      const displayVal = priceCostVar === 'per_item' ? itemCost.toFixed(2) : Math.round(rawTotal).toString();
+                                  // 1C Postpress calculation rates
+                                  const foldingCostPerItem = postFolding !== '0' ? norms.foldingPrice : 0;
+                                  const creasingCostPerItem = postCreasing !== '0' ? parseInt(postCreasing) * norms.foldingPrice : 0;
+                                  const dieCutCostPerItem = cardKind === '7' || cardKind === '8' || cardKind === '9' ? norms.dieCuttingPrice : 0;
+                                  const postpressTotalPerItem = foldingCostPerItem + creasingCostPerItem + dieCutCostPerItem;
 
-                                      return (
-                                        <td
-                                          key={tir}
-                                          onClick={() => {
-                                            setQuantity(tir);
-                                            setPaperType(matId === '80' ? 'offset' : 'coated');
-                                            setColors(colStr);
-                                            setCategory('Листівки');
-                                            setStep('editor');
-                                          }}
-                                          style={{ padding: '10px', fontWeight: '700', color: '#111', cursor: 'pointer', borderRight: '1px solid #ddd', transition: 'background-color 0.15s ease' }}
-                                          onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#fff0f0'; e.currentTarget.style.color = '#c00'; }}
-                                          onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = '#111'; }}
-                                        >
-                                          {displayVal} грн
-                                        </td>
-                                      );
-                                    })}
-                                  </tr>
-                                );
-                              })
+                                  return (
+                                    <tr key={`${matId}-${covId}-${colStr}-${rowIdx}`} style={{ backgroundColor: rowIdx % 2 === 0 ? '#ffffff' : '#fafafa', borderBottom: '1px solid #e8e8e8' }}>
+                                      <td style={{ padding: '8px 12px', textAlign: 'left', fontWeight: '600', color: '#222', borderRight: '1px solid #e0e0e0' }}>
+                                        {fullMatCover}
+                                      </td>
+                                      <td style={{ padding: '8px', fontWeight: '700', color: '#c00', borderRight: '1px solid #e0e0e0' }}>
+                                        {colStr}
+                                      </td>
+                                      <td style={{ padding: '8px', fontSize: '11px', color: '#666', borderRight: '1px solid #e0e0e0' }}>
+                                        1-2 дні
+                                      </td>
+                                      {[100, 250, 500, 1000, 1500, 2500, 5000, 10000].map(tir => {
+                                        const basePaperCost = areaM2 * (matDensity * 0.08) * tir;
+                                        const printCost = (isDouble ? 0.35 : 0.20) * tir + (tir > 500 ? 80 : 120);
+                                        const lamCost = (covId !== '0' && covId !== '') ? areaM2 * norms.laminationMattePrice * tir * (covId.includes('1+1') ? 2 : 1) : 0;
+                                        const postpressSum = postpressTotalPerItem * tir;
+                                        const deliveryCost = includeDelivery ? 80 : 0;
+                                        
+                                        const rawTotal = (basePaperCost + printCost + lamCost + postpressSum + deliveryCost) * (marginPercent / 100) * (sheetSetsCount || 1);
+                                        const itemCost = rawTotal / tir;
+                                        const displayVal = priceCostVar === 'per_item' ? itemCost.toFixed(2) : Math.round(rawTotal).toString();
+
+                                        return (
+                                          <td
+                                            key={tir}
+                                            onClick={() => {
+                                              setQuantity(tir);
+                                              setPaperType(matId === '80' ? 'offset' : 'coated');
+                                              setColors(colStr);
+                                              setCategory('Візитки');
+                                              setStep('editor');
+                                            }}
+                                            style={{ padding: '8px', fontWeight: '700', color: '#111', cursor: 'pointer', borderRight: '1px solid #e0e0e0', transition: 'all 0.12s ease' }}
+                                            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#fff0f0'; e.currentTarget.style.color = '#c00'; }}
+                                            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = '#111'; }}
+                                          >
+                                            {displayVal} грн
+                                          </td>
+                                        );
+                                      })}
+                                    </tr>
+                                  );
+                                })
+                              )
                             )
                           )}
                         </tbody>
