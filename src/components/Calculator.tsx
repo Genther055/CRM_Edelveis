@@ -365,10 +365,16 @@ export const Calculator: React.FC = () => {
   // Select Product from Catalog
   const handleSelectCategory = (cat: any) => {
     setCategory(cat);
-    setStep('editor');
     setCalcMode('auto');
     
     if (cat === 'Бланки') {
+      setMainCategoryTab('offset');
+      setOffsetSubTab('sheets');
+      setStep('catalog');
+      setSheetSizePreset('34');
+      setSheetCustomWidth('210');
+      setSheetCustomHeight('297');
+      setCardKind('1');
       setQuantity(1000);
       setPaperType('offset');
       setColors('1+0');
@@ -381,6 +387,13 @@ export const Calculator: React.FC = () => {
       setSelectedCoverings(['0']);
       setSelectedPrintColors(['1+0', '4+0']);
     } else if (cat === 'Візитки') {
+      setMainCategoryTab('offset');
+      setOffsetSubTab('sheets');
+      setStep('catalog');
+      setSheetSizePreset('1');
+      setSheetCustomWidth('90');
+      setSheetCustomHeight('50');
+      setCardKind('1');
       setQuantity(100);
       setPaperType('coated');
       setColors('4+4');
@@ -391,6 +404,13 @@ export const Calculator: React.FC = () => {
       setSelectedCoverings(['0', '7', '9', '30']);
       setSelectedPrintColors(['4+4', '4+0']);
     } else if (cat === 'Буклети') {
+      setMainCategoryTab('offset');
+      setOffsetSubTab('sheets');
+      setStep('catalog');
+      setSheetSizePreset('34');
+      setSheetCustomWidth('210');
+      setSheetCustomHeight('297');
+      setCardKind('6');
       setQuantity(500);
       setPaperType('coated');
       setColors('4+4');
@@ -402,6 +422,7 @@ export const Calculator: React.FC = () => {
       setSelectedCoverings(['0']);
       setSelectedPrintColors(['4+4']);
     } else if (cat === 'Дипломи випускні') {
+      setStep('editor');
       setQuantity(50);
       setPaperType('coated');
       setColors('4+0');
@@ -411,7 +432,14 @@ export const Calculator: React.FC = () => {
       setSelectedMaterials(['300', '350']);
       setSelectedCoverings(['7', '9']);
       setSelectedPrintColors(['4+0']);
-    } else if (cat === 'Календарі кишенькові') {
+    } else if (cat === 'Календарики кишенькові') {
+      setMainCategoryTab('offset');
+      setOffsetSubTab('sheets');
+      setStep('catalog');
+      setSheetSizePreset('91');
+      setSheetCustomWidth('100');
+      setSheetCustomHeight('70');
+      setCardKind('1');
       setQuantity(500);
       setPaperType('coated');
       setColors('4+4');
@@ -422,6 +450,10 @@ export const Calculator: React.FC = () => {
       setSelectedCoverings(['8', '10']);
       setSelectedPrintColors(['4+4']);
     } else if (cat === 'Книги') {
+      setMainCategoryTab('offset');
+      setOffsetSubTab('multipage');
+      setStep('catalog');
+      setMultiStitching('1');
       setQuantity(200);
       setPaperType('offset');
       setColors('1+1');
@@ -432,6 +464,13 @@ export const Calculator: React.FC = () => {
       setSelectedCoverings(['0', '7']);
       setSelectedPrintColors(['1+1', '4+4']);
     } else if (cat === 'Листівки') {
+      setMainCategoryTab('offset');
+      setOffsetSubTab('sheets');
+      setStep('catalog');
+      setSheetSizePreset('32');
+      setSheetCustomWidth('148');
+      setSheetCustomHeight('210');
+      setCardKind('1');
       setQuantity(1000);
       setPaperType('coated');
       setColors('4+4');
@@ -442,6 +481,13 @@ export const Calculator: React.FC = () => {
       setSelectedCoverings(['0', '7', '9']);
       setSelectedPrintColors(['4+4', '4+0']);
     } else if (cat === 'Сети') {
+      setMainCategoryTab('offset');
+      setOffsetSubTab('sheets');
+      setStep('catalog');
+      setSheetSizePreset('sets_a3');
+      setSheetCustomWidth('420');
+      setSheetCustomHeight('297');
+      setCardKind('1');
       setQuantity(1000);
       setPaperType('offset');
       setColors('1+0');
@@ -452,6 +498,13 @@ export const Calculator: React.FC = () => {
       setSelectedCoverings(['0']);
       setSelectedPrintColors(['1+0', '4+0']);
     } else if (cat === 'Папки') {
+      setMainCategoryTab('offset');
+      setOffsetSubTab('sheets');
+      setStep('catalog');
+      setSheetSizePreset('34');
+      setSheetCustomWidth('210');
+      setSheetCustomHeight('297');
+      setFolderSpine('5');
       setQuantity(100);
       setPaperType('coated');
       setColors('4+0');
@@ -462,6 +515,13 @@ export const Calculator: React.FC = () => {
       setSelectedCoverings(['0', '9', '30']);
       setSelectedPrintColors(['4+0', '4+4']);
     } else if (cat === 'Блокноти') {
+      setMainCategoryTab('offset');
+      setOffsetSubTab('sheets');
+      setStep('catalog');
+      setSheetSizePreset('32');
+      setSheetCustomWidth('148');
+      setSheetCustomHeight('210');
+      setCardKind('1');
       setQuantity(100);
       setPaperType('offset');
       setColors('4+0');
@@ -472,6 +532,12 @@ export const Calculator: React.FC = () => {
       setSelectedCoverings(['0', '7', '9']);
       setSelectedPrintColors(['4+0', '4+4', '1+0']);
     } else if (cat === 'Меню') {
+      setMainCategoryTab('offset');
+      setOffsetSubTab('sheets');
+      setStep('catalog');
+      setSheetSizePreset('34');
+      setSheetCustomWidth('210');
+      setSheetCustomHeight('297');
       setQuantity(30);
       setPaperType('coated');
       setColors('4+4');
@@ -479,6 +545,13 @@ export const Calculator: React.FC = () => {
       setBindingType('spring');
       setLaminationType('matte');
     } else if (cat === 'Наклейки') {
+      setMainCategoryTab('offset');
+      setOffsetSubTab('sheets');
+      setStep('catalog');
+      setSheetSizePreset('1');
+      setSheetCustomWidth('90');
+      setSheetCustomHeight('50');
+      setCardKind('1');
       setQuantity(1000);
       setPaperType('coated');
       setColors('4+0');
@@ -489,6 +562,13 @@ export const Calculator: React.FC = () => {
       setSelectedCoverings(['0', '7', '9']);
       setSelectedPrintColors(['4+0']);
     } else if (cat === 'Плакати') {
+      setMainCategoryTab('offset');
+      setOffsetSubTab('sheets');
+      setStep('catalog');
+      setSheetSizePreset('36');
+      setSheetCustomWidth('297');
+      setSheetCustomHeight('420');
+      setCardKind('1');
       setQuantity(100);
       setPaperType('coated');
       setColors('4+0');
@@ -499,6 +579,13 @@ export const Calculator: React.FC = () => {
       setSelectedCoverings(['0']);
       setSelectedPrintColors(['4+0']);
     } else if (cat === 'Флаєри') {
+      setMainCategoryTab('offset');
+      setOffsetSubTab('sheets');
+      setStep('catalog');
+      setSheetSizePreset('25');
+      setSheetCustomWidth('99');
+      setSheetCustomHeight('210');
+      setCardKind('1');
       setQuantity(1000);
       setPaperType('coated');
       setColors('4+4');
@@ -509,6 +596,7 @@ export const Calculator: React.FC = () => {
       setSelectedCoverings(['0', '7', '9']);
       setSelectedPrintColors(['4+4', '4+0']);
     } else if (cat === 'Нотаріальні книги') {
+      setStep('editor');
       setQuantity(10);
       setPaperType('offset');
       setColors('1+1');
@@ -516,6 +604,7 @@ export const Calculator: React.FC = () => {
       setBindingType('hardcover');
       setLaminationType('none');
     } else if (cat === 'Дипломи і палітурка') {
+      setStep('editor');
       setQuantity(20);
       setPaperType('coated');
       setColors('4+0');
@@ -523,6 +612,7 @@ export const Calculator: React.FC = () => {
       setBindingType('hardcover');
       setLaminationType('matte');
     } else if (cat === 'Логотипи виготовлення') {
+      setStep('editor');
       setQuantity(100);
       setPaperType('coated');
       setColors('4+0');
@@ -530,6 +620,7 @@ export const Calculator: React.FC = () => {
       setBindingType('none');
       setLaminationType('softtouch');
     } else if (cat === 'Шкільні журнали') {
+      setStep('editor');
       setQuantity(50);
       setPaperType('offset');
       setColors('1+1');
@@ -537,6 +628,13 @@ export const Calculator: React.FC = () => {
       setBindingType('hardcover');
       setLaminationType('none');
     } else if (cat === 'Етикетки') {
+      setMainCategoryTab('offset');
+      setOffsetSubTab('sheets');
+      setStep('catalog');
+      setSheetSizePreset('1');
+      setSheetCustomWidth('90');
+      setSheetCustomHeight('50');
+      setCardKind('1');
       setQuantity(2000);
       setPaperType('coated');
       setColors('4+0');
@@ -544,27 +642,22 @@ export const Calculator: React.FC = () => {
       setBindingType('none');
       setLaminationType('none');
     } else if (cat === 'Календарі') {
+      setMainCategoryTab('offset');
+      setOffsetSubTab('sheets');
+      setStep('catalog');
+      setSheetSizePreset('36');
+      setSheetCustomWidth('297');
+      setSheetCustomHeight('420');
+      setCardKind('1');
       setQuantity(100);
       setPaperType('coated');
       setColors('4+4');
       setSelectedFormat('A3');
       setBindingType('spring');
       setLaminationType('none');
-    } else if (cat === 'Блокноти') {
-      setQuantity(300);
-      setPaperType('offset');
-      setColors('1+1');
-      setSelectedFormat('A5');
-      setBindingType('spring');
-      setLaminationType('matte');
-    } else if (cat === 'Папки') {
-      setQuantity(500);
-      setPaperType('coated');
-      setColors('4+0');
-      setSelectedFormat('A4');
-      setBindingType('none');
     } else {
       // Бланки standard
+      setStep('editor');
       setQuantity(1000);
       setPaperType('offset');
       setColors('1+0');
@@ -1666,13 +1759,23 @@ export const Calculator: React.FC = () => {
                           </h3>
                         </div>
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => setOffsetSubTab('overview')}
-                        className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold shadow-sm transition-all"
-                      >
-                        ← Назад до категорій
-                      </button>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setStep('editor')}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold shadow-sm transition-all"
+                        >
+                          <Settings size={14} />
+                          <span>Конструктор 1С</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setOffsetSubTab('overview')}
+                          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold shadow-sm transition-all"
+                        >
+                          ← Назад до категорій
+                        </button>
+                      </div>
                     </div>
 
                     {/* Quick Info Links */}
