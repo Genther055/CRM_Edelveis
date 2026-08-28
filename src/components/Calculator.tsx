@@ -3997,173 +3997,273 @@ export const Calculator: React.FC = () => {
 
           {/* TAB 3: DIGITAL PRINTING */}
           {mainCategoryTab === 'digital' && (
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-              gap: '20px'
-            }}>
-              {[
-                {
-                  title: 'Листова',
-                  desc: 'Візитівки, листівки, бланки, буклети, наліпки, плакати…',
-                  icon: <FileText size={30} style={{ color: 'var(--primary)' }} />,
-                  color: 'rgba(0, 122, 255, 0.1)',
-                  badgeClass: 'ios-badge-blue',
-                  badge: 'SRA3 / Листи',
-                  metric: 'Офсет / Цифра',
-                  onClick: () => { setOffsetSubTab('sheets'); setMainCategoryTab('offset'); }
-                },
-                {
-                  title: 'Висічна',
-                  desc: 'Фігурні наліпки, візитівки, листівки, підставки, хенгери…',
-                  icon: <Scissors size={30} style={{ color: '#ff9500' }} />,
-                  color: 'rgba(255, 149, 0, 0.1)',
-                  badgeClass: 'ios-badge-orange',
-                  badge: 'Штампи',
-                  metric: 'Готові форми',
-                  onClick: () => { setOffsetSubTab('felling'); setMainCategoryTab('offset'); }
-                },
-                {
-                  title: 'Багатосторінкова',
-                  desc: 'Брошури, журнали, каталоги, книги, меню, прайс-листи, звіти…',
-                  icon: <BookOpen size={30} style={{ color: '#34c759' }} />,
-                  color: 'rgba(52, 199, 89, 0.1)',
-                  badgeClass: 'ios-badge-green',
-                  badge: 'Брошурування',
-                  metric: 'Скоба / PUR',
-                  onClick: () => { setOffsetSubTab('multipage'); setMainCategoryTab('offset'); }
-                },
-                {
-                  title: 'Індивідуальне замовлення',
-                  desc: 'Замовити прорахунок комплексного або нестандартного замовлення',
-                  icon: <Settings size={30} style={{ color: '#af52de' }} />,
-                  color: 'rgba(175, 82, 222, 0.1)',
-                  badgeClass: 'ios-badge-purple',
-                  badge: 'Нестандартні',
-                  metric: 'Конструктор',
-                  onClick: () => setStep('editor')
-                },
-                {
-                  title: 'Каширована',
-                  desc: 'Багатошарові візитівки, листівки, запрошення, меню…',
-                  icon: <Layers size={30} style={{ color: '#5856d6' }} />,
-                  color: 'rgba(88, 86, 214, 0.1)',
-                  badgeClass: 'ios-badge-purple',
-                  badge: 'Каширування',
-                  metric: 'Преміум картон',
-                  onClick: () => handleSelectCategory('Візитки')
-                },
-                {
-                  title: 'Друк в листах',
-                  desc: 'Відвантаження в листах без порізки: 320 × 450 мм (SRA3), 320 × 700 (Banner)',
-                  icon: <Printer size={30} style={{ color: '#0ea5e9' }} />,
-                  color: 'rgba(14, 165, 233, 0.1)',
-                  badgeClass: 'ios-badge-blue',
-                  badge: 'SRA3 / Banner',
-                  metric: 'Без порізки',
-                  onClick: () => handleSelectCategory('Листівки')
-                },
-                {
-                  title: 'Конвертна ламінація',
-                  desc: 'Меню, бейджи, документи, вказівники. Можливо для зовнішнього застосування',
-                  icon: <ShieldCheck size={30} style={{ color: '#34c759' }} />,
-                  color: 'rgba(52, 199, 89, 0.1)',
-                  badgeClass: 'ios-badge-green',
-                  badge: '125-250 мкм',
-                  metric: 'HoReCa / Меню',
-                  onClick: () => handleSelectCategory('Меню')
-                },
-                {
-                  title: 'Плотерна порізка',
-                  desc: 'Самоклеючих паперів та плівок. Наліпки, стікери, етикетка…',
-                  icon: <Crop size={30} style={{ color: '#ff9500' }} />,
-                  color: 'rgba(255, 149, 0, 0.1)',
-                  badgeClass: 'ios-badge-orange',
-                  badge: 'Плотер',
-                  metric: 'Самоклейка',
-                  onClick: () => handleSelectCategory('Наклейки')
-                },
-                {
-                  title: 'Фігурна порізка',
-                  desc: 'Від 1 екземпляра, любої форми… Упаковка, коробка, папка, круг, зірка…',
-                  icon: <Sparkles size={30} style={{ color: '#ff2d55' }} />,
-                  color: 'rgba(255, 45, 85, 0.1)',
-                  badgeClass: 'ios-badge-pink',
-                  badge: 'Планшетний плотер',
-                  metric: 'Від 1 екз',
-                  onClick: () => handleSelectCategory('Наклейки')
-                },
-                {
-                  title: 'Папки',
-                  desc: 'Від 1 екземпляра, з вклеєною кишенею…',
-                  icon: <FolderOpen size={30} style={{ color: 'var(--primary)' }} />,
-                  color: 'rgba(0, 122, 255, 0.1)',
-                  badgeClass: 'ios-badge-blue',
-                  badge: 'Вклеєна кишеня',
-                  metric: 'А4 папки',
-                  onClick: () => handleSelectCategory('Папки')
-                }
-              ].map(item => (
-                <div
-                  key={item.title}
-                  onClick={item.onClick}
-                  className="ios-card bg-white"
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                    padding: '24px',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                    minHeight: '200px',
-                    position: 'relative'
-                  }}
-                  onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; }}
-                >
-                  <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                      <div style={{
-                        width: '56px',
-                        height: '56px',
-                        borderRadius: '16px',
-                        backgroundColor: item.color,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                      }}>
-                        {item.icon}
-                      </div>
-                      <span className={`ios-badge ${item.badgeClass}`} style={{ fontSize: '11px', padding: '3px 8px' }}>
-                        {item.badge}
-                      </span>
-                    </div>
-
-                    <h4 style={{ fontSize: '15px', fontWeight: '800', marginBottom: '6px', color: 'var(--text-dark)' }}>
-                      {item.title}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+              {/* 4 Universal Technology Hero Cards - Unified Cupertino Blue Style */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 4px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: 'var(--primary)' }} />
+                    <h4 style={{ fontSize: '13px', fontWeight: '800', color: 'var(--text-dark)', textTransform: 'uppercase', letterSpacing: '0.5px', margin: 0 }}>
+                      Базові універсальні калькулятори
                     </h4>
-                    <p style={{ fontSize: '12px', color: 'var(--text-medium)', lineHeight: '1.4' }}>
-                      {item.desc}
-                    </p>
                   </div>
-
-                  <div style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    borderTop: '0.5px solid var(--border-light)',
-                    paddingTop: '12px',
-                    marginTop: '16px'
-                  }}>
-                    <span style={{ fontSize: '11px', fontWeight: '600', color: 'var(--text-medium)' }}>
-                      {item.metric}
-                    </span>
-                    <span style={{ color: 'var(--primary)', display: 'flex', alignItems: 'center', fontSize: '12px', fontWeight: '700' }}>
-                      Розрахувати <ChevronRight size={14} />
-                    </span>
-                  </div>
+                  <span className="ios-badge ios-badge-blue" style={{ fontSize: '11px', padding: '3px 9px' }}>
+                    4 основні напрямки
+                  </span>
                 </div>
-              ))}
+
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+                  gap: '20px'
+                }}>
+                  {[
+                    {
+                      title: 'Листова продукція',
+                      badge: 'SRA3 / Листи',
+                      desc: 'Візитівки, листівки, бланки, буклети, наліпки, плакати, флаєри…',
+                      icon: <FileText size={28} style={{ color: 'var(--primary)' }} />,
+                      metric: 'Цифровий друк',
+                      onClick: () => { setOffsetSubTab('sheets'); setMainCategoryTab('offset'); }
+                    },
+                    {
+                      title: 'Висічна продукція',
+                      badge: 'Штампи',
+                      desc: 'Фігурні наліпки, візитівки, листівки, підставки, хенгери…',
+                      icon: <Scissors size={28} style={{ color: 'var(--primary)' }} />,
+                      metric: 'Готові форми',
+                      onClick: () => { setOffsetSubTab('felling'); setMainCategoryTab('offset'); }
+                    },
+                    {
+                      title: 'Багатосторінкова',
+                      badge: 'Брошурування',
+                      desc: 'Брошури, журнали, каталоги, книги, меню, прайс-листи, звіти…',
+                      icon: <BookOpen size={28} style={{ color: 'var(--primary)' }} />,
+                      metric: 'Скоба, PUR клей',
+                      onClick: () => { setOffsetSubTab('multipage'); setMainCategoryTab('offset'); }
+                    },
+                    {
+                      title: 'Індивідуальний розрахунок',
+                      badge: 'Нестандартні',
+                      desc: 'Комплексні комерційні пропозиції з ручним підбором технологічних операцій.',
+                      icon: <Settings size={28} style={{ color: 'var(--primary)' }} />,
+                      metric: 'Конструктор розрахунку',
+                      onClick: () => setStep('editor')
+                    }
+                  ].map(item => (
+                    <div
+                      key={item.title}
+                      onClick={item.onClick}
+                      className="ios-card"
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'space-between',
+                        padding: '22px 24px',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                        minHeight: '195px',
+                        position: 'relative',
+                        background: 'linear-gradient(180deg, #f0f7ff 0%, #ffffff 100%)',
+                        border: '1.5px solid rgba(0, 122, 255, 0.22)',
+                        boxShadow: '0 4px 18px rgba(0, 122, 255, 0.05)'
+                      }}
+                      onMouseEnter={(e) => { 
+                        e.currentTarget.style.transform = 'translateY(-3px)'; 
+                        e.currentTarget.style.borderColor = 'var(--primary)';
+                        e.currentTarget.style.boxShadow = '0 8px 24px rgba(0, 122, 255, 0.12)';
+                      }}
+                      onMouseLeave={(e) => { 
+                        e.currentTarget.style.transform = 'translateY(0)'; 
+                        e.currentTarget.style.borderColor = 'rgba(0, 122, 255, 0.22)';
+                        e.currentTarget.style.boxShadow = '0 4px 18px rgba(0, 122, 255, 0.05)';
+                      }}
+                    >
+                      <div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+                          <div style={{
+                            width: '52px',
+                            height: '52px',
+                            borderRadius: '16px',
+                            backgroundColor: 'rgba(0, 122, 255, 0.1)',
+                            border: '1px solid rgba(0, 122, 255, 0.2)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            boxShadow: '0 2px 8px rgba(0, 122, 255, 0.08)'
+                          }}>
+                            {item.icon}
+                          </div>
+                          <span className="ios-badge ios-badge-blue" style={{ fontSize: '11px', padding: '3px 8px' }}>
+                            {item.badge}
+                          </span>
+                        </div>
+
+                        <h4 style={{ fontSize: '16px', fontWeight: '800', marginBottom: '6px', color: 'var(--text-dark)' }}>
+                          {item.title}
+                        </h4>
+                        <p style={{ fontSize: '12px', color: 'var(--text-medium)', lineHeight: '1.45' }}>
+                          {item.desc}
+                        </p>
+                      </div>
+
+                      <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        borderTop: '0.5px solid rgba(0, 122, 255, 0.15)',
+                        paddingTop: '12px',
+                        marginTop: '16px'
+                      }}>
+                        <span style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-medium)' }}>
+                          {item.metric}
+                        </span>
+                        <span style={{ color: 'var(--primary)', display: 'flex', alignItems: 'center', fontSize: '12px', fontWeight: '800', gap: '2px' }}>
+                          Відкрити <ChevronRight size={14} />
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* 6 Specialized Digital Categories */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 4px 0 4px', borderTop: '0.5px solid var(--border-light)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: 'var(--text-medium)' }} />
+                    <h4 style={{ fontSize: '13px', fontWeight: '800', color: 'var(--text-dark)', textTransform: 'uppercase', letterSpacing: '0.5px', margin: 0 }}>
+                      Спеціалізовані цифрові напрямки
+                    </h4>
+                  </div>
+                  <span style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-medium)' }}>
+                    6 окремих категорій
+                  </span>
+                </div>
+
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+                  gap: '20px'
+                }}>
+                  {[
+                    {
+                      title: 'Каширована продукція',
+                      desc: 'Багатошарові візитівки, листівки, запрошення, меню…',
+                      icon: <Layers size={28} style={{ color: 'var(--primary)' }} />,
+                      badgeClass: 'ios-badge-blue',
+                      badge: 'Каширування',
+                      metric: 'Преміум картон',
+                      onClick: () => handleSelectCategory('Візитки')
+                    },
+                    {
+                      title: 'Друк в листах',
+                      desc: 'Відвантаження в листах без порізки: 320 × 450 мм (SRA3), 320 × 700 (Banner)',
+                      icon: <Printer size={28} style={{ color: 'var(--primary)' }} />,
+                      badgeClass: 'ios-badge-blue',
+                      badge: 'SRA3 / Banner',
+                      metric: 'Без порізки',
+                      onClick: () => handleSelectCategory('Листівки')
+                    },
+                    {
+                      title: 'Конвертна ламінація',
+                      desc: 'Меню, бейджи, документи, вказівники. Можливо для зовнішнього застосування',
+                      icon: <ShieldCheck size={28} style={{ color: 'var(--primary)' }} />,
+                      badgeClass: 'ios-badge-blue',
+                      badge: '125-250 мкм',
+                      metric: 'HoReCa / Меню',
+                      onClick: () => handleSelectCategory('Меню')
+                    },
+                    {
+                      title: 'Плотерна порізка',
+                      desc: 'Самоклеючих паперів та плівок. Наліпки, стікери, етикетка…',
+                      icon: <Crop size={28} style={{ color: 'var(--primary)' }} />,
+                      badgeClass: 'ios-badge-blue',
+                      badge: 'Плотер',
+                      metric: 'Самоклейка',
+                      onClick: () => handleSelectCategory('Наклейки')
+                    },
+                    {
+                      title: 'Фігурна порізка',
+                      desc: 'Від 1 екземпляра, любої форми… Упаковка, коробка, папка, круг, зірка…',
+                      icon: <Sparkles size={28} style={{ color: 'var(--primary)' }} />,
+                      badgeClass: 'ios-badge-blue',
+                      badge: 'Планшетний плотер',
+                      metric: 'Від 1 екз',
+                      onClick: () => handleSelectCategory('Наклейки')
+                    },
+                    {
+                      title: 'Папки',
+                      desc: 'Від 1 екземпляра, з вклеєною кишенею…',
+                      icon: <FolderOpen size={28} style={{ color: 'var(--primary)' }} />,
+                      badgeClass: 'ios-badge-blue',
+                      badge: 'Вклеєна кишеня',
+                      metric: 'А4 папки',
+                      onClick: () => handleSelectCategory('Папки')
+                    }
+                  ].map(item => (
+                    <div
+                      key={item.title}
+                      onClick={item.onClick}
+                      className="ios-card bg-white"
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'space-between',
+                        padding: '24px',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease',
+                        minHeight: '200px',
+                        position: 'relative'
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; }}
+                    >
+                      <div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                          <div style={{
+                            width: '52px',
+                            height: '52px',
+                            borderRadius: '16px',
+                            backgroundColor: 'rgba(0, 122, 255, 0.08)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}>
+                            {item.icon}
+                          </div>
+                          <span className={`ios-badge ${item.badgeClass}`} style={{ fontSize: '11px', padding: '3px 8px' }}>
+                            {item.badge}
+                          </span>
+                        </div>
+
+                        <h4 style={{ fontSize: '15px', fontWeight: '800', marginBottom: '6px', color: 'var(--text-dark)' }}>
+                          {item.title}
+                        </h4>
+                        <p style={{ fontSize: '12px', color: 'var(--text-medium)', lineHeight: '1.4' }}>
+                          {item.desc}
+                        </p>
+                      </div>
+
+                      <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        borderTop: '0.5px solid var(--border-light)',
+                        paddingTop: '12px',
+                        marginTop: '16px'
+                      }}>
+                        <span style={{ fontSize: '11px', fontWeight: '600', color: 'var(--text-medium)' }}>
+                          {item.metric}
+                        </span>
+                        <span style={{ color: 'var(--primary)', display: 'flex', alignItems: 'center', fontSize: '12px', fontWeight: '700' }}>
+                          Розрахувати <ChevronRight size={14} />
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           )}
 
