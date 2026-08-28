@@ -1060,15 +1060,25 @@ export const Calculator: React.FC = () => {
             </div>
           </div>
 
-          {/* Top Category Tabs Navigation */}
-          <div className="flex items-center gap-2 p-1.5 bg-slate-100/90 border border-slate-200/80 rounded-2xl overflow-x-auto shadow-inner mb-6 backdrop-blur-md">
+          {/* Top Category Tabs Navigation - Cupertino iOS Switcher */}
+          <div style={{
+            display: 'flex',
+            gap: '8px',
+            backgroundColor: 'var(--bg-card)',
+            padding: '6px',
+            borderRadius: 'var(--radius-lg)',
+            border: '0.5px solid var(--border-light)',
+            overflowX: 'auto',
+            boxShadow: 'var(--shadow-flat)',
+            marginBottom: '8px'
+          }}>
             {[
-              { key: 'products', label: 'Усі Продукти', icon: '📦', count: 19 },
-              { key: 'offset', label: 'Офсетний друк', icon: '⚡', badge: '1С Авторозрахунок', count: 17 },
-              { key: 'digital', label: 'Цифровий друк', icon: '🖨️', count: 8 },
-              { key: 'wide', label: 'Широкоформатний', icon: '📐', count: 6 },
-              { key: 'roll', label: 'Рулонний друк', icon: '🏷️', count: 4 },
-              { key: 'films', label: 'Кольорові плівки', icon: '🎨', count: 5 }
+              { key: 'products', label: 'Усі Продукти', count: 19 },
+              { key: 'offset', label: 'Офсетний друк', badge: '1С Авторозрахунок', count: 17 },
+              { key: 'digital', label: 'Цифровий друк', count: 8 },
+              { key: 'wide', label: 'Широкоформатний', count: 6 },
+              { key: 'roll', label: 'Рулонний друк', count: 4 },
+              { key: 'films', label: 'Кольорові плівки', count: 5 }
             ].map(tab => {
               const isActive = mainCategoryTab === tab.key;
               return (
@@ -1076,24 +1086,44 @@ export const Calculator: React.FC = () => {
                   key={tab.key}
                   type="button"
                   onClick={() => setMainCategoryTab(tab.key as any)}
-                  className={`flex items-center gap-2 px-4 py-2.5 text-xs font-bold rounded-xl whitespace-nowrap transition-all ${
-                    isActive
-                      ? 'bg-white text-blue-600 shadow-md border border-slate-200/80'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
-                  }`}
+                  style={{
+                    padding: '8px 16px',
+                    borderRadius: 'var(--radius-md)',
+                    fontSize: '13px',
+                    fontWeight: '700',
+                    border: 'none',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    backgroundColor: isActive ? 'var(--primary)' : 'transparent',
+                    color: isActive ? '#ffffff' : 'var(--text-dark)',
+                    boxShadow: isActive ? '0 2px 8px rgba(0, 122, 255, 0.25)' : 'none',
+                    transition: 'all 0.15s ease',
+                    whiteSpace: 'nowrap'
+                  }}
                 >
-                  <span className="text-sm leading-none">{tab.icon}</span>
                   <span>{tab.label}</span>
                   {tab.badge && (
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold shadow-2xs ${
-                      isActive ? 'bg-blue-600 text-white' : 'bg-slate-200 text-slate-700'
-                    }`}>
+                    <span style={{
+                      fontSize: '10px',
+                      padding: '2px 6px',
+                      borderRadius: '10px',
+                      fontWeight: '700',
+                      backgroundColor: isActive ? 'rgba(255, 255, 255, 0.25)' : 'rgba(0, 122, 255, 0.12)',
+                      color: isActive ? '#ffffff' : 'var(--primary)'
+                    }}>
                       {tab.badge}
                     </span>
                   )}
-                  <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-semibold ${
-                    isActive ? 'bg-blue-50 text-blue-600' : 'bg-slate-200/60 text-slate-500'
-                  }`}>
+                  <span style={{
+                    fontSize: '10px',
+                    padding: '2px 6px',
+                    borderRadius: '10px',
+                    fontWeight: '600',
+                    backgroundColor: isActive ? 'rgba(255, 255, 255, 0.2)' : 'rgba(120, 120, 128, 0.1)',
+                    color: isActive ? '#ffffff' : 'var(--text-medium)'
+                  }}>
                     {tab.count}
                   </span>
                 </button>
@@ -1101,60 +1131,94 @@ export const Calculator: React.FC = () => {
             })}
           </div>
 
-          {/* TAB 1: PRODUCTS (All Categories) */}
+          {/* TAB 1: PRODUCTS (All Categories - Exact Dashboard iOS Card Grid) */}
           {mainCategoryTab === 'products' && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+              gap: '20px'
+            }}>
               {[
-                { title: 'Бланки та Листи', desc: 'Друк бланкової продукції на офсетному та самокопіювальному папері.', icon: FileText, color: 'text-blue-600 bg-blue-50 border-blue-100', cat: 'Бланки', tag: 'Офсет / Самоклейка' },
-                { title: 'Візитки', desc: '90х50 мм або євро-формат, ламінація SoftTouch та скруглення кутів.', icon: CreditCard, color: 'text-indigo-600 bg-indigo-50 border-indigo-100', cat: 'Візитки', tag: 'SoftTouch / Золото' },
-                { title: 'Буклети', desc: 'Рекламні буклети з 1, 2 або 3 фальцями (згинами).', icon: BookOpen, color: 'text-amber-600 bg-amber-50 border-amber-100', cat: 'Буклети', tag: '1-3 Фальці' },
-                { title: 'Дипломи випускні', desc: 'Святкові дипломи, почесні грамоти та сертифікати випускників.', icon: Sparkles, color: 'text-yellow-600 bg-yellow-50 border-yellow-100', cat: 'Дипломи випускні', tag: 'Сертифікати' },
-                { title: 'Календарики кишенькові', desc: 'Кишенькові календарики 70х100мм з двосторонньою ламінацією.', icon: Calendar, color: 'text-pink-600 bg-pink-50 border-pink-100', cat: 'Календарики кишенькові', tag: 'Ламінація 2+2' },
-                { title: 'Книги / Брошури', desc: 'Багатосторінкові книги на скобу, термоклей або м\'яку обкладинку.', icon: BookOpen, color: 'text-emerald-600 bg-emerald-50 border-emerald-100', cat: 'Книги', tag: 'Скоба / PUR клей' },
-                { title: 'Листівки', desc: 'Рекламні листівки А6, А5, А4 на крейдованому папері.', icon: Image, color: 'text-cyan-600 bg-cyan-50 border-cyan-100', cat: 'Листівки', tag: 'А-формати' },
-                { title: 'Меню для ресторанів', desc: 'Меню з цупкою ламінацією, скріпленням пружиною або болтами.', icon: Utensils, color: 'text-purple-600 bg-purple-50 border-purple-100', cat: 'Меню', tag: 'HoReCa' },
-                { title: 'Наклейки та Стікери', desc: 'Самоклеючі наклейки з плотерною надсічкою на аркушах.', icon: Tag, color: 'text-fuchsia-600 bg-fuchsia-50 border-fuchsia-100', cat: 'Наклейки', tag: 'Самоклейка' },
-                { title: 'Плакати та Афіші', desc: 'Великоформатний друк плакатів А3, А2, А1 для інтер\'єру та реклами.', icon: Layout, color: 'text-blue-600 bg-blue-50 border-blue-100', cat: 'Плакати', tag: 'Великий формат' },
-                { title: 'Флаєри', desc: 'Єврофлаєри (99х210мм) яскравого повноколірного 4+4 друку.', icon: Zap, color: 'text-amber-600 bg-amber-50 border-amber-100', cat: 'Флаєри', tag: 'Євроформат' },
-                { title: 'Нотаріальні книги', desc: 'Спеціалізовані нотаріальні реєстри у твердій прошивній палітурці.', icon: BookOpen, color: 'text-slate-700 bg-slate-100 border-slate-200', cat: 'Нотаріальні книги', tag: 'Тверда палітурка' },
-                { title: 'Дипломи і палітурка', desc: 'Тверда палітурка дипломних робіт, дисертацій з тисненням фольгою.', icon: Sparkles, color: 'text-emerald-600 bg-emerald-50 border-emerald-100', cat: 'Дипломи і палітурка', tag: 'Тиснення фольгою' },
-                { title: 'Логотипи виготовлення', desc: 'Брендування логотипів на фірмовій айдентиці та матеріалах.', icon: Layout, color: 'text-indigo-600 bg-indigo-50 border-indigo-100', cat: 'Логотипи виготовлення', tag: 'Брендування' },
-                { title: 'Шкільні журнали', desc: 'Класні журнали успішності та шкільні облікові відомості.', icon: BookOpen, color: 'text-rose-600 bg-rose-50 border-rose-100', cat: 'Шкільні журнали', tag: 'Шкільні реєстри' },
-                { title: 'Етикетки та Бірки', desc: 'Товарні етикетки, маркувальні ярлики та фасувальні стікери.', icon: Tag, color: 'text-teal-600 bg-teal-50 border-teal-100', cat: 'Етикетки', tag: 'Маркування' },
-                { title: 'Календарі', desc: 'Квартальні, настінні перекидні або будиночки на пружині.', icon: Calendar, color: 'text-red-600 bg-red-50 border-red-100', cat: 'Календарі', tag: 'Квартальні' },
-                { title: 'Блокноти', desc: 'Фірмові блокноти А5, А4 з пружиною та персоналізованою обкладинкою.', icon: Bookmark, color: 'text-teal-600 bg-teal-50 border-teal-100', cat: 'Блокноти', tag: 'Пружина' },
-                { title: 'Фірмові Папки', desc: 'Корпоративні папки з висічним замком для документів.', icon: FolderOpen, color: 'text-blue-600 bg-blue-50 border-blue-100', cat: 'Папки', tag: 'Висічний замок' }
-              ].map(item => {
-                const IconComponent = item.icon;
-                return (
-                  <div 
-                    key={item.title}
-                    onClick={() => handleSelectCategory(item.cat)}
-                    className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm card-lift cursor-pointer flex flex-col justify-between group"
-                  >
-                    <div>
-                      <div className="flex items-center justify-between mb-3.5">
-                        <div className={`w-12 h-12 rounded-xl border flex items-center justify-center transition-transform group-hover:scale-110 shadow-2xs ${item.color}`}>
-                          <IconComponent size={22} />
-                        </div>
-                        <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-slate-100 border border-slate-200 text-slate-600">
-                          {item.tag}
-                        </span>
+                { title: 'Бланки та Листи', desc: 'Друк бланкової продукції на офсетному та самокопіювальному папері.', icon: <FileText size={30} style={{ color: 'var(--primary)' }} />, color: 'rgba(0, 122, 255, 0.1)', badgeClass: 'ios-badge-blue', badge: 'Бланки', cat: 'Бланки', metric: 'Офсет / самоклейка' },
+                { title: 'Візитки', desc: '90х50 мм або євро-формат, ламінація SoftTouch та скруглення кутів.', icon: <CreditCard size={30} style={{ color: '#5856d6' }} />, color: 'rgba(88, 86, 214, 0.1)', badgeClass: 'ios-badge-purple', badge: 'Візитки', cat: 'Візитки', metric: 'SoftTouch / Золото' },
+                { title: 'Буклети', desc: 'Рекламні буклети з 1, 2 або 3 фальцями (згинами).', icon: <BookOpen size={30} style={{ color: '#ff9500' }} />, color: 'rgba(255, 149, 0, 0.1)', badgeClass: 'ios-badge-orange', badge: 'Буклети', cat: 'Буклети', metric: '1-3 Фальці' },
+                { title: 'Дипломи випускні', desc: 'Святкові дипломи, почесні грамоти та сертифікати випускників.', icon: <Sparkles size={30} style={{ color: '#ffcc00' }} />, color: 'rgba(255, 204, 0, 0.15)', badgeClass: 'ios-badge-yellow', badge: 'Дипломи', cat: 'Дипломи випускні', metric: 'Сертифікати' },
+                { title: 'Календарики кишенькові', desc: 'Кишенькові календарики 70х100мм з двосторонньою ламінацією.', icon: <Calendar size={30} style={{ color: '#34c759' }} />, color: 'rgba(52, 199, 89, 0.1)', badgeClass: 'ios-badge-green', badge: 'Календарі', cat: 'Календарики кишенькові', metric: 'Ламінація 2+2' },
+                { title: 'Книги / Брошури', desc: 'Багатосторінкові книги на скобу, термоклей або м\'яку обкладинку.', icon: <BookOpen size={30} style={{ color: '#34c759' }} />, color: 'rgba(52, 199, 89, 0.1)', badgeClass: 'ios-badge-green', badge: 'Книги', cat: 'Книги', metric: 'Скоба / PUR клей' },
+                { title: 'Листівки', desc: 'Рекламні листівки А6, А5, А4 на крейдованому папері.', icon: <Image size={30} style={{ color: '#0ea5e9' }} />, color: 'rgba(14, 165, 233, 0.1)', badgeClass: 'ios-badge-blue', badge: 'Листівки', cat: 'Листівки', metric: 'А-формати' },
+                { title: 'Меню для ресторанів', desc: 'Меню з цупкою ламінацією, скріпленням пружиною або болтами.', icon: <Utensils size={30} style={{ color: '#af52de' }} />, color: 'rgba(175, 82, 222, 0.1)', badgeClass: 'ios-badge-purple', badge: 'HoReCa', cat: 'Меню', metric: 'Меню ресторанні' },
+                { title: 'Наклейки та Стікери', desc: 'Самоклеючі наклейки з плотерною надсічкою на аркушах.', icon: <Tag size={30} style={{ color: '#ff9500' }} />, color: 'rgba(255, 149, 0, 0.1)', badgeClass: 'ios-badge-orange', badge: 'Самоклейка', cat: 'Наклейки', metric: 'Raflatac / плотер' },
+                { title: 'Плакати та Афіші', desc: 'Великоформатний друк плакатів А3, А2, А1 для інтер\'єру та реклами.', icon: <Layout size={30} style={{ color: 'var(--primary)' }} />, color: 'rgba(0, 122, 255, 0.1)', badgeClass: 'ios-badge-blue', badge: 'Плакати', cat: 'Плакати', metric: 'Великий формат' },
+                { title: 'Флаєри', desc: 'Єврофлаєри (99х210мм) яскравого повноколірного 4+4 друку.', icon: <Zap size={30} style={{ color: '#ff9500' }} />, color: 'rgba(255, 149, 0, 0.1)', badgeClass: 'ios-badge-orange', badge: 'Флаєри', cat: 'Флаєри', metric: 'Євроформат' },
+                { title: 'Нотаріальні книги', desc: 'Спеціалізовані нотаріальні реєстри у твердій прошивній палітурці.', icon: <BookOpen size={30} style={{ color: '#64748b' }} />, color: 'rgba(100, 116, 139, 0.1)', badgeClass: 'ios-badge-blue', badge: 'Реєстри', cat: 'Нотаріальні книги', metric: 'Тверда палітурка' },
+                { title: 'Дипломи і палітурка', desc: 'Тверда палітурка дипломних робіт, дисертацій з тисненням фольгою.', icon: <Sparkles size={30} style={{ color: '#34c759' }} />, color: 'rgba(52, 199, 89, 0.1)', badgeClass: 'ios-badge-green', badge: 'Палітурка', cat: 'Дипломи і палітурка', metric: 'Тиснення фольгою' },
+                { title: 'Логотипи виготовлення', desc: 'Брендування логотипів на фірмовій айдентиці та матеріалах.', icon: <Layout size={30} style={{ color: '#5856d6' }} />, color: 'rgba(88, 86, 214, 0.1)', badgeClass: 'ios-badge-purple', badge: 'Айдентика', cat: 'Логотипи виготовлення', metric: 'Брендування' },
+                { title: 'Шкільні журнали', desc: 'Класні журнали успішності та шкільні облікові відомості.', icon: <BookOpen size={30} style={{ color: '#ff3b30' }} />, color: 'rgba(255, 59, 48, 0.1)', badgeClass: 'ios-badge-red', badge: 'Журнали', cat: 'Шкільні журнали', metric: 'Шкільні реєстри' },
+                { title: 'Етикетки та Бірки', desc: 'Товарні етикетки, маркувальні ярлики та фасувальні стікери.', icon: <Tag size={30} style={{ color: '#0ea5e9' }} />, color: 'rgba(14, 165, 233, 0.1)', badgeClass: 'ios-badge-blue', badge: 'Етикетки', cat: 'Етикетки', metric: 'Маркування' },
+                { title: 'Календарі', desc: 'Квартальні, настінні перекидні або будиночки на пружині.', icon: <Calendar size={30} style={{ color: '#ff3b30' }} />, color: 'rgba(255, 59, 48, 0.1)', badgeClass: 'ios-badge-red', badge: 'Календарі', cat: 'Календарі', metric: 'Квартальні' },
+                { title: 'Блокноти', desc: 'Фірмові блокноти А5, А4 з пружиною та персоналізованою обкладинкою.', icon: <Bookmark size={30} style={{ color: '#0ea5e9' }} />, color: 'rgba(14, 165, 233, 0.1)', badgeClass: 'ios-badge-blue', badge: 'Блокноти', cat: 'Блокноти', metric: 'Пружина' },
+                { title: 'Фірмові Папки', desc: 'Корпоративні папки з висічним замком для документів.', icon: <FolderOpen size={30} style={{ color: 'var(--primary)' }} />, color: 'rgba(0, 122, 255, 0.1)', badgeClass: 'ios-badge-blue', badge: 'Папки', cat: 'Папки', metric: 'Висічний замок' }
+              ].map(item => (
+                <div 
+                  key={item.title}
+                  onClick={() => handleSelectCategory(item.cat)}
+                  className="ios-card bg-white"
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    padding: '24px',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    minHeight: '200px',
+                    position: 'relative'
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; }}
+                >
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                      <div style={{
+                        width: '56px',
+                        height: '56px',
+                        borderRadius: '16px',
+                        backgroundColor: item.color,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}>
+                        {item.icon}
                       </div>
-                      <h4 className="text-base font-extrabold text-slate-900 group-hover:text-blue-600 transition-colors mb-1.5">
-                        {item.title}
-                      </h4>
-                      <p className="text-xs text-slate-500 leading-relaxed m-0">
-                        {item.desc}
-                      </p>
+                      <span className={`ios-badge ${item.badgeClass}`} style={{ fontSize: '11px', padding: '3px 8px' }}>
+                        {item.badge}
+                      </span>
                     </div>
-                    <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-blue-600 group-hover:translate-x-1 transition-transform">
-                      <span>Розрахувати тираж</span>
-                      <ChevronRight size={15} />
-                    </div>
+
+                    <h4 style={{ fontSize: '15px', fontWeight: '800', marginBottom: '6px', color: 'var(--text-dark)' }}>
+                      {item.title}
+                    </h4>
+                    <p style={{ fontSize: '12px', color: 'var(--text-medium)', lineHeight: '1.4' }}>
+                      {item.desc}
+                    </p>
                   </div>
-                );
-              })}
+
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    borderTop: '0.5px solid var(--border-light)',
+                    paddingTop: '12px',
+                    marginTop: '16px'
+                  }}>
+                    <span style={{ fontSize: '11px', fontWeight: '600', color: 'var(--text-medium)' }}>
+                      {item.metric}
+                    </span>
+                    <span style={{ color: 'var(--primary)', display: 'flex', alignItems: 'center', fontSize: '12px', fontWeight: '700' }}>
+                      Відкрити <ChevronRight size={14} />
+                    </span>
+                  </div>
+                </div>
+              ))}
             </div>
           )}
 
@@ -1163,18 +1227,27 @@ export const Calculator: React.FC = () => {
             <div className="flex flex-col gap-6">
               {/* Offset Sub-Tab Navigation Header */}
               {(offsetSubTab === 'sheets' || offsetSubTab === 'felling' || offsetSubTab === 'multipage') ? (
-                <div className="bg-white border border-slate-200 rounded-xl px-5 py-3.5 shadow-sm flex items-center justify-between">
-                  <div className="flex items-center gap-3 text-sm font-bold text-slate-700">
+                <div style={{
+                  backgroundColor: 'var(--bg-card)',
+                  border: '0.5px solid var(--border-light)',
+                  borderRadius: 'var(--radius-lg)',
+                  padding: '14px 20px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  boxShadow: 'var(--shadow-flat)'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '14px', fontWeight: '700', color: 'var(--text-dark)' }}>
                     <button
                       type="button"
                       onClick={() => setOffsetSubTab('overview')}
-                      className="text-blue-600 hover:text-blue-700 hover:underline flex items-center gap-1.5 transition-colors"
+                      style={{ background: 'none', border: 'none', color: 'var(--primary)', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
                     >
                       <ArrowLeft size={16} />
                       <span>Офсетний друк</span>
                     </button>
-                    <span className="text-slate-300">/</span>
-                    <span className="text-slate-900 font-extrabold">
+                    <span style={{ color: 'var(--text-medium)', opacity: 0.5 }}>/</span>
+                    <span style={{ fontWeight: '800' }}>
                       {offsetSubTab === 'sheets' && 'Листова продукція (Збірні спуски)'}
                       {offsetSubTab === 'felling' && 'Висічна продукція (Штампи)'}
                       {offsetSubTab === 'multipage' && 'Багатосторінкова продукція'}
@@ -1183,759 +1256,528 @@ export const Calculator: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setOffsetSubTab('overview')}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold shadow-sm transition-all"
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      padding: '6px 14px',
+                      borderRadius: 'var(--radius-md)',
+                      border: '0.5px solid var(--border-light)',
+                      backgroundColor: 'var(--bg-card)',
+                      color: 'var(--text-dark)',
+                      fontSize: '12px',
+                      fontWeight: '700',
+                      cursor: 'pointer'
+                    }}
                   >
                     ← Всі 17 категорій
                   </button>
                 </div>
               ) : (
-                /* 4 Technology Hero Header Cards */
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                /* 4 Technology Hero Cards - Cupertino iOS Style */
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+                  gap: '20px'
+                }}>
                   {[
                     { 
                       title: 'Листова продукція', 
                       badge: 'Збірні спуски', 
+                      badgeClass: 'ios-badge-blue',
                       desc: 'Візитівки, листівки, бланки, буклети, наліпки, плакати, флаєри…', 
                       subTab: 'sheets', 
-                      icon: <FileText size={22} className="text-white" />,
-                      gradient: 'bg-gradient-blue shadow-blue-500/20',
-                      badgeStyle: 'bg-blue-50 text-blue-700 border-blue-200'
+                      icon: <FileText size={30} style={{ color: 'var(--primary)' }} />,
+                      color: 'rgba(0, 122, 255, 0.1)',
+                      metric: 'Офсетні спуски'
                     },
                     { 
                       title: 'Висічна продукція', 
                       badge: 'Штампи', 
+                      badgeClass: 'ios-badge-orange',
                       desc: 'Фігурні наліпки, хенгери, папки, кишенькові календарі, підставки…', 
                       subTab: 'felling', 
-                      icon: <Scissors size={22} className="text-white" />,
-                      gradient: 'bg-gradient-amber shadow-amber-500/20',
-                      badgeStyle: 'bg-amber-50 text-amber-700 border-amber-200'
+                      icon: <Scissors size={30} style={{ color: '#ff9500' }} />,
+                      color: 'rgba(255, 149, 0, 0.1)',
+                      metric: 'Готові штампи'
                     },
                     { 
                       title: 'Багатосторінкова', 
                       badge: 'Брошурування', 
+                      badgeClass: 'ios-badge-green',
                       desc: 'Каталоги, журнали, брошури, блокноти на пружині, ресторанні меню…', 
                       subTab: 'multipage', 
-                      icon: <BookOpen size={22} className="text-white" />,
-                      gradient: 'bg-gradient-emerald shadow-emerald-500/20',
-                      badgeStyle: 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                      icon: <BookOpen size={30} style={{ color: '#34c759' }} />,
+                      color: 'rgba(52, 199, 89, 0.1)',
+                      metric: 'Скоба, PUR клей'
                     },
                     { 
                       title: 'Індивідуальний розрахунок', 
                       badge: 'Нестандартні', 
-                      desc: 'Комплексні комерційні пропозиції з ручним підбором операцій', 
+                      badgeClass: 'ios-badge-purple',
+                      desc: 'Комплексні комерційні пропозиції з ручним підбором операцій 1С.', 
                       subTab: 'custom', 
-                      icon: <Settings size={22} className="text-white" />,
-                      gradient: 'bg-gradient-purple shadow-purple-500/20',
-                      badgeStyle: 'bg-purple-50 text-purple-700 border-purple-200'
+                      icon: <Settings size={30} style={{ color: '#af52de' }} />,
+                      color: 'rgba(175, 82, 222, 0.1)',
+                      metric: 'Конструктор 1С'
                     }
-                  ].map((item, i) => (
+                  ].map(item => (
                     <div
-                      key={i}
+                      key={item.title}
                       onClick={() => setOffsetSubTab(item.subTab as any)}
-                      className="bg-white border border-slate-200/90 hover:border-blue-400 rounded-2xl p-5 shadow-sm card-lift cursor-pointer group flex flex-col justify-between"
+                      className="ios-card bg-white"
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'space-between',
+                        padding: '24px',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease',
+                        minHeight: '200px',
+                        position: 'relative'
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; }}
                     >
                       <div>
-                        <div className="flex items-center justify-between mb-3">
-                          <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${item.gradient} transition-transform group-hover:scale-105`}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                          <div style={{
+                            width: '56px',
+                            height: '56px',
+                            borderRadius: '16px',
+                            backgroundColor: item.color,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}>
                             {item.icon}
                           </div>
-                          <span className={`text-[11px] font-bold px-2.5 py-1 rounded-full border shadow-2xs ${item.badgeStyle}`}>
+                          <span className={`ios-badge ${item.badgeClass}`} style={{ fontSize: '11px', padding: '3px 8px' }}>
                             {item.badge}
                           </span>
                         </div>
-                        <h4 className="font-extrabold text-base text-slate-900 group-hover:text-blue-600 transition-colors mb-1.5">
+
+                        <h4 style={{ fontSize: '15px', fontWeight: '800', marginBottom: '6px', color: 'var(--text-dark)' }}>
                           {item.title}
                         </h4>
-                        <p className="text-xs text-slate-500 leading-relaxed m-0">{item.desc}</p>
+                        <p style={{ fontSize: '12px', color: 'var(--text-medium)', lineHeight: '1.4' }}>
+                          {item.desc}
+                        </p>
                       </div>
-                      <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-blue-600 group-hover:translate-x-1 transition-transform">
-                        <span>Відкрити калькулятор</span>
-                        <ChevronRight size={15} />
+
+                      <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        borderTop: '0.5px solid var(--border-light)',
+                        paddingTop: '12px',
+                        marginTop: '16px'
+                      }}>
+                        <span style={{ fontSize: '11px', fontWeight: '600', color: 'var(--text-medium)' }}>
+                          {item.metric}
+                        </span>
+                        <span style={{ color: 'var(--primary)', display: 'flex', alignItems: 'center', fontSize: '12px', fontWeight: '700' }}>
+                          Відкрити <ChevronRight size={14} />
+                        </span>
                       </div>
                     </div>
                   ))}
                 </div>
               )}
 
-              {/* OVERVIEW SUBTAB: 17-Card Modern Product Grid with Colorful Avatars & Chips */}
+              {/* OVERVIEW SUBTAB: 17 Offset Products in Exact Dashboard iOS Card Style */}
               {offsetSubTab === 'overview' && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {/* 1. Візитівка */}
-                  <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm card-lift flex flex-col justify-between group">
-                    <div>
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-2.5">
-                          <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
-                            <CreditCard size={19} />
+                <div style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+                  gap: '20px'
+                }}>
+                  {[
+                    {
+                      id: 'vizitka',
+                      title: 'Візитівка',
+                      desc: 'Стандартні (90х50), євро (85х55), квадратні та круглі з ламінацією.',
+                      icon: <CreditCard size={30} style={{ color: 'var(--primary)' }} />,
+                      color: 'rgba(0, 122, 255, 0.1)',
+                      badgeClass: 'ios-badge-blue',
+                      badge: 'Візитки',
+                      metric: 'Збірний спуск',
+                      onClick: () => openOffsetProduct({ category: 'Візитки', subCategory: 'Візитівка', subTab: 'sheets', preset: '1', w: '90', h: '50', kind: '1' }),
+                      formats: [
+                        { name: '90×50', onClick: () => openOffsetProduct({ category: 'Візитки', subCategory: 'Візитівка', subTab: 'sheets', preset: '1', w: '90', h: '50', kind: '1' }) },
+                        { name: '85×55', onClick: () => openOffsetProduct({ category: 'Візитки', subCategory: 'Візитівка', subTab: 'sheets', preset: '5', w: '85', h: '55', kind: '1' }) },
+                        { name: '50×50', onClick: () => openOffsetProduct({ category: 'Візитки', subCategory: 'Візитівка', subTab: 'sheets', preset: '5', w: '50', h: '50', kind: '2' }) },
+                        { name: 'Кругла', onClick: () => openOffsetProduct({ category: 'Візитки', subCategory: 'Візитівка', subTab: 'sheets', preset: '5', w: '50', h: '50', kind: '7' }) }
+                      ]
+                    },
+                    {
+                      id: 'calendar',
+                      title: 'Календар кишеньковий',
+                      desc: 'Кишенькові календарі 100х70 та 90х60 з двосторонньою ламінацією та скругленням.',
+                      icon: <Calendar size={30} style={{ color: '#34c759' }} />,
+                      color: 'rgba(52, 199, 89, 0.1)',
+                      badgeClass: 'ios-badge-green',
+                      badge: 'Ламінація',
+                      metric: 'Ламінація 2+2',
+                      onClick: () => openOffsetProduct({ category: 'Календарі кишенькові', subCategory: 'Календар', subTab: 'sheets', preset: '91', w: '100', h: '70', kind: '1' }),
+                      formats: [
+                        { name: '100×70', onClick: () => openOffsetProduct({ category: 'Календарі кишенькові', subCategory: 'Календар', subTab: 'sheets', preset: '91', w: '100', h: '70', kind: '1' }) },
+                        { name: '90×60', onClick: () => openOffsetProduct({ category: 'Календарі кишенькові', subCategory: 'Календар', subTab: 'sheets', preset: '90', w: '90', h: '60', kind: '1' }) },
+                        { name: '70×70', onClick: () => openOffsetProduct({ category: 'Календарі кишенькові', subCategory: 'Календар', subTab: 'sheets', preset: '256', w: '70', h: '70', kind: '2' }) }
+                      ]
+                    },
+                    {
+                      id: 'flyer',
+                      title: 'Флаєр',
+                      desc: 'Єврофлаєри (210х99) та міні-флаєри для промоакцій і рекламної роздачі.',
+                      icon: <Zap size={30} style={{ color: '#af52de' }} />,
+                      color: 'rgba(175, 82, 222, 0.1)',
+                      badgeClass: 'ios-badge-purple',
+                      badge: 'Євроформат',
+                      metric: 'Євроформат',
+                      onClick: () => openOffsetProduct({ category: 'Флаєри', subCategory: 'Флаєр', subTab: 'sheets', preset: '25', w: '99', h: '210', kind: '1' }),
+                      formats: [
+                        { name: '210×99', onClick: () => openOffsetProduct({ category: 'Флаєри', subCategory: 'Флаєр', subTab: 'sheets', preset: '25', w: '99', h: '210', kind: '1' }) },
+                        { name: '210×198', onClick: () => openOffsetProduct({ category: 'Флаєри', subCategory: 'Флаєр', subTab: 'sheets', preset: '26', w: '198', h: '210', kind: '6' }) },
+                        { name: '99×99', onClick: () => openOffsetProduct({ category: 'Флаєри', subCategory: 'Флаєр', subTab: 'sheets', preset: '24', w: '99', h: '99', kind: '2' }) }
+                      ]
+                    },
+                    {
+                      id: 'listivka',
+                      title: 'Листівка',
+                      desc: 'Рекламні листівки стандартних А-форматів (А7, А6, А5, А4, А3) на крейді.',
+                      icon: <Image size={30} style={{ color: '#ff9500' }} />,
+                      color: 'rgba(255, 149, 0, 0.1)',
+                      badgeClass: 'ios-badge-orange',
+                      badge: 'А-формати',
+                      metric: 'А7-А3 формати',
+                      onClick: () => openOffsetProduct({ category: 'Листівки', subCategory: 'Листівка', subTab: 'sheets', preset: '28', w: '70', h: '100', kind: '1' }),
+                      formats: [
+                        { name: 'А7', onClick: () => openOffsetProduct({ category: 'Листівки', subCategory: 'Листівка', subTab: 'sheets', preset: '28', w: '70', h: '100', kind: '1' }) },
+                        { name: 'А6', onClick: () => openOffsetProduct({ category: 'Листівки', subCategory: 'Листівка', subTab: 'sheets', preset: '312', w: '105', h: '148', kind: '1' }) },
+                        { name: 'А5', onClick: () => openOffsetProduct({ category: 'Листівки', subCategory: 'Листівка', subTab: 'sheets', preset: '32', w: '148', h: '210', kind: '1' }) },
+                        { name: 'А4', onClick: () => openOffsetProduct({ category: 'Листівки', subCategory: 'Листівка', subTab: 'sheets', preset: '34', w: '210', h: '297', kind: '1' }) },
+                        { name: 'А3', onClick: () => openOffsetProduct({ category: 'Листівки', subCategory: 'Листівка', subTab: 'sheets', preset: '36', w: '297', h: '420', kind: '1' }) },
+                        { name: 'Кругла', onClick: () => openOffsetProduct({ category: 'Листівки', subCategory: 'Листівка', subTab: 'sheets', preset: '37', w: '70', h: '70', kind: '7' }) }
+                      ]
+                    },
+                    {
+                      id: 'plakat',
+                      title: 'Плакати та постери',
+                      desc: 'Великоформатний офсетний друк А3, В3, А2, В2, А1, В1 для реклами.',
+                      icon: <Layout size={30} style={{ color: 'var(--primary)' }} />,
+                      color: 'rgba(0, 122, 255, 0.1)',
+                      badgeClass: 'ios-badge-blue',
+                      badge: 'Великий формат',
+                      metric: 'До В1 формату',
+                      onClick: () => openOffsetProduct({ category: 'Плакати', subCategory: 'Плакати', subTab: 'sheets', preset: '36', w: '297', h: '420', kind: '1' }),
+                      formats: [
+                        { name: 'А3', onClick: () => openOffsetProduct({ category: 'Плакати', subCategory: 'Плакати', subTab: 'sheets', preset: '36', w: '297', h: '420', kind: '1' }) },
+                        { name: 'В3', onClick: () => openOffsetProduct({ category: 'Плакати', subCategory: 'Плакати', subTab: 'sheets', preset: 'b3', w: '340', h: '490', kind: '1' }) },
+                        { name: 'А2', onClick: () => openOffsetProduct({ category: 'Плакати', subCategory: 'Плакати', subTab: 'sheets', preset: '15', w: '420', h: '594', kind: '1' }) },
+                        { name: 'В2', onClick: () => openOffsetProduct({ category: 'Плакати', subCategory: 'Плакати', subTab: 'sheets', preset: 'b2', w: '480', h: '690', kind: '1' }) },
+                        { name: 'А1', onClick: () => openOffsetProduct({ category: 'Плакати', subCategory: 'Плакати', subTab: 'sheets', preset: '16', w: '594', h: '841', kind: '1' }) },
+                        { name: 'B1', onClick: () => openOffsetProduct({ category: 'Плакати', subCategory: 'Плакати', subTab: 'sheets', preset: 'b1', w: '680', h: '980', kind: '1' }) }
+                      ]
+                    },
+                    {
+                      id: 'sets',
+                      title: 'Сети / Плейсмати',
+                      desc: 'Одноразові ресторанні підкладки на стіл з офсетного або крафт-паперу.',
+                      icon: <Utensils size={30} style={{ color: '#34c759' }} />,
+                      color: 'rgba(52, 199, 89, 0.1)',
+                      badgeClass: 'ios-badge-green',
+                      badge: 'HoReCa',
+                      metric: 'Ресторанні сети',
+                      onClick: () => openOffsetProduct({ category: 'Сети', subCategory: 'Сети', subTab: 'sheets', preset: 'sets_a3', w: '420', h: '297', kind: '1' }),
+                      formats: [
+                        { name: 'А3 (420×297)', onClick: () => openOffsetProduct({ category: 'Сети', subCategory: 'Сети', subTab: 'sheets', preset: 'sets_a3', w: '420', h: '297', kind: '1' }) },
+                        { name: 'В3 (490×340)', onClick: () => openOffsetProduct({ category: 'Сети', subCategory: 'Сети', subTab: 'sheets', preset: 'sets_b3', w: '490', h: '340', kind: '1' }) }
+                      ]
+                    },
+                    {
+                      id: 'buklet',
+                      title: 'Буклет (12 видів)',
+                      desc: 'Рекламні буклети: книжка, намотування, гармошка, вікно, комбіновані.',
+                      icon: <BookOpen size={30} style={{ color: 'var(--primary)' }} />,
+                      color: 'rgba(0, 122, 255, 0.1)',
+                      badgeClass: 'ios-badge-blue',
+                      badge: 'Фальцовка',
+                      metric: '1-5 фальців',
+                      onClick: () => openOffsetProduct({ category: 'Буклети', subCategory: 'Буклет', subTab: 'sheets', preset: '34', w: '210', h: '297', kind: '6' }),
+                      formats: [
+                        { name: 'А4 в Євро', onClick: () => openOffsetProduct({ category: 'Буклети', subCategory: 'Буклет', subTab: 'sheets', preset: '34', w: '210', h: '297', kind: '6' }) },
+                        { name: '2Євро в Євро', onClick: () => openOffsetProduct({ category: 'Буклети', subCategory: 'Буклет', subTab: 'sheets', preset: '26', w: '198', h: '210', kind: '6' }) },
+                        { name: 'А6', onClick: () => openOffsetProduct({ category: 'Буклети', subCategory: 'Буклет', subTab: 'sheets', preset: '312', w: '105', h: '148', kind: '6' }) },
+                        { name: 'А5', onClick: () => openOffsetProduct({ category: 'Буклети', subCategory: 'Буклет', subTab: 'sheets', preset: '32', w: '148', h: '210', kind: '6' }) },
+                        { name: 'А4', onClick: () => openOffsetProduct({ category: 'Буклети', subCategory: 'Буклет', subTab: 'sheets', preset: '34', w: '210', h: '297', kind: '6' }) }
+                      ]
+                    },
+                    {
+                      id: 'katalog',
+                      title: 'Каталог / Брошура',
+                      desc: 'Багатосторінкові видання зі скріпленням на скобу, пружину або PUR термоклей.',
+                      icon: <BookOpen size={30} style={{ color: '#af52de' }} />,
+                      color: 'rgba(175, 82, 222, 0.1)',
+                      badgeClass: 'ios-badge-purple',
+                      badge: 'Багатосторінкова',
+                      metric: 'Скоба / PUR клей',
+                      onClick: () => openOffsetProduct({ category: 'Книги', subCategory: 'Каталог', subTab: 'multipage', stitching: '1' }),
+                      formats: [
+                        { name: 'Скоба', onClick: () => openOffsetProduct({ category: 'Книги', subCategory: 'Каталог', subTab: 'multipage', stitching: '1' }) },
+                        { name: 'Пружина', onClick: () => openOffsetProduct({ category: 'Книги', subCategory: 'Каталог', subTab: 'multipage', stitching: '2' }) },
+                        { name: 'PUR Клей', onClick: () => openOffsetProduct({ category: 'Книги', subCategory: 'Каталог', subTab: 'multipage', stitching: '3' }) }
+                      ]
+                    },
+                    {
+                      id: 'bloknot',
+                      title: 'Блокнот на пружині',
+                      desc: 'Фірмові корпоративні блокноти з кольоровою обкладинкою та пружиною.',
+                      icon: <Bookmark size={30} style={{ color: '#0ea5e9' }} />,
+                      color: 'rgba(14, 165, 233, 0.1)',
+                      badgeClass: 'ios-badge-blue',
+                      badge: 'Пружина',
+                      metric: '25-100 аркушів',
+                      onClick: () => openOffsetProduct({ category: 'Блокноти', subCategory: 'Блокнот', subTab: 'sheets', preset: '32', w: '148', h: '210', kind: '1' }),
+                      formats: [
+                        { name: 'А6', onClick: () => openOffsetProduct({ category: 'Блокноти', subCategory: 'Блокнот', subTab: 'sheets', preset: '312', w: '105', h: '148', kind: '1' }) },
+                        { name: 'А5', onClick: () => openOffsetProduct({ category: 'Блокноти', subCategory: 'Блокнот', subTab: 'sheets', preset: '32', w: '148', h: '210', kind: '1' }) },
+                        { name: 'А4', onClick: () => openOffsetProduct({ category: 'Блокноти', subCategory: 'Блокнот', subTab: 'sheets', preset: '34', w: '210', h: '297', kind: '1' }) }
+                      ]
+                    },
+                    {
+                      id: 'nalipka',
+                      title: 'Наліпка / Стікер',
+                      desc: 'Самоклеючі етикетки на папері Raflatac з просічкою або плотерною надсічкою.',
+                      icon: <Tag size={30} style={{ color: '#ff9500' }} />,
+                      color: 'rgba(255, 149, 0, 0.1)',
+                      badgeClass: 'ios-badge-orange',
+                      badge: 'Самоклейка',
+                      metric: 'Raflatac / плівка',
+                      onClick: () => openOffsetProduct({ category: 'Наклейки', subCategory: 'Наліпка', subTab: 'sheets', preset: '1', w: '90', h: '50', kind: '1' }),
+                      formats: [
+                        { name: '90×50', onClick: () => openOffsetProduct({ category: 'Наклейки', subCategory: 'Наліпка', subTab: 'sheets', preset: '1', w: '90', h: '50', kind: '1' }) },
+                        { name: '50×50', onClick: () => openOffsetProduct({ category: 'Наклейки', subCategory: 'Наліпка', subTab: 'sheets', preset: '5', w: '50', h: '50', kind: '2' }) },
+                        { name: 'Кругла', onClick: () => openOffsetProduct({ category: 'Наклейки', subCategory: 'Наліпка', subTab: 'sheets', preset: '5', w: '50', h: '50', kind: '7' }) },
+                        { name: 'Овальна', onClick: () => openOffsetProduct({ category: 'Наклейки', subCategory: 'Наліпка', subTab: 'sheets', preset: '1', w: '90', h: '50', kind: '8' }) }
+                      ]
+                    },
+                    {
+                      id: 'papka',
+                      title: 'Папка А4',
+                      desc: 'Корпоративні фірмові папки для документів з висічним замком та кишенею.',
+                      icon: <FolderOpen size={30} style={{ color: 'var(--primary)' }} />,
+                      color: 'rgba(0, 122, 255, 0.1)',
+                      badgeClass: 'ios-badge-blue',
+                      badge: 'Висічний замок',
+                      metric: 'Висічний замок',
+                      onClick: () => openOffsetProduct({ category: 'Папки', subCategory: 'Папка А4', subTab: 'sheets', preset: '34', w: '210', h: '297', folderSpine: '5' }),
+                      formats: [
+                        { name: 'Без корінця', onClick: () => openOffsetProduct({ category: 'Папки', subCategory: 'Папка А4', subTab: 'sheets', preset: '34', w: '210', h: '297', folderSpine: '0', folderRezinka: 'none' }) },
+                        { name: 'Корінець 5мм', onClick: () => openOffsetProduct({ category: 'Папки', subCategory: 'Папка А4', subTab: 'sheets', preset: '34', w: '210', h: '297', folderSpine: '5', folderRezinka: 'none' }) },
+                        { name: 'З резинкою', onClick: () => openOffsetProduct({ category: 'Папки', subCategory: 'Папка А4', subTab: 'sheets', preset: '34', w: '210', h: '297', folderSpine: '5', folderRezinka: 'blue' }) }
+                      ]
+                    },
+                    {
+                      id: 'listivka_fig',
+                      title: 'Листівка фігурна',
+                      desc: 'Листівки з індивідуальною висічкою, біговкою, скругленням або європідвісом.',
+                      icon: <Scissors size={30} style={{ color: '#34c759' }} />,
+                      color: 'rgba(52, 199, 89, 0.1)',
+                      badgeClass: 'ios-badge-green',
+                      badge: 'Біговка',
+                      metric: 'Штамп / біговка',
+                      onClick: () => openOffsetProduct({ category: 'Листівки', subCategory: 'Листівка', subTab: 'sheets', preset: '32', w: '148', h: '210', kind: '1' }),
+                      formats: [
+                        { name: 'Одинарна', onClick: () => openOffsetProduct({ category: 'Листівки', subCategory: 'Листівка', subTab: 'sheets', preset: '32', w: '148', h: '210', kind: '1' }) },
+                        { name: 'Складна', onClick: () => openOffsetProduct({ category: 'Листівки', subCategory: 'Листівка', subTab: 'sheets', preset: '34', w: '210', h: '297', kind: '6' }) },
+                        { name: 'Кругла', onClick: () => openOffsetProduct({ category: 'Листівки', subCategory: 'Листівка', subTab: 'sheets', preset: '37', w: '70', h: '70', kind: '7' }) }
+                      ]
+                    },
+                    {
+                      id: 'sitky',
+                      title: 'Календарні сітки',
+                      desc: 'Стандартні та металізовані 3-секційні календарні сітки на 2026/2027 роки.',
+                      icon: <Calendar size={30} style={{ color: 'var(--primary)' }} />,
+                      color: 'rgba(0, 122, 255, 0.1)',
+                      badgeClass: 'ios-badge-blue',
+                      badge: '2026/2027',
+                      metric: '2026/2027 рік',
+                      onClick: () => openOffsetProduct({ category: 'Календарі кишенькові', subCategory: 'Календарні сітки', subTab: 'sheets', preset: '34', w: '210', h: '297', kind: '1' }),
+                      formats: [
+                        { name: 'Сітки 2026', onClick: () => openOffsetProduct({ category: 'Календарі кишенькові', subCategory: 'Календарні сітки', subTab: 'sheets', preset: '34', w: '210', h: '297', kind: '1' }) },
+                        { name: 'Металік / Золото', onClick: () => openOffsetProduct({ category: 'Календарі кишенькові', subCategory: 'Календарні сітки', subTab: 'sheets', preset: '34', w: '210', h: '297', kind: '1' }) }
+                      ]
+                    },
+                    {
+                      id: 'sheets_print',
+                      title: 'Друк в листах',
+                      desc: 'Офсетний друк на повних друкарських листах А2, В2, А1, В1 без порізки на вироби.',
+                      icon: <Layers size={30} style={{ color: '#af52de' }} />,
+                      color: 'rgba(175, 82, 222, 0.1)',
+                      badgeClass: 'ios-badge-purple',
+                      badge: 'Без порізки',
+                      metric: 'Повні листи',
+                      onClick: () => openOffsetProduct({ category: 'Бланки', subCategory: 'Друк в листах', subTab: 'sheets', preset: '15', w: '420', h: '594', kind: '1' }),
+                      formats: [
+                        { name: 'А2', onClick: () => openOffsetProduct({ category: 'Бланки', subCategory: 'Друк в листах', subTab: 'sheets', preset: '15', w: '420', h: '594', kind: '1' }) },
+                        { name: 'В2', onClick: () => openOffsetProduct({ category: 'Бланки', subCategory: 'Друк в листах', subTab: 'sheets', preset: 'b2', w: '480', h: '690', kind: '1' }) },
+                        { name: 'А1', onClick: () => openOffsetProduct({ category: 'Бланки', subCategory: 'Друк в листах', subTab: 'sheets', preset: '16', w: '594', h: '841', kind: '1' }) },
+                        { name: 'B1', onClick: () => openOffsetProduct({ category: 'Бланки', subCategory: 'Друк в листах', subTab: 'sheets', preset: 'b1', w: '680', h: '980', kind: '1' }) }
+                      ]
+                    },
+                    {
+                      id: 'envelope',
+                      title: 'Конверт',
+                      desc: 'Фірмовий офсетний друк на готових конвертах: Євро (DL), С6, С5, С4.',
+                      icon: <Mail size={30} style={{ color: 'var(--primary)' }} />,
+                      color: 'rgba(0, 122, 255, 0.1)',
+                      badgeClass: 'ios-badge-blue',
+                      badge: 'Корпоративний',
+                      metric: 'Євро DL, C6-C4',
+                      onClick: () => openOffsetProduct({ category: 'Бланки', subCategory: 'Конверт', subTab: 'sheets', preset: '25', w: '110', h: '220', envelopeFormat: 'E65' }),
+                      formats: [
+                        { name: 'Євро DL', onClick: () => openOffsetProduct({ category: 'Бланки', subCategory: 'Конверт', subTab: 'sheets', preset: '25', w: '110', h: '220', envelopeFormat: 'E65' }) },
+                        { name: 'С6', onClick: () => openOffsetProduct({ category: 'Бланки', subCategory: 'Конверт', subTab: 'sheets', preset: '21', w: '114', h: '162', envelopeFormat: 'C6' }) },
+                        { name: 'С5', onClick: () => openOffsetProduct({ category: 'Бланки', subCategory: 'Конверт', subTab: 'sheets', preset: '32', w: '162', h: '229', envelopeFormat: 'C5' }) },
+                        { name: 'С4', onClick: () => openOffsetProduct({ category: 'Бланки', subCategory: 'Конверт', subTab: 'sheets', preset: '34', w: '229', h: '324', envelopeFormat: 'C4' }) }
+                      ]
+                    },
+                    {
+                      id: 'calendar_vis',
+                      title: 'Календарі висічні',
+                      desc: 'Настільні об\'ємні календарі-будиночки та пірамідки з висічним замком.',
+                      icon: <Clock size={30} style={{ color: '#ff9500' }} />,
+                      color: 'rgba(255, 149, 0, 0.1)',
+                      badgeClass: 'ios-badge-orange',
+                      badge: 'Настільні',
+                      metric: 'Готові штампи',
+                      onClick: () => openOffsetProduct({ category: 'Календарі кишенькові', subCategory: 'Календарі висічні', subTab: 'felling', preset: '160', w: '210', h: '300', stamp: '160' }),
+                      formats: [
+                        { name: 'Будинок', onClick: () => openOffsetProduct({ category: 'Календарі кишенькові', subCategory: 'Календарі висічні', subTab: 'felling', preset: '160', w: '210', h: '300', stamp: '160' }) },
+                        { name: 'Пірамідка', onClick: () => openOffsetProduct({ category: 'Календарі кишенькові', subCategory: 'Календарі висічні', subTab: 'felling', preset: '161', w: '305', h: '134', stamp: '161' }) }
+                      ]
+                    },
+                    {
+                      id: 'wrap_paper',
+                      title: 'Пакувальний папір',
+                      desc: 'Друк подарункового та пакувального паперу на крафті чи офсеті в листах.',
+                      icon: <Package size={30} style={{ color: '#0ea5e9' }} />,
+                      color: 'rgba(14, 165, 233, 0.1)',
+                      badgeClass: 'ios-badge-blue',
+                      badge: 'Крафт / Офсет',
+                      metric: 'Крафт в листах',
+                      onClick: () => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset('36'); setSheetCustomWidth('297'); setSheetCustomHeight('420'); handleSelectCategory('Бланки'); },
+                      formats: [
+                        { name: 'А3', onClick: () => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset('36'); setSheetCustomWidth('297'); setSheetCustomHeight('420'); handleSelectCategory('Бланки'); } },
+                        { name: 'В3', onClick: () => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset('b3'); setSheetCustomWidth('340'); setSheetCustomHeight('490'); handleSelectCategory('Бланки'); } },
+                        { name: 'А2', onClick: () => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset('15'); setSheetCustomWidth('420'); setSheetCustomHeight('594'); handleSelectCategory('Бланки'); } },
+                        { name: 'В2', onClick: () => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset('b2'); setSheetCustomWidth('480'); setSheetCustomHeight('690'); handleSelectCategory('Бланки'); } },
+                        { name: 'А1', onClick: () => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset('16'); setSheetCustomWidth('594'); setSheetCustomHeight('841'); handleSelectCategory('Бланки'); } },
+                        { name: 'B1', onClick: () => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset('b1'); setSheetCustomWidth('680'); setSheetCustomHeight('980'); handleSelectCategory('Бланки'); } }
+                      ]
+                    }
+                  ].map(item => (
+                    <div
+                      key={item.id}
+                      onClick={item.onClick}
+                      className="ios-card bg-white"
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        justifyContent: 'space-between',
+                        padding: '24px',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s ease',
+                        minHeight: '200px',
+                        position: 'relative'
+                      }}
+                      onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                      onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; }}
+                    >
+                      <div>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                          <div style={{
+                            width: '56px',
+                            height: '56px',
+                            borderRadius: '16px',
+                            backgroundColor: item.color,
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}>
+                            {item.icon}
                           </div>
-                          <div>
-                            <h4
-                              onClick={() => openOffsetProduct({ category: 'Візитки', subCategory: 'Візитівка', subTab: 'sheets', preset: '1', w: '90', h: '50', kind: '1' })}
-                              className="text-sm font-extrabold text-slate-900 group-hover:text-blue-600 cursor-pointer transition-colors m-0"
-                            >
-                              Візитівка
-                            </h4>
-                            <span className="text-[10px] text-slate-400 font-semibold">90×50, 85×55, круг</span>
-                          </div>
+                          <span className={`ios-badge ${item.badgeClass}`} style={{ fontSize: '11px', padding: '3px 8px' }}>
+                            {item.badge}
+                          </span>
                         </div>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 border border-blue-100 text-blue-600">✨ Вибір</span>
-                      </div>
-                      <div className="flex flex-wrap gap-1.5 mt-2">
-                        {[
-                          { name: '📐 90×50', preset: '1', w: '90', h: '50', kind: '1' },
-                          { name: '📐 85×55', preset: '5', w: '85', h: '55', kind: '1' },
-                          { name: '⬜ 50×50', preset: '5', w: '50', h: '50', kind: '2' },
-                          { name: '🔘 Кругла', preset: '5', w: '50', h: '50', kind: '7' }
-                        ].map(item => (
-                          <button
-                            key={item.name}
-                            type="button"
-                            onClick={() => openOffsetProduct({ category: 'Візитки', subCategory: 'Візитівка', subTab: 'sheets', preset: item.preset, w: item.w, h: item.h, kind: item.kind })}
-                            className="pill-chip"
-                          >
-                            {item.name}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
 
-                  {/* 2. Календар кишеньковий */}
-                  <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm card-lift flex flex-col justify-between group">
-                    <div>
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-2.5">
-                          <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-600 flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
-                            <Calendar size={19} />
-                          </div>
-                          <div>
-                            <h4
-                              onClick={() => openOffsetProduct({ category: 'Календарики кишенькові', subCategory: 'Календар', subTab: 'sheets', preset: '91', w: '100', h: '70', kind: '1' })}
-                              className="text-sm font-extrabold text-slate-900 group-hover:text-blue-600 cursor-pointer transition-colors m-0"
-                            >
-                              Календар кишеньковий
-                            </h4>
-                            <span className="text-[10px] text-slate-400 font-semibold">100×70, 90×60, 70×70</span>
-                          </div>
-                        </div>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-600">🛡️ Ламінація</span>
-                      </div>
-                      <div className="flex flex-wrap gap-1.5 mt-2">
-                        {[
-                          { name: '📐 100×70', preset: '91', w: '100', h: '70', kind: '1' },
-                          { name: '📐 90×60', preset: '90', w: '90', h: '60', kind: '1' },
-                          { name: '⬜ 70×70', preset: '256', w: '70', h: '70', kind: '2' }
-                        ].map(item => (
-                          <button
-                            key={item.name}
-                            type="button"
-                            onClick={() => openOffsetProduct({ category: 'Календарики кишенькові', subCategory: 'Календар', subTab: 'sheets', preset: item.preset, w: item.w, h: item.h, kind: item.kind })}
-                            className="pill-chip"
-                          >
-                            {item.name}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
+                        <h4 style={{ fontSize: '15px', fontWeight: '800', marginBottom: '6px', color: 'var(--text-dark)' }}>
+                          {item.title}
+                        </h4>
+                        <p style={{ fontSize: '12px', color: 'var(--text-medium)', lineHeight: '1.4' }}>
+                          {item.desc}
+                        </p>
 
-                  {/* 3. Флаєр */}
-                  <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm card-lift flex flex-col justify-between group">
-                    <div>
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-2.5">
-                          <div className="w-10 h-10 rounded-xl bg-purple-50 border border-purple-100 text-purple-600 flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
-                            <Zap size={19} />
+                        {/* Format Chips */}
+                        {item.formats && (
+                          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '12px' }}>
+                            {item.formats.map(fmt => (
+                              <button
+                                key={fmt.name}
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  fmt.onClick();
+                                }}
+                                style={{
+                                  fontSize: '11px',
+                                  fontWeight: '600',
+                                  padding: '4px 8px',
+                                  borderRadius: '8px',
+                                  backgroundColor: 'var(--bg-system)',
+                                  border: '0.5px solid var(--border-light)',
+                                  color: 'var(--text-dark)',
+                                  cursor: 'pointer',
+                                  transition: 'all 0.15s ease'
+                                }}
+                                onMouseEnter={(e) => {
+                                  e.currentTarget.style.backgroundColor = 'var(--primary)';
+                                  e.currentTarget.style.color = '#ffffff';
+                                  e.currentTarget.style.borderColor = 'var(--primary)';
+                                }}
+                                onMouseLeave={(e) => {
+                                  e.currentTarget.style.backgroundColor = 'var(--bg-system)';
+                                  e.currentTarget.style.color = 'var(--text-dark)';
+                                  e.currentTarget.style.borderColor = 'var(--border-light)';
+                                }}
+                              >
+                                {fmt.name}
+                              </button>
+                            ))}
                           </div>
-                          <div>
-                            <h4
-                              onClick={() => openOffsetProduct({ category: 'Флаєри', subCategory: 'Флаєр', subTab: 'sheets', preset: '25', w: '99', h: '210', kind: '1' })}
-                              className="text-sm font-extrabold text-slate-900 group-hover:text-blue-600 cursor-pointer transition-colors m-0"
-                            >
-                              Флаєр
-                            </h4>
-                            <span className="text-[10px] text-slate-400 font-semibold">Євро, 1/2 Євро, 2×Євро</span>
-                          </div>
-                        </div>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-50 border border-purple-100 text-purple-600">⚡ Євроформат</span>
+                        )}
                       </div>
-                      <div className="flex flex-wrap gap-1.5 mt-2">
-                        {[
-                          { name: '📐 210×99', preset: '25', w: '99', h: '210', kind: '1' },
-                          { name: '📐 210×198', preset: '26', w: '198', h: '210', kind: '6' },
-                          { name: '⬜ 99×99', preset: '24', w: '99', h: '99', kind: '2' }
-                        ].map(item => (
-                          <button
-                            key={item.name}
-                            type="button"
-                            onClick={() => openOffsetProduct({ category: 'Флаєри', subCategory: 'Флаєр', subTab: 'sheets', preset: item.preset, w: item.w, h: item.h, kind: item.kind })}
-                            className="pill-chip"
-                          >
-                            {item.name}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
 
-                  {/* 4. Листівка */}
-                  <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm card-lift flex flex-col justify-between group">
-                    <div>
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-2.5">
-                          <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-100 text-amber-600 flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
-                            <Image size={19} />
-                          </div>
-                          <div>
-                            <h4
-                              onClick={() => openOffsetProduct({ category: 'Листівки', subCategory: 'Листівка', subTab: 'sheets', preset: '28', w: '70', h: '100', kind: '1' })}
-                              className="text-sm font-extrabold text-slate-900 group-hover:text-blue-600 cursor-pointer transition-colors m-0"
-                            >
-                              Листівка
-                            </h4>
-                            <span className="text-[10px] text-slate-400 font-semibold">А7, А6, А5, А4, А3</span>
-                          </div>
-                        </div>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 border border-amber-100 text-amber-600">📑 А-формати</span>
-                      </div>
-                      <div className="flex flex-wrap gap-1.5 mt-2">
-                        {[
-                          { name: 'А7 (70×100)', preset: '28', w: '70', h: '100', kind: '1' },
-                          { name: 'А6 (105×148)', preset: '312', w: '105', h: '148', kind: '1' },
-                          { name: 'А5 (148×210)', preset: '32', w: '148', h: '210', kind: '1' },
-                          { name: 'А4 (210×297)', preset: '34', w: '210', h: '297', kind: '1' },
-                          { name: 'А3 (297×420)', preset: '36', w: '297', h: '420', kind: '1' },
-                          { name: '🔘 Кругла', preset: '37', w: '70', h: '70', kind: '7' }
-                        ].map(item => (
-                          <button
-                            key={item.name}
-                            type="button"
-                            onClick={() => openOffsetProduct({ category: 'Листівки', subCategory: 'Листівка', subTab: 'sheets', preset: item.preset, w: item.w, h: item.h, kind: item.kind })}
-                            className="pill-chip"
-                          >
-                            {item.name}
-                          </button>
-                        ))}
+                      {/* Footer of card */}
+                      <div style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        borderTop: '0.5px solid var(--border-light)',
+                        paddingTop: '12px',
+                        marginTop: '16px'
+                      }}>
+                        <span style={{ fontSize: '11px', fontWeight: '600', color: 'var(--text-medium)' }}>
+                          {item.metric}
+                        </span>
+                        <span style={{ color: 'var(--primary)', display: 'flex', alignItems: 'center', fontSize: '12px', fontWeight: '700' }}>
+                          Розрахувати <ChevronRight size={14} />
+                        </span>
                       </div>
                     </div>
-                  </div>
-
-                  {/* 5. Плакати та постери */}
-                  <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm card-lift flex flex-col justify-between group">
-                    <div>
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-2.5">
-                          <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
-                            <Layout size={19} />
-                          </div>
-                          <div>
-                            <h4
-                              onClick={() => openOffsetProduct({ category: 'Плакати', subCategory: 'Плакати', subTab: 'sheets', preset: '36', w: '297', h: '420', kind: '1' })}
-                              className="text-sm font-extrabold text-slate-900 group-hover:text-blue-600 cursor-pointer transition-colors m-0"
-                            >
-                              Плакати та постери
-                            </h4>
-                            <span className="text-[10px] text-slate-400 font-semibold">А3, В3, А2, В2, А1, В1</span>
-                          </div>
-                        </div>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 border border-blue-100 text-blue-600">🖼️ Великий</span>
-                      </div>
-                      <div className="flex flex-wrap gap-1.5 mt-2">
-                        {[
-                          { name: 'А3 (297×420)', preset: '36', w: '297', h: '420', kind: '1' },
-                          { name: 'В3 (340×490)', preset: 'b3', w: '340', h: '490', kind: '1' },
-                          { name: 'А2 (420×594)', preset: '15', w: '420', h: '594', kind: '1' },
-                          { name: 'В2 (480×690)', preset: 'b2', w: '480', h: '690', kind: '1' },
-                          { name: 'А1 (594×841)', preset: '16', w: '594', h: '841', kind: '1' },
-                          { name: 'B1 (680×980)', preset: 'b1', w: '680', h: '980', kind: '1' }
-                        ].map(item => (
-                          <button
-                            key={item.name}
-                            type="button"
-                            onClick={() => openOffsetProduct({ category: 'Плакати', subCategory: 'Плакати', subTab: 'sheets', preset: item.preset, w: item.w, h: item.h, kind: item.kind })}
-                            className="pill-chip"
-                          >
-                            {item.name}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 6. Сети / Плейсмати */}
-                  <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm card-lift flex flex-col justify-between group">
-                    <div>
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-2.5">
-                          <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-600 flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
-                            <Utensils size={19} />
-                          </div>
-                          <div>
-                            <h4
-                              onClick={() => openOffsetProduct({ category: 'Сети', subCategory: 'Сети', subTab: 'sheets', preset: 'sets_a3', w: '420', h: '297', kind: '1' })}
-                              className="text-sm font-extrabold text-slate-900 group-hover:text-blue-600 cursor-pointer transition-colors m-0"
-                            >
-                              Сети / Плейсмати
-                            </h4>
-                            <span className="text-[10px] text-slate-400 font-semibold">Крафт та офсет підкладки</span>
-                          </div>
-                        </div>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-600">☕ HoReCa</span>
-                      </div>
-                      <div className="flex flex-wrap gap-1.5 mt-2">
-                        {[
-                          { name: 'А3 (420×297)', preset: 'sets_a3', w: '420', h: '297', kind: '1' },
-                          { name: 'В3 (490×340)', preset: 'sets_b3', w: '490', h: '340', kind: '1' }
-                        ].map(item => (
-                          <button
-                            key={item.name}
-                            type="button"
-                            onClick={() => openOffsetProduct({ category: 'Сети', subCategory: 'Сети', subTab: 'sheets', preset: item.preset, w: item.w, h: item.h, kind: item.kind })}
-                            className="pill-chip"
-                          >
-                            {item.name}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 7. Буклет (12 видів) */}
-                  <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm card-lift flex flex-col justify-between group">
-                    <div>
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-2.5">
-                          <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
-                            <BookOpen size={19} />
-                          </div>
-                          <div>
-                            <h4
-                              onClick={() => openOffsetProduct({ category: 'Буклети', subCategory: 'Буклет', subTab: 'sheets', preset: '34', w: '210', h: '297', kind: '6' })}
-                              className="text-sm font-extrabold text-slate-900 group-hover:text-blue-600 cursor-pointer transition-colors m-0"
-                            >
-                              Буклет (12 видів)
-                            </h4>
-                            <span className="text-[10px] text-slate-400 font-semibold">1, 2, 3 фальці, гармошка</span>
-                          </div>
-                        </div>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 border border-blue-100 text-blue-600">📜 Фальцовка</span>
-                      </div>
-                      <div className="flex flex-wrap gap-1.5 mt-2">
-                        {[
-                          { name: 'А4 в Євро', preset: '34', w: '210', h: '297', kind: '6' },
-                          { name: '2Євро в Євро', preset: '26', w: '198', h: '210', kind: '6' },
-                          { name: 'А6', preset: '312', w: '105', h: '148', kind: '6' },
-                          { name: 'А5', preset: '32', w: '148', h: '210', kind: '6' },
-                          { name: 'А4', preset: '34', w: '210', h: '297', kind: '6' }
-                        ].map(item => (
-                          <button
-                            key={item.name}
-                            type="button"
-                            onClick={() => openOffsetProduct({ category: 'Буклети', subCategory: 'Буклет', subTab: 'sheets', preset: item.preset, w: item.w, h: item.h, kind: item.kind })}
-                            className="pill-chip"
-                          >
-                            {item.name}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 8. Каталог / Брошура */}
-                  <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm card-lift flex flex-col justify-between group">
-                    <div>
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-2.5">
-                          <div className="w-10 h-10 rounded-xl bg-purple-50 border border-purple-100 text-purple-600 flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
-                            <BookOpen size={19} />
-                          </div>
-                          <div>
-                            <h4
-                              onClick={() => openOffsetProduct({ category: 'Книги', subCategory: 'Каталог', subTab: 'multipage', stitching: '1' })}
-                              className="text-sm font-extrabold text-slate-900 group-hover:text-blue-600 cursor-pointer transition-colors m-0"
-                            >
-                              Каталог / Брошура
-                            </h4>
-                            <span className="text-[10px] text-slate-400 font-semibold">Багатосторінкові видання</span>
-                          </div>
-                        </div>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-50 border border-purple-100 text-purple-600">📚 Багатостор.</span>
-                      </div>
-                      <div className="flex flex-wrap gap-1.5 mt-2">
-                        {[
-                          { label: '📌 Скоба (2 шт)', id: '1' },
-                          { label: '🌀 Пружина', id: '2' },
-                          { label: '🧴 PUR Клей', id: '3' }
-                        ].map(st => (
-                          <button
-                            key={st.label}
-                            type="button"
-                            onClick={() => openOffsetProduct({ category: 'Книги', subCategory: 'Каталог', subTab: 'multipage', stitching: st.id })}
-                            className="pill-chip"
-                          >
-                            {st.label}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 9. Блокнот на пружині */}
-                  <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm card-lift flex flex-col justify-between group">
-                    <div>
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-2.5">
-                          <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-100 text-teal-600 flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
-                            <Bookmark size={19} />
-                          </div>
-                          <div>
-                            <h4
-                              onClick={() => openOffsetProduct({ category: 'Блокноти', subCategory: 'Блокнот', subTab: 'sheets', preset: '32', w: '148', h: '210', kind: '1' })}
-                              className="text-sm font-extrabold text-slate-900 group-hover:text-blue-600 cursor-pointer transition-colors m-0"
-                            >
-                              Блокнот на пружині
-                            </h4>
-                            <span className="text-[10px] text-slate-400 font-semibold">25, 50, 100 аркушів</span>
-                          </div>
-                        </div>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-50 border border-teal-100 text-teal-600">📒 Пружина</span>
-                      </div>
-                      <div className="flex flex-wrap gap-1.5 mt-2">
-                        {[
-                          { name: 'А6 (105×148)', preset: '312', w: '105', h: '148' },
-                          { name: 'А5 (148×210)', preset: '32', w: '148', h: '210' },
-                          { name: 'А4 (210×297)', preset: '34', w: '210', h: '297' }
-                        ].map(item => (
-                          <button
-                            key={item.name}
-                            type="button"
-                            onClick={() => openOffsetProduct({ category: 'Блокноти', subCategory: 'Блокнот', subTab: 'sheets', preset: item.preset, w: item.w, h: item.h, kind: '1' })}
-                            className="pill-chip"
-                          >
-                            {item.name}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 10. Наліпка / Стікер */}
-                  <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm card-lift flex flex-col justify-between group">
-                    <div>
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-2.5">
-                          <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-100 text-amber-600 flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
-                            <Tag size={19} />
-                          </div>
-                          <div>
-                            <h4
-                              onClick={() => openOffsetProduct({ category: 'Наклейки', subCategory: 'Наліпка', subTab: 'sheets', preset: '1', w: '90', h: '50', kind: '1' })}
-                              className="text-sm font-extrabold text-slate-900 group-hover:text-blue-600 cursor-pointer transition-colors m-0"
-                            >
-                              Наліпка / Стікер
-                            </h4>
-                            <span className="text-[10px] text-slate-400 font-semibold">Самоклейка з просічкою</span>
-                          </div>
-                        </div>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 border border-amber-100 text-amber-600">🏷️ Самоклейка</span>
-                      </div>
-                      <div className="flex flex-wrap gap-1.5 mt-2">
-                        {[
-                          { name: '📐 90×50', preset: '1', w: '90', h: '50', kind: '1' },
-                          { name: '⬜ 50×50', preset: '5', w: '50', h: '50', kind: '2' },
-                          { name: '🔘 Кругла', preset: '5', w: '50', h: '50', kind: '7' },
-                          { name: '🥚 Овальна', preset: '1', w: '90', h: '50', kind: '8' }
-                        ].map(item => (
-                          <button
-                            key={item.name}
-                            type="button"
-                            onClick={() => openOffsetProduct({ category: 'Наклейки', subCategory: 'Наліпка', subTab: 'sheets', preset: item.preset, w: item.w, h: item.h, kind: item.kind })}
-                            className="pill-chip"
-                          >
-                            {item.name}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 11. Папка А4 */}
-                  <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm card-lift flex flex-col justify-between group">
-                    <div>
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-2.5">
-                          <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
-                            <FolderOpen size={19} />
-                          </div>
-                          <div>
-                            <h4
-                              onClick={() => openOffsetProduct({ category: 'Папки', subCategory: 'Папка А4', subTab: 'sheets', preset: '34', w: '210', h: '297', folderSpine: '5' })}
-                              className="text-sm font-extrabold text-slate-900 group-hover:text-blue-600 cursor-pointer transition-colors m-0"
-                            >
-                              Папка А4
-                            </h4>
-                            <span className="text-[10px] text-slate-400 font-semibold">З висічним замком</span>
-                          </div>
-                        </div>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 border border-blue-100 text-blue-600">📁 Замок</span>
-                      </div>
-                      <div className="flex flex-wrap gap-1.5 mt-2">
-                        {[
-                          { name: 'Без корінця', spine: '0' as const, rezinka: 'none' as const },
-                          { name: 'Корінець 5мм', spine: '5' as const, rezinka: 'none' as const },
-                          { name: 'З резинкою', spine: '5' as const, rezinka: 'blue' as const }
-                        ].map(fmt => (
-                          <button
-                            key={fmt.name}
-                            type="button"
-                            onClick={() => openOffsetProduct({ category: 'Папки', subCategory: 'Папка А4', subTab: 'sheets', preset: '34', w: '210', h: '297', folderSpine: fmt.spine, folderRezinka: fmt.rezinka })}
-                            className="pill-chip"
-                          >
-                            {fmt.name}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 12. Листівка фігурна */}
-                  <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm card-lift flex flex-col justify-between group">
-                    <div>
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-2.5">
-                          <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-600 flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
-                            <Scissors size={19} />
-                          </div>
-                          <div>
-                            <h4
-                              onClick={() => openOffsetProduct({ category: 'Листівки', subCategory: 'Листівка', subTab: 'sheets', preset: '32', w: '148', h: '210', kind: '1' })}
-                              className="text-sm font-extrabold text-slate-900 group-hover:text-blue-600 cursor-pointer transition-colors m-0"
-                            >
-                              Листівка фігурна
-                            </h4>
-                            <span className="text-[10px] text-slate-400 font-semibold">Біговка та скруглення</span>
-                          </div>
-                        </div>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-600">✂️ Біговка</span>
-                      </div>
-                      <div className="flex flex-wrap gap-1.5 mt-2">
-                        {[
-                          { name: '📄 Одинарна', preset: '32', w: '148', h: '210', kind: '1' },
-                          { name: '📖 Складна', preset: '34', w: '210', h: '297', kind: '6' },
-                          { name: '🔘 Кругла', preset: '37', w: '70', h: '70', kind: '7' }
-                        ].map(item => (
-                          <button
-                            key={item.name}
-                            type="button"
-                            onClick={() => openOffsetProduct({ category: 'Листівки', subCategory: 'Листівка', subTab: 'sheets', preset: item.preset, w: item.w, h: item.h, kind: item.kind })}
-                            className="pill-chip"
-                          >
-                            {item.name}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 13. Календарні сітки */}
-                  <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm card-lift flex flex-col justify-between group">
-                    <div>
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-2.5">
-                          <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
-                            <Calendar size={19} />
-                          </div>
-                          <div>
-                            <h4
-                              onClick={() => openOffsetProduct({ category: 'Календарі кишенькові', subCategory: 'Календарні сітки', subTab: 'sheets', preset: '34', w: '210', h: '297', kind: '1' })}
-                              className="text-sm font-extrabold text-slate-900 group-hover:text-blue-600 cursor-pointer transition-colors m-0"
-                            >
-                              Календарні сітки
-                            </h4>
-                            <span className="text-[10px] text-slate-400 font-semibold">Квартальні 3-секційні</span>
-                          </div>
-                        </div>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 border border-blue-100 text-blue-600">📅 2026/2027</span>
-                      </div>
-                      <div className="flex flex-wrap gap-1.5 mt-2">
-                        <button
-                          type="button"
-                          onClick={() => openOffsetProduct({ category: 'Календарі кишенькові', subCategory: 'Календарні сітки', subTab: 'sheets', preset: '34', w: '210', h: '297', kind: '1' })}
-                          className="pill-chip"
-                        >
-                          <Calendar size={12} className="text-blue-600" />
-                          <span>Сітки 2026</span>
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => openOffsetProduct({ category: 'Календарі кишенькові', subCategory: 'Календарні сітки', subTab: 'sheets', preset: '34', w: '210', h: '297', kind: '1' })}
-                          className="pill-chip"
-                        >
-                          <span>🌟 Золото / Металік</span>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 14. Друк в листах */}
-                  <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm card-lift flex flex-col justify-between group">
-                    <div>
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-2.5">
-                          <div className="w-10 h-10 rounded-xl bg-purple-50 border border-purple-100 text-purple-600 flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
-                            <Layers size={19} />
-                          </div>
-                          <div>
-                            <h4
-                              onClick={() => openOffsetProduct({ category: 'Бланки', subCategory: 'Друк в листах', subTab: 'sheets', preset: '15', w: '420', h: '594', kind: '1' })}
-                              className="text-sm font-extrabold text-slate-900 group-hover:text-blue-600 cursor-pointer transition-colors m-0"
-                            >
-                              Друк в листах
-                            </h4>
-                            <span className="text-[10px] text-slate-400 font-semibold">Повні друкарські листи</span>
-                          </div>
-                        </div>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-50 border border-purple-100 text-purple-600">📦 Без порізки</span>
-                      </div>
-                      <div className="flex flex-wrap gap-1.5 mt-2">
-                        {[
-                          { name: 'А2 (420×594)', preset: '15', w: '420', h: '594' },
-                          { name: 'В2 (480×690)', preset: 'b2', w: '480', h: '690' },
-                          { name: 'А1 (594×841)', preset: '16', w: '594', h: '841' },
-                          { name: 'B1 (680×980)', preset: 'b1', w: '680', h: '980' }
-                        ].map(item => (
-                          <button
-                            key={item.name}
-                            type="button"
-                            onClick={() => openOffsetProduct({ category: 'Бланки', subCategory: 'Друк в листах', subTab: 'sheets', preset: item.preset, w: item.w, h: item.h, kind: '1' })}
-                            className="pill-chip"
-                          >
-                            {item.name}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 15. Конверт */}
-                  <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm card-lift flex flex-col justify-between group">
-                    <div>
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-2.5">
-                          <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
-                            <Mail size={19} />
-                          </div>
-                          <div>
-                            <h4
-                              onClick={() => openOffsetProduct({ category: 'Бланки', subCategory: 'Конверт', subTab: 'sheets', preset: '25', w: '110', h: '220', envelopeFormat: 'E65' })}
-                              className="text-sm font-extrabold text-slate-900 group-hover:text-blue-600 cursor-pointer transition-colors m-0"
-                            >
-                              Конверт
-                            </h4>
-                            <span className="text-[10px] text-slate-400 font-semibold">Фірмові поштові конверти</span>
-                          </div>
-                        </div>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 border border-blue-100 text-blue-600">✉️ Корпоративні</span>
-                      </div>
-                      <div className="flex flex-wrap gap-1.5 mt-2">
-                        {[
-                          { name: 'Євро DL (110×220)', preset: '25', w: '110', h: '220', fmt: 'E65' as const },
-                          { name: 'С6 (114×162)', preset: '21', w: '114', h: '162', fmt: 'C6' as const },
-                          { name: 'С5 (162×229)', preset: '32', w: '162', h: '229', fmt: 'C5' as const },
-                          { name: 'С4 (229×324)', preset: '34', w: '229', h: '324', fmt: 'C4' as const }
-                        ].map(item => (
-                          <button
-                            key={item.name}
-                            type="button"
-                            onClick={() => openOffsetProduct({ category: 'Бланки', subCategory: 'Конверт', subTab: 'sheets', preset: item.preset, w: item.w, h: item.h, envelopeFormat: item.fmt })}
-                            className="pill-chip"
-                          >
-                            {item.name}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 16. Календарі висічні */}
-                  <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm card-lift flex flex-col justify-between group">
-                    <div>
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-2.5">
-                          <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-100 text-amber-600 flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
-                            <Clock size={19} />
-                          </div>
-                          <div>
-                            <h4
-                              onClick={() => openOffsetProduct({ category: 'Календарі кишенькові', subCategory: 'Календарі висічні', subTab: 'felling', preset: '160', w: '210', h: '300', stamp: '160' })}
-                              className="text-sm font-extrabold text-slate-900 group-hover:text-blue-600 cursor-pointer transition-colors m-0"
-                            >
-                              Календарі висічні
-                            </h4>
-                            <span className="text-[10px] text-slate-400 font-semibold">Настільні об'ємні</span>
-                          </div>
-                        </div>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 border border-amber-100 text-amber-600">🏠 Настільні</span>
-                      </div>
-                      <div className="flex flex-wrap gap-1.5 mt-2">
-                        {[
-                          { name: '🏠 Будинок (210×300)', preset: '160', w: '210', h: '300' },
-                          { name: '🔺 Пірамідка (305×134)', preset: '161', w: '305', h: '134' }
-                        ].map(item => (
-                          <button
-                            key={item.name}
-                            type="button"
-                            onClick={() => openOffsetProduct({ category: 'Календарі кишенькові', subCategory: 'Календарі висічні', subTab: 'felling', preset: item.preset, w: item.w, h: item.h, stamp: item.preset })}
-                            className="pill-chip"
-                          >
-                            {item.name}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* 17. Пакувальний папір */}
-                  <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm card-lift flex flex-col justify-between group">
-                    <div>
-                      <div className="flex items-center justify-between mb-3">
-                        <div className="flex items-center gap-2.5">
-                          <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-100 text-teal-600 flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
-                            <Package size={19} />
-                          </div>
-                          <div>
-                            <h4
-                              onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset('36'); setSheetCustomWidth('297'); setSheetCustomHeight('420'); handleSelectCategory('Бланки'); }}
-                              className="text-sm font-extrabold text-slate-900 group-hover:text-blue-600 cursor-pointer transition-colors m-0"
-                            >
-                              Пакувальний папір
-                            </h4>
-                            <span className="text-[10px] text-slate-400 font-semibold">Крафт та офсет у листах</span>
-                          </div>
-                        </div>
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-50 border border-teal-100 text-teal-600">🎁 Крафт</span>
-                      </div>
-                      <div className="flex flex-wrap gap-1.5 mt-2">
-                        {[
-                          { name: 'А3 (297×420)', preset: '36', w: '297', h: '420' },
-                          { name: 'В3 (340×490)', preset: 'b3', w: '340', h: '490' },
-                          { name: 'А2 (420×594)', preset: '15', w: '420', h: '594' },
-                          { name: 'В2 (480×690)', preset: 'b2', w: '480', h: '690' },
-                          { name: 'А1 (594×841)', preset: '16', w: '594', h: '841' },
-                          { name: 'B1 (680×980)', preset: 'b1', w: '680', h: '980' }
-                        ].map(item => (
-                          <button
-                            key={item.name}
-                            type="button"
-                            onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset(item.preset); setSheetCustomWidth(item.w); setSheetCustomHeight(item.h); handleSelectCategory('Бланки'); }}
-                            className="pill-chip"
-                          >
-                            {item.name}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
+                  ))}
                 </div>
               )}
 
