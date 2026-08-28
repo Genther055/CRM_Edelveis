@@ -1079,7 +1079,7 @@ export const Calculator: React.FC = () => {
               { key: 'products', label: 'Усі Продукти', count: 19 },
               { key: 'offset', label: 'Офсетний друк', badge: 'Авторозрахунок', count: 17 },
               { key: 'digital', label: 'Цифровий друк', count: 10 },
-              { key: 'wide', label: 'Широкоформатний', count: 6 },
+              { key: 'wide', label: 'Широкоформатний', count: 10 },
               { key: 'roll', label: 'Рулонний друк', count: 4 },
               { key: 'films', label: 'Кольорові плівки', count: 5 }
             ].map(tab => {
@@ -4150,69 +4150,109 @@ export const Calculator: React.FC = () => {
             }}>
               {[
                 {
-                  title: 'Банери Frontlit / Backlit',
-                  desc: 'Литі та ламіновані банери з проклейкою підворотів та встановленням металевих люверсів.',
+                  title: 'Банер',
+                  desc: 'Банерні вивіски, розтяжки, тенти, брандмауери…',
                   icon: <Layout size={30} style={{ color: 'var(--primary)' }} />,
                   color: 'rgba(0, 122, 255, 0.1)',
                   badgeClass: 'ios-badge-blue',
-                  badge: 'Люверси / Проклейка',
-                  metric: 'Зовнішня реклама',
-                  cat: 'Плакати'
+                  badge: 'Frontlit / Блокаут',
+                  metric: 'Люверси / Проклейка',
+                  onClick: () => handleSelectCategory('Плакати')
                 },
                 {
-                  title: 'Плівка ORAJET (самоклейка)',
-                  desc: 'Глянцева, матова, прозора та перфорована One Way Vision плівка для вітрин та авто.',
+                  title: 'Плівка',
+                  desc: 'Наліпки, плівка для обклеювання вітрин, вивісок, авто…',
                   icon: <Tag size={30} style={{ color: '#ff9500' }} />,
                   color: 'rgba(255, 149, 0, 0.1)',
                   badgeClass: 'ios-badge-orange',
-                  badge: 'ORAJET 3164',
-                  metric: 'Вітрини та авто',
-                  cat: 'Наклейки'
+                  badge: 'ORAJET / Ritrama',
+                  metric: 'Глянець / Мат',
+                  onClick: () => handleSelectCategory('Наклейки')
                 },
                 {
-                  title: 'Постери Citylight & Blueback',
-                  desc: 'Друк великоформатних постерів для сітілайтів та білбордів 3х6м з вологостійким папером.',
+                  title: 'Папір',
+                  desc: 'Афіші, плакати, постери, сітілайти, бігборди…',
                   icon: <Image size={30} style={{ color: '#0ea5e9' }} />,
                   color: 'rgba(14, 165, 233, 0.1)',
                   badgeClass: 'ios-badge-blue',
                   badge: 'Citylight / Blueback',
-                  metric: 'Білборди та сітілайти',
-                  cat: 'Плакати'
+                  metric: 'Широкий формат',
+                  onClick: () => handleSelectCategory('Плакати')
                 },
                 {
-                  title: 'Картини на полотні (Canvas)',
-                  desc: 'Інтер\'єрний друк фотографій та картин на натуральному полотні з натяжкою на підрамник.',
-                  icon: <Sparkles size={30} style={{ color: '#af52de' }} />,
+                  title: 'Індивідуальне замовлення',
+                  desc: 'Замовити прорахунок комплексного або нестандартного замовлення',
+                  icon: <Settings size={30} style={{ color: '#af52de' }} />,
                   color: 'rgba(175, 82, 222, 0.1)',
                   badgeClass: 'ios-badge-purple',
-                  badge: 'Натуральне полотно',
-                  metric: 'Підрамник у зборі',
-                  cat: 'Плакати'
+                  badge: 'Нестандартні',
+                  metric: 'Конструктор',
+                  onClick: () => setStep('editor')
                 },
                 {
-                  title: 'Таблички на ПВХ / Акрилі',
-                  desc: 'Прямий УФ-друк або накатка плівки на пластик ПВХ 3-5мм, акрил чи алюмінієвий композит.',
-                  icon: <FolderOpen size={30} style={{ color: '#34c759' }} />,
+                  title: 'ПВХ',
+                  desc: 'Таблички, вказівники, вивіски, букви, планшети, ростові фігури…',
+                  icon: <Layers size={30} style={{ color: '#5856d6' }} />,
+                  color: 'rgba(88, 86, 214, 0.1)',
+                  badgeClass: 'ios-badge-purple',
+                  badge: 'Пластик 3-5мм',
+                  metric: 'УФ-друк / Накатка',
+                  onClick: () => handleSelectCategory('Плакати')
+                },
+                {
+                  title: 'Пінокартон',
+                  desc: 'Таблички, вказівники, вивіски, букви, планшети, ростові фігури…',
+                  icon: <FileText size={30} style={{ color: '#34c759' }} />,
                   color: 'rgba(52, 199, 89, 0.1)',
                   badgeClass: 'ios-badge-green',
-                  badge: 'ПВХ / Композит',
-                  metric: 'Інформаційні вивіски',
-                  cat: 'Плакати'
+                  badge: 'Легкий 5-10мм',
+                  metric: 'Інтер\'єрні стенди',
+                  onClick: () => handleSelectCategory('Плакати')
                 },
                 {
-                  title: 'Наклейки на скло та вітрини',
-                  desc: 'Перфоровані плівки One Way Vision з ефектом односторонньої прозорості.',
-                  icon: <Layers size={30} style={{ color: '#ff3b30' }} />,
-                  color: 'rgba(255, 59, 48, 0.1)',
-                  badgeClass: 'ios-badge-red',
-                  badge: 'One Way Vision',
-                  metric: 'Оформлення вітрин',
-                  cat: 'Наклейки'
+                  title: 'Композит',
+                  desc: 'Таблички, вказівники, вивіски, букви, планшети, ростові фігури…',
+                  icon: <ShieldCheck size={30} style={{ color: '#007aff' }} />,
+                  color: 'rgba(0, 122, 255, 0.1)',
+                  badgeClass: 'ios-badge-blue',
+                  badge: 'Алюміній 3мм',
+                  metric: 'Фасадні вивіски',
+                  onClick: () => handleSelectCategory('Плакати')
+                },
+                {
+                  title: 'Акрил',
+                  desc: 'Номерки, бірки, фотографії, годинники, таблички, фігурні вироби…',
+                  icon: <Sparkles size={30} style={{ color: '#ff2d55' }} />,
+                  color: 'rgba(255, 45, 85, 0.1)',
+                  badgeClass: 'ios-badge-pink',
+                  badge: 'Оргскло / Прозорий',
+                  metric: 'Лазерна різка',
+                  onClick: () => handleSelectCategory('Плакати')
+                },
+                {
+                  title: 'Полотна',
+                  desc: 'Полотна, картини, модулі…',
+                  icon: <Image size={30} style={{ color: '#af52de' }} />,
+                  color: 'rgba(175, 82, 222, 0.1)',
+                  badgeClass: 'ios-badge-purple',
+                  badge: 'Canvas',
+                  metric: 'Підрамник',
+                  onClick: () => handleSelectCategory('Плакати')
+                },
+                {
+                  title: 'Мобільні стенди',
+                  desc: 'X-banner, L-banner, Roll-up, Press-wall…',
+                  icon: <FolderOpen size={30} style={{ color: '#ff9500' }} />,
+                  color: 'rgba(255, 149, 0, 0.1)',
+                  badgeClass: 'ios-badge-orange',
+                  badge: 'Roll-up / X-banner',
+                  metric: 'Стенд + полотно',
+                  onClick: () => handleSelectCategory('Плакати')
                 }
               ].map(item => (
                 <div
                   key={item.title}
-                  onClick={() => handleSelectCategory(item.cat)}
+                  onClick={item.onClick}
                   className="ios-card bg-white"
                   style={{
                     display: 'flex',
