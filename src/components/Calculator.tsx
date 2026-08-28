@@ -3376,10 +3376,65 @@ export const Calculator: React.FC = () => {
                     <h4 style={{ fontSize: '12px', fontWeight: '800', color: 'var(--text-dark)', textTransform: 'uppercase', letterSpacing: '0.5px', margin: 0 }}>Спосіб зшивання</h4>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                       {[
-                        { id: '1', name: 'Скоба (8 — 64 стр)', img: 'https://sborka.ua/cside/img/skoba.png' },
-                        { id: '2', name: 'Пружина (4 — 524 стр)', img: 'https://sborka.ua/cside/img/pr_prujina.png' },
-                        { id: '3', name: 'Клей PUR (30 — 608 стр)', img: 'https://sborka.ua/cside/img/pur_glue_img.png' },
-                        { id: '4', name: 'Блокноти (30 — 608 стр)', img: 'https://sborka.ua/cside/img/pr_bloknot.png' },
+                        { 
+                          id: '1', 
+                          name: 'Скоба (8 — 64 стр)', 
+                          icon: (
+                            <svg width="44" height="44" viewBox="0 0 48 48" fill="none">
+                              <path d="M12 8L28 6V38L12 40V8Z" fill="#E2E8F0" stroke="#94A3B8" strokeWidth="1.5" strokeLinejoin="round"/>
+                              <path d="M28 6L40 10V42L28 38V6Z" fill="#FFFFFF" stroke="#64748B" strokeWidth="1.5" strokeLinejoin="round"/>
+                              <line x1="28" y1="6" x2="28" y2="38" stroke="var(--primary)" strokeWidth="2"/>
+                              <line x1="26.5" y1="12" x2="29.5" y2="12" stroke="#0F172A" strokeWidth="2.5" strokeLinecap="round"/>
+                              <line x1="26.5" y1="32" x2="29.5" y2="32" stroke="#0F172A" strokeWidth="2.5" strokeLinecap="round"/>
+                              <rect x="31" y="14" width="6" height="5" rx="1" fill="var(--primary)" fillOpacity="0.2"/>
+                              <line x1="31" y1="23" x2="37" y2="23" stroke="var(--primary)" strokeWidth="1.5" strokeLinecap="round"/>
+                              <line x1="31" y1="27" x2="35" y2="27" stroke="#94A3B8" strokeWidth="1.5" strokeLinecap="round"/>
+                            </svg>
+                          )
+                        },
+                        { 
+                          id: '2', 
+                          name: 'Пружина (4 — 524 стр)', 
+                          icon: (
+                            <svg width="44" height="44" viewBox="0 0 48 48" fill="none">
+                              <rect x="14" y="8" width="26" height="34" rx="3" fill="#FFFFFF" stroke="#64748B" strokeWidth="1.5"/>
+                              <path d="M12 11H14V41H12V11Z" fill="#E2E8F0"/>
+                              <path d="M11 13C11 12 17 12 17 13M11 19C11 18 17 18 17 19M11 25C11 24 17 24 17 25M11 31C11 30 17 30 17 31M11 37C11 36 17 36 17 37" stroke="var(--primary)" strokeWidth="2" strokeLinecap="round"/>
+                              <rect x="22" y="14" width="12" height="4" rx="1" fill="var(--primary)" fillOpacity="0.8"/>
+                              <line x1="22" y1="22" x2="34" y2="22" stroke="#94A3B8" strokeWidth="1.5" strokeLinecap="round"/>
+                              <line x1="22" y1="26" x2="30" y2="26" stroke="#CBD5E1" strokeWidth="1.5" strokeLinecap="round"/>
+                            </svg>
+                          )
+                        },
+                        { 
+                          id: '3', 
+                          name: 'Клей PUR (30 — 608 стр)', 
+                          icon: (
+                            <svg width="44" height="44" viewBox="0 0 48 48" fill="none">
+                              <path d="M16 12L24 6H38L30 12H16Z" fill="#E2E8F0" stroke="#94A3B8" strokeWidth="1.2"/>
+                              <path d="M10 12L16 12V42L10 42V12Z" fill="var(--primary)" stroke="var(--primary)" strokeWidth="1.2"/>
+                              <rect x="16" y="12" width="22" height="30" rx="1" fill="#FFFFFF" stroke="#64748B" strokeWidth="1.5"/>
+                              <rect x="20" y="18" width="14" height="10" rx="2" fill="var(--primary)" fillOpacity="0.12" stroke="var(--primary)" strokeWidth="1" strokeDasharray="2 2"/>
+                              <circle cx="27" cy="23" r="2.5" fill="var(--primary)"/>
+                              <line x1="20" y1="32" x2="34" y2="32" stroke="#64748B" strokeWidth="1.5" strokeLinecap="round"/>
+                            </svg>
+                          )
+                        },
+                        { 
+                          id: '4', 
+                          name: 'Блокноти (30 — 608 стр)', 
+                          icon: (
+                            <svg width="44" height="44" viewBox="0 0 48 48" fill="none">
+                              <rect x="11" y="11" width="26" height="32" rx="3" fill="#FFFFFF" stroke="#64748B" strokeWidth="1.5"/>
+                              <rect x="11" y="9" width="26" height="5" rx="1.5" fill="#0F172A"/>
+                              <path d="M15 7V11M20 7V11M25 7V11M30 7V11" stroke="var(--primary)" strokeWidth="2" strokeLinecap="round"/>
+                              <line x1="16" y1="20" x2="32" y2="20" stroke="#E2E8F0" strokeWidth="1.5"/>
+                              <line x1="16" y1="25" x2="32" y2="25" stroke="#E2E8F0" strokeWidth="1.5"/>
+                              <line x1="16" y1="30" x2="32" y2="30" stroke="#E2E8F0" strokeWidth="1.5"/>
+                              <line x1="16" y1="35" x2="26" y2="35" stroke="var(--primary)" strokeWidth="1.5" strokeLinecap="round"/>
+                            </svg>
+                          )
+                        },
                       ].map(stItem => {
                         const isActive = multiStitching === stItem.id;
                         return (
@@ -3397,10 +3452,13 @@ export const Calculator: React.FC = () => {
                               justifyContent: 'center',
                               gap: '8px',
                               cursor: 'pointer',
-                              transition: 'all 0.15s ease'
+                              transition: 'all 0.15s ease',
+                              minHeight: '92px'
                             }}
                           >
-                            <img src={stItem.img} alt={stItem.name} className="w-16 h-10 object-contain" />
+                            <div className="flex items-center justify-center h-11">
+                              {stItem.icon}
+                            </div>
                             <span style={{ fontSize: '12px', fontWeight: '700', textAlign: 'center', color: isActive ? 'var(--primary)' : 'var(--text-dark)' }}>
                               {stItem.name}
                             </span>
