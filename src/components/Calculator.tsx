@@ -15,7 +15,17 @@ import {
   Tag,
   MessageSquare,
   AlertTriangle,
-  SlidersHorizontal
+  SlidersHorizontal,
+  CreditCard,
+  Sparkles,
+  Image,
+  Utensils,
+  Mail,
+  Package,
+  Scissors,
+  ChevronRight,
+  Zap,
+  Bookmark
 } from 'lucide-react';
 import html2pdf from 'html2pdf.js';
 
@@ -1050,16 +1060,15 @@ export const Calculator: React.FC = () => {
             </div>
           </div>
 
-          {/* Top Main Category Switcher (Exact Sborka Header Styling) */}
           {/* Top Category Tabs Navigation */}
-          <div className="flex items-center gap-1.5 p-1.5 bg-slate-100/90 border border-slate-200/80 rounded-xl overflow-x-auto shadow-inner mb-6">
+          <div className="flex items-center gap-2 p-1.5 bg-slate-100/90 border border-slate-200/80 rounded-2xl overflow-x-auto shadow-inner mb-6 backdrop-blur-md">
             {[
-              { key: 'products', label: 'Усі Продукти' },
-              { key: 'offset', label: 'Офсетний друк', badge: '1С Авторозрахунок' },
-              { key: 'digital', label: 'Цифровий друк' },
-              { key: 'wide', label: 'Широкоформатний' },
-              { key: 'roll', label: 'Рулонний друк' },
-              { key: 'films', label: 'Кольорові плівки' }
+              { key: 'products', label: 'Усі Продукти', icon: '📦', count: 19 },
+              { key: 'offset', label: 'Офсетний друк', icon: '⚡', badge: '1С Авторозрахунок', count: 17 },
+              { key: 'digital', label: 'Цифровий друк', icon: '🖨️', count: 8 },
+              { key: 'wide', label: 'Широкоформатний', icon: '📐', count: 6 },
+              { key: 'roll', label: 'Рулонний друк', icon: '🏷️', count: 4 },
+              { key: 'films', label: 'Кольорові плівки', icon: '🎨', count: 5 }
             ].map(tab => {
               const isActive = mainCategoryTab === tab.key;
               return (
@@ -1067,20 +1076,26 @@ export const Calculator: React.FC = () => {
                   key={tab.key}
                   type="button"
                   onClick={() => setMainCategoryTab(tab.key as any)}
-                  className={`flex items-center gap-2 px-4 py-2 text-xs font-bold rounded-lg whitespace-nowrap transition-all ${
+                  className={`flex items-center gap-2 px-4 py-2.5 text-xs font-bold rounded-xl whitespace-nowrap transition-all ${
                     isActive
-                      ? 'bg-white text-blue-600 shadow-sm border border-slate-200/60'
-                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/50'
+                      ? 'bg-white text-blue-600 shadow-md border border-slate-200/80'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
                   }`}
                 >
+                  <span className="text-sm leading-none">{tab.icon}</span>
                   <span>{tab.label}</span>
                   {tab.badge && (
-                    <span className={`text-[10px] px-1.5 py-0.5 rounded font-bold ${
-                      isActive ? 'bg-blue-50 text-blue-600' : 'bg-slate-200 text-slate-600'
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold shadow-2xs ${
+                      isActive ? 'bg-blue-600 text-white' : 'bg-slate-200 text-slate-700'
                     }`}>
                       {tab.badge}
                     </span>
                   )}
+                  <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-semibold ${
+                    isActive ? 'bg-blue-50 text-blue-600' : 'bg-slate-200/60 text-slate-500'
+                  }`}>
+                    {tab.count}
+                  </span>
                 </button>
               );
             })}
@@ -1090,47 +1105,52 @@ export const Calculator: React.FC = () => {
           {mainCategoryTab === 'products' && (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {[
-                { title: 'Бланки та Листи', desc: 'Друк бланкової продукції на офсетному та самокопіювальному папері.', icon: FileText, color: 'text-blue-600 bg-blue-50', cat: 'Бланки' },
-                { title: 'Візитки', desc: '90х50 мм або євро-формат, ламінація SoftTouch та скруглiння кутів.', icon: Layout, color: 'text-indigo-600 bg-indigo-50', cat: 'Візитки' },
-                { title: 'Буклети', desc: 'Рекламні буклети з 1, 2 або 3 фальцями (згинами).', icon: Layers, color: 'text-amber-600 bg-amber-50', cat: 'Буклети' },
-                { title: 'Дипломи випускні', desc: 'Святкові дипломи, почесні грамоти та сертифікати випускників.', icon: BookOpen, color: 'text-yellow-600 bg-yellow-50', cat: 'Дипломи випускні' },
-                { title: 'Календарики кишенькові', desc: 'Кишенькові календарики 70х100мм з двосторонньою ламінацією.', icon: Calendar, color: 'text-pink-600 bg-pink-50', cat: 'Календарики кишенькові' },
-                { title: 'Книги / Брошури', desc: 'Багатосторінкові книги на скобу, термоклей або м\'яку обкладинку.', icon: BookOpen, color: 'text-emerald-600 bg-emerald-50', cat: 'Книги' },
-                { title: 'Листівки', desc: 'Рекламні листівки А6, А5, А4 на крейдованому папері.', icon: FileText, color: 'text-cyan-600 bg-cyan-50', cat: 'Листівки' },
-                { title: 'Меню для ресторанів', desc: 'Меню з цупкою ламінацією, скріпленням пружиною або болтами.', icon: Layers, color: 'text-purple-600 bg-purple-50', cat: 'Меню' },
-                { title: 'Наклейки та Стікери', desc: 'Самоклеючі наклейки з плотерною надсічкою на аркушах.', icon: Layers, color: 'text-fuchsia-600 bg-fuchsia-50', cat: 'Наклейки' },
-                { title: 'Плакати та Афіші', desc: 'Великоформатний друк плакатів А3, А2, А1 для інтер\'єру та реклами.', icon: Layout, color: 'text-blue-600 bg-blue-50', cat: 'Плакати' },
-                { title: 'Флаєри', desc: 'Єврофлаєри (99х210мм) яскравого повноколірного 4+4 друку.', icon: FileText, color: 'text-amber-600 bg-amber-50', cat: 'Флаєри' },
-                { title: 'Нотаріальні книги', desc: 'Спеціалізовані нотаріальні реєстри у твердій прошивній палітурці.', icon: BookOpen, color: 'text-slate-600 bg-slate-100', cat: 'Нотаріальні книги' },
-                { title: 'Дипломи і палітурка', desc: 'Тверда палітурка дипломних робіт, дисертацій з тисненням фольгою.', icon: BookOpen, color: 'text-emerald-600 bg-emerald-50', cat: 'Дипломи і палітурка' },
-                { title: 'Логотипи виготовлення', desc: 'Брендування логотипів на фірмовій айдентиці та матеріалах.', icon: Layout, color: 'text-indigo-600 bg-indigo-50', cat: 'Логотипи виготовлення' },
-                { title: 'Шкільні журнали', desc: 'Класні журнали успішності та шкільні облікові відомості.', icon: BookOpen, color: 'text-rose-600 bg-rose-50', cat: 'Шкільні журнали' },
-                { title: 'Етикетки та Бірки', desc: 'Товарні етикетки, маркувальні ярлики та фасувальні стікери.', icon: Layers, color: 'text-teal-600 bg-teal-50', cat: 'Етикетки' },
-                { title: 'Календарі', desc: 'Квартальні, настінні перекидні або будиночки на пружині.', icon: Calendar, color: 'text-red-600 bg-red-50', cat: 'Календарі' },
-                { title: 'Блокноти', desc: 'Фірмові блокноти А5, А4 з пружиною та персоналізованою обкладинкою.', icon: BookOpen, color: 'text-teal-600 bg-teal-50', cat: 'Блокноти' },
-                { title: 'Фірмові Папки', desc: 'Корпоративні папки з висічним замком для документів.', icon: FolderOpen, color: 'text-slate-600 bg-slate-100', cat: 'Папки' }
+                { title: 'Бланки та Листи', desc: 'Друк бланкової продукції на офсетному та самокопіювальному папері.', icon: FileText, color: 'text-blue-600 bg-blue-50 border-blue-100', cat: 'Бланки', tag: 'Офсет / Самоклейка' },
+                { title: 'Візитки', desc: '90х50 мм або євро-формат, ламінація SoftTouch та скруглення кутів.', icon: CreditCard, color: 'text-indigo-600 bg-indigo-50 border-indigo-100', cat: 'Візитки', tag: 'SoftTouch / Золото' },
+                { title: 'Буклети', desc: 'Рекламні буклети з 1, 2 або 3 фальцями (згинами).', icon: BookOpen, color: 'text-amber-600 bg-amber-50 border-amber-100', cat: 'Буклети', tag: '1-3 Фальці' },
+                { title: 'Дипломи випускні', desc: 'Святкові дипломи, почесні грамоти та сертифікати випускників.', icon: Sparkles, color: 'text-yellow-600 bg-yellow-50 border-yellow-100', cat: 'Дипломи випускні', tag: 'Сертифікати' },
+                { title: 'Календарики кишенькові', desc: 'Кишенькові календарики 70х100мм з двосторонньою ламінацією.', icon: Calendar, color: 'text-pink-600 bg-pink-50 border-pink-100', cat: 'Календарики кишенькові', tag: 'Ламінація 2+2' },
+                { title: 'Книги / Брошури', desc: 'Багатосторінкові книги на скобу, термоклей або м\'яку обкладинку.', icon: BookOpen, color: 'text-emerald-600 bg-emerald-50 border-emerald-100', cat: 'Книги', tag: 'Скоба / PUR клей' },
+                { title: 'Листівки', desc: 'Рекламні листівки А6, А5, А4 на крейдованому папері.', icon: Image, color: 'text-cyan-600 bg-cyan-50 border-cyan-100', cat: 'Листівки', tag: 'А-формати' },
+                { title: 'Меню для ресторанів', desc: 'Меню з цупкою ламінацією, скріпленням пружиною або болтами.', icon: Utensils, color: 'text-purple-600 bg-purple-50 border-purple-100', cat: 'Меню', tag: 'HoReCa' },
+                { title: 'Наклейки та Стікери', desc: 'Самоклеючі наклейки з плотерною надсічкою на аркушах.', icon: Tag, color: 'text-fuchsia-600 bg-fuchsia-50 border-fuchsia-100', cat: 'Наклейки', tag: 'Самоклейка' },
+                { title: 'Плакати та Афіші', desc: 'Великоформатний друк плакатів А3, А2, А1 для інтер\'єру та реклами.', icon: Layout, color: 'text-blue-600 bg-blue-50 border-blue-100', cat: 'Плакати', tag: 'Великий формат' },
+                { title: 'Флаєри', desc: 'Єврофлаєри (99х210мм) яскравого повноколірного 4+4 друку.', icon: Zap, color: 'text-amber-600 bg-amber-50 border-amber-100', cat: 'Флаєри', tag: 'Євроформат' },
+                { title: 'Нотаріальні книги', desc: 'Спеціалізовані нотаріальні реєстри у твердій прошивній палітурці.', icon: BookOpen, color: 'text-slate-700 bg-slate-100 border-slate-200', cat: 'Нотаріальні книги', tag: 'Тверда палітурка' },
+                { title: 'Дипломи і палітурка', desc: 'Тверда палітурка дипломних робіт, дисертацій з тисненням фольгою.', icon: Sparkles, color: 'text-emerald-600 bg-emerald-50 border-emerald-100', cat: 'Дипломи і палітурка', tag: 'Тиснення фольгою' },
+                { title: 'Логотипи виготовлення', desc: 'Брендування логотипів на фірмовій айдентиці та матеріалах.', icon: Layout, color: 'text-indigo-600 bg-indigo-50 border-indigo-100', cat: 'Логотипи виготовлення', tag: 'Брендування' },
+                { title: 'Шкільні журнали', desc: 'Класні журнали успішності та шкільні облікові відомості.', icon: BookOpen, color: 'text-rose-600 bg-rose-50 border-rose-100', cat: 'Шкільні журнали', tag: 'Шкільні реєстри' },
+                { title: 'Етикетки та Бірки', desc: 'Товарні етикетки, маркувальні ярлики та фасувальні стікери.', icon: Tag, color: 'text-teal-600 bg-teal-50 border-teal-100', cat: 'Етикетки', tag: 'Маркування' },
+                { title: 'Календарі', desc: 'Квартальні, настінні перекидні або будиночки на пружині.', icon: Calendar, color: 'text-red-600 bg-red-50 border-red-100', cat: 'Календарі', tag: 'Квартальні' },
+                { title: 'Блокноти', desc: 'Фірмові блокноти А5, А4 з пружиною та персоналізованою обкладинкою.', icon: Bookmark, color: 'text-teal-600 bg-teal-50 border-teal-100', cat: 'Блокноти', tag: 'Пружина' },
+                { title: 'Фірмові Папки', desc: 'Корпоративні папки з висічним замком для документів.', icon: FolderOpen, color: 'text-blue-600 bg-blue-50 border-blue-100', cat: 'Папки', tag: 'Висічний замок' }
               ].map(item => {
                 const IconComponent = item.icon;
                 return (
                   <div 
                     key={item.title}
                     onClick={() => handleSelectCategory(item.cat)}
-                    className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm hover:shadow-md hover:border-blue-300 transition-all cursor-pointer flex flex-col justify-between group"
+                    className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm card-lift cursor-pointer flex flex-col justify-between group"
                   >
                     <div>
-                      <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-transform group-hover:scale-110 ${item.color}`}>
-                        <IconComponent size={24} />
+                      <div className="flex items-center justify-between mb-3.5">
+                        <div className={`w-12 h-12 rounded-xl border flex items-center justify-center transition-transform group-hover:scale-110 shadow-2xs ${item.color}`}>
+                          <IconComponent size={22} />
+                        </div>
+                        <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-slate-100 border border-slate-200 text-slate-600">
+                          {item.tag}
+                        </span>
                       </div>
-                      <h4 className="text-base font-bold text-slate-900 group-hover:text-blue-600 transition-colors mb-1.5">
+                      <h4 className="text-base font-extrabold text-slate-900 group-hover:text-blue-600 transition-colors mb-1.5">
                         {item.title}
                       </h4>
                       <p className="text-xs text-slate-500 leading-relaxed m-0">
                         {item.desc}
                       </p>
                     </div>
-                    <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold text-blue-600 group-hover:translate-x-1 transition-transform">
-                      <span>Перейти до розрахунку</span>
-                      <span>→</span>
+                    <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-blue-600 group-hover:translate-x-1 transition-transform">
+                      <span>Розрахувати тираж</span>
+                      <ChevronRight size={15} />
                     </div>
                   </div>
                 );
@@ -1165,67 +1185,113 @@ export const Calculator: React.FC = () => {
                     onClick={() => setOffsetSubTab('overview')}
                     className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold shadow-sm transition-all"
                   >
-                    ← Всі 16 категорій
+                    ← Всі 17 категорій
                   </button>
                 </div>
               ) : (
-                /* 4 Technology Header Columns */
+                /* 4 Technology Hero Header Cards */
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                   {[
-                    { title: 'Листова продукція', badge: 'Збірні спуски', desc: 'Візитівки, листівки, бланки, буклети, наліпки, плакати, флаєри…', subTab: 'sheets', icon: <FileText size={20} className="text-blue-500" /> },
-                    { title: 'Висічна продукція', badge: 'Штампи', desc: 'Фігурні наліпки, хенгери, папки, кишенькові календарі, підставки…', subTab: 'felling', icon: <Layers size={20} className="text-amber-500" /> },
-                    { title: 'Багатосторінкова', badge: 'Брошурування', desc: 'Каталоги, журнали, брошури, блокноти на пружині, ресторанні меню…', subTab: 'multipage', icon: <BookOpen size={20} className="text-emerald-500" /> },
-                    { title: 'Індивідуальний розрахунок', badge: 'Нестандартні', desc: 'Комплексні комерційні пропозиції з ручним підбором операцій', subTab: 'custom', icon: <Settings size={20} className="text-purple-500" /> }
+                    { 
+                      title: 'Листова продукція', 
+                      badge: 'Збірні спуски', 
+                      desc: 'Візитівки, листівки, бланки, буклети, наліпки, плакати, флаєри…', 
+                      subTab: 'sheets', 
+                      icon: <FileText size={22} className="text-white" />,
+                      gradient: 'bg-gradient-blue shadow-blue-500/20',
+                      badgeStyle: 'bg-blue-50 text-blue-700 border-blue-200'
+                    },
+                    { 
+                      title: 'Висічна продукція', 
+                      badge: 'Штампи', 
+                      desc: 'Фігурні наліпки, хенгери, папки, кишенькові календарі, підставки…', 
+                      subTab: 'felling', 
+                      icon: <Scissors size={22} className="text-white" />,
+                      gradient: 'bg-gradient-amber shadow-amber-500/20',
+                      badgeStyle: 'bg-amber-50 text-amber-700 border-amber-200'
+                    },
+                    { 
+                      title: 'Багатосторінкова', 
+                      badge: 'Брошурування', 
+                      desc: 'Каталоги, журнали, брошури, блокноти на пружині, ресторанні меню…', 
+                      subTab: 'multipage', 
+                      icon: <BookOpen size={22} className="text-white" />,
+                      gradient: 'bg-gradient-emerald shadow-emerald-500/20',
+                      badgeStyle: 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                    },
+                    { 
+                      title: 'Індивідуальний розрахунок', 
+                      badge: 'Нестандартні', 
+                      desc: 'Комплексні комерційні пропозиції з ручним підбором операцій', 
+                      subTab: 'custom', 
+                      icon: <Settings size={22} className="text-white" />,
+                      gradient: 'bg-gradient-purple shadow-purple-500/20',
+                      badgeStyle: 'bg-purple-50 text-purple-700 border-purple-200'
+                    }
                   ].map((item, i) => (
                     <div
                       key={i}
                       onClick={() => setOffsetSubTab(item.subTab as any)}
-                      className="bg-white border border-slate-200 hover:border-blue-400 rounded-xl p-5 shadow-sm hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between"
+                      className="bg-white border border-slate-200/90 hover:border-blue-400 rounded-2xl p-5 shadow-sm card-lift cursor-pointer group flex flex-col justify-between"
                     >
                       <div>
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="flex items-center gap-2.5">
+                        <div className="flex items-center justify-between mb-3">
+                          <div className={`w-11 h-11 rounded-xl flex items-center justify-center ${item.gradient} transition-transform group-hover:scale-105`}>
                             {item.icon}
-                            <span className="font-bold text-sm text-slate-900 group-hover:text-blue-600 transition-colors">{item.title}</span>
                           </div>
-                          <span className="text-[11px] font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors">
+                          <span className={`text-[11px] font-bold px-2.5 py-1 rounded-full border shadow-2xs ${item.badgeStyle}`}>
                             {item.badge}
                           </span>
                         </div>
-                        <p className="text-xs text-slate-500 leading-relaxed m-0 mt-1">{item.desc}</p>
+                        <h4 className="font-extrabold text-base text-slate-900 group-hover:text-blue-600 transition-colors mb-1.5">
+                          {item.title}
+                        </h4>
+                        <p className="text-xs text-slate-500 leading-relaxed m-0">{item.desc}</p>
+                      </div>
+                      <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-blue-600 group-hover:translate-x-1 transition-transform">
+                        <span>Відкрити калькулятор</span>
+                        <ChevronRight size={15} />
                       </div>
                     </div>
                   ))}
                 </div>
               )}
 
-              {/* OVERVIEW SUBTAB: 16-Card Modern Product Grid */}
+              {/* OVERVIEW SUBTAB: 17-Card Modern Product Grid with Colorful Avatars & Chips */}
               {offsetSubTab === 'overview' && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {/* 1. Візитівка */}
-                  <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm hover:shadow-md hover:border-blue-300 transition-all flex flex-col justify-between group">
+                  <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm card-lift flex flex-col justify-between group">
                     <div>
                       <div className="flex items-center justify-between mb-3">
-                        <h4
-                          onClick={() => openOffsetProduct({ category: 'Візитки', subCategory: 'Візитівка', subTab: 'sheets', preset: '1', w: '90', h: '50', kind: '1' })}
-                          className="text-base font-bold text-slate-900 group-hover:text-blue-600 cursor-pointer transition-colors m-0"
-                        >
-                          Візитівка
-                        </h4>
-                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-blue-50 text-blue-600">Швидкий вибір</span>
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
+                            <CreditCard size={19} />
+                          </div>
+                          <div>
+                            <h4
+                              onClick={() => openOffsetProduct({ category: 'Візитки', subCategory: 'Візитівка', subTab: 'sheets', preset: '1', w: '90', h: '50', kind: '1' })}
+                              className="text-sm font-extrabold text-slate-900 group-hover:text-blue-600 cursor-pointer transition-colors m-0"
+                            >
+                              Візитівка
+                            </h4>
+                            <span className="text-[10px] text-slate-400 font-semibold">90×50, 85×55, круг</span>
+                          </div>
+                        </div>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 border border-blue-100 text-blue-600">✨ Вибір</span>
                       </div>
-                      <div className="flex flex-wrap gap-1.5">
+                      <div className="flex flex-wrap gap-1.5 mt-2">
                         {[
-                          { name: '90×50', preset: '1', w: '90', h: '50', kind: '1' },
-                          { name: '85×55', preset: '5', w: '85', h: '55', kind: '1' },
-                          { name: '50×50', preset: '5', w: '50', h: '50', kind: '2' },
-                          { name: 'Кругла', preset: '5', w: '50', h: '50', kind: '7' }
+                          { name: '📐 90×50', preset: '1', w: '90', h: '50', kind: '1' },
+                          { name: '📐 85×55', preset: '5', w: '85', h: '55', kind: '1' },
+                          { name: '⬜ 50×50', preset: '5', w: '50', h: '50', kind: '2' },
+                          { name: '🔘 Кругла', preset: '5', w: '50', h: '50', kind: '7' }
                         ].map(item => (
                           <button
                             key={item.name}
                             type="button"
                             onClick={() => openOffsetProduct({ category: 'Візитки', subCategory: 'Візитівка', subTab: 'sheets', preset: item.preset, w: item.w, h: item.h, kind: item.kind })}
-                            className="px-2.5 py-1 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 border border-slate-200/60 text-slate-700 transition-all"
+                            className="pill-chip"
                           >
                             {item.name}
                           </button>
@@ -1234,29 +1300,37 @@ export const Calculator: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* 2. Календар */}
-                  <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm hover:shadow-md hover:border-blue-300 transition-all flex flex-col justify-between group">
+                  {/* 2. Календар кишеньковий */}
+                  <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm card-lift flex flex-col justify-between group">
                     <div>
                       <div className="flex items-center justify-between mb-3">
-                        <h4
-                          onClick={() => openOffsetProduct({ category: 'Календарі кишенькові', subCategory: 'Календар', subTab: 'sheets', preset: '91', w: '100', h: '70', kind: '1' })}
-                          className="text-base font-bold text-slate-900 group-hover:text-blue-600 cursor-pointer transition-colors m-0"
-                        >
-                          Календар кишеньковий
-                        </h4>
-                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-emerald-50 text-emerald-600">Ламінація</span>
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-600 flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
+                            <Calendar size={19} />
+                          </div>
+                          <div>
+                            <h4
+                              onClick={() => openOffsetProduct({ category: 'Календарики кишенькові', subCategory: 'Календар', subTab: 'sheets', preset: '91', w: '100', h: '70', kind: '1' })}
+                              className="text-sm font-extrabold text-slate-900 group-hover:text-blue-600 cursor-pointer transition-colors m-0"
+                            >
+                              Календар кишеньковий
+                            </h4>
+                            <span className="text-[10px] text-slate-400 font-semibold">100×70, 90×60, 70×70</span>
+                          </div>
+                        </div>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-600">🛡️ Ламінація</span>
                       </div>
-                      <div className="flex flex-wrap gap-1.5">
+                      <div className="flex flex-wrap gap-1.5 mt-2">
                         {[
-                          { name: '100×70', preset: '91', w: '100', h: '70', kind: '1' },
-                          { name: '90×60', preset: '90', w: '90', h: '60', kind: '1' },
-                          { name: '70×70', preset: '256', w: '70', h: '70', kind: '2' }
+                          { name: '📐 100×70', preset: '91', w: '100', h: '70', kind: '1' },
+                          { name: '📐 90×60', preset: '90', w: '90', h: '60', kind: '1' },
+                          { name: '⬜ 70×70', preset: '256', w: '70', h: '70', kind: '2' }
                         ].map(item => (
                           <button
                             key={item.name}
                             type="button"
-                            onClick={() => openOffsetProduct({ category: 'Календарі кишенькові', subCategory: 'Календар', subTab: 'sheets', preset: item.preset, w: item.w, h: item.h, kind: item.kind })}
-                            className="px-2.5 py-1 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 border border-slate-200/60 text-slate-700 transition-all"
+                            onClick={() => openOffsetProduct({ category: 'Календарики кишенькові', subCategory: 'Календар', subTab: 'sheets', preset: item.preset, w: item.w, h: item.h, kind: item.kind })}
+                            className="pill-chip"
                           >
                             {item.name}
                           </button>
@@ -1266,28 +1340,36 @@ export const Calculator: React.FC = () => {
                   </div>
 
                   {/* 3. Флаєр */}
-                  <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm hover:shadow-md hover:border-blue-300 transition-all flex flex-col justify-between group">
+                  <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm card-lift flex flex-col justify-between group">
                     <div>
                       <div className="flex items-center justify-between mb-3">
-                        <h4
-                          onClick={() => openOffsetProduct({ category: 'Флаєри', subCategory: 'Флаєр', subTab: 'sheets', preset: '25', w: '99', h: '210', kind: '1' })}
-                          className="text-base font-bold text-slate-900 group-hover:text-blue-600 cursor-pointer transition-colors m-0"
-                        >
-                          Флаєр
-                        </h4>
-                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-purple-50 text-purple-600">Євроформат</span>
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-10 h-10 rounded-xl bg-purple-50 border border-purple-100 text-purple-600 flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
+                            <Zap size={19} />
+                          </div>
+                          <div>
+                            <h4
+                              onClick={() => openOffsetProduct({ category: 'Флаєри', subCategory: 'Флаєр', subTab: 'sheets', preset: '25', w: '99', h: '210', kind: '1' })}
+                              className="text-sm font-extrabold text-slate-900 group-hover:text-blue-600 cursor-pointer transition-colors m-0"
+                            >
+                              Флаєр
+                            </h4>
+                            <span className="text-[10px] text-slate-400 font-semibold">Євро, 1/2 Євро, 2×Євро</span>
+                          </div>
+                        </div>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-50 border border-purple-100 text-purple-600">⚡ Євроформат</span>
                       </div>
-                      <div className="flex flex-wrap gap-1.5">
+                      <div className="flex flex-wrap gap-1.5 mt-2">
                         {[
-                          { name: '210×99', preset: '25', w: '99', h: '210', kind: '1' },
-                          { name: '210×198', preset: '26', w: '198', h: '210', kind: '6' },
-                          { name: '99×99', preset: '24', w: '99', h: '99', kind: '2' }
+                          { name: '📐 210×99', preset: '25', w: '99', h: '210', kind: '1' },
+                          { name: '📐 210×198', preset: '26', w: '198', h: '210', kind: '6' },
+                          { name: '⬜ 99×99', preset: '24', w: '99', h: '99', kind: '2' }
                         ].map(item => (
                           <button
                             key={item.name}
                             type="button"
                             onClick={() => openOffsetProduct({ category: 'Флаєри', subCategory: 'Флаєр', subTab: 'sheets', preset: item.preset, w: item.w, h: item.h, kind: item.kind })}
-                            className="px-2.5 py-1 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 border border-slate-200/60 text-slate-700 transition-all"
+                            className="pill-chip"
                           >
                             {item.name}
                           </button>
@@ -1297,31 +1379,39 @@ export const Calculator: React.FC = () => {
                   </div>
 
                   {/* 4. Листівка */}
-                  <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm hover:shadow-md hover:border-blue-300 transition-all flex flex-col justify-between group">
+                  <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm card-lift flex flex-col justify-between group">
                     <div>
                       <div className="flex items-center justify-between mb-3">
-                        <h4
-                          onClick={() => openOffsetProduct({ category: 'Листівки', subCategory: 'Листівка', subTab: 'sheets', preset: '28', w: '70', h: '100', kind: '1' })}
-                          className="text-base font-bold text-slate-900 group-hover:text-blue-600 cursor-pointer transition-colors m-0"
-                        >
-                          Листівка
-                        </h4>
-                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-amber-50 text-amber-600">А-формати</span>
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-100 text-amber-600 flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
+                            <Image size={19} />
+                          </div>
+                          <div>
+                            <h4
+                              onClick={() => openOffsetProduct({ category: 'Листівки', subCategory: 'Листівка', subTab: 'sheets', preset: '28', w: '70', h: '100', kind: '1' })}
+                              className="text-sm font-extrabold text-slate-900 group-hover:text-blue-600 cursor-pointer transition-colors m-0"
+                            >
+                              Листівка
+                            </h4>
+                            <span className="text-[10px] text-slate-400 font-semibold">А7, А6, А5, А4, А3</span>
+                          </div>
+                        </div>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 border border-amber-100 text-amber-600">📑 А-формати</span>
                       </div>
-                      <div className="flex flex-wrap gap-1.5">
+                      <div className="flex flex-wrap gap-1.5 mt-2">
                         {[
-                          { name: 'А7', preset: '28', w: '70', h: '100', kind: '1' },
-                          { name: 'А6', preset: '312', w: '105', h: '148', kind: '1' },
-                          { name: 'А5', preset: '32', w: '148', h: '210', kind: '1' },
-                          { name: 'А4', preset: '34', w: '210', h: '297', kind: '1' },
-                          { name: 'А3', preset: '36', w: '297', h: '420', kind: '1' },
-                          { name: 'Кругла', preset: '37', w: '70', h: '70', kind: '7' }
+                          { name: 'А7 (70×100)', preset: '28', w: '70', h: '100', kind: '1' },
+                          { name: 'А6 (105×148)', preset: '312', w: '105', h: '148', kind: '1' },
+                          { name: 'А5 (148×210)', preset: '32', w: '148', h: '210', kind: '1' },
+                          { name: 'А4 (210×297)', preset: '34', w: '210', h: '297', kind: '1' },
+                          { name: 'А3 (297×420)', preset: '36', w: '297', h: '420', kind: '1' },
+                          { name: '🔘 Кругла', preset: '37', w: '70', h: '70', kind: '7' }
                         ].map(item => (
                           <button
                             key={item.name}
                             type="button"
                             onClick={() => openOffsetProduct({ category: 'Листівки', subCategory: 'Листівка', subTab: 'sheets', preset: item.preset, w: item.w, h: item.h, kind: item.kind })}
-                            className="px-2.5 py-1 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 border border-slate-200/60 text-slate-700 transition-all"
+                            className="pill-chip"
                           >
                             {item.name}
                           </button>
@@ -1330,32 +1420,40 @@ export const Calculator: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* 5. Плакати */}
-                  <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm hover:shadow-md hover:border-blue-300 transition-all flex flex-col justify-between group">
+                  {/* 5. Плакати та постери */}
+                  <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm card-lift flex flex-col justify-between group">
                     <div>
                       <div className="flex items-center justify-between mb-3">
-                        <h4
-                          onClick={() => openOffsetProduct({ category: 'Плакати', subCategory: 'Плакати', subTab: 'sheets', preset: '36', w: '297', h: '420', kind: '1' })}
-                          className="text-base font-bold text-slate-900 group-hover:text-blue-600 cursor-pointer transition-colors m-0"
-                        >
-                          Плакати та постери
-                        </h4>
-                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-blue-50 text-blue-600">Великий формат</span>
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
+                            <Layout size={19} />
+                          </div>
+                          <div>
+                            <h4
+                              onClick={() => openOffsetProduct({ category: 'Плакати', subCategory: 'Плакати', subTab: 'sheets', preset: '36', w: '297', h: '420', kind: '1' })}
+                              className="text-sm font-extrabold text-slate-900 group-hover:text-blue-600 cursor-pointer transition-colors m-0"
+                            >
+                              Плакати та постери
+                            </h4>
+                            <span className="text-[10px] text-slate-400 font-semibold">А3, В3, А2, В2, А1, В1</span>
+                          </div>
+                        </div>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 border border-blue-100 text-blue-600">🖼️ Великий</span>
                       </div>
-                      <div className="flex flex-wrap gap-1.5">
+                      <div className="flex flex-wrap gap-1.5 mt-2">
                         {[
-                          { name: 'А3', preset: '36', w: '297', h: '420', kind: '1' },
-                          { name: 'В3', preset: 'b3', w: '340', h: '490', kind: '1' },
-                          { name: 'А2', preset: '15', w: '420', h: '594', kind: '1' },
-                          { name: 'В2', preset: 'b2', w: '480', h: '690', kind: '1' },
-                          { name: 'А1', preset: '16', w: '594', h: '841', kind: '1' },
-                          { name: 'B1', preset: 'b1', w: '680', h: '980', kind: '1' }
+                          { name: 'А3 (297×420)', preset: '36', w: '297', h: '420', kind: '1' },
+                          { name: 'В3 (340×490)', preset: 'b3', w: '340', h: '490', kind: '1' },
+                          { name: 'А2 (420×594)', preset: '15', w: '420', h: '594', kind: '1' },
+                          { name: 'В2 (480×690)', preset: 'b2', w: '480', h: '690', kind: '1' },
+                          { name: 'А1 (594×841)', preset: '16', w: '594', h: '841', kind: '1' },
+                          { name: 'B1 (680×980)', preset: 'b1', w: '680', h: '980', kind: '1' }
                         ].map(item => (
                           <button
                             key={item.name}
                             type="button"
                             onClick={() => openOffsetProduct({ category: 'Плакати', subCategory: 'Плакати', subTab: 'sheets', preset: item.preset, w: item.w, h: item.h, kind: item.kind })}
-                            className="px-2.5 py-1 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 border border-slate-200/60 text-slate-700 transition-all"
+                            className="pill-chip"
                           >
                             {item.name}
                           </button>
@@ -1364,19 +1462,27 @@ export const Calculator: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* 6. Сети */}
-                  <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm hover:shadow-md hover:border-blue-300 transition-all flex flex-col justify-between group">
+                  {/* 6. Сети / Плейсмати */}
+                  <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm card-lift flex flex-col justify-between group">
                     <div>
                       <div className="flex items-center justify-between mb-3">
-                        <h4
-                          onClick={() => openOffsetProduct({ category: 'Сети', subCategory: 'Сети', subTab: 'sheets', preset: 'sets_a3', w: '420', h: '297', kind: '1' })}
-                          className="text-base font-bold text-slate-900 group-hover:text-blue-600 cursor-pointer transition-colors m-0"
-                        >
-                          Сети / Плейсмати
-                        </h4>
-                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-emerald-50 text-emerald-600">HoReCa</span>
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-600 flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
+                            <Utensils size={19} />
+                          </div>
+                          <div>
+                            <h4
+                              onClick={() => openOffsetProduct({ category: 'Сети', subCategory: 'Сети', subTab: 'sheets', preset: 'sets_a3', w: '420', h: '297', kind: '1' })}
+                              className="text-sm font-extrabold text-slate-900 group-hover:text-blue-600 cursor-pointer transition-colors m-0"
+                            >
+                              Сети / Плейсмати
+                            </h4>
+                            <span className="text-[10px] text-slate-400 font-semibold">Крафт та офсет підкладки</span>
+                          </div>
+                        </div>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-600">☕ HoReCa</span>
                       </div>
-                      <div className="flex flex-wrap gap-1.5">
+                      <div className="flex flex-wrap gap-1.5 mt-2">
                         {[
                           { name: 'А3 (420×297)', preset: 'sets_a3', w: '420', h: '297', kind: '1' },
                           { name: 'В3 (490×340)', preset: 'sets_b3', w: '490', h: '340', kind: '1' }
@@ -1385,7 +1491,7 @@ export const Calculator: React.FC = () => {
                             key={item.name}
                             type="button"
                             onClick={() => openOffsetProduct({ category: 'Сети', subCategory: 'Сети', subTab: 'sheets', preset: item.preset, w: item.w, h: item.h, kind: item.kind })}
-                            className="px-2.5 py-1 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 border border-slate-200/60 text-slate-700 transition-all"
+                            className="pill-chip"
                           >
                             {item.name}
                           </button>
@@ -1394,19 +1500,27 @@ export const Calculator: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* 7. Буклет */}
-                  <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm hover:shadow-md hover:border-blue-300 transition-all flex flex-col justify-between group">
+                  {/* 7. Буклет (12 видів) */}
+                  <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm card-lift flex flex-col justify-between group">
                     <div>
                       <div className="flex items-center justify-between mb-3">
-                        <h4
-                          onClick={() => openOffsetProduct({ category: 'Буклети', subCategory: 'Буклет', subTab: 'sheets', preset: '34', w: '210', h: '297', kind: '6' })}
-                          className="text-base font-bold text-slate-900 group-hover:text-blue-600 cursor-pointer transition-colors m-0"
-                        >
-                          Буклет (12 видів)
-                        </h4>
-                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-blue-50 text-blue-600">Фальцовка</span>
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
+                            <BookOpen size={19} />
+                          </div>
+                          <div>
+                            <h4
+                              onClick={() => openOffsetProduct({ category: 'Буклети', subCategory: 'Буклет', subTab: 'sheets', preset: '34', w: '210', h: '297', kind: '6' })}
+                              className="text-sm font-extrabold text-slate-900 group-hover:text-blue-600 cursor-pointer transition-colors m-0"
+                            >
+                              Буклет (12 видів)
+                            </h4>
+                            <span className="text-[10px] text-slate-400 font-semibold">1, 2, 3 фальці, гармошка</span>
+                          </div>
+                        </div>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 border border-blue-100 text-blue-600">📜 Фальцовка</span>
                       </div>
-                      <div className="flex flex-wrap gap-1.5">
+                      <div className="flex flex-wrap gap-1.5 mt-2">
                         {[
                           { name: 'А4 в Євро', preset: '34', w: '210', h: '297', kind: '6' },
                           { name: '2Євро в Євро', preset: '26', w: '198', h: '210', kind: '6' },
@@ -1418,7 +1532,7 @@ export const Calculator: React.FC = () => {
                             key={item.name}
                             type="button"
                             onClick={() => openOffsetProduct({ category: 'Буклети', subCategory: 'Буклет', subTab: 'sheets', preset: item.preset, w: item.w, h: item.h, kind: item.kind })}
-                            className="px-2.5 py-1 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 border border-slate-200/60 text-slate-700 transition-all"
+                            className="pill-chip"
                           >
                             {item.name}
                           </button>
@@ -1427,29 +1541,37 @@ export const Calculator: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* 8. Каталог */}
-                  <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm hover:shadow-md hover:border-blue-300 transition-all flex flex-col justify-between group">
+                  {/* 8. Каталог / Брошура */}
+                  <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm card-lift flex flex-col justify-between group">
                     <div>
                       <div className="flex items-center justify-between mb-3">
-                        <h4
-                          onClick={() => openOffsetProduct({ category: 'Книги', subCategory: 'Каталог', subTab: 'multipage', stitching: '1' })}
-                          className="text-base font-bold text-slate-900 group-hover:text-blue-600 cursor-pointer transition-colors m-0"
-                        >
-                          Каталог / Брошура
-                        </h4>
-                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-purple-50 text-purple-600">Багатосторінкова</span>
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-10 h-10 rounded-xl bg-purple-50 border border-purple-100 text-purple-600 flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
+                            <BookOpen size={19} />
+                          </div>
+                          <div>
+                            <h4
+                              onClick={() => openOffsetProduct({ category: 'Книги', subCategory: 'Каталог', subTab: 'multipage', stitching: '1' })}
+                              className="text-sm font-extrabold text-slate-900 group-hover:text-blue-600 cursor-pointer transition-colors m-0"
+                            >
+                              Каталог / Брошура
+                            </h4>
+                            <span className="text-[10px] text-slate-400 font-semibold">Багатосторінкові видання</span>
+                          </div>
+                        </div>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-50 border border-purple-100 text-purple-600">📚 Багатостор.</span>
                       </div>
-                      <div className="flex flex-wrap gap-1.5">
+                      <div className="flex flex-wrap gap-1.5 mt-2">
                         {[
-                          { label: 'Скоба', id: '1' },
-                          { label: 'Пружина', id: '2' },
-                          { label: 'Клей', id: '3' }
+                          { label: '📌 Скоба (2 шт)', id: '1' },
+                          { label: '🌀 Пружина', id: '2' },
+                          { label: '🧴 PUR Клей', id: '3' }
                         ].map(st => (
                           <button
                             key={st.label}
                             type="button"
                             onClick={() => openOffsetProduct({ category: 'Книги', subCategory: 'Каталог', subTab: 'multipage', stitching: st.id })}
-                            className="px-2.5 py-1 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 border border-slate-200/60 text-slate-700 transition-all"
+                            className="pill-chip"
                           >
                             {st.label}
                           </button>
@@ -1458,29 +1580,37 @@ export const Calculator: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* 9. Блокнот */}
-                  <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm hover:shadow-md hover:border-blue-300 transition-all flex flex-col justify-between group">
+                  {/* 9. Блокнот на пружині */}
+                  <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm card-lift flex flex-col justify-between group">
                     <div>
                       <div className="flex items-center justify-between mb-3">
-                        <h4
-                          onClick={() => openOffsetProduct({ category: 'Блокноти', subCategory: 'Блокнот', subTab: 'sheets', preset: '32', w: '148', h: '210', kind: '1' })}
-                          className="text-base font-bold text-slate-900 group-hover:text-blue-600 cursor-pointer transition-colors m-0"
-                        >
-                          Блокнот на пружині
-                        </h4>
-                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-teal-50 text-teal-600">Пружина</span>
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-100 text-teal-600 flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
+                            <Bookmark size={19} />
+                          </div>
+                          <div>
+                            <h4
+                              onClick={() => openOffsetProduct({ category: 'Блокноти', subCategory: 'Блокнот', subTab: 'sheets', preset: '32', w: '148', h: '210', kind: '1' })}
+                              className="text-sm font-extrabold text-slate-900 group-hover:text-blue-600 cursor-pointer transition-colors m-0"
+                            >
+                              Блокнот на пружині
+                            </h4>
+                            <span className="text-[10px] text-slate-400 font-semibold">25, 50, 100 аркушів</span>
+                          </div>
+                        </div>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-50 border border-teal-100 text-teal-600">📒 Пружина</span>
                       </div>
-                      <div className="flex flex-wrap gap-1.5">
+                      <div className="flex flex-wrap gap-1.5 mt-2">
                         {[
-                          { name: 'А6', preset: '312', w: '105', h: '148' },
-                          { name: 'А5', preset: '32', w: '148', h: '210' },
-                          { name: 'А4', preset: '34', w: '210', h: '297' }
+                          { name: 'А6 (105×148)', preset: '312', w: '105', h: '148' },
+                          { name: 'А5 (148×210)', preset: '32', w: '148', h: '210' },
+                          { name: 'А4 (210×297)', preset: '34', w: '210', h: '297' }
                         ].map(item => (
                           <button
                             key={item.name}
                             type="button"
                             onClick={() => openOffsetProduct({ category: 'Блокноти', subCategory: 'Блокнот', subTab: 'sheets', preset: item.preset, w: item.w, h: item.h, kind: '1' })}
-                            className="px-2.5 py-1 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 border border-slate-200/60 text-slate-700 transition-all"
+                            className="pill-chip"
                           >
                             {item.name}
                           </button>
@@ -1489,30 +1619,38 @@ export const Calculator: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* 10. Наліпка */}
-                  <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm hover:shadow-md hover:border-blue-300 transition-all flex flex-col justify-between group">
+                  {/* 10. Наліпка / Стікер */}
+                  <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm card-lift flex flex-col justify-between group">
                     <div>
                       <div className="flex items-center justify-between mb-3">
-                        <h4
-                          onClick={() => openOffsetProduct({ category: 'Наклейки', subCategory: 'Наліпка', subTab: 'sheets', preset: '1', w: '90', h: '50', kind: '1' })}
-                          className="text-base font-bold text-slate-900 group-hover:text-blue-600 cursor-pointer transition-colors m-0"
-                        >
-                          Наліпка / Стікер
-                        </h4>
-                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-amber-50 text-amber-600">Самоклейка</span>
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-100 text-amber-600 flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
+                            <Tag size={19} />
+                          </div>
+                          <div>
+                            <h4
+                              onClick={() => openOffsetProduct({ category: 'Наклейки', subCategory: 'Наліпка', subTab: 'sheets', preset: '1', w: '90', h: '50', kind: '1' })}
+                              className="text-sm font-extrabold text-slate-900 group-hover:text-blue-600 cursor-pointer transition-colors m-0"
+                            >
+                              Наліпка / Стікер
+                            </h4>
+                            <span className="text-[10px] text-slate-400 font-semibold">Самоклейка з просічкою</span>
+                          </div>
+                        </div>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 border border-amber-100 text-amber-600">🏷️ Самоклейка</span>
                       </div>
-                      <div className="flex flex-wrap gap-1.5">
+                      <div className="flex flex-wrap gap-1.5 mt-2">
                         {[
-                          { name: '90×50', preset: '1', w: '90', h: '50', kind: '1' },
-                          { name: '50×50', preset: '5', w: '50', h: '50', kind: '2' },
-                          { name: 'Кругла', preset: '5', w: '50', h: '50', kind: '7' },
-                          { name: 'Овальна', preset: '1', w: '90', h: '50', kind: '8' }
+                          { name: '📐 90×50', preset: '1', w: '90', h: '50', kind: '1' },
+                          { name: '⬜ 50×50', preset: '5', w: '50', h: '50', kind: '2' },
+                          { name: '🔘 Кругла', preset: '5', w: '50', h: '50', kind: '7' },
+                          { name: '🥚 Овальна', preset: '1', w: '90', h: '50', kind: '8' }
                         ].map(item => (
                           <button
                             key={item.name}
                             type="button"
                             onClick={() => openOffsetProduct({ category: 'Наклейки', subCategory: 'Наліпка', subTab: 'sheets', preset: item.preset, w: item.w, h: item.h, kind: item.kind })}
-                            className="px-2.5 py-1 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 border border-slate-200/60 text-slate-700 transition-all"
+                            className="pill-chip"
                           >
                             {item.name}
                           </button>
@@ -1522,18 +1660,26 @@ export const Calculator: React.FC = () => {
                   </div>
 
                   {/* 11. Папка А4 */}
-                  <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm hover:shadow-md hover:border-blue-300 transition-all flex flex-col justify-between group">
+                  <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm card-lift flex flex-col justify-between group">
                     <div>
                       <div className="flex items-center justify-between mb-3">
-                        <h4
-                          onClick={() => openOffsetProduct({ category: 'Папки', subCategory: 'Папка А4', subTab: 'sheets', preset: '34', w: '210', h: '297', folderSpine: '5' })}
-                          className="text-base font-bold text-slate-900 group-hover:text-blue-600 cursor-pointer transition-colors m-0"
-                        >
-                          Папка А4
-                        </h4>
-                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-blue-50 text-blue-600">Висічний замок</span>
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
+                            <FolderOpen size={19} />
+                          </div>
+                          <div>
+                            <h4
+                              onClick={() => openOffsetProduct({ category: 'Папки', subCategory: 'Папка А4', subTab: 'sheets', preset: '34', w: '210', h: '297', folderSpine: '5' })}
+                              className="text-sm font-extrabold text-slate-900 group-hover:text-blue-600 cursor-pointer transition-colors m-0"
+                            >
+                              Папка А4
+                            </h4>
+                            <span className="text-[10px] text-slate-400 font-semibold">З висічним замком</span>
+                          </div>
+                        </div>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 border border-blue-100 text-blue-600">📁 Замок</span>
                       </div>
-                      <div className="flex flex-wrap gap-1.5">
+                      <div className="flex flex-wrap gap-1.5 mt-2">
                         {[
                           { name: 'Без корінця', spine: '0' as const, rezinka: 'none' as const },
                           { name: 'Корінець 5мм', spine: '5' as const, rezinka: 'none' as const },
@@ -1543,7 +1689,7 @@ export const Calculator: React.FC = () => {
                             key={fmt.name}
                             type="button"
                             onClick={() => openOffsetProduct({ category: 'Папки', subCategory: 'Папка А4', subTab: 'sheets', preset: '34', w: '210', h: '297', folderSpine: fmt.spine, folderRezinka: fmt.rezinka })}
-                            className="px-2.5 py-1 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 border border-slate-200/60 text-slate-700 transition-all"
+                            className="pill-chip"
                           >
                             {fmt.name}
                           </button>
@@ -1552,29 +1698,37 @@ export const Calculator: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* 12. Листівка (Одинарна/Складна/Кругла) */}
-                  <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm hover:shadow-md hover:border-blue-300 transition-all flex flex-col justify-between group">
+                  {/* 12. Листівка фігурна */}
+                  <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm card-lift flex flex-col justify-between group">
                     <div>
                       <div className="flex items-center justify-between mb-3">
-                        <h4
-                          onClick={() => openOffsetProduct({ category: 'Листівки', subCategory: 'Листівка', subTab: 'sheets', preset: '32', w: '148', h: '210', kind: '1' })}
-                          className="text-base font-bold text-slate-900 group-hover:text-blue-600 cursor-pointer transition-colors m-0"
-                        >
-                          Листівка фігурна
-                        </h4>
-                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-emerald-50 text-emerald-600">Біговка</span>
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-600 flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
+                            <Scissors size={19} />
+                          </div>
+                          <div>
+                            <h4
+                              onClick={() => openOffsetProduct({ category: 'Листівки', subCategory: 'Листівка', subTab: 'sheets', preset: '32', w: '148', h: '210', kind: '1' })}
+                              className="text-sm font-extrabold text-slate-900 group-hover:text-blue-600 cursor-pointer transition-colors m-0"
+                            >
+                              Листівка фігурна
+                            </h4>
+                            <span className="text-[10px] text-slate-400 font-semibold">Біговка та скруглення</span>
+                          </div>
+                        </div>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 border border-emerald-100 text-emerald-600">✂️ Біговка</span>
                       </div>
-                      <div className="flex flex-wrap gap-1.5">
+                      <div className="flex flex-wrap gap-1.5 mt-2">
                         {[
-                          { name: 'Одинарна', preset: '32', w: '148', h: '210', kind: '1' },
-                          { name: 'Складна', preset: '34', w: '210', h: '297', kind: '6' },
-                          { name: 'Кругла', preset: '37', w: '70', h: '70', kind: '7' }
+                          { name: '📄 Одинарна', preset: '32', w: '148', h: '210', kind: '1' },
+                          { name: '📖 Складна', preset: '34', w: '210', h: '297', kind: '6' },
+                          { name: '🔘 Кругла', preset: '37', w: '70', h: '70', kind: '7' }
                         ].map(item => (
                           <button
                             key={item.name}
                             type="button"
                             onClick={() => openOffsetProduct({ category: 'Листівки', subCategory: 'Листівка', subTab: 'sheets', preset: item.preset, w: item.w, h: item.h, kind: item.kind })}
-                            className="px-2.5 py-1 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 border border-slate-200/60 text-slate-700 transition-all"
+                            className="pill-chip"
                           >
                             {item.name}
                           </button>
@@ -1584,54 +1738,77 @@ export const Calculator: React.FC = () => {
                   </div>
 
                   {/* 13. Календарні сітки */}
-                  <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm hover:shadow-md hover:border-blue-300 transition-all flex flex-col justify-between group">
+                  <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm card-lift flex flex-col justify-between group">
                     <div>
                       <div className="flex items-center justify-between mb-3">
-                        <h4
-                          onClick={() => openOffsetProduct({ category: 'Календарі кишенькові', subCategory: 'Календарні сітки', subTab: 'sheets', preset: '34', w: '210', h: '297', kind: '1' })}
-                          className="text-base font-bold text-slate-900 group-hover:text-blue-600 cursor-pointer transition-colors m-0"
-                        >
-                          Календарні сітки
-                        </h4>
-                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-blue-50 text-blue-600">2026/2027</span>
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
+                            <Calendar size={19} />
+                          </div>
+                          <div>
+                            <h4
+                              onClick={() => openOffsetProduct({ category: 'Календарі кишенькові', subCategory: 'Календарні сітки', subTab: 'sheets', preset: '34', w: '210', h: '297', kind: '1' })}
+                              className="text-sm font-extrabold text-slate-900 group-hover:text-blue-600 cursor-pointer transition-colors m-0"
+                            >
+                              Календарні сітки
+                            </h4>
+                            <span className="text-[10px] text-slate-400 font-semibold">Квартальні 3-секційні</span>
+                          </div>
+                        </div>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 border border-blue-100 text-blue-600">📅 2026/2027</span>
                       </div>
-                      <div className="flex flex-wrap gap-1.5">
+                      <div className="flex flex-wrap gap-1.5 mt-2">
                         <button
                           type="button"
                           onClick={() => openOffsetProduct({ category: 'Календарі кишенькові', subCategory: 'Календарні сітки', subTab: 'sheets', preset: '34', w: '210', h: '297', kind: '1' })}
-                          className="px-3 py-1 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 border border-slate-200/60 text-slate-700 transition-all flex items-center gap-1.5"
+                          className="pill-chip"
                         >
-                          <Calendar size={13} className="text-blue-600" />
+                          <Calendar size={12} className="text-blue-600" />
                           <span>Сітки 2026</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => openOffsetProduct({ category: 'Календарі кишенькові', subCategory: 'Календарні сітки', subTab: 'sheets', preset: '34', w: '210', h: '297', kind: '1' })}
+                          className="pill-chip"
+                        >
+                          <span>🌟 Золото / Металік</span>
                         </button>
                       </div>
                     </div>
                   </div>
 
                   {/* 14. Друк в листах */}
-                  <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm hover:shadow-md hover:border-blue-300 transition-all flex flex-col justify-between group">
+                  <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm card-lift flex flex-col justify-between group">
                     <div>
                       <div className="flex items-center justify-between mb-3">
-                        <h4
-                          onClick={() => openOffsetProduct({ category: 'Бланки', subCategory: 'Друк в листах', subTab: 'sheets', preset: '15', w: '420', h: '594', kind: '1' })}
-                          className="text-base font-bold text-slate-900 group-hover:text-blue-600 cursor-pointer transition-colors m-0"
-                        >
-                          Друк в листах
-                        </h4>
-                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-purple-50 text-purple-600">Без порізки</span>
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-10 h-10 rounded-xl bg-purple-50 border border-purple-100 text-purple-600 flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
+                            <Layers size={19} />
+                          </div>
+                          <div>
+                            <h4
+                              onClick={() => openOffsetProduct({ category: 'Бланки', subCategory: 'Друк в листах', subTab: 'sheets', preset: '15', w: '420', h: '594', kind: '1' })}
+                              className="text-sm font-extrabold text-slate-900 group-hover:text-blue-600 cursor-pointer transition-colors m-0"
+                            >
+                              Друк в листах
+                            </h4>
+                            <span className="text-[10px] text-slate-400 font-semibold">Повні друкарські листи</span>
+                          </div>
+                        </div>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-50 border border-purple-100 text-purple-600">📦 Без порізки</span>
                       </div>
-                      <div className="flex flex-wrap gap-1.5">
+                      <div className="flex flex-wrap gap-1.5 mt-2">
                         {[
-                          { name: 'А2', preset: '15', w: '420', h: '594' },
-                          { name: 'В2', preset: 'b2', w: '480', h: '690' },
-                          { name: 'А1', preset: '16', w: '594', h: '841' },
-                          { name: 'B1', preset: 'b1', w: '680', h: '980' }
+                          { name: 'А2 (420×594)', preset: '15', w: '420', h: '594' },
+                          { name: 'В2 (480×690)', preset: 'b2', w: '480', h: '690' },
+                          { name: 'А1 (594×841)', preset: '16', w: '594', h: '841' },
+                          { name: 'B1 (680×980)', preset: 'b1', w: '680', h: '980' }
                         ].map(item => (
                           <button
                             key={item.name}
                             type="button"
                             onClick={() => openOffsetProduct({ category: 'Бланки', subCategory: 'Друк в листах', subTab: 'sheets', preset: item.preset, w: item.w, h: item.h, kind: '1' })}
-                            className="px-2.5 py-1 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 border border-slate-200/60 text-slate-700 transition-all"
+                            className="pill-chip"
                           >
                             {item.name}
                           </button>
@@ -1641,29 +1818,37 @@ export const Calculator: React.FC = () => {
                   </div>
 
                   {/* 15. Конверт */}
-                  <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm hover:shadow-md hover:border-blue-300 transition-all flex flex-col justify-between group">
+                  <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm card-lift flex flex-col justify-between group">
                     <div>
                       <div className="flex items-center justify-between mb-3">
-                        <h4
-                          onClick={() => openOffsetProduct({ category: 'Бланки', subCategory: 'Конверт', subTab: 'sheets', preset: '25', w: '110', h: '220', envelopeFormat: 'E65' })}
-                          className="text-base font-bold text-slate-900 group-hover:text-blue-600 cursor-pointer transition-colors m-0"
-                        >
-                          Конверт
-                        </h4>
-                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-blue-50 text-blue-600">Корпоративний</span>
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
+                            <Mail size={19} />
+                          </div>
+                          <div>
+                            <h4
+                              onClick={() => openOffsetProduct({ category: 'Бланки', subCategory: 'Конверт', subTab: 'sheets', preset: '25', w: '110', h: '220', envelopeFormat: 'E65' })}
+                              className="text-sm font-extrabold text-slate-900 group-hover:text-blue-600 cursor-pointer transition-colors m-0"
+                            >
+                              Конверт
+                            </h4>
+                            <span className="text-[10px] text-slate-400 font-semibold">Фірмові поштові конверти</span>
+                          </div>
+                        </div>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 border border-blue-100 text-blue-600">✉️ Корпоративні</span>
                       </div>
-                      <div className="flex flex-wrap gap-1.5">
+                      <div className="flex flex-wrap gap-1.5 mt-2">
                         {[
-                          { name: 'Євро', preset: '25', w: '110', h: '220', fmt: 'E65' as const },
-                          { name: 'С6', preset: '21', w: '114', h: '162', fmt: 'C6' as const },
-                          { name: 'С5', preset: '32', w: '162', h: '229', fmt: 'C5' as const },
-                          { name: 'С4', preset: '34', w: '229', h: '324', fmt: 'C4' as const }
+                          { name: 'Євро DL (110×220)', preset: '25', w: '110', h: '220', fmt: 'E65' as const },
+                          { name: 'С6 (114×162)', preset: '21', w: '114', h: '162', fmt: 'C6' as const },
+                          { name: 'С5 (162×229)', preset: '32', w: '162', h: '229', fmt: 'C5' as const },
+                          { name: 'С4 (229×324)', preset: '34', w: '229', h: '324', fmt: 'C4' as const }
                         ].map(item => (
                           <button
                             key={item.name}
                             type="button"
                             onClick={() => openOffsetProduct({ category: 'Бланки', subCategory: 'Конверт', subTab: 'sheets', preset: item.preset, w: item.w, h: item.h, envelopeFormat: item.fmt })}
-                            className="px-2.5 py-1 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 border border-slate-200/60 text-slate-700 transition-all"
+                            className="pill-chip"
                           >
                             {item.name}
                           </button>
@@ -1673,27 +1858,35 @@ export const Calculator: React.FC = () => {
                   </div>
 
                   {/* 16. Календарі висічні */}
-                  <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm hover:shadow-md hover:border-blue-300 transition-all flex flex-col justify-between group">
+                  <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm card-lift flex flex-col justify-between group">
                     <div>
                       <div className="flex items-center justify-between mb-3">
-                        <h4
-                          onClick={() => openOffsetProduct({ category: 'Календарі кишенькові', subCategory: 'Календарі висічні', subTab: 'felling', preset: '160', w: '210', h: '300', stamp: '160' })}
-                          className="text-base font-bold text-slate-900 group-hover:text-blue-600 cursor-pointer transition-colors m-0"
-                        >
-                          Календарі висічні
-                        </h4>
-                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-amber-50 text-amber-600">Настільні</span>
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-10 h-10 rounded-xl bg-amber-50 border border-amber-100 text-amber-600 flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
+                            <Clock size={19} />
+                          </div>
+                          <div>
+                            <h4
+                              onClick={() => openOffsetProduct({ category: 'Календарі кишенькові', subCategory: 'Календарі висічні', subTab: 'felling', preset: '160', w: '210', h: '300', stamp: '160' })}
+                              className="text-sm font-extrabold text-slate-900 group-hover:text-blue-600 cursor-pointer transition-colors m-0"
+                            >
+                              Календарі висічні
+                            </h4>
+                            <span className="text-[10px] text-slate-400 font-semibold">Настільні об'ємні</span>
+                          </div>
+                        </div>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-50 border border-amber-100 text-amber-600">🏠 Настільні</span>
                       </div>
-                      <div className="flex flex-wrap gap-1.5">
+                      <div className="flex flex-wrap gap-1.5 mt-2">
                         {[
-                          { name: 'Будинок', preset: '160', w: '210', h: '300' },
-                          { name: 'Пірамідка', preset: '161', w: '305', h: '134' }
+                          { name: '🏠 Будинок (210×300)', preset: '160', w: '210', h: '300' },
+                          { name: '🔺 Пірамідка (305×134)', preset: '161', w: '305', h: '134' }
                         ].map(item => (
                           <button
                             key={item.name}
                             type="button"
                             onClick={() => openOffsetProduct({ category: 'Календарі кишенькові', subCategory: 'Календарі висічні', subTab: 'felling', preset: item.preset, w: item.w, h: item.h, stamp: item.preset })}
-                            className="px-2.5 py-1 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 border border-slate-200/60 text-slate-700 transition-all"
+                            className="pill-chip"
                           >
                             {item.name}
                           </button>
@@ -1703,31 +1896,39 @@ export const Calculator: React.FC = () => {
                   </div>
 
                   {/* 17. Пакувальний папір */}
-                  <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm hover:shadow-md hover:border-blue-300 transition-all flex flex-col justify-between group">
+                  <div className="bg-white border border-slate-200/90 rounded-2xl p-5 shadow-sm card-lift flex flex-col justify-between group">
                     <div>
                       <div className="flex items-center justify-between mb-3">
-                        <h4
-                          onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset('36'); setSheetCustomWidth('297'); setSheetCustomHeight('420'); handleSelectCategory('Бланки'); }}
-                          className="text-base font-bold text-slate-900 group-hover:text-blue-600 cursor-pointer transition-colors m-0"
-                        >
-                          Пакувальний папір
-                        </h4>
-                        <span className="text-[11px] font-semibold px-2 py-0.5 rounded bg-teal-50 text-teal-600">Крафт / Офсет</span>
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-10 h-10 rounded-xl bg-teal-50 border border-teal-100 text-teal-600 flex items-center justify-center shadow-2xs group-hover:scale-105 transition-transform">
+                            <Package size={19} />
+                          </div>
+                          <div>
+                            <h4
+                              onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset('36'); setSheetCustomWidth('297'); setSheetCustomHeight('420'); handleSelectCategory('Бланки'); }}
+                              className="text-sm font-extrabold text-slate-900 group-hover:text-blue-600 cursor-pointer transition-colors m-0"
+                            >
+                              Пакувальний папір
+                            </h4>
+                            <span className="text-[10px] text-slate-400 font-semibold">Крафт та офсет у листах</span>
+                          </div>
+                        </div>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-teal-50 border border-teal-100 text-teal-600">🎁 Крафт</span>
                       </div>
-                      <div className="flex flex-wrap gap-1.5">
+                      <div className="flex flex-wrap gap-1.5 mt-2">
                         {[
-                          { name: 'А3', preset: '36', w: '297', h: '420' },
-                          { name: 'В3', preset: 'b3', w: '340', h: '490' },
-                          { name: 'А2', preset: '15', w: '420', h: '594' },
-                          { name: 'В2', preset: 'b2', w: '480', h: '690' },
-                          { name: 'А1', preset: '16', w: '594', h: '841' },
-                          { name: 'B1', preset: 'b1', w: '680', h: '980' }
+                          { name: 'А3 (297×420)', preset: '36', w: '297', h: '420' },
+                          { name: 'В3 (340×490)', preset: 'b3', w: '340', h: '490' },
+                          { name: 'А2 (420×594)', preset: '15', w: '420', h: '594' },
+                          { name: 'В2 (480×690)', preset: 'b2', w: '480', h: '690' },
+                          { name: 'А1 (594×841)', preset: '16', w: '594', h: '841' },
+                          { name: 'B1 (680×980)', preset: 'b1', w: '680', h: '980' }
                         ].map(item => (
                           <button
                             key={item.name}
                             type="button"
                             onClick={() => { setOffsetSubTab('sheets'); setCardKind('1'); setSheetSizePreset(item.preset); setSheetCustomWidth(item.w); setSheetCustomHeight(item.h); handleSelectCategory('Бланки'); }}
-                            className="px-2.5 py-1 text-xs font-semibold rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-200 border border-slate-200/60 text-slate-700 transition-all"
+                            className="pill-chip"
                           >
                             {item.name}
                           </button>
