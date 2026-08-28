@@ -157,12 +157,6 @@ export const Calculator: React.FC = () => {
 
   // Digital Sheets Specific Detailed States (as shown in reference)
   const [digitalSheetSets, setDigitalSheetSets] = useState<number>(1);
-  const [digitalSheetBoxes, setDigitalSheetBoxes] = useState<number>(0);
-  const [digitalSheetMaterialCat, setDigitalSheetMaterialCat] = useState<string>('coated_matte');
-  const [digitalSheetDensity, setDigitalSheetDensity] = useState<string>('350');
-  const [digitalSheetCoating, setDigitalSheetCoating] = useState<string>('none');
-  const [digitalSheetPrintColor, setDigitalSheetPrintColor] = useState<string>('4_4');
-  const [digitalSheetSpotVarnish, setDigitalSheetSpotVarnish] = useState<string>('none');
   const [digitalSheetWithDelivery, setDigitalSheetWithDelivery] = useState<boolean>(false);
   const [digitalSheetPerPiece, setDigitalSheetPerPiece] = useState<boolean>(false);
   const [digitalSheetPostPressOpen, setDigitalSheetPostPressOpen] = useState<boolean>(false);
@@ -172,6 +166,15 @@ export const Calculator: React.FC = () => {
   const [digitalSheetPersonalization, setDigitalSheetPersonalization] = useState<string>('0');
   const [digitalSheetFolding, setDigitalSheetFolding] = useState<string>('0');
   const [digitalSheetGluingBlock, setDigitalSheetGluingBlock] = useState<string>('0');
+
+  // Multi-selection Filter States for Digital Sheets & Felling (Matching Offset Style)
+  const [digitalSelectedMaterials, setDigitalSelectedMaterials] = useState<string[]>(['80', '130', '300', '350']);
+  const [digitalSelectedCoverings, setDigitalSelectedCoverings] = useState<string[]>(['0', '7', '10']);
+  const [digitalSelectedPrints, setDigitalSelectedPrints] = useState<string[]>(['4+0', '4+4']);
+
+  const [fellingSelectedMaterials, setFellingSelectedMaterials] = useState<string[]>(['300', '350']);
+  const [fellingSelectedCoverings, setFellingSelectedCoverings] = useState<string[]>(['0', '7', '10']);
+  const [fellingSelectedPrints, setFellingSelectedPrints] = useState<string[]>(['4+0', '4+4']);
 
   // Helper to transition into specific offset product calculator
   const openOffsetProduct = (params: {
@@ -4515,7 +4518,7 @@ export const Calculator: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Section: Післядрукарська обробка (Accordion) */}
+                  {/* Section: Післядрукарська обробка (Нормативи) */}
                   <div className="ios-card bg-white overflow-hidden">
                     <button
                       type="button"
@@ -4523,13 +4526,28 @@ export const Calculator: React.FC = () => {
                       className="w-full p-4 flex items-center justify-between bg-slate-50/70 hover:bg-slate-100/80 transition-colors border-b border-slate-100"
                     >
                       <div className="flex items-center gap-2">
-                        <span className="text-xs font-extrabold uppercase tracking-wider text-slate-800">Післядрукарська обробка</span>
+                        <SlidersHorizontal size={15} className="text-blue-600" />
+                        <span className="text-xs font-extrabold uppercase tracking-wider text-slate-800">Післядрукарська обробка (Нормативи)</span>
                         {(digitalSheetCornerCurve !== '0' || digitalSheetDrilling !== '0' || digitalSheetLuvers !== '0' || digitalSheetPersonalization !== '0' || digitalSheetFolding !== '0' || digitalSheetGluingBlock !== '0') && (
                           <span className="ios-badge-blue text-[10px] px-2 py-0.5 rounded-full font-bold">Опції обрано</span>
                         )}
                       </div>
-                      <div className="flex items-center gap-1.5 text-xs font-bold text-blue-600">
-                        <span>{digitalSheetPostPressOpen ? 'Згорнути' : 'Розгорнути'}</span>
+                      <div className="flex items-center gap-2 text-xs font-bold text-blue-600">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setDigitalSheetCornerCurve('0');
+                            setDigitalSheetDrilling('0');
+                            setDigitalSheetLuvers('0');
+                            setDigitalSheetPersonalization('0');
+                            setDigitalSheetFolding('0');
+                            setDigitalSheetGluingBlock('0');
+                          }}
+                          className="px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-600 text-[11px] font-semibold transition-colors"
+                        >
+                          Очистити
+                        </button>
                         <ChevronDown size={16} className={`transition-transform duration-200 ${digitalSheetPostPressOpen ? 'rotate-180' : ''}`} />
                       </div>
                     </button>
@@ -4622,384 +4640,328 @@ export const Calculator: React.FC = () => {
                     )}
                   </div>
 
-                  {/* Section: Комплектів & Пластиковий бокс Counters */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {/* Sets Counter */}
-                    <div className="ios-card bg-white p-4 flex items-center justify-between gap-4">
-                      <div className="flex items-center gap-3">
-                        <span className="text-xs font-extrabold text-slate-900 whitespace-nowrap">Комплектів:</span>
-                        <div className="flex items-center border border-slate-200 rounded-xl bg-slate-50 overflow-hidden">
-                          <button
-                            type="button"
-                            onClick={() => setDigitalSheetSets(Math.max(1, digitalSheetSets - 1))}
-                            className="w-8 h-8 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-200 transition-colors"
-                          >
-                            -
-                          </button>
-                          <span className="w-10 text-center font-extrabold text-xs text-slate-900 bg-white py-1">
-                            {digitalSheetSets}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => setDigitalSheetSets(digitalSheetSets + 1)}
-                            className="w-8 h-8 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-200 transition-colors"
-                          >
-                            +
-                          </button>
-                        </div>
-                      </div>
-                      <p className="text-[11px] text-slate-500 m-0 text-right leading-tight">
-                        Замовлень з однаковими параметрами, але різними макетами
-                      </p>
-                    </div>
-
-                    {/* Plastic Boxes Counter */}
-                    <div className="ios-card bg-white p-4 flex items-center justify-between gap-4">
-                      <div className="flex items-center gap-3">
-                        <span className="text-xs font-extrabold text-slate-900 whitespace-nowrap">Пластиковий бокс:</span>
-                        <div className="flex items-center border border-slate-200 rounded-xl bg-slate-50 overflow-hidden">
-                          <button
-                            type="button"
-                            onClick={() => setDigitalSheetBoxes(Math.max(0, digitalSheetBoxes - 1))}
-                            className="w-8 h-8 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-200 transition-colors"
-                          >
-                            -
-                          </button>
-                          <span className="w-10 text-center font-extrabold text-xs text-slate-900 bg-white py-1">
-                            {digitalSheetBoxes}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() => setDigitalSheetBoxes(digitalSheetBoxes + 1)}
-                            className="w-8 h-8 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-200 transition-colors"
-                          >
-                            +
-                          </button>
-                        </div>
-                      </div>
-                      <p className="text-[11px] text-slate-500 m-0 text-right leading-tight">
-                        Вміщує до 100 візитівок (+15 ₴/бокс)
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Section: Фільтр (вибір, порівняння) - Full Interactive Matrix */}
-                  <div className="ios-card bg-white p-5 flex flex-col gap-5">
-                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800 m-0 flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-blue-600"></span>
-                      Фільтр (вибір, порівняння)
-                    </h4>
-
-                    {/* 1. МАТЕРІАЛ Family Row */}
-                    <div className="flex flex-col gap-2">
-                      <div className="flex items-center gap-2">
-                        <span className="text-[11px] font-extrabold uppercase text-slate-400 w-24">МАТЕРІАЛ:</span>
-                        <div className="flex flex-wrap gap-1.5 flex-1">
-                          {[
-                            { id: 'coated_matte', label: 'Крейдована матова' },
-                            { id: 'coated_gloss', label: 'Крейдована глянцева' },
-                            { id: 'offset_paper', label: 'Офсетний папір' },
-                            { id: 'mondi_dns', label: 'MONDI DNS PREMIUM' },
-                            { id: 'munken_pure', label: 'MUNKEN PURE' },
-                            { id: 'one_side_card', label: 'Односторонній картон' },
-                            { id: 'designer_card', label: 'Дизайнерський картон' },
-                            { id: 'raflatac_paper', label: 'Самоклейка папір', badge: 'NEW' },
-                            { id: 'raflatac_film', label: 'Самоклейка плівка' },
-                            { id: 'synaps', label: 'Синтетичний SYNAPS' },
-                            { id: 'arena_ivory', label: 'Arena Ivory smooth' },
-                          ].map(m => (
-                            <button
-                              key={m.id}
-                              type="button"
-                              onClick={() => setDigitalSheetMaterialCat(m.id)}
-                              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all relative ${
-                                digitalSheetMaterialCat === m.id
-                                  ? 'bg-blue-600 text-white shadow-sm'
-                                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                              }`}
-                            >
-                              {m.label}
-                              {m.badge && (
-                                <span className="absolute -top-1.5 -right-1 bg-amber-500 text-white text-[8px] font-black px-1 rounded-full">
-                                  {m.badge}
-                                </span>
-                              )}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Densities for Chosen Material */}
-                      <div className="flex items-center gap-2 pl-24 pt-1">
-                        <div className="flex flex-wrap gap-1.5">
-                          {(digitalSheetMaterialCat === 'offset_paper'
-                            ? ['70', '80', '100', '120', '160']
-                            : digitalSheetMaterialCat === 'designer_card'
-                            ? ['Touch Cover 301', 'Ispira 250', 'Sirio Pearl 300', 'Льон 300', 'Крафт 300']
-                            : digitalSheetMaterialCat === 'raflatac_paper' || digitalSheetMaterialCat === 'raflatac_film'
-                            ? ['Напівглянець', 'Біла PP', 'Прозора PP']
-                            : ['90', '115', '130', '150', '170', '200', '250', '300', '350', '450']
-                          ).map(d => (
-                            <button
-                              key={d}
-                              type="button"
-                              onClick={() => setDigitalSheetDensity(d)}
-                              className={`px-3 py-1 rounded-md text-[11px] font-bold border transition-all ${
-                                digitalSheetDensity === d
-                                  ? 'border-blue-600 bg-blue-50 text-blue-700'
-                                  : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
-                              }`}
-                            >
-                              {digitalSheetMaterialCat.includes('coated') ? `Крейд МАТ ${d}` : d.includes('Touch') || d.includes('PP') ? d : `${d} г/м²`}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* 2. ПОКРИТТЯ (Lamination) Rows */}
-                    <div className="flex flex-col gap-2 pt-2 border-t border-slate-100">
-                      <div className="flex items-start gap-2">
-                        <span className="text-[11px] font-extrabold uppercase text-slate-400 w-24 pt-1">ПОКРИТТЯ:</span>
-                        <div className="flex flex-col gap-1.5 flex-1">
-                          {/* Row 1: 25 mic */}
-                          <div className="flex flex-wrap gap-1.5">
-                            {[
-                              { id: 'none', label: 'НІ (без покриття)' },
-                              { id: 'gl_1_0_25', label: 'ГЛ 1+0 25 мкм' },
-                              { id: 'gl_1_1_25', label: 'ГЛ 1+1 25 мкм' },
-                              { id: 'mat_1_0_25', label: 'МАТ 1+0 25 мкм' },
-                              { id: 'mat_1_1_25', label: 'МАТ 1+1 25 мкм' },
-                              { id: 'antiscuff_1_0', label: 'AntiScuff 1+0' },
-                              { id: 'antiscuff_1_1', label: 'AntiScuff 1+1' },
-                              { id: 'soft_1_0', label: 'SOFT лам 1+0' },
-                              { id: 'soft_1_1', label: 'SOFT лам 1+1' },
-                            ].map(c => (
-                              <button
-                                key={c.id}
-                                type="button"
-                                onClick={() => setDigitalSheetCoating(c.id)}
-                                className={`px-2.5 py-1 rounded-md text-[11px] font-bold border transition-all ${
-                                  digitalSheetCoating === c.id
-                                    ? 'border-blue-600 bg-blue-50 text-blue-700 shadow-xs'
-                                    : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
-                                }`}
-                              >
-                                {c.label}
-                              </button>
-                            ))}
-                          </div>
-
-                          {/* Row 2: Heavy & Pouch (75-250 mic) */}
-                          <div className="flex flex-wrap gap-1.5">
-                            {[
-                              { id: 'gl_1_1_75', label: 'ГЛ 1+1 75 мкм' },
-                              { id: 'gl_1_1_100', label: 'ГЛ 1+1 100 мкм' },
-                              { id: 'gl_1_1_125', label: 'ГЛ 1+1 125 мкм' },
-                              { id: 'gl_1_1_175', label: 'ГЛ 1+1 175 мкм' },
-                              { id: 'gl_1_1_250', label: 'ГЛ 1+1 250 мкм' },
-                              { id: 'mat_1_1_75', label: 'МАТ 1+1 75 мкм' },
-                              { id: 'mat_1_1_125', label: 'МАТ 1+1 125 мкм' },
-                              { id: 'mat_1_1_250', label: 'МАТ 1+1 250 мкм' },
-                            ].map(c => (
-                              <button
-                                key={c.id}
-                                type="button"
-                                onClick={() => setDigitalSheetCoating(c.id)}
-                                className={`px-2.5 py-1 rounded-md text-[10px] font-semibold border transition-all ${
-                                  digitalSheetCoating === c.id
-                                    ? 'border-blue-600 bg-blue-50 text-blue-700 shadow-xs'
-                                    : 'border-slate-200 bg-slate-50/70 text-slate-500 hover:bg-slate-100'
-                                }`}
-                              >
-                                {c.label}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* 3. ДРУК (Color mode) Row */}
-                    <div className="flex flex-col gap-2 pt-2 border-t border-slate-100">
-                      <div className="flex items-center gap-2">
-                        <span className="text-[11px] font-extrabold uppercase text-slate-400 w-24">ДРУК:</span>
-                        <div className="flex flex-wrap gap-1.5 flex-1">
-                          {[
-                            { id: 'none', label: 'Без друку' },
-                            { id: '4_0', label: 'Повнокольор. 4+0' },
-                            { id: '4_4', label: 'Повнокольор. 4+4' },
-                            { id: '1_0', label: 'Чорно білий 1+0' },
-                            { id: '1_1', label: 'Чорно білий 1+1' },
-                            { id: 'white_1_0', label: 'WHITE 1+0' },
-                            { id: 'white_1_1', label: 'WHITE 1+1' },
-                            { id: 'white_cmyk_5_0', label: 'WHITE + CMYK 5+0' },
-                            { id: 'white_cmyk_5_5', label: 'WHITE + CMYK 5+5' },
-                            { id: 'cmyk_white_5_0', label: 'CMYK + WHITE 5+0' },
-                          ].map(p => (
-                            <button
-                              key={p.id}
-                              type="button"
-                              onClick={() => setDigitalSheetPrintColor(p.id)}
-                              className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${
-                                digitalSheetPrintColor === p.id
-                                  ? 'border-blue-600 bg-blue-600 text-white shadow-sm'
-                                  : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-100'
-                              }`}
-                            >
-                              {p.label}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* 4. ДОДАТИ: Цифровий вибірковий лак */}
-                    <div className="flex items-center gap-3 pt-2 border-t border-slate-100">
-                      <span className="text-[11px] font-extrabold uppercase text-slate-400 w-24">ДОДАТИ:</span>
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-slate-700">Цифровий вибірковий лак (3D / UV):</span>
-                        <select
-                          value={digitalSheetSpotVarnish}
-                          onChange={(e) => setDigitalSheetSpotVarnish(e.target.value)}
-                          className="bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1 text-xs font-bold text-slate-800"
-                        >
-                          <option value="none">Ні</option>
-                          <option value="1_0">1+0 (з 1 боку)</option>
-                          <option value="1_1">1+1 (з 2 боків)</option>
-                        </select>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Section: Live Pricing Grid with Cupertino Controls */}
-                  <div className="ios-card bg-white overflow-hidden shadow-md">
-                    {/* Header Controls Bar */}
-                    <div className="bg-slate-900 text-white px-5 py-3.5 flex flex-wrap items-center justify-between gap-4">
-                      <div className="flex items-center gap-4">
-                        <span className="text-xs font-extrabold uppercase tracking-wider text-blue-400">Розрахунок вартості</span>
-                        <div className="flex items-center gap-2 text-xs">
-                          <label className="flex items-center gap-1.5 cursor-pointer text-slate-300 hover:text-white">
-                            <input
-                              type="checkbox"
-                              checked={digitalSheetWithDelivery}
-                              onChange={(e) => setDigitalSheetWithDelivery(e.target.checked)}
-                              className="rounded text-blue-500 focus:ring-0"
-                            />
-                            <span>З доставкою</span>
-                          </label>
-                          <span className="text-slate-600">|</span>
-                          <label className="flex items-center gap-1.5 cursor-pointer text-slate-300 hover:text-white">
-                            <input
-                              type="checkbox"
-                              checked={digitalSheetPerPiece}
-                              onChange={(e) => setDigitalSheetPerPiece(e.target.checked)}
-                              className="rounded text-blue-500 focus:ring-0"
-                            />
-                            <span>За екземпляр</span>
-                          </label>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-3">
-                        <span className="text-xs text-slate-400">Готовність: 1 робочий день</span>
+                  {/* Section: КОМПЛЕКТІВ МАКЕТІВ Bar */}
+                  <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex items-center justify-between flex-wrap gap-4">
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs font-extrabold uppercase text-slate-800">КОМПЛЕКТІВ МАКЕТІВ:</span>
+                      <div className="flex items-center gap-1">
                         <button
                           type="button"
-                          onClick={() => alert('Експорт прайс-листа в Excel')}
-                          className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-emerald-400 text-xs font-bold transition-all"
-                          title="Експорт в Excel"
+                          onClick={() => setDigitalSheetSets(Math.max(1, digitalSheetSets - 1))}
+                          className="w-7 h-7 rounded-md bg-white border border-slate-200 text-slate-700 font-bold hover:bg-slate-50 flex items-center justify-center transition-colors"
                         >
-                          <FileSpreadsheet size={16} />
+                          -
+                        </button>
+                        <input
+                          type="number"
+                          value={digitalSheetSets}
+                          onChange={(e) => setDigitalSheetSets(Math.max(1, parseInt(e.target.value) || 1))}
+                          className="w-12 h-7 text-center rounded-md border border-slate-200 font-bold text-xs"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setDigitalSheetSets(digitalSheetSets + 1)}
+                          className="w-7 h-7 rounded-md bg-white border border-slate-200 text-slate-700 font-bold hover:bg-slate-50 flex items-center justify-center transition-colors"
+                        >
+                          +
                         </button>
                       </div>
                     </div>
+                    <span className="text-xs text-slate-400 font-medium">
+                      (Кількість однакових замовлень з різними макетами)
+                    </span>
+                  </div>
 
-                    {/* Table Matrix */}
+                  {/* Section: Фільтр специфікацій та матеріалів (Exact CRM Offset Pill Buttons) */}
+                  <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+                    <div className="px-5 py-3.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                      <h4 className="text-sm font-bold text-slate-900 m-0">
+                        Фільтр специфікацій та матеріалів
+                      </h4>
+                      <span className="text-xs text-slate-500 font-medium">Оберіть параметри для формування матриці цін</span>
+                    </div>
+
+                    <div className="flex flex-col divide-y divide-slate-100">
+                      {/* Row 1: Material Options */}
+                      <div className="flex flex-col md:flex-row">
+                        <div className="w-full md:w-36 bg-slate-50/70 p-3.5 border-b md:border-b-0 md:border-r border-slate-100 text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center">
+                          МАТЕРІАЛ:
+                        </div>
+                        <div className="flex-1 p-3.5 flex gap-1.5 flex-wrap items-center">
+                          {[
+                            { id: 'kraft_70', label: 'Крафт бурий 70' },
+                            { id: '80', label: 'Офсет 80' },
+                            { id: 'linen_300', label: 'Льон білий 300' },
+                            { id: 'tintoretto_crema', label: 'Tintoretto crema 300' },
+                            { id: 'tintoretto_gesso', label: 'Tintoretto gesso 300' },
+                            { id: 'stardream_opal', label: 'Stardream opal 285' },
+                            { id: 'stardream_diamond', label: 'Stardream diamond 285' },
+                            { id: 'stardream_topaz', label: 'Stardream topaz 285' },
+                            { id: '90', label: 'Крейда МАТ 90' },
+                            { id: '115', label: 'Крейда МАТ 115' },
+                            { id: '130', label: 'Крейда МАТ 130' },
+                            { id: '150', label: 'Крейда МАТ 150' },
+                            { id: '170', label: 'Крейда МАТ 170' },
+                            { id: '250', label: 'Крейда МАТ 250' },
+                            { id: '300', label: 'Крейда МАТ 300' },
+                            { id: '350', label: 'Крейда МАТ 350' },
+                            { id: '450', label: 'Крейда МАТ 450' },
+                            { id: 'raflatac', label: 'Самоклейка Raflatac' }
+                          ].map(mat => {
+                            const isSel = digitalSelectedMaterials.includes(mat.id);
+                            return (
+                              <button
+                                key={mat.id}
+                                type="button"
+                                onClick={() => {
+                                  setDigitalSelectedMaterials(prev => 
+                                    prev.includes(mat.id) ? prev.filter(x => x !== mat.id) : [...prev, mat.id]
+                                  );
+                                }}
+                                className={`px-2.5 py-1 text-xs font-semibold rounded-lg border transition-all ${
+                                  isSel
+                                    ? 'bg-blue-600 text-white border-blue-600 shadow-sm font-bold'
+                                    : 'bg-slate-100 hover:bg-slate-200/80 text-slate-700 border-slate-200/60'
+                                }`}
+                              >
+                                {mat.label}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Row 2: Coating Options */}
+                      <div className="flex flex-col md:flex-row">
+                        <div className="w-full md:w-36 bg-slate-50/70 p-3.5 border-b md:border-b-0 md:border-r border-slate-100 text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center">
+                          ПОКРИТТЯ:
+                        </div>
+                        <div className="flex-1 p-3.5 flex gap-1.5 flex-wrap items-center">
+                          {[
+                            { id: '0', label: 'БП' },
+                            { id: '7', label: 'ГЛ лам 1+0' },
+                            { id: '8', label: 'ГЛ лам 1+1' },
+                            { id: '9', label: 'МАТ лам 1+0' },
+                            { id: '10', label: 'МАТ лам 1+1' },
+                            { id: '30', label: 'SOFT лам 1+0' },
+                            { id: '31', label: 'SOFT лам 1+1' },
+                            { id: 'uv_10', label: 'УФ ЛАК 1+0' },
+                            { id: 'uv_11', label: 'УФ ЛАК 1+1' },
+                            { id: 'gibrid_10', label: 'Гібрид 1+0' }
+                          ].map(cov => {
+                            const isSel = digitalSelectedCoverings.includes(cov.id);
+                            return (
+                              <button
+                                key={cov.id}
+                                type="button"
+                                onClick={() => {
+                                  setDigitalSelectedCoverings(prev => 
+                                    prev.includes(cov.id) ? prev.filter(x => x !== cov.id) : [...prev, cov.id]
+                                  );
+                                }}
+                                className={`px-2.5 py-1 text-xs font-semibold rounded-lg border transition-all ${
+                                  isSel
+                                    ? 'bg-blue-600 text-white border-blue-600 shadow-sm font-bold'
+                                    : 'bg-slate-100 hover:bg-slate-200/80 text-slate-700 border-slate-200/60'
+                                }`}
+                              >
+                                {cov.label}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Row 3: Color Printing Options */}
+                      <div className="flex flex-col md:flex-row">
+                        <div className="w-full md:w-36 bg-slate-50/70 p-3.5 border-b md:border-b-0 md:border-r border-slate-100 text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center">
+                          ДРУК:
+                        </div>
+                        <div className="flex-1 p-3.5 flex gap-1.5 flex-wrap items-center">
+                          {[
+                            { id: '4+0', label: 'Односторонній 4+0' },
+                            { id: '4+4', label: 'Двосторонній 4+4' },
+                            { id: '1+0', label: 'Одноколірний 1+0' },
+                            { id: '1+1', label: 'Одноколірний 1+1' },
+                            { id: 'white_10', label: 'WHITE 1+0' },
+                            { id: 'white_11', label: 'WHITE 1+1' },
+                            { id: 'white_50', label: '5+0 WHITE+CMYK' },
+                            { id: 'white_55', label: '5+5 WHITE+CMYK' },
+                          ].map(col => {
+                            const isSel = digitalSelectedPrints.includes(col.id);
+                            return (
+                              <button
+                                key={col.id}
+                                type="button"
+                                onClick={() => {
+                                  setDigitalSelectedPrints(prev => 
+                                    prev.includes(col.id) ? prev.filter(x => x !== col.id) : [...prev, col.id]
+                                  );
+                                }}
+                                className={`px-2.5 py-1 text-xs font-semibold rounded-lg border transition-all ${
+                                  isSel
+                                    ? 'bg-blue-600 text-white border-blue-600 shadow-sm font-bold'
+                                    : 'bg-slate-100 hover:bg-slate-200/80 text-slate-700 border-slate-200/60'
+                                }`}
+                              >
+                                {col.label}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Price Calculation Matrix Table (Matching Exact Offset Design) */}
+                  <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+                    {/* Banner Controls Bar */}
+                    <div className="bg-slate-900 text-white px-5 py-3.5 flex items-center justify-between flex-wrap gap-4">
+                      <div className="flex items-center gap-2">
+                        <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span className="text-xs font-bold uppercase tracking-wider text-slate-200">
+                          ВАРТІСТЬ ТА СТРОКИ ВИГОТОВЛЕННЯ
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-4">
+                        <label className="text-xs font-medium text-slate-300 flex items-center gap-2 cursor-pointer hover:text-white transition-colors">
+                          <input
+                            type="checkbox"
+                            checked={digitalSheetWithDelivery}
+                            onChange={(e) => setDigitalSheetWithDelivery(e.target.checked)}
+                            className="rounded text-blue-600 focus:ring-blue-500 h-3.5 w-3.5"
+                          />
+                          <span>{digitalSheetWithDelivery ? 'З доставкою' : 'Без доставки'}</span>
+                        </label>
+
+                        <div className="flex bg-slate-800 p-1 rounded-lg border border-slate-700 text-xs font-semibold">
+                          <button
+                            type="button"
+                            onClick={() => setDigitalSheetPerPiece(false)}
+                            className={`px-3 py-1 rounded-md transition-all ${
+                              !digitalSheetPerPiece
+                                ? 'bg-blue-600 text-white shadow-sm'
+                                : 'text-slate-400 hover:text-white'
+                            }`}
+                          >
+                            за наклад
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setDigitalSheetPerPiece(true)}
+                            className={`px-3 py-1 rounded-md transition-all ${
+                              digitalSheetPerPiece
+                                ? 'bg-blue-600 text-white shadow-sm'
+                                : 'text-slate-400 hover:text-white'
+                            }`}
+                          >
+                            за екземпляр
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
                     <div className="overflow-x-auto">
                       <table className="w-full text-center text-xs border-collapse">
                         <thead>
-                          <tr className="bg-slate-800 text-slate-200 text-xs font-semibold uppercase">
-                            <th className="py-3 px-4 text-left border-r border-slate-700/50">Матеріал та ламінація</th>
+                          <tr className="bg-slate-800/95 text-slate-200 text-xs font-semibold uppercase tracking-wider border-b border-slate-700">
+                            <th className="py-3 px-4 text-left border-r border-slate-700/50">Матеріал та покриття</th>
                             <th className="py-3 px-3 border-r border-slate-700/50">Друк</th>
                             <th className="py-3 px-3 border-r border-slate-700/50">Готовність</th>
-                            {[1, 25, 50, 75, 100, 200, 500].map(tir => (
-                              <th key={tir} className="py-3 px-3 border-r border-slate-700/50 last:border-r-0 font-extrabold text-blue-300">
-                                {tir} шт.
-                              </th>
+                            {[1, 25, 50, 100, 200, 500, 1000].map(tir => (
+                              <th key={tir} style={{ padding: '9px 8px', border: '1px solid #a00000' }} className="font-bold text-white bg-slate-800">{tir}</th>
                             ))}
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100">
-                          {/* Current Custom Selected Row */}
-                          <tr className="bg-blue-50/40 font-bold">
-                            <td className="py-3 px-4 text-left border-r border-slate-200 text-blue-950 font-extrabold">
-                              {digitalSheetMaterialCat.includes('coated') ? `Крейдований ${digitalSheetDensity} г/м²` : digitalSheetMaterialCat}
-                              {digitalSheetCoating !== 'none' ? ` + Лам (${digitalSheetCoating})` : ' (без лам.)'}
-                              {digitalSheetBoxes > 0 ? ` + ${digitalSheetBoxes} бокс` : ''}
-                            </td>
-                            <td className="py-3 px-3 border-r border-slate-200 text-blue-600 font-extrabold">
-                              {digitalSheetPrintColor.replace('_', '+')}
-                            </td>
-                            <td className="py-3 px-3 border-r border-slate-200 text-slate-500 font-semibold">
-                              1 день
-                            </td>
-                            {[1, 25, 50, 75, 100, 200, 500].map(tir => {
-                              const baseUnitRate = digitalSheetPrintColor.includes('4_4') ? 2.4 : 1.5;
-                              const lamRate = digitalSheetCoating !== 'none' ? 1.2 : 0;
-                              const postCurveRate = digitalSheetCornerCurve !== '0' ? 0.35 : 0;
-                              const boxCost = digitalSheetBoxes * 15;
-                              const deliveryCost = digitalSheetWithDelivery ? 90 : 0;
-                              const totalCost = Math.round(tir * digitalSheetSets * (baseUnitRate + lamRate + postCurveRate) + boxCost + deliveryCost + 65);
-                              const displayCost = digitalSheetPerPiece ? (totalCost / tir).toFixed(2) : totalCost;
-
-                              return (
-                                <td
-                                  key={tir}
-                                  onClick={() => {
-                                    setQuantity(tir);
-                                    setCategory('Листівки');
-                                    setStep('editor');
-                                  }}
-                                  className="py-3 px-3 border-r border-slate-200 last:border-r-0 text-slate-950 font-black hover:bg-blue-600 hover:text-white cursor-pointer transition-all text-sm"
-                                  title="Натисніть щоб оформити замовлення"
-                                >
-                                  {displayCost} ₴
-                                </td>
-                              );
-                            })}
-                          </tr>
-
-                          {/* Related Material Rows for Fast Comparison */}
-                          {[
-                            { mat: 'Крейдований 350 г/м² (мат)', col: '4+4', r: 2.2 },
-                            { mat: 'Крейдований 350 г/м² + Soft Touch 1+1', col: '4+4', r: 3.2 },
-                            { mat: 'Крейдований 300 г/м² + Глянець 1+0', col: '4+0', r: 1.8 },
-                            { mat: 'Офсетний 80 г/м² (бланки)', col: '4+0', r: 0.65 },
-                            { mat: 'Самоклейка Raflatac напівглянець', col: '4+0', r: 1.9 },
-                            { mat: 'Дизайнерський картон Touch Cover 301г', col: '4+4', r: 5.5 },
-                          ].map((row, idx) => (
-                            <tr key={idx} className="hover:bg-slate-50 transition-colors text-slate-700">
-                              <td className="py-2.5 px-4 text-left font-medium border-r border-slate-100">{row.mat}</td>
-                              <td className="py-2.5 px-3 font-semibold text-slate-600 border-r border-slate-100">{row.col}</td>
-                              <td className="py-2.5 px-3 text-slate-400 border-r border-slate-100">1 день</td>
-                              {[1, 25, 50, 75, 100, 200, 500].map(tir => {
-                                const cost = Math.round(tir * row.r + 75);
-                                return (
-                                  <td
-                                    key={tir}
-                                    onClick={() => {
-                                      setQuantity(tir);
-                                      setCategory('Листівки');
-                                      setStep('editor');
-                                    }}
-                                    className="py-2.5 px-3 font-bold text-slate-800 border-r border-slate-100 last:border-r-0 hover:bg-blue-600 hover:text-white cursor-pointer transition-all"
-                                  >
-                                    {digitalSheetPerPiece ? (cost / tir).toFixed(2) : cost} ₴
-                                  </td>
-                                );
-                              })}
+                        <tbody>
+                          {digitalSelectedMaterials.length === 0 || digitalSelectedCoverings.length === 0 || digitalSelectedPrints.length === 0 ? (
+                            <tr>
+                              <td colSpan={10} className="py-8 text-center text-slate-400 font-semibold">
+                                Будь ласка, оберіть хоча б один матеріал, покриття та тип друку у фільтрі вище.
+                              </td>
                             </tr>
-                          ))}
+                          ) : (
+                            digitalSelectedMaterials.flatMap(matId =>
+                              digitalSelectedCoverings.flatMap(covId =>
+                                digitalSelectedPrints.map(colId => {
+                                  const matLabels: Record<string, string> = {
+                                    '80': 'Офсет 80г',
+                                    '90': 'Крейда МАТ 90г',
+                                    '115': 'Крейда МАТ 115г',
+                                    '130': 'Крейда МАТ 130г',
+                                    '150': 'Крейда МАТ 150г',
+                                    '170': 'Крейда МАТ 170г',
+                                    '250': 'Крейда МАТ 250г',
+                                    '300': 'Крейда МАТ 300г',
+                                    '350': 'Крейда МАТ 350г',
+                                    '450': 'Крейда МАТ 450г',
+                                    'kraft_70': 'Крафт бурий 70г',
+                                    'linen_300': 'Льон білий 300г',
+                                    'tintoretto_crema': 'Tintoretto crema 300г',
+                                    'tintoretto_gesso': 'Tintoretto gesso 300г',
+                                    'stardream_opal': 'Stardream opal 285г',
+                                    'stardream_diamond': 'Stardream diamond 285г',
+                                    'stardream_topaz': 'Stardream topaz 285г',
+                                    'raflatac': 'Самоклейка Raflatac',
+                                  };
+                                  const covLabels: Record<string, string> = {
+                                    '0': '',
+                                    '7': '(ГЛ лам 1+0)',
+                                    '8': '(ГЛ лам 1+1)',
+                                    '9': '(МАТ лам 1+0)',
+                                    '10': '(МАТ лам 1+1)',
+                                    '30': '(SOFT лам 1+0)',
+                                    '31': '(SOFT лам 1+1)',
+                                    'uv_10': '(УФ ЛАК 1+0)',
+                                    'uv_11': '(УФ ЛАК 1+1)',
+                                    'gibrid_10': '(Гібрид 1+0)',
+                                  };
+
+                                  const matName = matLabels[matId] || `Папір ${matId}г`;
+                                  const covName = covLabels[covId] || '';
+                                  const fullMatName = covName ? `${matName} ${covName}` : matName;
+
+                                  const baseRate = colId.includes('4+4') || colId.includes('5+5') ? 2.4 : 1.5;
+                                  const lamRate = covId === '0' ? 0 : covId.includes('3') ? 1.8 : 1.1;
+                                  const deliveryFee = digitalSheetWithDelivery ? 90 : 0;
+
+                                  return (
+                                    <tr key={`${matId}-${covId}-${colId}`} className="hover:bg-blue-50/30 transition-colors border-b border-slate-100">
+                                      <td className="py-3 px-4 text-left font-bold text-slate-800 border-r border-slate-100">
+                                        {fullMatName}
+                                      </td>
+                                      <td className="py-3 px-3 font-bold text-rose-600 border-r border-slate-100">
+                                        {colId}
+                                      </td>
+                                      <td className="py-3 px-3 text-slate-500 font-semibold border-r border-slate-100">
+                                        1 день
+                                      </td>
+                                      {[1, 25, 50, 100, 200, 500, 1000].map(tir => {
+                                        const cost = Math.round(tir * digitalSheetSets * (baseRate + lamRate) + deliveryFee + 65);
+                                        const displayCost = digitalSheetPerPiece ? (cost / tir).toFixed(2) : cost;
+
+                                        return (
+                                          <td
+                                            key={tir}
+                                            onClick={() => {
+                                              setQuantity(tir);
+                                              setCategory('Листівки');
+                                              setStep('editor');
+                                            }}
+                                            className="py-3 px-3 border-r border-slate-100 last:border-r-0 font-extrabold text-slate-900 hover:bg-blue-600 hover:text-white cursor-pointer transition-all text-sm"
+                                            title="Натисніть для замовлення"
+                                          >
+                                            {displayCost} грн
+                                          </td>
+                                        );
+                                      })}
+                                    </tr>
+                                  );
+                                })
+                              )
+                            )
+                          )}
                         </tbody>
                       </table>
                     </div>
@@ -5009,78 +4971,411 @@ export const Calculator: React.FC = () => {
 
               {/* 2. DIGITAL FELLING (ВИСІЧНА ПРОДУКЦІЯ) */}
               {digitalSubTab === 'felling' && (
-                <div className="flex flex-col gap-6">
-                  <div className="ios-card bg-white" style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                      <div style={{ width: '44px', height: '44px', borderRadius: '14px', backgroundColor: 'rgba(0, 122, 255, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)' }}>
-                        <Scissors size={22} />
+                <div className="flex flex-col gap-5">
+                  {/* Title & Info Bar */}
+                  <div className="ios-card bg-white p-4">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <div className="flex items-center gap-3">
+                        <div style={{ width: '42px', height: '42px', borderRadius: '12px', backgroundColor: 'rgba(0, 122, 255, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)' }}>
+                          <Scissors size={22} />
+                        </div>
+                        <div>
+                          <h3 className="text-base font-extrabold text-slate-900 m-0">Висічна продукція</h3>
+                          <span className="text-xs text-slate-500">Швидка цифрова висічка готових форм (хенгери, підставки, кишенькові календарі)</span>
+                        </div>
                       </div>
-                      <div>
-                        <h4 style={{ fontSize: '15px', fontWeight: '800', color: 'var(--text-dark)', margin: 0 }}>Цифрова висічна продукція (штампи)</h4>
-                        <span style={{ fontSize: '12px', color: 'var(--text-medium)' }}>Готові контури висічки: хенгери на двері, підставки, кишенькові календарики</span>
+
+                      {/* Quick Info Badges */}
+                      <div className="flex flex-wrap items-center gap-2">
+                        {[
+                          { label: 'Інструкція по оформленню', icon: <Info size={13} className="text-blue-500" /> },
+                          { label: 'Завантажити шаблон штампу', icon: <Download size={13} className="text-emerald-500" /> },
+                          { label: 'Терміни друку', icon: <Clock size={13} className="text-amber-500" /> },
+                          { label: 'Матеріали', icon: <Layers size={13} className="text-indigo-500" /> },
+                          { label: 'Зразки матеріалів', icon: <Tag size={13} className="text-cyan-500" /> },
+                          { label: 'Знайшли помилку?', icon: <AlertTriangle size={13} className="text-rose-500" /> },
+                        ].map((b, idx) => (
+                          <button
+                            key={idx}
+                            type="button"
+                            onClick={() => setActiveInfoModal('modal_instr_digital')}
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200/80 text-[11px] font-semibold text-slate-700 transition-all"
+                          >
+                            {b.icon}
+                            <span>{b.label}</span>
+                          </button>
+                        ))}
                       </div>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    {[
-                      { id: '128', title: 'Хенгер на двері №1', size: '90 × 200 мм', desc: 'З круглим отвором та розрізом' },
-                      { id: '129', title: 'Хенгер на двері №2', size: '100 × 210 мм', desc: 'З гачком на ручку' },
-                      { id: '130', title: 'Підставка під чашку', size: 'Ø 90 мм', desc: 'Круглий костер' },
-                      { id: '131', title: 'Календар кишеньковий', size: '100 × 70 мм', desc: 'З заокругленими кутами R=5' },
-                    ].map(st => (
-                      <button
-                        key={st.id}
-                        type="button"
-                        onClick={() => setFellingStamp(st.id)}
-                        className={`p-4 rounded-xl text-left transition-all ${
-                          fellingStamp === st.id
-                            ? 'border-2 border-blue-600 bg-blue-50/30 shadow-md text-blue-900'
-                            : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
-                        }`}
-                      >
-                        <div className="text-xs font-bold">{st.title}</div>
-                        <div className="text-[11px] font-semibold text-blue-600 mt-0.5">{st.size}</div>
-                        <div className="text-[10px] text-slate-500 mt-1">{st.desc}</div>
-                      </button>
-                    ))}
+                  {/* Section: Форма (Categories) */}
+                  <div className="ios-card bg-white p-5 flex flex-col gap-4">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800 m-0 flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-blue-600"></span>
+                      Форма
+                    </h4>
+
+                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
+                      {[
+                        { id: '1', title: 'Стандартна', desc: 'Хенгери, доміки' },
+                        { id: '2', title: 'Кругла', desc: 'Костери, наліпки' },
+                        { id: '3', title: 'Овальна', desc: 'Овальні форми' },
+                        { id: '4', title: 'Прямокутна', desc: 'Із заокругленням' },
+                        { id: '5', title: 'Етикетка', desc: 'Кольєретки, бірки' },
+                      ].map(f => (
+                        <button
+                          key={f.id}
+                          type="button"
+                          onClick={() => setFellingForm(f.id)}
+                          className={`p-3.5 rounded-xl text-center transition-all border ${
+                            fellingForm === f.id
+                              ? 'border-2 border-blue-600 bg-blue-50/40 shadow-sm font-bold text-blue-900'
+                              : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+                          }`}
+                        >
+                          <div className="text-xs font-extrabold">{f.title}</div>
+                          <div className="text-[10px] text-slate-400 mt-0.5">{f.desc}</div>
+                        </button>
+                      ))}
+                    </div>
                   </div>
 
-                  {/* Pricing Matrix */}
-                  <div className="ios-card bg-white overflow-hidden">
-                    <div className="bg-slate-900 text-white px-5 py-3.5 flex items-center justify-between">
-                      <h4 className="text-xs font-bold uppercase tracking-wider text-slate-200 m-0">Прайс цифрової висічної продукції</h4>
+                  {/* Section: Штамп & Вид готового виробу */}
+                  <div className="ios-card bg-white p-5">
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+                      <div className="md:col-span-6 flex flex-col gap-4">
+                        <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800 m-0 flex items-center gap-2">
+                          <span className="w-2 h-2 rounded-full bg-blue-600"></span>
+                          Штамп
+                        </h4>
+
+                        <div>
+                          <label className="text-[11px] font-bold text-slate-600 block mb-1.5">Оберіть готовий штамп:</label>
+                          <select
+                            value={fellingStamp}
+                            onChange={(e) => setFellingStamp(e.target.value)}
+                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 focus:bg-white focus:border-blue-600 focus:outline-none transition-all shadow-sm"
+                          >
+                            <option value="128">Хенгер вид 1 (90 × 200 мм) — з круглим отвором та розрізом</option>
+                            <option value="133">Хенгер вид 2 (90 × 200 мм) — з гачком на ручку дверей</option>
+                            <option value="160">Будинок (210 × 300 мм) — календар настільний</option>
+                            <option value="161">Пірамідка (305 × 134 мм) — настільна рекламна піраміда</option>
+                            <option value="130">Підставка під чашку (Ø 90 мм) — круглий костер</option>
+                            <option value="131">Календар кишеньковий (100 × 70 мм) — з радіусом R=5</option>
+                          </select>
+                        </div>
+
+                        <div className="p-3 bg-blue-50/40 rounded-xl border border-blue-100 flex items-center gap-3">
+                          <Download size={16} className="text-blue-600 shrink-0" />
+                          <div className="text-xs">
+                            <span className="font-bold text-blue-900 block">Готовий контур штампу</span>
+                            <span className="text-[11px] text-blue-700">Завантажте векторний шаблон PDF для розміщення вашого макету</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Right: Preview Box */}
+                      <div className="md:col-span-6 flex flex-col items-center justify-center p-6 bg-gradient-to-b from-slate-50 to-slate-100/60 rounded-2xl border border-slate-200/80 min-h-[170px]">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-3">Вид готового виробу</span>
+                        <div className="w-32 h-44 rounded-xl bg-white border-2 border-blue-600 shadow-md flex flex-col items-center justify-center relative p-3 text-center">
+                          <div className="w-8 h-8 rounded-full border-2 border-blue-400 mb-2"></div>
+                          <span className="text-xs font-black text-blue-700">
+                            {fellingStamp === '128' || fellingStamp === '133' ? '90 × 200 мм' : fellingStamp === '160' ? '210 × 300 мм' : '100 × 70 мм'}
+                          </span>
+                          <span className="text-[10px] text-slate-400 mt-1">Висічний контур</span>
+                        </div>
+                      </div>
                     </div>
+                  </div>
+
+                  {/* Section: КОМПЛЕКТІВ МАКЕТІВ Bar */}
+                  <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex items-center justify-between flex-wrap gap-4">
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs font-extrabold uppercase text-slate-800">КОМПЛЕКТІВ МАКЕТІВ:</span>
+                      <div className="flex items-center gap-1">
+                        <button
+                          type="button"
+                          onClick={() => setDigitalSheetSets(Math.max(1, digitalSheetSets - 1))}
+                          className="w-7 h-7 rounded-md bg-white border border-slate-200 text-slate-700 font-bold hover:bg-slate-50 flex items-center justify-center transition-colors"
+                        >
+                          -
+                        </button>
+                        <input
+                          type="number"
+                          value={digitalSheetSets}
+                          onChange={(e) => setDigitalSheetSets(Math.max(1, parseInt(e.target.value) || 1))}
+                          className="w-12 h-7 text-center rounded-md border border-slate-200 font-bold text-xs"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setDigitalSheetSets(digitalSheetSets + 1)}
+                          className="w-7 h-7 rounded-md bg-white border border-slate-200 text-slate-700 font-bold hover:bg-slate-50 flex items-center justify-center transition-colors"
+                        >
+                          +
+                        </button>
+                      </div>
+                    </div>
+                    <span className="text-xs text-slate-400 font-medium">
+                      (Кількість однакових замовлень з різними макетами)
+                    </span>
+                  </div>
+
+                  {/* Section: Фільтр специфікацій та матеріалів (Exact CRM Offset Pill Buttons) */}
+                  <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+                    <div className="px-5 py-3.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                      <h4 className="text-sm font-bold text-slate-900 m-0">
+                        Фільтр специфікацій та матеріалів
+                      </h4>
+                      <span className="text-xs text-slate-500 font-medium">Оберіть параметри для формування матриці цін</span>
+                    </div>
+
+                    <div className="flex flex-col divide-y divide-slate-100">
+                      {/* Row 1: Material Options */}
+                      <div className="flex flex-col md:flex-row">
+                        <div className="w-full md:w-36 bg-slate-50/70 p-3.5 border-b md:border-b-0 md:border-r border-slate-100 text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center">
+                          МАТЕРІАЛ:
+                        </div>
+                        <div className="flex-1 p-3.5 flex gap-1.5 flex-wrap items-center">
+                          {[
+                            { id: '300', label: 'Крейда МАТ 300' },
+                            { id: '350', label: 'Крейда МАТ 350' },
+                            { id: '450', label: 'Крейда МАТ 450' },
+                            { id: 'card_white', label: 'Картон білий 300' },
+                            { id: 'kraft_300', label: 'Крафт картон 300' },
+                            { id: 'beer_card', label: 'Пивний картон 1.5 мм' },
+                          ].map(mat => {
+                            const isSel = fellingSelectedMaterials.includes(mat.id);
+                            return (
+                              <button
+                                key={mat.id}
+                                type="button"
+                                onClick={() => {
+                                  setFellingSelectedMaterials(prev => 
+                                    prev.includes(mat.id) ? prev.filter(x => x !== mat.id) : [...prev, mat.id]
+                                  );
+                                }}
+                                className={`px-2.5 py-1 text-xs font-semibold rounded-lg border transition-all ${
+                                  isSel
+                                    ? 'bg-blue-600 text-white border-blue-600 shadow-sm font-bold'
+                                    : 'bg-slate-100 hover:bg-slate-200/80 text-slate-700 border-slate-200/60'
+                                }`}
+                              >
+                                {mat.label}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Row 2: Coating Options */}
+                      <div className="flex flex-col md:flex-row">
+                        <div className="w-full md:w-36 bg-slate-50/70 p-3.5 border-b md:border-b-0 md:border-r border-slate-100 text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center">
+                          ПОКРИТТЯ:
+                        </div>
+                        <div className="flex-1 p-3.5 flex gap-1.5 flex-wrap items-center">
+                          {[
+                            { id: '0', label: 'БП' },
+                            { id: '7', label: 'ГЛ лам 1+0' },
+                            { id: '8', label: 'ГЛ лам 1+1' },
+                            { id: '9', label: 'МАТ лам 1+0' },
+                            { id: '10', label: 'МАТ лам 1+1' },
+                            { id: '30', label: 'SOFT лам 1+0' },
+                            { id: '31', label: 'SOFT лам 1+1' },
+                          ].map(cov => {
+                            const isSel = fellingSelectedCoverings.includes(cov.id);
+                            return (
+                              <button
+                                key={cov.id}
+                                type="button"
+                                onClick={() => {
+                                  setFellingSelectedCoverings(prev => 
+                                    prev.includes(cov.id) ? prev.filter(x => x !== cov.id) : [...prev, cov.id]
+                                  );
+                                }}
+                                className={`px-2.5 py-1 text-xs font-semibold rounded-lg border transition-all ${
+                                  isSel
+                                    ? 'bg-blue-600 text-white border-blue-600 shadow-sm font-bold'
+                                    : 'bg-slate-100 hover:bg-slate-200/80 text-slate-700 border-slate-200/60'
+                                }`}
+                              >
+                                {cov.label}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Row 3: Color Printing Options */}
+                      <div className="flex flex-col md:flex-row">
+                        <div className="w-full md:w-36 bg-slate-50/70 p-3.5 border-b md:border-b-0 md:border-r border-slate-100 text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center">
+                          ДРУК:
+                        </div>
+                        <div className="flex-1 p-3.5 flex gap-1.5 flex-wrap items-center">
+                          {[
+                            { id: '4+0', label: 'Односторонній 4+0' },
+                            { id: '4+4', label: 'Двосторонній 4+4' },
+                            { id: '1+0', label: 'Одноколірний 1+0' },
+                            { id: '1+1', label: 'Одноколірний 1+1' },
+                          ].map(col => {
+                            const isSel = fellingSelectedPrints.includes(col.id);
+                            return (
+                              <button
+                                key={col.id}
+                                type="button"
+                                onClick={() => {
+                                  setFellingSelectedPrints(prev => 
+                                    prev.includes(col.id) ? prev.filter(x => x !== col.id) : [...prev, col.id]
+                                  );
+                                }}
+                                className={`px-2.5 py-1 text-xs font-semibold rounded-lg border transition-all ${
+                                  isSel
+                                    ? 'bg-blue-600 text-white border-blue-600 shadow-sm font-bold'
+                                    : 'bg-slate-100 hover:bg-slate-200/80 text-slate-700 border-slate-200/60'
+                                }`}
+                              >
+                                {col.label}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Price Calculation Matrix Table (Matching Exact Offset Design) */}
+                  <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+                    {/* Banner Controls Bar */}
+                    <div className="bg-slate-900 text-white px-5 py-3.5 flex items-center justify-between flex-wrap gap-4">
+                      <div className="flex items-center gap-2">
+                        <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span className="text-xs font-bold uppercase tracking-wider text-slate-200">
+                          ВАРТІСТЬ ТА СТРОКИ ВИГОТОВЛЕННЯ
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-4">
+                        <label className="text-xs font-medium text-slate-300 flex items-center gap-2 cursor-pointer hover:text-white transition-colors">
+                          <input
+                            type="checkbox"
+                            checked={digitalSheetWithDelivery}
+                            onChange={(e) => setDigitalSheetWithDelivery(e.target.checked)}
+                            className="rounded text-blue-600 focus:ring-blue-500 h-3.5 w-3.5"
+                          />
+                          <span>{digitalSheetWithDelivery ? 'З доставкою' : 'Без доставки'}</span>
+                        </label>
+
+                        <div className="flex bg-slate-800 p-1 rounded-lg border border-slate-700 text-xs font-semibold">
+                          <button
+                            type="button"
+                            onClick={() => setDigitalSheetPerPiece(false)}
+                            className={`px-3 py-1 rounded-md transition-all ${
+                              !digitalSheetPerPiece
+                                ? 'bg-blue-600 text-white shadow-sm'
+                                : 'text-slate-400 hover:text-white'
+                            }`}
+                          >
+                            за наклад
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setDigitalSheetPerPiece(true)}
+                            className={`px-3 py-1 rounded-md transition-all ${
+                              digitalSheetPerPiece
+                                ? 'bg-blue-600 text-white shadow-sm'
+                                : 'text-slate-400 hover:text-white'
+                            }`}
+                          >
+                            за екземпляр
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+
                     <div className="overflow-x-auto">
                       <table className="w-full text-center text-xs border-collapse">
                         <thead>
-                          <tr className="bg-slate-800 text-slate-200 text-xs font-semibold uppercase">
-                            <th className="py-3 px-4 text-left border-r border-slate-700/50">Форма / Матеріал</th>
+                          <tr className="bg-slate-800/95 text-slate-200 text-xs font-semibold uppercase tracking-wider border-b border-slate-700">
+                            <th className="py-3 px-4 text-left border-r border-slate-700/50">Форма, Матеріал та покриття</th>
+                            <th className="py-3 px-3 border-r border-slate-700/50">Друк</th>
+                            <th className="py-3 px-3 border-r border-slate-700/50">Готовність</th>
                             {[50, 100, 200, 500, 1000].map(tir => (
-                              <th key={tir} className="py-3 px-3 border-r border-slate-700/50 last:border-r-0 font-bold">{tir} шт.</th>
+                              <th key={tir} style={{ padding: '9px 8px', border: '1px solid #a00000' }} className="font-bold text-white bg-slate-800">{tir}</th>
                             ))}
                           </tr>
                         </thead>
-                        <tbody className="divide-y divide-slate-100">
-                          {[
-                            { name: 'Хенгер на двері (Картон 350г 4+4)', r: 4.8 },
-                            { name: 'Хенгер на двері + Матова ламінація 1+1', r: 6.2 },
-                            { name: 'Костер під чашку (Пивний картон 1.5мм)', r: 8.5 },
-                            { name: 'Кишеньковий календар 100×70 (350г + Лам)', r: 2.8 },
-                          ].map((row, idx) => (
-                            <tr key={idx} className="hover:bg-blue-50/20 transition-colors">
-                              <td className="py-2.5 px-4 text-left font-semibold text-slate-800 border-r border-slate-100">{row.name}</td>
-                              {[50, 100, 200, 500, 1000].map(tir => (
-                                <td
-                                  key={tir}
-                                  onClick={() => { setQuantity(tir); setCategory('Листівки'); setStep('editor'); }}
-                                  className="py-2.5 px-3 font-bold text-slate-900 border-r border-slate-100 last:border-r-0 hover:bg-blue-600 hover:text-white cursor-pointer transition-all"
-                                >
-                                  {Math.round(tir * row.r + 140)} ₴
-                                </td>
-                              ))}
+                        <tbody>
+                          {fellingSelectedMaterials.length === 0 || fellingSelectedCoverings.length === 0 || fellingSelectedPrints.length === 0 ? (
+                            <tr>
+                              <td colSpan={8} className="py-8 text-center text-slate-400 font-semibold">
+                                Будь ласка, оберіть параметри висічки у фільтрі вище.
+                              </td>
                             </tr>
-                          ))}
+                          ) : (
+                            fellingSelectedMaterials.flatMap(matId =>
+                              fellingSelectedCoverings.flatMap(covId =>
+                                fellingSelectedPrints.map(colId => {
+                                  const matLabels: Record<string, string> = {
+                                    '300': 'Крейда МАТ 300г',
+                                    '350': 'Крейда МАТ 350г',
+                                    '450': 'Крейда МАТ 450г',
+                                    'card_white': 'Картон білий 300г',
+                                    'kraft_300': 'Крафт картон 300г',
+                                    'beer_card': 'Пивний картон 1.5мм',
+                                  };
+                                  const covLabels: Record<string, string> = {
+                                    '0': '',
+                                    '7': '(ГЛ лам 1+0)',
+                                    '8': '(ГЛ лам 1+1)',
+                                    '9': '(МАТ лам 1+0)',
+                                    '10': '(МАТ лам 1+1)',
+                                    '30': '(SOFT лам 1+0)',
+                                    '31': '(SOFT лам 1+1)',
+                                  };
+
+                                  const matName = matLabels[matId] || `Матеріал ${matId}`;
+                                  const covName = covLabels[covId] || '';
+                                  const fullMatName = covName ? `${matName} ${covName}` : matName;
+
+                                  const baseRate = colId.includes('4+4') ? 4.5 : 3.2;
+                                  const lamRate = covId === '0' ? 0 : 1.4;
+
+                                  return (
+                                    <tr key={`${matId}-${covId}-${colId}`} className="hover:bg-blue-50/30 transition-colors border-b border-slate-100">
+                                      <td className="py-3 px-4 text-left font-bold text-slate-800 border-r border-slate-100">
+                                        Хенгер №{fellingStamp} — {fullMatName}
+                                      </td>
+                                      <td className="py-3 px-3 font-bold text-rose-600 border-r border-slate-100">
+                                        {colId}
+                                      </td>
+                                      <td className="py-3 px-3 text-slate-500 font-semibold border-r border-slate-100">
+                                        1-2 дні
+                                      </td>
+                                      {[50, 100, 200, 500, 1000].map(tir => {
+                                        const cost = Math.round(tir * digitalSheetSets * (baseRate + lamRate) + 140);
+                                        const displayCost = digitalSheetPerPiece ? (cost / tir).toFixed(2) : cost;
+
+                                        return (
+                                          <td
+                                            key={tir}
+                                            onClick={() => {
+                                              setQuantity(tir);
+                                              setCategory('Листівки');
+                                              setStep('editor');
+                                            }}
+                                            className="py-3 px-3 border-r border-slate-100 last:border-r-0 font-extrabold text-slate-900 hover:bg-blue-600 hover:text-white cursor-pointer transition-all text-sm"
+                                            title="Натисніть для замовлення"
+                                          >
+                                            {displayCost} грн
+                                          </td>
+                                        );
+                                      })}
+                                    </tr>
+                                  );
+                                })
+                              )
+                            )
+                          )}
                         </tbody>
                       </table>
                     </div>
