@@ -117,6 +117,17 @@ export const Calculator: React.FC = () => {
   const [gridYear, setGridYear] = useState<'2026' | '2027'>('2026');
   const [gridCursor, setGridCursor] = useState<boolean>(true);
 
+  // Roll Label Calculator specific states
+  const [rollWidth, setRollWidth] = useState<string>('50');
+  const [rollHeight, setRollHeight] = useState<string>('50');
+  const [rollQuantity, setRollQuantity] = useState<number>(1000);
+  const [rollGap, setRollGap] = useState<string>('4');
+  const [rollCore, setRollCore] = useState<string>('76');
+  const [rollOrientation, setRollOrientation] = useState<string>('1');
+  const [rollMaterial, setRollMaterial] = useState<string>('209');
+  const [rollColor, setRollColor] = useState<string>('1');
+  const [rollCoating, setRollCoating] = useState<string>('0');
+
   // Helper to transition into specific offset product calculator
   const openOffsetProduct = (params: {
     category: any;
@@ -3890,6 +3901,21 @@ export const Calculator: React.FC = () => {
                         </p>
                       </div>
                     )}
+                    {activeInfoModal === 'instr_roll' && (
+                      <div className="flex flex-col gap-3">
+                        <div className="flex items-center gap-2 text-blue-600 font-bold text-base">
+                          <FileText size={20} />
+                          <span>Інструкція: Рулонний друк етикеток</span>
+                        </div>
+                        <p className="text-xs text-slate-600 leading-relaxed m-0">
+                          1. Вкажіть точні розміри однієї наліпки у міліметрах (ширина × висота).<br/>
+                          2. Вкажіть відстань між наліпками у рулоні (стандарт — 4 мм).<br/>
+                          3. Оберіть діаметр втулки під ваш аплікатор (стандарт — 76 мм) та орієнтацію намотки.<br/>
+                          4. Оберіть бажаний матеріал (папір, поліпропілен, винний), колірність та покриття лаком.<br/>
+                          5. Клікніть на комірку в таблиці цін для оформлення замовлення.
+                        </p>
+                      </div>
+                    )}
                     {activeInfoModal === 'terms' && (
                       <div className="flex flex-col gap-3">
                         <div className="flex items-center gap-2 text-blue-600 font-bold text-base">
@@ -4313,115 +4339,615 @@ export const Calculator: React.FC = () => {
             </div>
           )}
 
-          {/* TAB 5: ROLL PRINTING */}
+          {/* TAB 5: ROLL PRINTING (Рулонна етикетка та наліпки) */}
           {mainCategoryTab === 'roll' && (
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-              gap: '20px'
-            }}>
-              {[
-                {
-                  title: 'Рулонна Етикетка (Папір)',
-                  desc: 'Самоклеючі етикетки у рулонах на напівглянці для автоматичних аплікаторів та маркування.',
-                  icon: <Tag size={30} style={{ color: '#0ea5e9' }} />,
-                  color: 'rgba(14, 165, 233, 0.1)',
-                  badgeClass: 'ios-badge-blue',
-                  badge: 'Напівглянець',
-                  metric: 'Рулони / бобіни',
-                  cat: 'Етикетки'
-                },
-                {
-                  title: 'Поліпропіленова Етикетка',
-                  desc: 'Вологостійкі та жиростійкі білі або срібні PP наклейки для побутової хімії та продуктів.',
-                  icon: <Layers size={30} style={{ color: '#34c759' }} />,
-                  color: 'rgba(52, 199, 89, 0.1)',
-                  badgeClass: 'ios-badge-green',
-                  badge: 'Поліпропілен PP',
-                  metric: 'Вологостійка',
-                  cat: 'Етикетки'
-                },
-                {
-                  title: 'Прозора рулонна етикетка',
-                  desc: 'Ефект невидимої етикетки (no-look label) для прозорої косметичної та скляної тари.',
-                  icon: <Sparkles size={30} style={{ color: '#af52de' }} />,
-                  color: 'rgba(175, 82, 222, 0.1)',
-                  badgeClass: 'ios-badge-purple',
-                  badge: 'Прозора плівка',
-                  metric: 'No-look label',
-                  cat: 'Етикетки'
-                },
-                {
-                  title: 'Преміум-етикетка з тисненням',
-                  desc: 'Тиснення золотою та срібною фольгою, конгрев та вибірковий УФ-лак у рулонах.',
-                  icon: <Sparkles size={30} style={{ color: '#ffcc00' }} />,
-                  color: 'rgba(255, 204, 0, 0.15)',
-                  badgeClass: 'ios-badge-yellow',
-                  badge: 'Фольга / Конгрев',
-                  metric: 'Преміум серія',
-                  cat: 'Етикетки'
-                }
-              ].map(item => (
-                <div
-                  key={item.title}
-                  onClick={() => handleSelectCategory(item.cat)}
-                  className="ios-card bg-white"
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                    padding: '24px',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                    minHeight: '200px',
-                    position: 'relative'
-                  }}
-                  onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; }}
-                >
-                  <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                      <div style={{
-                        width: '56px',
-                        height: '56px',
-                        borderRadius: '16px',
-                        backgroundColor: item.color,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                      }}>
-                        {item.icon}
-                      </div>
-                      <span className={`ios-badge ${item.badgeClass}`} style={{ fontSize: '11px', padding: '3px 8px' }}>
-                        {item.badge}
-                      </span>
-                    </div>
-
-                    <h4 style={{ fontSize: '15px', fontWeight: '800', marginBottom: '6px', color: 'var(--text-dark)' }}>
-                      {item.title}
-                    </h4>
-                    <p style={{ fontSize: '12px', color: 'var(--text-medium)', lineHeight: '1.4' }}>
-                      {item.desc}
-                    </p>
+            <div className="flex flex-col gap-6">
+              {/* Top Banner & Info Navigation Bar */}
+              <div className="ios-card bg-white" style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                  <div style={{ width: '44px', height: '44px', borderRadius: '14px', backgroundColor: 'rgba(0, 122, 255, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)' }}>
+                    <Tag size={22} />
                   </div>
-
-                  <div style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    borderTop: '0.5px solid var(--border-light)',
-                    paddingTop: '12px',
-                    marginTop: '16px'
-                  }}>
-                    <span style={{ fontSize: '11px', fontWeight: '600', color: 'var(--text-medium)' }}>
-                      {item.metric}
-                    </span>
-                    <span style={{ color: 'var(--primary)', display: 'flex', alignItems: 'center', fontSize: '12px', fontWeight: '700' }}>
-                      Розрахувати <ChevronRight size={14} />
-                    </span>
+                  <div>
+                    <h4 style={{ fontSize: '15px', fontWeight: '800', color: 'var(--text-dark)', margin: 0 }}>Рулонна етикетка</h4>
+                    <span style={{ fontSize: '12px', color: 'var(--text-medium)' }}>Друк самоклеючихся етикеток і наліпок в рулонах</span>
                   </div>
                 </div>
-              ))}
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                  <button
+                    type="button"
+                    onClick={() => setActiveInfoModal('instr_roll')}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      padding: '8px 14px',
+                      borderRadius: 'var(--radius-md)',
+                      border: '0.5px solid var(--border-light)',
+                      backgroundColor: 'var(--bg-system)',
+                      color: 'var(--text-dark)',
+                      fontSize: '12px',
+                      fontWeight: '600',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <FileText size={14} style={{ color: 'var(--primary)' }} />
+                    <span>Інструкція</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveInfoModal('terms')}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      padding: '8px 14px',
+                      borderRadius: 'var(--radius-md)',
+                      border: '0.5px solid var(--border-light)',
+                      backgroundColor: 'var(--bg-system)',
+                      color: 'var(--text-dark)',
+                      fontSize: '12px',
+                      fontWeight: '600',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <Clock size={14} style={{ color: 'var(--primary)' }} />
+                    <span>Терміни друку</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveInfoModal('materials')}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      padding: '8px 14px',
+                      borderRadius: 'var(--radius-md)',
+                      border: '0.5px solid var(--border-light)',
+                      backgroundColor: 'var(--bg-system)',
+                      color: 'var(--text-dark)',
+                      fontSize: '12px',
+                      fontWeight: '600',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <Layers size={14} style={{ color: 'var(--primary)' }} />
+                    <span>Матеріали</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setActiveInfoModal('samples')}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      padding: '8px 14px',
+                      borderRadius: 'var(--radius-md)',
+                      border: '0.5px solid var(--border-light)',
+                      backgroundColor: 'var(--bg-system)',
+                      color: 'var(--text-dark)',
+                      fontSize: '12px',
+                      fontWeight: '600',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <Tag size={14} style={{ color: 'var(--primary)' }} />
+                    <span>Зразки</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Main Setup Cards Grid */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Left Card: Dimensions & Roll Core Parameters */}
+                <div className="ios-card bg-white" style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  <h4 style={{ fontSize: '12px', fontWeight: '800', color: 'var(--text-dark)', textTransform: 'uppercase', letterSpacing: '0.5px', margin: 0, borderBottom: '0.5px solid var(--border-light)', paddingBottom: '8px' }}>
+                    Параметри етикетки та намотки
+                  </h4>
+
+                  {/* Size Inputs */}
+                  <div>
+                    <label className="text-xs font-semibold text-slate-700 block mb-1.5">
+                      Введіть розмір 1 етикетки (мм):
+                    </label>
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1 flex items-center bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5">
+                        <input
+                          type="number"
+                          value={rollWidth}
+                          onChange={(e) => setRollWidth(e.target.value)}
+                          placeholder="Ширина"
+                          min="25"
+                          max="300"
+                          className="w-full bg-transparent text-xs font-bold text-slate-800 outline-none"
+                        />
+                        <span className="text-[11px] font-semibold text-slate-400">мм</span>
+                      </div>
+                      <span className="text-slate-400 font-bold">×</span>
+                      <div className="flex-1 flex items-center bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5">
+                        <input
+                          type="number"
+                          value={rollHeight}
+                          onChange={(e) => setRollHeight(e.target.value)}
+                          placeholder="Висота"
+                          min="25"
+                          max="470"
+                          className="w-full bg-transparent text-xs font-bold text-slate-800 outline-none"
+                        />
+                        <span className="text-[11px] font-semibold text-slate-400">мм</span>
+                      </div>
+                    </div>
+                    <span className="text-[11px] text-slate-400 mt-1 block">
+                      Максимальний розмір 300 × 470 мм, мінімальний 25 × 25 мм
+                    </span>
+                  </div>
+
+                  {/* Quick Size Presets */}
+                  <div>
+                    <label className="text-[11px] font-semibold text-slate-500 block mb-1">Швидкі пресети:</label>
+                    <div className="flex flex-wrap gap-1.5">
+                      {[
+                        { label: '30×20', w: '30', h: '20' },
+                        { label: '40×30', w: '40', h: '30' },
+                        { label: '50×50', w: '50', h: '50' },
+                        { label: '58×40', w: '58', h: '40' },
+                        { label: '70×50', w: '70', h: '50' },
+                        { label: '90×50', w: '90', h: '50' },
+                        { label: '100×100', w: '100', h: '100' },
+                        { label: '100×150', w: '100', h: '150' },
+                      ].map(p => (
+                        <button
+                          key={p.label}
+                          type="button"
+                          onClick={() => { setRollWidth(p.w); setRollHeight(p.h); }}
+                          className={`px-2.5 py-1 rounded-md text-[11px] font-bold transition-all ${
+                            rollWidth === p.w && rollHeight === p.h
+                              ? 'bg-blue-600 text-white shadow-sm'
+                              : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                          }`}
+                        >
+                          {p.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Quantity and Spacing */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="text-xs font-semibold text-slate-700 block mb-1.5">Тираж (шт):</label>
+                      <input
+                        type="number"
+                        value={rollQuantity}
+                        onChange={(e) => setRollQuantity(Math.max(100, parseInt(e.target.value) || 100))}
+                        step="500"
+                        min="100"
+                        className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-xs font-bold text-slate-800"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-semibold text-slate-700 block mb-1.5">Відстань між етикетками:</label>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="number"
+                          value={rollGap}
+                          onChange={(e) => setRollGap(e.target.value)}
+                          min="4"
+                          max="12"
+                          className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-xs font-bold text-slate-800"
+                        />
+                        <span className="text-xs text-slate-500 font-semibold whitespace-nowrap">від 4 до 12 мм</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Spool / Core Diameter */}
+                  <div>
+                    <label className="text-xs font-semibold text-slate-700 block mb-1.5">Діаметр втулки (шпулі):</label>
+                    <div className="flex flex-wrap gap-2">
+                      {[
+                        { id: '76', label: '76 мм (стандартна)' },
+                        { id: '40', label: '40 мм' },
+                        { id: '25', label: '25 мм' },
+                      ].map(core => (
+                        <button
+                          key={core.id}
+                          type="button"
+                          onClick={() => setRollCore(core.id)}
+                          className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                            rollCore === core.id
+                              ? 'bg-blue-600 text-white shadow-sm'
+                              : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                          }`}
+                        >
+                          {core.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right Card: Roll Orientation & Live Metrics */}
+                <div className="ios-card bg-white" style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  <h4 style={{ fontSize: '12px', fontWeight: '800', color: 'var(--text-dark)', textTransform: 'uppercase', letterSpacing: '0.5px', margin: 0, borderBottom: '0.5px solid var(--border-light)', paddingBottom: '8px' }}>
+                    Виберіть орієнтацію наліпки на рулоні
+                  </h4>
+
+                  {/* 4 Orientation Selectors with Clean Vector Graphics */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                    {[
+                      {
+                        id: '1',
+                        label: '1. Головою вперед',
+                        desc: 'Верх перший',
+                        icon: (
+                          <svg width="46" height="46" viewBox="0 0 54 54" fill="none">
+                            <ellipse cx="27" cy="14" rx="14" ry="5" fill="#E2E8F0" stroke="#64748B" strokeWidth="1.5"/>
+                            <path d="M13 14V34C13 36.76 19.27 39 27 39C34.73 39 41 36.76 41 34V14" fill="#F8FAFC" stroke="#64748B" strokeWidth="1.5"/>
+                            <ellipse cx="27" cy="34" rx="14" ry="5" fill="#FFFFFF" stroke="#64748B" strokeWidth="1.2"/>
+                            <path d="M14 30L2 46H26L38 30" fill="#FFFFFF" stroke="#007AFF" strokeWidth="1.5"/>
+                            <rect x="7" y="34" width="18" height="4" rx="1" fill="#007AFF" fillOpacity="0.8"/>
+                            <line x1="8" y1="41" x2="22" y2="41" stroke="#94A3B8" strokeWidth="1.2"/>
+                          </svg>
+                        )
+                      },
+                      {
+                        id: '2',
+                        label: '2. Низом вперед',
+                        desc: 'Низ перший',
+                        icon: (
+                          <svg width="46" height="46" viewBox="0 0 54 54" fill="none">
+                            <ellipse cx="27" cy="14" rx="14" ry="5" fill="#E2E8F0" stroke="#64748B" strokeWidth="1.5"/>
+                            <path d="M13 14V34C13 36.76 19.27 39 27 39C34.73 39 41 36.76 41 34V14" fill="#F8FAFC" stroke="#64748B" strokeWidth="1.5"/>
+                            <ellipse cx="27" cy="34" rx="14" ry="5" fill="#FFFFFF" stroke="#64748B" strokeWidth="1.2"/>
+                            <path d="M14 30L2 46H26L38 30" fill="#FFFFFF" stroke="#007AFF" strokeWidth="1.5"/>
+                            <line x1="8" y1="36" x2="22" y2="36" stroke="#94A3B8" strokeWidth="1.2"/>
+                            <rect x="7" y="40" width="18" height="4" rx="1" fill="#007AFF" fillOpacity="0.8"/>
+                          </svg>
+                        )
+                      },
+                      {
+                        id: '3',
+                        label: '3. Правим краєм',
+                        desc: 'Правий бік',
+                        icon: (
+                          <svg width="46" height="46" viewBox="0 0 54 54" fill="none">
+                            <ellipse cx="27" cy="14" rx="14" ry="5" fill="#E2E8F0" stroke="#64748B" strokeWidth="1.5"/>
+                            <path d="M13 14V34C13 36.76 19.27 39 27 39C34.73 39 41 36.76 41 34V14" fill="#F8FAFC" stroke="#64748B" strokeWidth="1.5"/>
+                            <ellipse cx="27" cy="34" rx="14" ry="5" fill="#FFFFFF" stroke="#64748B" strokeWidth="1.2"/>
+                            <path d="M14 30L2 46H26L38 30" fill="#FFFFFF" stroke="#007AFF" strokeWidth="1.5"/>
+                            <rect x="18" y="34" width="4" height="10" rx="0.8" fill="#007AFF" fillOpacity="0.8"/>
+                            <line x1="8" y1="36" x2="14" y2="36" stroke="#94A3B8" strokeWidth="1.2"/>
+                            <line x1="8" y1="41" x2="14" y2="41" stroke="#94A3B8" strokeWidth="1.2"/>
+                          </svg>
+                        )
+                      },
+                      {
+                        id: '4',
+                        label: '4. Лівим краєм',
+                        desc: 'Лівий бік',
+                        icon: (
+                          <svg width="46" height="46" viewBox="0 0 54 54" fill="none">
+                            <ellipse cx="27" cy="14" rx="14" ry="5" fill="#E2E8F0" stroke="#64748B" strokeWidth="1.5"/>
+                            <path d="M13 14V34C13 36.76 19.27 39 27 39C34.73 39 41 36.76 41 34V14" fill="#F8FAFC" stroke="#64748B" strokeWidth="1.5"/>
+                            <ellipse cx="27" cy="34" rx="14" ry="5" fill="#FFFFFF" stroke="#64748B" strokeWidth="1.2"/>
+                            <path d="M14 30L2 46H26L38 30" fill="#FFFFFF" stroke="#007AFF" strokeWidth="1.5"/>
+                            <rect x="6" y="34" width="4" height="10" rx="0.8" fill="#007AFF" fillOpacity="0.8"/>
+                            <line x1="13" y1="36" x2="20" y2="36" stroke="#94A3B8" strokeWidth="1.2"/>
+                            <line x1="13" y1="41" x2="20" y2="41" stroke="#94A3B8" strokeWidth="1.2"/>
+                          </svg>
+                        )
+                      }
+                    ].map(orient => {
+                      const isActive = rollOrientation === orient.id;
+                      return (
+                        <div
+                          key={orient.id}
+                          onClick={() => setRollOrientation(orient.id)}
+                          style={{
+                            padding: '10px 8px',
+                            borderRadius: 'var(--radius-md)',
+                            border: isActive ? '2px solid var(--primary)' : '0.5px solid var(--border-light)',
+                            backgroundColor: isActive ? 'rgba(0, 122, 255, 0.05)' : 'var(--bg-system)',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '6px',
+                            cursor: 'pointer',
+                            transition: 'all 0.15s ease'
+                          }}
+                        >
+                          <div className="flex items-center justify-center h-10">
+                            {orient.icon}
+                          </div>
+                          <span style={{ fontSize: '11px', fontWeight: '700', textAlign: 'center', color: isActive ? 'var(--primary)' : 'var(--text-dark)' }}>
+                            {orient.label}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Calculated Roll Technical Metrics */}
+                  {(() => {
+                    const w = parseFloat(rollWidth) || 50;
+                    const h = parseFloat(rollHeight) || 50;
+                    const gap = parseFloat(rollGap) || 4;
+                    const linearMeters = Math.round((rollQuantity * (h + gap)) / 1000 * 10) / 10;
+                    const sqMeters = Math.round((w / 1000) * linearMeters * 100) / 100;
+                    const approxRolls = Math.max(1, Math.ceil(linearMeters / 100));
+
+                    return (
+                      <div className="bg-slate-50 border border-slate-200/80 rounded-xl p-3.5 flex items-center justify-between flex-wrap gap-3 text-xs">
+                        <div>
+                          <span className="text-slate-500 block text-[11px]">Метраж намотки:</span>
+                          <strong className="text-slate-800 text-sm">{linearMeters} м.п.</strong>
+                        </div>
+                        <div>
+                          <span className="text-slate-500 block text-[11px]">Площа друку:</span>
+                          <strong className="text-slate-800 text-sm">{sqMeters} м²</strong>
+                        </div>
+                        <div>
+                          <span className="text-slate-500 block text-[11px]">Орієнтовно рулонів:</span>
+                          <strong className="text-blue-600 text-sm">{approxRolls} шт (~100м/рулон)</strong>
+                        </div>
+                      </div>
+                    );
+                  })()}
+                </div>
+              </div>
+
+              {/* Material, Print & Coating Filter Bar */}
+              <div className="ios-card bg-white" style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <h4 style={{ fontSize: '12px', fontWeight: '800', color: 'var(--text-dark)', textTransform: 'uppercase', letterSpacing: '0.5px', margin: 0 }}>
+                  Матеріали, друк та покриття
+                </h4>
+
+                {/* 1. Material Selector */}
+                <div>
+                  <label className="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-2">Матеріал основи:</label>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
+                    {[
+                      { id: '209', title: 'Етикеточний папір', subtitle: 'Raflatac напівглянець' },
+                      { id: '210', title: 'Папір Крафт', subtitle: 'Еко самоклейка' },
+                      { id: '212', title: 'Плівка біла', subtitle: 'Поліпропілен PP' },
+                      { id: '213', title: 'Плівка прозора', subtitle: 'No-look label' },
+                      { id: '214', title: 'Плівка срібло', subtitle: 'Металізована PP' },
+                      { id: '211', title: 'Винний Antique', subtitle: 'Antique White' },
+                      { id: '215', title: 'Винний Martel', subtitle: 'Фактурний Martel' },
+                    ].map(mat => {
+                      const isActive = rollMaterial === mat.id;
+                      return (
+                        <button
+                          key={mat.id}
+                          type="button"
+                          onClick={() => setRollMaterial(mat.id)}
+                          style={{
+                            padding: '10px 8px',
+                            borderRadius: 'var(--radius-md)',
+                            border: isActive ? '2px solid var(--primary)' : '0.5px solid var(--border-light)',
+                            backgroundColor: isActive ? 'rgba(0, 122, 255, 0.06)' : 'var(--bg-system)',
+                            textAlign: 'center',
+                            cursor: 'pointer',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            justifyContent: 'center',
+                            alignItems: 'center',
+                            gap: '3px'
+                          }}
+                        >
+                          <span style={{ fontSize: '11.5px', fontWeight: '700', color: isActive ? 'var(--primary)' : 'var(--text-dark)' }}>
+                            {mat.title}
+                          </span>
+                          <span style={{ fontSize: '10px', color: 'var(--text-medium)' }}>
+                            {mat.subtitle}
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* 2. Colors and Coating Row */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2 border-t border-slate-100">
+                  {/* Colors */}
+                  <div>
+                    <label className="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-2">Кольоровість друку:</label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {[
+                        { id: '1', name: 'Повноколірний 4+0', desc: 'CMYK друк' },
+                        { id: '8', name: 'WHITE 1+0', desc: 'Друк білим' },
+                        { id: '14', name: 'WHITE + CMYK 5+0', desc: 'Білий + CMYK' },
+                      ].map(col => {
+                        const isActive = rollColor === col.id;
+                        return (
+                          <button
+                            key={col.id}
+                            type="button"
+                            onClick={() => setRollColor(col.id)}
+                            style={{
+                              padding: '10px 8px',
+                              borderRadius: 'var(--radius-md)',
+                              border: isActive ? '2px solid var(--primary)' : '0.5px solid var(--border-light)',
+                              backgroundColor: isActive ? 'rgba(0, 122, 255, 0.06)' : 'var(--bg-system)',
+                              textAlign: 'center',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            <div style={{ fontSize: '11.5px', fontWeight: '700', color: isActive ? 'var(--primary)' : 'var(--text-dark)' }}>
+                              {col.name}
+                            </div>
+                            <div style={{ fontSize: '10px', color: 'var(--text-medium)' }}>
+                              {col.desc}
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Coatings */}
+                  <div>
+                    <label className="text-xs font-bold text-slate-600 uppercase tracking-wider block mb-2">Захисне покриття (Лак):</label>
+                    <div className="grid grid-cols-3 gap-2">
+                      {[
+                        { id: '0', name: 'Без покриття', desc: 'Стандартний друк' },
+                        { id: '190', name: 'Лак глянцевий', desc: 'УФ-лакування' },
+                        { id: '191', name: 'Лак матовий', desc: 'Захисний лак' },
+                      ].map(coat => {
+                        const isActive = rollCoating === coat.id;
+                        return (
+                          <button
+                            key={coat.id}
+                            type="button"
+                            onClick={() => setRollCoating(coat.id)}
+                            style={{
+                              padding: '10px 8px',
+                              borderRadius: 'var(--radius-md)',
+                              border: isActive ? '2px solid var(--primary)' : '0.5px solid var(--border-light)',
+                              backgroundColor: isActive ? 'rgba(0, 122, 255, 0.06)' : 'var(--bg-system)',
+                              textAlign: 'center',
+                              cursor: 'pointer'
+                            }}
+                          >
+                            <div style={{ fontSize: '11.5px', fontWeight: '700', color: isActive ? 'var(--primary)' : 'var(--text-dark)' }}>
+                              {coat.name}
+                            </div>
+                            <div style={{ fontSize: '10px', color: 'var(--text-medium)' }}>
+                              {coat.desc}
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Pricing Matrix Table for Roll Printing */}
+              <div className="ios-card bg-white" style={{ overflow: 'hidden' }}>
+                <div className="bg-slate-900 text-white px-5 py-3.5 flex items-center justify-between flex-wrap gap-4">
+                  <h4 className="text-xs font-bold uppercase tracking-wider text-slate-200 m-0">
+                    Специфікація розрахунків та прайс-лист рулонної етикетки
+                  </h4>
+
+                  <div className="flex items-center gap-4">
+                    <label className="text-xs font-medium text-slate-300 flex items-center gap-2 cursor-pointer hover:text-white">
+                      <input
+                        type="checkbox"
+                        checked={includeDelivery}
+                        onChange={(e) => setIncludeDelivery(e.target.checked)}
+                        className="rounded text-blue-600 focus:ring-blue-500"
+                      />
+                      <span>З доставкою</span>
+                    </label>
+
+                    <div className="flex bg-slate-800 p-1 rounded-lg border border-slate-700 text-xs font-semibold">
+                      <button
+                        type="button"
+                        onClick={() => setPriceCostVar('per_tirazh')}
+                        className={`px-3 py-1 rounded-md transition-all ${
+                          priceCostVar === 'per_tirazh' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
+                        }`}
+                      >
+                        За наклад
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setPriceCostVar('per_item')}
+                        className={`px-3 py-1 rounded-md transition-all ${
+                          priceCostVar === 'per_item' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
+                        }`}
+                      >
+                        За 1000 шт
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="overflow-x-auto">
+                  <table className="w-full text-center text-xs border-collapse">
+                    <thead>
+                      <tr className="bg-slate-800/95 text-slate-200 text-xs font-semibold uppercase tracking-wider border-b border-slate-700">
+                        <th className="py-3 px-4 text-left border-r border-slate-700/50">Матеріал та покриття</th>
+                        <th className="py-3 px-3 border-r border-slate-700/50">Друк</th>
+                        <th className="py-3 px-3 border-r border-slate-700/50">Готовність</th>
+                        {[500, 1000, 2000, 5000, 10000, 25000].map(tir => (
+                          <th key={tir} className="py-3 px-3 border-r border-slate-700/50 last:border-r-0 font-bold">
+                            {tir} шт.
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      {[
+                        { matId: '209', matName: 'Етикеточний папір Raflatac', rate: 65 },
+                        { matId: '210', matName: 'Етикеточний папір Крафт', rate: 85 },
+                        { matId: '212', matName: 'Поліпропілен білий (PP)', rate: 95 },
+                        { matId: '213', matName: 'Поліпропілен прозорий', rate: 110 },
+                        { matId: '214', matName: 'Поліпропілен срібло', rate: 135 },
+                        { matId: '211', matName: 'Папір винний Antique White', rate: 150 },
+                        { matId: '215', matName: 'Папір винний Martel', rate: 165 },
+                      ].map((row) => {
+                        const isSelectedMat = rollMaterial === row.matId;
+                        const w = parseFloat(rollWidth) || 50;
+                        const h = parseFloat(rollHeight) || 50;
+                        const gap = parseFloat(rollGap) || 4;
+                        const colorAdd = rollColor === '14' ? 85 : rollColor === '8' ? 55 : 40;
+                        const coatAdd = rollCoating === '190' ? 25 : rollCoating === '191' ? 30 : 0;
+                        const coatName = rollCoating === '190' ? ' + Лак глянець' : rollCoating === '191' ? ' + Лак мат' : ' (без лаку)';
+                        const colorName = rollColor === '14' ? '5+0 White+CMYK' : rollColor === '8' ? '1+0 White' : '4+0 CMYK';
+
+                        return (
+                          <tr
+                            key={row.matId}
+                            className={`transition-colors ${isSelectedMat ? 'bg-blue-50/50 font-semibold' : 'hover:bg-blue-50/20'}`}
+                          >
+                            <td className="py-2.5 px-4 text-left font-semibold text-slate-800 border-r border-slate-100 flex items-center justify-between">
+                              <span>{row.matName}{coatName}</span>
+                              {isSelectedMat && (
+                                <span className="ios-badge-blue text-[10px] px-1.5 py-0.5 rounded ml-2">Обрано</span>
+                              )}
+                            </td>
+                            <td className="py-2.5 px-3 font-bold text-blue-600 border-r border-slate-100 whitespace-nowrap">
+                              {colorName}
+                            </td>
+                            <td className="py-2.5 px-3 text-slate-500 text-[11px] border-r border-slate-100 whitespace-nowrap">
+                              2-3 дні
+                            </td>
+                            {[500, 1000, 2000, 5000, 10000, 25000].map(tir => {
+                              const meters = (tir * (h + gap)) / 1000;
+                              const sqM = (w / 1000) * meters;
+                              const totalCost = Math.round(sqM * (row.rate + colorAdd + coatAdd) + 420 + (includeDelivery ? 75 : 0));
+                              const displayVal = priceCostVar === 'per_item'
+                                ? ((totalCost / tir) * 1000).toFixed(1)
+                                : totalCost.toString();
+
+                              return (
+                                <td
+                                  key={tir}
+                                  onClick={() => {
+                                    setRollMaterial(row.matId);
+                                    setRollQuantity(tir);
+                                    setQuantity(tir);
+                                    setCategory('Етикетки');
+                                    setStep('editor');
+                                  }}
+                                  className="py-2.5 px-3 font-bold text-slate-900 border-r border-slate-100 last:border-r-0 hover:bg-blue-600 hover:text-white cursor-pointer transition-all duration-150"
+                                >
+                                  {displayVal} ₴
+                                </td>
+                              );
+                            })}
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
             </div>
           )}
 
