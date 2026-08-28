@@ -31,6 +31,7 @@ import {
   ShieldCheck,
   Info,
   ChevronDown,
+  Menu,
   FileSpreadsheet
 } from 'lucide-react';
 import html2pdf from 'html2pdf.js';
@@ -142,6 +143,10 @@ export const Calculator: React.FC = () => {
   const [rollColor, setRollColor] = useState<string>('1');
   const [rollCoating, setRollCoating] = useState<string>('0');
   const [rollGalleryIndex, setRollGalleryIndex] = useState<number>(0);
+
+  // Mega Menu Interactive Dropdown States
+  const [isMegaMenuOpen, setIsMegaMenuOpen] = useState<boolean>(false);
+  const [hoveredMegaProduct, setHoveredMegaProduct] = useState<string>('cards');
 
   // Sub-tabs in Digital printing: 'overview' | 'sheets' | 'felling' | 'multipage' | 'custom' | 'mounted' | 'in_sheets' | 'pouch_lam' | 'plotter_cut' | 'die_cut_custom' | 'folders'
   const [digitalSubTab, setDigitalSubTab] = useState<'overview' | 'sheets' | 'felling' | 'multipage' | 'custom' | 'mounted' | 'in_sheets' | 'pouch_lam' | 'plotter_cut' | 'die_cut_custom' | 'folders'>('overview');
@@ -1152,75 +1157,513 @@ export const Calculator: React.FC = () => {
             </div>
           </div>
 
-          {/* Top Category Tabs Navigation - Cupertino iOS Switcher */}
-          <div style={{
-            display: 'flex',
-            gap: '8px',
-            backgroundColor: 'var(--bg-card)',
-            padding: '6px',
-            borderRadius: 'var(--radius-lg)',
-            border: '0.5px solid var(--border-light)',
-            overflowX: 'auto',
-            boxShadow: 'var(--shadow-flat)',
-            marginBottom: '8px'
-          }}>
-            {[
-              { key: 'products', label: 'Усі Продукти', count: 19 },
-              { key: 'offset', label: 'Офсетний друк', badge: 'Авторозрахунок', count: 17 },
-              { key: 'digital', label: 'Цифровий друк', count: 10 },
-              { key: 'wide', label: 'Широкоформатний', count: 10 },
-              { key: 'roll', label: 'Рулонний друк', count: 4 },
-              { key: 'films', label: 'Кольорові плівки', count: 5 }
-            ].map(tab => {
-              const isActive = mainCategoryTab === tab.key;
-              return (
+          {/* Top Category Tabs Navigation - Cupertino iOS Switcher with Mega Menu Trigger */}
+          <div style={{ position: 'relative', zIndex: 40 }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              gap: '8px',
+              backgroundColor: 'var(--bg-card)',
+              padding: '6px',
+              borderRadius: 'var(--radius-lg)',
+              border: '0.5px solid var(--border-light)',
+              boxShadow: 'var(--shadow-flat)',
+              marginBottom: '8px'
+            }}>
+              <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', flex: 1 }}>
+                {/* Catalog Mega Menu Button Trigger */}
                 <button
-                  key={tab.key}
                   type="button"
-                  onClick={() => setMainCategoryTab(tab.key as any)}
+                  onClick={() => setIsMegaMenuOpen(!isMegaMenuOpen)}
                   style={{
                     padding: '8px 16px',
                     borderRadius: 'var(--radius-md)',
                     fontSize: '13px',
-                    fontWeight: '700',
+                    fontWeight: '800',
                     border: 'none',
                     cursor: 'pointer',
                     display: 'flex',
                     alignItems: 'center',
                     gap: '8px',
-                    backgroundColor: isActive ? 'var(--primary)' : 'transparent',
-                    color: isActive ? '#ffffff' : 'var(--text-dark)',
-                    boxShadow: isActive ? '0 2px 8px rgba(0, 122, 255, 0.25)' : 'none',
+                    backgroundColor: isMegaMenuOpen ? 'var(--primary)' : 'var(--bg-system)',
+                    color: isMegaMenuOpen ? '#ffffff' : 'var(--text-dark)',
+                    boxShadow: isMegaMenuOpen ? '0 2px 8px rgba(0, 122, 255, 0.25)' : 'none',
                     transition: 'all 0.15s ease',
                     whiteSpace: 'nowrap'
                   }}
                 >
-                  <span>{tab.label}</span>
-                  {tab.badge && (
-                    <span style={{
-                      fontSize: '10px',
-                      padding: '2px 6px',
-                      borderRadius: '10px',
-                      fontWeight: '700',
-                      backgroundColor: isActive ? 'rgba(255, 255, 255, 0.25)' : 'rgba(0, 122, 255, 0.12)',
-                      color: isActive ? '#ffffff' : 'var(--primary)'
-                    }}>
-                      {tab.badge}
-                    </span>
-                  )}
-                  <span style={{
-                    fontSize: '10px',
-                    padding: '2px 6px',
-                    borderRadius: '10px',
-                    fontWeight: '600',
-                    backgroundColor: isActive ? 'rgba(255, 255, 255, 0.2)' : 'rgba(120, 120, 128, 0.1)',
-                    color: isActive ? '#ffffff' : 'var(--text-medium)'
-                  }}>
-                    {tab.count}
-                  </span>
+                  <Menu size={16} />
+                  <span>Каталог меню</span>
+                  <ChevronDown size={14} style={{ transform: isMegaMenuOpen ? 'rotate(180deg)' : 'none', transition: 'transform 0.2s ease' }} />
                 </button>
-              );
-            })}
+
+                {[
+                  { key: 'products', label: 'Усі Продукти', count: 19 },
+                  { key: 'offset', label: 'Офсетний друк', badge: 'Авторозрахунок', count: 17 },
+                  { key: 'digital', label: 'Цифровий друк', count: 10 },
+                  { key: 'wide', label: 'Широкоформатний', count: 10 },
+                  { key: 'roll', label: 'Рулонний друк', count: 4 },
+                  { key: 'films', label: 'Кольорові плівки', count: 5 }
+                ].map(tab => {
+                  const isActive = mainCategoryTab === tab.key;
+                  return (
+                    <button
+                      key={tab.key}
+                      type="button"
+                      onClick={() => {
+                        setMainCategoryTab(tab.key as any);
+                        setIsMegaMenuOpen(false);
+                      }}
+                      style={{
+                        padding: '8px 16px',
+                        borderRadius: 'var(--radius-md)',
+                        fontSize: '13px',
+                        fontWeight: '700',
+                        border: 'none',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px',
+                        backgroundColor: isActive ? 'var(--primary)' : 'transparent',
+                        color: isActive ? '#ffffff' : 'var(--text-dark)',
+                        boxShadow: isActive ? '0 2px 8px rgba(0, 122, 255, 0.25)' : 'none',
+                        transition: 'all 0.15s ease',
+                        whiteSpace: 'nowrap'
+                      }}
+                    >
+                      <span>{tab.label}</span>
+                      {tab.badge && (
+                        <span style={{
+                          fontSize: '10px',
+                          padding: '2px 6px',
+                          borderRadius: '10px',
+                          fontWeight: '700',
+                          backgroundColor: isActive ? 'rgba(255, 255, 255, 0.25)' : 'rgba(0, 122, 255, 0.12)',
+                          color: isActive ? '#ffffff' : 'var(--primary)'
+                        }}>
+                          {tab.badge}
+                        </span>
+                      )}
+                      <span style={{
+                        fontSize: '10px',
+                        padding: '2px 6px',
+                        borderRadius: '10px',
+                        fontWeight: '600',
+                        backgroundColor: isActive ? 'rgba(255, 255, 255, 0.2)' : 'rgba(120, 120, 128, 0.1)',
+                        color: isActive ? '#ffffff' : 'var(--text-medium)'
+                      }}>
+                        {tab.count}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Star / Favorites Button */}
+              <button
+                type="button"
+                onClick={() => setMainCategoryTab('products')}
+                style={{
+                  padding: '8px 12px',
+                  borderRadius: 'var(--radius-md)',
+                  backgroundColor: 'var(--bg-system)',
+                  border: '0.5px solid var(--border-light)',
+                  color: 'var(--text-medium)',
+                  cursor: 'pointer'
+                }}
+                title="Обрані вироби"
+              >
+                <Sparkles size={16} />
+              </button>
+            </div>
+
+            {/* INTERACTIVE MEGA MENU DROPDOWN PANEL (3 COLUMNS LIST + 4TH COLUMN LIVE PREVIEW) */}
+            {isMegaMenuOpen && (
+              <div
+                className="ios-card bg-white"
+                style={{
+                  position: 'absolute',
+                  top: '100%',
+                  left: 0,
+                  right: 0,
+                  padding: '20px 24px',
+                  boxShadow: '0 16px 40px rgba(0, 0, 0, 0.14)',
+                  border: '1px solid var(--border-light)',
+                  borderRadius: '20px',
+                  zIndex: 100,
+                  animation: 'fadeIn 0.2s cubic-bezier(0.4, 0, 0.2, 1)'
+                }}
+              >
+                {/* Mega Menu Top Header */}
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '0.5px solid var(--border-light)', paddingBottom: '12px', marginBottom: '16px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: 'var(--primary)' }} />
+                    <span style={{ fontSize: '13px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.5px', color: 'var(--text-dark)' }}>
+                      Каталог поліграфічної продукції
+                    </span>
+                    <span style={{ fontSize: '11px', color: 'var(--text-medium)', fontWeight: '600' }}>
+                      (Наведіть курсор для перегляду схеми виробу)
+                    </span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setIsMegaMenuOpen(false)}
+                    style={{
+                      padding: '4px 10px',
+                      borderRadius: '8px',
+                      backgroundColor: 'var(--bg-system)',
+                      border: '0.5px solid var(--border-light)',
+                      fontSize: '11px',
+                      fontWeight: '700',
+                      color: 'var(--text-dark)',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    ✕ Закрити
+                  </button>
+                </div>
+
+                {/* Mega Menu Content Grid (3 Columns Product List + 1 Column Interactive Preview) */}
+                <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+                  {/* Left 3 Columns: 32 Organized Products */}
+                  <div className="md:col-span-8 lg:col-span-9 grid grid-cols-1 sm:grid-cols-3 gap-2">
+                    {/* Column 1 */}
+                    <div className="flex flex-col gap-0.5">
+                      {[
+                        { id: 'banners', title: 'Банери', tab: 'wide', sub: 'banner', type: 'Широкоформатний' },
+                        { id: 'blanks', title: 'Бланки, Оголошення', tab: 'digital', sub: 'sheets', type: 'Цифровий / Офсет' },
+                        { id: 'notebooks', title: 'Блокноти', tab: 'offset', sub: 'multipage', type: 'Багатосторінкова' },
+                        { id: 'brochures', title: 'Брошури, Каталоги', tab: 'offset', sub: 'multipage', type: 'Каталоги' },
+                        { id: 'booklets', title: 'Буклети, Карти', tab: 'offset', sub: 'sheets', type: 'Листова' },
+                        { id: 'tags', title: 'Бірки, Цінники', tab: 'digital', sub: 'felling', type: 'Висічна' },
+                        { id: 'cards', title: 'Візитівки', tab: 'offset', sub: 'sheets', type: 'Офсет / Цифра' },
+                        { id: 'samples', title: 'Зразки матеріалів', modal: 'samples', type: 'Зразки' },
+                        { id: 'calendar_grid', title: 'Календарні сітки', tab: 'offset', sub: 'sheets', type: 'Календарі' },
+                        { id: 'calendars', title: 'Календарі', tab: 'offset', sub: 'sheets', type: 'Календарі' },
+                        { id: 'mounted', title: 'Каширована продукція', tab: 'digital', sub: 'mounted', type: 'Каширована' },
+                        { id: 'tickets', title: 'Квитки, Купони', tab: 'digital', sub: 'felling', type: 'Перфорація' },
+                      ].map(item => {
+                        const isHovered = hoveredMegaProduct === item.id;
+                        return (
+                          <div
+                            key={item.id}
+                            onMouseEnter={() => setHoveredMegaProduct(item.id)}
+                            onClick={() => {
+                              if (item.modal) {
+                                setActiveInfoModal(item.modal as any);
+                              } else {
+                                setMainCategoryTab(item.tab as any);
+                                if (item.tab === 'digital' && item.sub) setDigitalSubTab(item.sub as any);
+                                if (item.tab === 'wide' && item.sub) setWideSubTab(item.sub as any);
+                              }
+                              setIsMegaMenuOpen(false);
+                            }}
+                            style={{
+                              padding: '7px 10px',
+                              borderRadius: '8px',
+                              fontSize: '12px',
+                              fontWeight: isHovered ? '800' : '600',
+                              color: isHovered ? 'var(--primary)' : 'var(--text-dark)',
+                              backgroundColor: isHovered ? 'rgba(0, 122, 255, 0.08)' : 'transparent',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              transition: 'all 0.12s ease'
+                            }}
+                          >
+                            <span>{item.title}</span>
+                            {isHovered && <ChevronRight size={13} style={{ color: 'var(--primary)' }} />}
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Column 2 */}
+                    <div className="flex flex-col gap-0.5">
+                      {[
+                        { id: 'color_films', title: 'Кольорові плівки', tab: 'films', type: 'ORACAL 641' },
+                        { id: 'envelopes', title: 'Конверти', tab: 'offset', sub: 'sheets', type: 'Конверти' },
+                        { id: 'cubes', title: 'Листи для запису', tab: 'offset', sub: 'sheets', type: 'Кубарики' },
+                        { id: 'postcards', title: 'Листівки, Запрошення', tab: 'offset', sub: 'sheets', type: 'Запрошення' },
+                        { id: 'flyers', title: 'Листівки, Флаєри', tab: 'offset', sub: 'sheets', type: 'Флаєри' },
+                        { id: 'magnets', title: 'Магніти', tab: 'digital', sub: 'felling', type: 'Магнітний вініл' },
+                        { id: 'menu', title: 'Меню', tab: 'digital', sub: 'pouch_lam', type: 'HoReCa Меню' },
+                        { id: 'stands', title: 'Мобільні стенди', tab: 'wide', sub: 'stands', type: 'Roll-Up / Павук' },
+                        { id: 'stickers', title: 'Наліпки, Стікери, Етикетки', tab: 'digital', sub: 'plotter_cut', type: 'Самоклейка' },
+                        { id: 'folders', title: 'Папки з вклеєною кишенею', tab: 'digital', sub: 'folders', type: 'Папки А4' },
+                        { id: 'posters', title: 'Плакати, Афіши', tab: 'wide', sub: 'paper', type: 'А3-А0' },
+                        { id: 'plastic_cards', title: 'Пластикові карти', tab: 'digital', sub: 'felling', type: 'Пластик 0.76мм' },
+                      ].map(item => {
+                        const isHovered = hoveredMegaProduct === item.id;
+                        return (
+                          <div
+                            key={item.id}
+                            onMouseEnter={() => setHoveredMegaProduct(item.id)}
+                            onClick={() => {
+                              setMainCategoryTab(item.tab as any);
+                              if (item.tab === 'digital' && item.sub) setDigitalSubTab(item.sub as any);
+                              if (item.tab === 'wide' && item.sub) setWideSubTab(item.sub as any);
+                              setIsMegaMenuOpen(false);
+                            }}
+                            style={{
+                              padding: '7px 10px',
+                              borderRadius: '8px',
+                              fontSize: '12px',
+                              fontWeight: isHovered ? '800' : '600',
+                              color: isHovered ? 'var(--primary)' : 'var(--text-dark)',
+                              backgroundColor: isHovered ? 'rgba(0, 122, 255, 0.08)' : 'transparent',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              transition: 'all 0.12s ease'
+                            }}
+                          >
+                            <span>{item.title}</span>
+                            {isHovered && <ChevronRight size={13} style={{ color: 'var(--primary)' }} />}
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {/* Column 3 */}
+                    <div className="flex flex-col gap-0.5">
+                      {[
+                        { id: 'canvas', title: 'Полотна, Картини', tab: 'wide', sub: 'canvas', type: 'Canvas полотно' },
+                        { id: 'posters_paper', title: 'Постери', tab: 'wide', sub: 'paper', type: 'Citylight' },
+                        { id: 'roll_label', title: 'Рулонна етикетка', tab: 'roll', type: 'Втулка 76мм' },
+                        { id: 'self_adhesive_film', title: 'Самоклеюча плівка', tab: 'wide', sub: 'film', type: 'ORAJET' },
+                        { id: 'scratch', title: 'Скретч-карти, Лотереї', tab: 'digital', sub: 'felling', type: 'Скретч покриття' },
+                        { id: 'signs', title: 'Таблички, Вивіски', tab: 'wide', sub: 'pvc', type: 'ПВХ / Композит' },
+                        { id: 'hangers', title: 'Хенгери', tab: 'digital', sub: 'die_cut_custom', type: 'Дверні бирки' },
+                        { id: 'all_products', title: 'ВСІ ПРОДУКТИ', tab: 'products', type: 'Головний каталог' },
+                      ].map(item => {
+                        const isHovered = hoveredMegaProduct === item.id;
+                        return (
+                          <div
+                            key={item.id}
+                            onMouseEnter={() => setHoveredMegaProduct(item.id)}
+                            onClick={() => {
+                              setMainCategoryTab(item.tab as any);
+                              if (item.tab === 'digital' && item.sub) setDigitalSubTab(item.sub as any);
+                              if (item.tab === 'wide' && item.sub) setWideSubTab(item.sub as any);
+                              setIsMegaMenuOpen(false);
+                            }}
+                            style={{
+                              padding: '7px 10px',
+                              borderRadius: '8px',
+                              fontSize: '12px',
+                              fontWeight: isHovered ? '800' : '600',
+                              color: isHovered ? 'var(--primary)' : 'var(--text-dark)',
+                              backgroundColor: isHovered ? 'rgba(0, 122, 255, 0.08)' : 'transparent',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'space-between',
+                              transition: 'all 0.12s ease'
+                            }}
+                          >
+                            <span>{item.title}</span>
+                            {isHovered && <ChevronRight size={13} style={{ color: 'var(--primary)' }} />}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Column 4: Dynamic Live SVG Diagram & Interactive Spec Box */}
+                  <div className="md:col-span-4 lg:col-span-3 flex flex-col items-center justify-center p-4 bg-slate-50 border border-slate-200/80 rounded-2xl min-h-[280px]">
+                    {/* 1. Cards (Візитівки) */}
+                    {hoveredMegaProduct === 'cards' && (
+                      <div className="flex flex-col items-center text-center">
+                        <svg width="140" height="100" viewBox="0 0 160 110" fill="none">
+                          <rect x="25" y="28" width="95" height="55" rx="6" fill="#E2E8F0" stroke="#94A3B8" strokeWidth="1.5"/>
+                          <rect x="40" y="15" width="95" height="55" rx="6" fill="#FFFFFF" stroke="#007AFF" strokeWidth="2"/>
+                          <rect x="48" y="23" width="16" height="16" rx="3" fill="#007AFF" fillOpacity="0.8"/>
+                          <line x1="70" y1="26" x2="120" y2="26" stroke="#007AFF" strokeWidth="2" strokeLinecap="round"/>
+                          <line x1="70" y1="34" x2="105" y2="34" stroke="#64748B" strokeWidth="1.5" strokeLinecap="round"/>
+                          <line x1="48" y1="52" x2="120" y2="52" stroke="#CBD5E1" strokeWidth="1.5"/>
+                          <line x1="48" y1="58" x2="100" y2="58" stroke="#CBD5E1" strokeWidth="1.5"/>
+                        </svg>
+                        <h4 className="text-xs font-extrabold text-slate-800 mt-2">Візитівки (90×50 / 85×55 мм)</h4>
+                        <p className="text-[11px] text-slate-500 mt-1">Офсетний та цифровий друк, SoftTouch ламінація, вибірковий лак.</p>
+                      </div>
+                    )}
+
+                    {/* 2. Roll Label (Рулонна етикетка) */}
+                    {hoveredMegaProduct === 'roll_label' && (
+                      <div className="flex flex-col items-center text-center">
+                        <svg width="140" height="100" viewBox="0 0 160 110" fill="none">
+                          <ellipse cx="80" cy="28" rx="45" ry="14" fill="#E2E8F0" stroke="#64748B" strokeWidth="1.5"/>
+                          <path d="M35 28V80C35 88 55 94 80 94C105 94 125 88 125 80V28" fill="#F8FAFC" stroke="#64748B" strokeWidth="1.5"/>
+                          <ellipse cx="80" cy="80" rx="45" ry="14" fill="#FFFFFF" stroke="#64748B" strokeWidth="1.2"/>
+                          <path d="M38 70L8 95H48L78 70" fill="#FFFFFF" stroke="#007AFF" strokeWidth="1.5"/>
+                          <rect x="18" y="75" width="22" height="6" rx="1.5" fill="#007AFF" fillOpacity="0.8"/>
+                          <line x1="20" y1="86" x2="38" y2="86" stroke="#94A3B8" strokeWidth="1.5"/>
+                        </svg>
+                        <h4 className="text-xs font-extrabold text-slate-800 mt-2">Рулонна етикетка</h4>
+                        <p className="text-[11px] text-slate-500 mt-1">Самоклейка в рулонах на втулці 76/40 мм під аплікатор.</p>
+                      </div>
+                    )}
+
+                    {/* 3. Calendar Grid (Календарні сітки) */}
+                    {hoveredMegaProduct === 'calendar_grid' && (
+                      <div className="flex flex-col items-center text-center">
+                        <svg width="140" height="100" viewBox="0 0 160 110" fill="none">
+                          <rect x="25" y="15" width="110" height="80" rx="6" fill="#FFFFFF" stroke="#007AFF" strokeWidth="2"/>
+                          <rect x="25" y="15" width="110" height="18" fill="#007AFF"/>
+                          <line x1="30" y1="24" x2="70" y2="24" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round"/>
+                          <rect x="35" y="42" width="20" height="14" rx="2" fill="#E2E8F0"/>
+                          <rect x="62" y="42" width="20" height="14" rx="2" fill="#E2E8F0"/>
+                          <rect x="89" y="42" width="20" height="14" rx="2" fill="#E2E8F0"/>
+                          <rect x="35" y="62" width="20" height="14" rx="2" fill="#E2E8F0"/>
+                          <rect x="62" y="62" width="20" height="14" rx="2" fill="#007AFF" fillOpacity="0.2" stroke="#007AFF"/>
+                          <rect x="89" y="62" width="20" height="14" rx="2" fill="#E2E8F0"/>
+                        </svg>
+                        <h4 className="text-xs font-extrabold text-slate-800 mt-2">Календарні сітки</h4>
+                        <p className="text-[11px] text-slate-500 mt-1">Стандартні, золоті та металізовані сітки для квартальних календарів.</p>
+                      </div>
+                    )}
+
+                    {/* 4. Plastic Cards (Пластикові карти) */}
+                    {hoveredMegaProduct === 'plastic_cards' && (
+                      <div className="flex flex-col items-center text-center">
+                        <svg width="140" height="100" viewBox="0 0 160 110" fill="none">
+                          <rect x="25" y="20" width="110" height="70" rx="8" fill="#1E293B" stroke="#007AFF" strokeWidth="2"/>
+                          <rect x="25" y="32" width="110" height="14" fill="#0F172A"/>
+                          <rect x="35" y="56" width="22" height="16" rx="3" fill="#F59E0B"/>
+                          <text x="65" y="68" fill="#94A3B8" fontSize="10" fontWeight="bold">c.card</text>
+                          <line x1="35" y1="80" x2="90" y2="80" stroke="#64748B" strokeWidth="2"/>
+                        </svg>
+                        <h4 className="text-xs font-extrabold text-slate-800 mt-2">Пластикові карти</h4>
+                        <p className="text-[11px] text-slate-500 mt-1">Пластикові картки з чипом, магнітною смугою та ембосуванням.</p>
+                      </div>
+                    )}
+
+                    {/* 5. Folders (Папки з вклеєною кишенею) */}
+                    {hoveredMegaProduct === 'folders' && (
+                      <div className="flex flex-col items-center text-center">
+                        <svg width="140" height="100" viewBox="0 0 160 110" fill="none">
+                          <path d="M25 20H85L100 35H135V95H25V20Z" fill="#FFFFFF" stroke="#007AFF" strokeWidth="2"/>
+                          <path d="M25 65H95V95H25V65Z" fill="#007AFF" fillOpacity="0.15" stroke="#007AFF" strokeWidth="1.5"/>
+                          <rect x="35" y="73" width="28" height="14" rx="2" fill="#FFFFFF" stroke="#64748B"/>
+                          <line x1="40" y1="40" x2="80" y2="40" stroke="#CBD5E1" strokeWidth="2"/>
+                          <line x1="40" y1="48" x2="70" y2="48" stroke="#CBD5E1" strokeWidth="2"/>
+                        </svg>
+                        <h4 className="text-xs font-extrabold text-slate-800 mt-2">Фірмові папки А4</h4>
+                        <p className="text-[11px] text-slate-500 mt-1">З суцільновисічною або вклеєною кишенею під документи та візитку.</p>
+                      </div>
+                    )}
+
+                    {/* 6. Memo Cubes (Листи для запису) */}
+                    {hoveredMegaProduct === 'cubes' && (
+                      <div className="flex flex-col items-center text-center">
+                        <svg width="140" height="100" viewBox="0 0 160 110" fill="none">
+                          <path d="M80 15L125 35L80 55L35 35L80 15Z" fill="#FFFFFF" stroke="#007AFF" strokeWidth="2"/>
+                          <path d="M35 35V80L80 100V55L35 35Z" fill="#F1F5F9" stroke="#007AFF" strokeWidth="2"/>
+                          <path d="M125 35V80L80 100V55L125 35Z" fill="#E2E8F0" stroke="#007AFF" strokeWidth="2"/>
+                          <line x1="35" y1="45" x2="80" y2="65" stroke="#CBD5E1"/>
+                          <line x1="35" y1="55" x2="80" y2="75" stroke="#CBD5E1"/>
+                          <line x1="35" y1="65" x2="80" y2="85" stroke="#CBD5E1"/>
+                        </svg>
+                        <h4 className="text-xs font-extrabold text-slate-800 mt-2">Кубарики (Листи для запису)</h4>
+                        <p className="text-[11px] text-slate-500 mt-1">Блоки для нотаток 90×90 мм з проклейкою або в боксі.</p>
+                      </div>
+                    )}
+
+                    {/* 7. Flyers (Листівки, Флаєри) */}
+                    {hoveredMegaProduct === 'flyers' && (
+                      <div className="flex flex-col items-center text-center">
+                        <svg width="140" height="100" viewBox="0 0 160 110" fill="none">
+                          <rect x="45" y="15" width="70" height="85" rx="5" fill="#FFFFFF" stroke="#007AFF" strokeWidth="2"/>
+                          <rect x="52" y="24" width="56" height="24" rx="3" fill="#007AFF" fillOpacity="0.15"/>
+                          <circle cx="62" cy="36" r="6" fill="#007AFF"/>
+                          <line x1="52" y1="56" x2="108" y2="56" stroke="#64748B" strokeWidth="2" strokeLinecap="round"/>
+                          <line x1="52" y1="64" x2="98" y2="64" stroke="#94A3B8" strokeWidth="1.5" strokeLinecap="round"/>
+                          <line x1="52" y1="72" x2="104" y2="72" stroke="#94A3B8" strokeWidth="1.5" strokeLinecap="round"/>
+                        </svg>
+                        <h4 className="text-xs font-extrabold text-slate-800 mt-2">Листівки та Флаєри</h4>
+                        <p className="text-[11px] text-slate-500 mt-1">Єврофлаєри, А6, А5, А4 на глянцевому або матовому папері.</p>
+                      </div>
+                    )}
+
+                    {/* 8. Scratch Cards (Скретч-карти) */}
+                    {hoveredMegaProduct === 'scratch' && (
+                      <div className="flex flex-col items-center text-center">
+                        <svg width="140" height="100" viewBox="0 0 160 110" fill="none">
+                          <rect x="30" y="20" width="100" height="65" rx="6" fill="#FFFFFF" stroke="#007AFF" strokeWidth="2"/>
+                          <rect x="45" y="35" width="70" height="22" rx="3" fill="#94A3B8" stroke="#64748B" strokeDasharray="3 3"/>
+                          <circle cx="120" cy="65" r="14" fill="#F59E0B" stroke="#D97706" strokeWidth="2"/>
+                          <text x="116" y="69" fill="#FFFFFF" fontSize="11" fontWeight="bold">₴</text>
+                          <line x1="45" y1="68" x2="85" y2="68" stroke="#CBD5E1" strokeWidth="1.5"/>
+                        </svg>
+                        <h4 className="text-xs font-extrabold text-slate-800 mt-2">Скретч-карти та Лотереї</h4>
+                        <p className="text-[11px] text-slate-500 mt-1">Зі стираним захисним шаром, змінними промокодами та штрихкодами.</p>
+                      </div>
+                    )}
+
+                    {/* 9. Envelopes (Конверти) */}
+                    {hoveredMegaProduct === 'envelopes' && (
+                      <div className="flex flex-col items-center text-center">
+                        <svg width="140" height="100" viewBox="0 0 160 110" fill="none">
+                          <rect x="25" y="25" width="110" height="65" rx="6" fill="#FFFFFF" stroke="#007AFF" strokeWidth="2"/>
+                          <path d="M25 25L80 65L135 25" stroke="#007AFF" strokeWidth="2"/>
+                          <rect x="105" y="32" width="18" height="22" rx="2" fill="#E2E8F0" stroke="#94A3B8"/>
+                          <line x1="38" y1="72" x2="85" y2="72" stroke="#CBD5E1" strokeWidth="2"/>
+                        </svg>
+                        <h4 className="text-xs font-extrabold text-slate-800 mt-2">Брендовані конверти</h4>
+                        <p className="text-[11px] text-slate-500 mt-1">Євро (DL), С6, С5, С4 з самоклейкою стрічкою та віконцем.</p>
+                      </div>
+                    )}
+
+                    {/* 10. Banners (Банери) */}
+                    {hoveredMegaProduct === 'banners' && (
+                      <div className="flex flex-col items-center text-center">
+                        <svg width="140" height="100" viewBox="0 0 160 110" fill="none">
+                          <rect x="20" y="25" width="120" height="60" rx="4" fill="#FFFFFF" stroke="#007AFF" strokeWidth="2"/>
+                          <circle cx="28" cy="33" r="3" fill="#64748B"/>
+                          <circle cx="132" cy="33" r="3" fill="#64748B"/>
+                          <circle cx="28" cy="77" r="3" fill="#64748B"/>
+                          <circle cx="132" cy="77" r="3" fill="#64748B"/>
+                          <rect x="38" y="38" width="84" height="34" rx="3" fill="#007AFF" fillOpacity="0.12"/>
+                          <text x="54" y="59" fill="#007AFF" fontSize="11" fontWeight="bold">BANNER</text>
+                        </svg>
+                        <h4 className="text-xs font-extrabold text-slate-800 mt-2">Широкоформатні банери</h4>
+                        <p className="text-[11px] text-slate-500 mt-1">Frontlit, Blockout, сітка Mesh з люверсами та проклейкою краю.</p>
+                      </div>
+                    )}
+
+                    {/* 11. Hangers (Хенгери) */}
+                    {hoveredMegaProduct === 'hangers' && (
+                      <div className="flex flex-col items-center text-center">
+                        <svg width="140" height="100" viewBox="0 0 160 110" fill="none">
+                          <path d="M60 15H100V95H60V15Z" fill="#FFFFFF" stroke="#007AFF" strokeWidth="2"/>
+                          <circle cx="80" cy="35" r="12" fill="#F1F5F9" stroke="#007AFF" strokeWidth="1.5"/>
+                          <path d="M80 47V60" stroke="#007AFF" strokeWidth="1.5"/>
+                          <line x1="68" y1="70" x2="92" y2="70" stroke="#64748B" strokeWidth="1.5"/>
+                          <line x1="68" y1="78" x2="88" y2="78" stroke="#94A3B8" strokeWidth="1.5"/>
+                        </svg>
+                        <h4 className="text-xs font-extrabold text-slate-800 mt-2">Дверні хенгери</h4>
+                        <p className="text-[11px] text-slate-500 mt-1">Висічні рекламні гачки на дверні ручки готелів та промо-акцій.</p>
+                      </div>
+                    )}
+
+                    {/* Fallback for other items */}
+                    {!['cards', 'roll_label', 'calendar_grid', 'plastic_cards', 'folders', 'cubes', 'flyers', 'scratch', 'envelopes', 'banners', 'hangers'].includes(hoveredMegaProduct) && (
+                      <div className="flex flex-col items-center text-center">
+                        <div className="w-16 h-16 rounded-2xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600 mb-2">
+                          <Layers size={32} />
+                        </div>
+                        <h4 className="text-xs font-extrabold text-slate-800 mt-1">Поліграфічна продукція</h4>
+                        <p className="text-[11px] text-slate-500 mt-1">Оберіть виріб для автоматичного розрахунку вартості та тиражів.</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* TAB 1: PRODUCTS (All Categories - Exact Dashboard iOS Card Grid) */}
