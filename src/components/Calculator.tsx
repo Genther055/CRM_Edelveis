@@ -3117,15 +3117,68 @@ export const Calculator: React.FC = () => {
                   </div>
 
                   {/* Form Selector Header Bar */}
+                  {/* Form Shape Selector */}
                   <div className="ios-card bg-white" style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
                     <h4 style={{ fontSize: '12px', fontWeight: '800', color: 'var(--text-dark)', textTransform: 'uppercase', letterSpacing: '0.5px', margin: 0 }}>Форма штампу</h4>
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
                       {[
-                        { id: '1', name: 'Стандартна', img: 'https://sborka.ua/cside/img/Standart/standart.png' },
-                        { id: '2', name: 'Кругла', img: 'https://sborka.ua/cside/img/Circle/s245_245.png' },
-                        { id: '3', name: 'Овальна', img: 'https://sborka.ua/cside/img/Oval/31_21_n108.png' },
-                        { id: '4', name: 'Прямокутна', img: 'https://sborka.ua/cside/img/Priam/119_89_n112.png' },
-                        { id: '5', name: 'Етикетка, кольєретка', img: 'https://sborka.ua/cside/img/Etiket/65_113_n56.png' },
+                        { 
+                          id: '1', 
+                          name: 'Стандартна', 
+                          icon: (
+                            <svg width="36" height="32" viewBox="0 0 40 32" fill="none">
+                              <rect x="6" y="4" width="28" height="24" rx="4" fill="#FFFFFF" stroke="var(--primary)" strokeWidth="1.5"/>
+                              <rect x="10" y="8" width="10" height="3" rx="1" fill="var(--primary)" fillOpacity="0.4"/>
+                              <circle cx="28" cy="10" r="2.5" fill="var(--primary)" fillOpacity="0.6"/>
+                              <line x1="10" y1="16" x2="30" y2="16" stroke="#CBD5E1" strokeWidth="1.5"/>
+                              <line x1="10" y1="21" x2="24" y2="21" stroke="#CBD5E1" strokeWidth="1.5"/>
+                            </svg>
+                          )
+                        },
+                        { 
+                          id: '2', 
+                          name: 'Кругла', 
+                          icon: (
+                            <svg width="36" height="32" viewBox="0 0 40 32" fill="none">
+                              <circle cx="20" cy="16" r="12" fill="#FFFFFF" stroke="var(--primary)" strokeWidth="1.5"/>
+                              <circle cx="20" cy="16" r="8" fill="var(--primary)" fillOpacity="0.12" stroke="var(--primary)" strokeWidth="1" strokeDasharray="2 2"/>
+                              <circle cx="20" cy="16" r="3" fill="var(--primary)"/>
+                            </svg>
+                          )
+                        },
+                        { 
+                          id: '3', 
+                          name: 'Овальна', 
+                          icon: (
+                            <svg width="36" height="32" viewBox="0 0 40 32" fill="none">
+                              <ellipse cx="20" cy="16" rx="15" ry="10" fill="#FFFFFF" stroke="var(--primary)" strokeWidth="1.5"/>
+                              <ellipse cx="20" cy="16" rx="10" ry="6" fill="var(--primary)" fillOpacity="0.12" stroke="var(--primary)" strokeWidth="1" strokeDasharray="2 2"/>
+                              <line x1="14" y1="16" x2="26" y2="16" stroke="var(--primary)" strokeWidth="1.5" strokeLinecap="round"/>
+                            </svg>
+                          )
+                        },
+                        { 
+                          id: '4', 
+                          name: 'Прямокутна', 
+                          icon: (
+                            <svg width="36" height="32" viewBox="0 0 40 32" fill="none">
+                              <rect x="4" y="6" width="32" height="20" rx="3" fill="#FFFFFF" stroke="var(--primary)" strokeWidth="1.5"/>
+                              <rect x="8" y="10" width="24" height="12" rx="1.5" fill="var(--primary)" fillOpacity="0.12" stroke="var(--primary)" strokeWidth="1" strokeDasharray="2 2"/>
+                              <circle cx="20" cy="16" r="2.5" fill="var(--primary)"/>
+                            </svg>
+                          )
+                        },
+                        { 
+                          id: '5', 
+                          name: 'Етикетка, кольєретка', 
+                          icon: (
+                            <svg width="36" height="32" viewBox="0 0 40 32" fill="none">
+                              <path d="M12 26C12 26 14 18 16 10C17 6 23 6 24 10C26 18 28 26 28 26H12Z" fill="#FFFFFF" stroke="var(--primary)" strokeWidth="1.5" strokeLinejoin="round"/>
+                              <circle cx="20" cy="14" r="3" fill="var(--primary)" fillOpacity="0.2"/>
+                              <line x1="16" y1="21" x2="24" y2="21" stroke="var(--primary)" strokeWidth="1.5" strokeLinecap="round"/>
+                            </svg>
+                          )
+                        },
                       ].map(formItem => {
                         const isActive = fellingForm === formItem.id;
                         return (
@@ -3133,7 +3186,7 @@ export const Calculator: React.FC = () => {
                             key={formItem.id}
                             onClick={() => setFellingForm(formItem.id)}
                             style={{
-                              padding: '14px',
+                              padding: '12px 14px',
                               borderRadius: 'var(--radius-md)',
                               border: isActive ? '2px solid var(--primary)' : '0.5px solid var(--border-light)',
                               backgroundColor: isActive ? 'rgba(0, 122, 255, 0.05)' : 'var(--bg-system)',
@@ -3143,10 +3196,13 @@ export const Calculator: React.FC = () => {
                               justifyContent: 'center',
                               gap: '8px',
                               cursor: 'pointer',
-                              transition: 'all 0.15s ease'
+                              transition: 'all 0.15s ease',
+                              minHeight: '82px'
                             }}
                           >
-                            <img src={formItem.img} alt={formItem.name} className="w-14 h-10 object-contain" />
+                            <div className="flex items-center justify-center h-8">
+                              {formItem.icon}
+                            </div>
                             <span style={{ fontSize: '12px', fontWeight: '700', textAlign: 'center', color: isActive ? 'var(--primary)' : 'var(--text-dark)' }}>
                               {formItem.name}
                             </span>
@@ -3202,24 +3258,89 @@ export const Calculator: React.FC = () => {
                     {/* Right Column: Visual Stamp Preview */}
                     <div className="ios-card bg-white" style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '12px' }}>
                       <span style={{ fontSize: '12px', fontWeight: '800', color: 'var(--text-medium)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Вид готового виробу</span>
-                      <div className="w-full h-48 border-2 border-dashed border-slate-200 bg-slate-50 rounded-xl flex items-center justify-center p-4">
+                      <div className="w-full h-48 border-2 border-dashed border-slate-200 bg-slate-50/60 rounded-xl flex items-center justify-center p-3">
                         {(() => {
-                          const stampImgs: Record<string, string> = {
-                            '128': 'https://sborka.ua/cside/img/Standart/henger1.png',
-                            '133': 'https://sborka.ua/cside/img/Standart/henger2.png',
-                            '160': 'https://sborka.ua/cside/img/Standart/domik.png',
-                            '161': 'https://sborka.ua/cside/img/Standart/piramid.png',
-                            '58': 'https://sborka.ua/cside/img/Standart/papka.png',
-                            '59': 'https://sborka.ua/cside/img/Standart/papka2.png',
-                          };
-                          const imgUrl = stampImgs[fellingStamp];
-                          return imgUrl ? (
-                            <img src={imgUrl} alt="Прев'ю штампу" className="max-h-40 max-w-full object-contain" />
-                          ) : (
-                            <div className="w-28 h-28 border-2 border-dashed border-blue-400 rounded-xl flex items-center justify-center text-blue-600 font-bold text-xs">
-                              Висічка
-                            </div>
-                          );
+                          switch (fellingStamp) {
+                            case '128':
+                              return (
+                                <svg width="120" height="160" viewBox="0 0 120 160" fill="none">
+                                  <path d="M20 20C20 12 28 6 36 6H84C92 6 100 12 100 20V144C100 152 92 156 84 156H36C28 156 20 152 20 144V20Z" fill="#FFFFFF" stroke="#64748B" strokeWidth="2"/>
+                                  <circle cx="60" cy="45" r="20" stroke="#0F172A" strokeWidth="2.5" fill="#F1F5F9"/>
+                                  <path d="M60 25C70 25 80 28 100 38" stroke="#0F172A" strokeWidth="2.5" strokeLinecap="round"/>
+                                  <rect x="36" y="80" width="48" height="32" rx="6" fill="var(--primary)" fillOpacity="0.1" stroke="var(--primary)" strokeWidth="1.5"/>
+                                  <circle cx="60" cy="94" r="5" fill="var(--primary)"/>
+                                  <line x1="44" y1="104" x2="76" y2="104" stroke="var(--primary)" strokeWidth="2" strokeLinecap="round"/>
+                                  <line x1="40" y1="126" x2="80" y2="126" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round"/>
+                                  <line x1="48" y1="134" x2="72" y2="134" stroke="#CBD5E1" strokeWidth="1.5" strokeLinecap="round"/>
+                                </svg>
+                              );
+                            case '133':
+                              return (
+                                <svg width="120" height="160" viewBox="0 0 120 160" fill="none">
+                                  <path d="M20 60H100V144C100 152 92 156 84 156H36C28 156 20 152 20 144V60Z" fill="#FFFFFF" stroke="#64748B" strokeWidth="2"/>
+                                  <path d="M20 60V30C20 14 36 6 56 6C76 6 92 18 88 38C84 50 64 50 60 60" fill="none" stroke="#64748B" strokeWidth="2"/>
+                                  <circle cx="54" cy="32" r="15" fill="#F1F5F9" stroke="#0F172A" strokeWidth="2.5"/>
+                                  <path d="M54 17C68 17 80 22 88 38" stroke="#0F172A" strokeWidth="2.5"/>
+                                  <rect x="36" y="80" width="48" height="32" rx="6" fill="var(--primary)" fillOpacity="0.1" stroke="var(--primary)" strokeWidth="1.5"/>
+                                  <circle cx="60" cy="94" r="4.5" fill="var(--primary)"/>
+                                  <line x1="44" y1="104" x2="76" y2="104" stroke="var(--primary)" strokeWidth="2" strokeLinecap="round"/>
+                                  <line x1="40" y1="126" x2="80" y2="126" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round"/>
+                                </svg>
+                              );
+                            case '160':
+                              return (
+                                <svg width="150" height="140" viewBox="0 0 150 140" fill="none">
+                                  <path d="M15 115L75 25L135 115H15Z" fill="#E2E8F0" stroke="#64748B" strokeWidth="1.5"/>
+                                  <path d="M30 115L75 40L120 115H30Z" fill="#FFFFFF" stroke="#0F172A" strokeWidth="2"/>
+                                  <rect x="50" y="60" width="50" height="10" rx="2" fill="var(--primary)"/>
+                                  <line x1="55" y1="65" x2="95" y2="65" stroke="#FFFFFF" strokeWidth="1.5" strokeLinecap="round"/>
+                                  <rect x="50" y="75" width="50" height="28" rx="2" fill="var(--primary)" fillOpacity="0.08" stroke="var(--primary)" strokeWidth="1"/>
+                                  <line x1="55" y1="82" x2="95" y2="82" stroke="#64748B" strokeWidth="1.5"/>
+                                  <line x1="55" y1="89" x2="95" y2="89" stroke="#64748B" strokeWidth="1.5"/>
+                                  <line x1="55" y1="96" x2="85" y2="96" stroke="#94A3B8" strokeWidth="1.5"/>
+                                </svg>
+                              );
+                            case '161':
+                              return (
+                                <svg width="150" height="140" viewBox="0 0 150 140" fill="none">
+                                  <path d="M75 15L15 125L75 138L135 125L75 15Z" fill="#F8FAFC" stroke="#64748B" strokeWidth="2"/>
+                                  <path d="M75 15L15 125L75 138V15Z" fill="#E2E8F0" stroke="#64748B" strokeWidth="1.5"/>
+                                  <path d="M75 15L135 125L75 138V15Z" fill="#FFFFFF" stroke="#0F172A" strokeWidth="2"/>
+                                  <rect x="85" y="60" width="36" height="40" rx="4" fill="var(--primary)" fillOpacity="0.1" stroke="var(--primary)" strokeWidth="1.5"/>
+                                  <circle cx="103" cy="74" r="5" fill="var(--primary)"/>
+                                  <line x1="91" y1="86" x2="115" y2="86" stroke="var(--primary)" strokeWidth="1.5" strokeLinecap="round"/>
+                                </svg>
+                              );
+                            case '58':
+                              return (
+                                <svg width="160" height="130" viewBox="0 0 160 130" fill="none">
+                                  <path d="M15 15H72V115H15V15Z" fill="#E2E8F0" stroke="#64748B" strokeWidth="1.5"/>
+                                  <rect x="72" y="15" width="6" height="100" fill="var(--primary)" stroke="var(--primary)" strokeWidth="1"/>
+                                  <path d="M78 15H145V115H78V15Z" fill="#FFFFFF" stroke="#0F172A" strokeWidth="2"/>
+                                  <path d="M78 75L145 65V115H78V75Z" fill="var(--primary)" fillOpacity="0.15" stroke="var(--primary)" strokeWidth="1.5"/>
+                                  <line x1="95" y1="90" x2="125" y2="90" stroke="var(--primary)" strokeWidth="2" strokeLinecap="round"/>
+                                  <line x1="100" y1="98" x2="120" y2="98" stroke="#64748B" strokeWidth="1.5" strokeLinecap="round"/>
+                                </svg>
+                              );
+                            case '59':
+                              return (
+                                <svg width="160" height="130" viewBox="0 0 160 130" fill="none">
+                                  <path d="M12 15H70V115H12V15Z" fill="#E2E8F0" stroke="#64748B" strokeWidth="1.5"/>
+                                  <rect x="70" y="15" width="10" height="100" fill="var(--primary)" stroke="var(--primary)" strokeWidth="1"/>
+                                  <line x1="75" y1="15" x2="75" y2="115" stroke="#FFFFFF" strokeWidth="1" strokeDasharray="2 2"/>
+                                  <path d="M80 15H148V115H80V15Z" fill="#FFFFFF" stroke="#0F172A" strokeWidth="2"/>
+                                  <path d="M80 70L148 60V115H80V70Z" fill="var(--primary)" fillOpacity="0.2" stroke="var(--primary)" strokeWidth="1.5"/>
+                                  <rect x="94" y="85" width="38" height="18" rx="2" fill="#FFFFFF" stroke="var(--primary)" strokeWidth="1"/>
+                                  <line x1="100" y1="92" x2="126" y2="92" stroke="var(--primary)" strokeWidth="1.5"/>
+                                </svg>
+                              );
+                            default:
+                              return (
+                                <div className="w-28 h-28 border-2 border-dashed border-blue-400 rounded-xl flex items-center justify-center text-blue-600 font-bold text-xs">
+                                  Висічка
+                                </div>
+                              );
+                          }
                         })()}
                       </div>
                     </div>
