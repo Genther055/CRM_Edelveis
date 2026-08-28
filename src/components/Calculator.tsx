@@ -1074,7 +1074,7 @@ export const Calculator: React.FC = () => {
           }}>
             {[
               { key: 'products', label: 'Усі Продукти', count: 19 },
-              { key: 'offset', label: 'Офсетний друк', badge: '1С Авторозрахунок', count: 17 },
+              { key: 'offset', label: 'Офсетний друк', badge: 'Авторозрахунок', count: 17 },
               { key: 'digital', label: 'Цифровий друк', count: 8 },
               { key: 'wide', label: 'Широкоформатний', count: 6 },
               { key: 'roll', label: 'Рулонний друк', count: 4 },
@@ -1321,10 +1321,10 @@ export const Calculator: React.FC = () => {
                       { 
                         title: 'Індивідуальний розрахунок', 
                         badge: 'Нестандартні', 
-                        desc: 'Комплексні комерційні пропозиції з ручним підбором операцій 1С.', 
+                        desc: 'Комплексні комерційні пропозиції з ручним підбором технологічних операцій.', 
                         subTab: 'custom', 
                         icon: <Settings size={28} style={{ color: 'var(--primary)' }} />,
-                        metric: 'Конструктор 1С'
+                        metric: 'Конструктор розрахунку'
                       }
                     ].map(item => (
                       <div
@@ -1841,7 +1841,7 @@ export const Calculator: React.FC = () => {
                           style={{ padding: '8px 14px', borderRadius: 'var(--radius-md)', fontSize: '12px', fontWeight: '700', cursor: 'pointer', border: 'none', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
                         >
                           <Settings size={14} />
-                          <span>Конструктор 1С</span>
+                          <span>Конструктор розрахунку</span>
                         </button>
                         <button
                           type="button"
@@ -2529,7 +2529,7 @@ export const Calculator: React.FC = () => {
                     >
                       <div className="flex items-center gap-2.5">
                         <SlidersHorizontal size={18} className="text-blue-600" />
-                        <h4 className="text-sm font-bold text-slate-900 m-0">Післядрукарська обробка (Нормативи 1С)</h4>
+                        <h4 className="text-sm font-bold text-slate-900 m-0">Післядрукарська обробка (Нормативи)</h4>
                       </div>
                       <div className="flex items-center gap-3">
                         <button
@@ -4365,7 +4365,7 @@ export const Calculator: React.FC = () => {
                   transition: 'all 0.15s ease'
                 }}
               >
-                Поопераційний (1С)
+                Поопераційний розрахунок
               </button>
             </div>
 
@@ -4701,7 +4701,7 @@ export const Calculator: React.FC = () => {
                 <div className="ios-card bg-white" style={{ overflow: 'hidden' }}>
                   <div className="bg-slate-900 text-white px-5 py-3.5 flex justify-between items-center">
                     <h3 className="text-xs font-bold uppercase tracking-wider text-slate-200 m-0">
-                      Виробничі операції та калькуляція собівартості (1С)
+                      Виробничі операції та калькуляція собівартості
                     </h3>
                     <span className="px-2.5 py-1 rounded-full bg-blue-500/20 text-blue-300 font-bold text-[10px] border border-blue-400/30">
                       Поопераційні тарифи

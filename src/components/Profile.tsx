@@ -80,7 +80,7 @@ export const Profile: React.FC = () => {
 
   // 10 Recent tasks list
   const profileTasks = [
-    { id: 'T-201', project: 'Поліграфія CRM', status: 'В роботі', scene: 'Налаштування Калькулятора & 1С', startDate: '2026-08-17', duration: '2 дні', estimation: '6 год', objectCategory: 'Верстка', level: 'Середній', file: 'Calculator.tsx' },
+    { id: 'T-201', project: 'Поліграфія CRM', status: 'В роботі', scene: 'Налаштування Калькулятора & Норм', startDate: '2026-08-17', duration: '2 дні', estimation: '6 год', objectCategory: 'Верстка', level: 'Середній', file: 'Calculator.tsx' },
     { id: 'T-202', project: 'Поліграфія CRM', status: 'Завершено', scene: 'Уніфікація назв замовників (Замовник №1..5)', startDate: '2026-08-17', duration: '1 день', estimation: '3 год', objectCategory: 'База даних', level: 'Легкий', file: 'AppContext.tsx' },
     { id: 'T-203', project: 'Поліграфія CRM', status: 'Завершено', scene: 'Формування розлогого рахунку PDF', startDate: '2026-08-17', duration: '1 день', estimation: '4 год', objectCategory: 'Логіка PDF', level: 'Складний', file: 'Calculator.tsx' },
     { id: 'T-204', project: 'Друкарня Вінниця', status: 'Завершено', scene: 'Перевірка макету №15744', startDate: '2026-08-16', duration: '0.5 дня', estimation: '2 год', objectCategory: 'Додрук', level: 'Легкий', file: 'Production.tsx' },

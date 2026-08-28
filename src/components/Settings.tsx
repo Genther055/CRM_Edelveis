@@ -643,7 +643,7 @@ export const Settings: React.FC = () => {
                           { id: 'p_buy_goods', name: 'Закупівлі товару' },
                           { id: 'p_view_purchase', name: 'Перегляд закупівлі' },
                           { id: 'p_buy_client_goods', name: 'Купівлі товарів покупця' },
-                          { id: 'p_view_1c_order', name: 'Перегляд замовлення 1С' },
+                          { id: 'p_view_1c_order', name: 'Перегляд замовлення виробництва' },
                           { id: 'p_writeoff_purchase_goods', name: 'Списання товару на закупівлі' },
                           { id: 'p_export_purchases', name: 'Експорт закупівлі' },
                           { id: 'p_view_waybill', name: 'Перегляд накладної' },
