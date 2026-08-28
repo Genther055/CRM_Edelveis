@@ -25,7 +25,10 @@ import {
   Scissors,
   ChevronRight,
   Zap,
-  Bookmark
+  Bookmark,
+  Printer,
+  Crop,
+  ShieldCheck
 } from 'lucide-react';
 import html2pdf from 'html2pdf.js';
 
@@ -1075,7 +1078,7 @@ export const Calculator: React.FC = () => {
             {[
               { key: 'products', label: 'Усі Продукти', count: 19 },
               { key: 'offset', label: 'Офсетний друк', badge: 'Авторозрахунок', count: 17 },
-              { key: 'digital', label: 'Цифровий друк', count: 8 },
+              { key: 'digital', label: 'Цифровий друк', count: 10 },
               { key: 'wide', label: 'Широкоформатний', count: 6 },
               { key: 'roll', label: 'Рулонний друк', count: 4 },
               { key: 'films', label: 'Кольорові плівки', count: 5 }
@@ -3975,89 +3978,109 @@ export const Calculator: React.FC = () => {
             }}>
               {[
                 {
-                  title: 'Термінові Візитки',
-                  desc: 'Цифровий оперативний друк від 100 шт за 1 годину на крейді 350г/м² або тач-картоні.',
-                  icon: <CreditCard size={30} style={{ color: 'var(--primary)' }} />,
-                  color: 'rgba(0, 122, 255, 0.1)',
-                  badgeClass: 'ios-badge-blue',
-                  badge: 'Від 1 години',
-                  metric: 'Від 100 шт',
-                  cat: 'Візитки'
-                },
-                {
-                  title: 'Цифрові Листівки SRA3',
-                  desc: 'Оперативний листовий друк на Xerox Versant 180 від 10 примірників А6, А5, А4.',
-                  icon: <Image size={30} style={{ color: '#0ea5e9' }} />,
-                  color: 'rgba(14, 165, 233, 0.1)',
-                  badgeClass: 'ios-badge-blue',
-                  badge: 'Xerox Versant',
-                  metric: 'Від 10 шт',
-                  cat: 'Листівки'
-                },
-                {
-                  title: 'Меню з конвертною ламінацією',
-                  desc: 'Захищені ресторанні меню та бейджі з посиленим гарячим ламінуванням 125/250 мкм.',
-                  icon: <Utensils size={30} style={{ color: '#af52de' }} />,
-                  color: 'rgba(175, 82, 222, 0.1)',
-                  badgeClass: 'ios-badge-purple',
-                  badge: 'Ламінація 125-250мкм',
-                  metric: 'HoReCa меню',
-                  cat: 'Меню'
-                },
-                {
-                  title: 'Дипломи та Сертифікати',
-                  desc: 'Персоналізовані дипломи, почесні грамоти та сертифікати з фольгуванням.',
-                  icon: <Sparkles size={30} style={{ color: '#ffcc00' }} />,
-                  color: 'rgba(255, 204, 0, 0.15)',
-                  badgeClass: 'ios-badge-yellow',
-                  badge: 'Фольгування',
-                  metric: 'Іменний друк',
-                  cat: 'Дипломи випускні'
-                },
-                {
-                  title: 'Брошури на скобу',
-                  desc: 'Малотиражні каталоги, презентації та інструкції від 5 примірників.',
-                  icon: <BookOpen size={30} style={{ color: '#34c759' }} />,
-                  color: 'rgba(52, 199, 89, 0.1)',
-                  badgeClass: 'ios-badge-green',
-                  badge: 'Скоба / Пружина',
-                  metric: 'Від 5 шт',
-                  cat: 'Книги'
-                },
-                {
-                  title: 'Фірмові Бланки',
-                  desc: 'Друк фірмових бланків малими тиражами на якісному офсетному папері 80-100г.',
+                  title: 'Листова',
+                  desc: 'Візитівки, листівки, бланки, буклети, наліпки, плакати…',
                   icon: <FileText size={30} style={{ color: 'var(--primary)' }} />,
                   color: 'rgba(0, 122, 255, 0.1)',
                   badgeClass: 'ios-badge-blue',
-                  badge: 'Офісні',
-                  metric: 'А4 бланки',
-                  cat: 'Бланки'
+                  badge: 'SRA3 / Листи',
+                  metric: 'Офсет / Цифра',
+                  onClick: () => { setOffsetSubTab('sheets'); setMainCategoryTab('offset'); }
                 },
                 {
-                  title: 'Стікери з плотерною надсічкою',
-                  desc: 'Контурна цифрова порізка фігурних наклейок на листах самоклейки Raflatac / Ritrama.',
-                  icon: <Tag size={30} style={{ color: '#ff9500' }} />,
+                  title: 'Висічна',
+                  desc: 'Фігурні наліпки, візитівки, листівки, підставки, хенгери…',
+                  icon: <Scissors size={30} style={{ color: '#ff9500' }} />,
                   color: 'rgba(255, 149, 0, 0.1)',
                   badgeClass: 'ios-badge-orange',
-                  badge: 'Плотерна надсічка',
-                  metric: 'Будь-яка форма',
-                  cat: 'Наклейки'
+                  badge: 'Штампи',
+                  metric: 'Готові форми',
+                  onClick: () => { setOffsetSubTab('felling'); setMainCategoryTab('offset'); }
                 },
                 {
-                  title: 'Календарі настільні цифрові',
-                  desc: 'Оперативні календарі-будиночки та перекидні настільні від 5 примірників.',
-                  icon: <Calendar size={30} style={{ color: '#ff3b30' }} />,
-                  color: 'rgba(255, 59, 48, 0.1)',
-                  badgeClass: 'ios-badge-red',
-                  badge: 'Настільні',
-                  metric: 'Від 5 шт',
-                  cat: 'Календарі'
+                  title: 'Багатосторінкова',
+                  desc: 'Брошури, журнали, каталоги, книги, меню, прайс-листи, звіти…',
+                  icon: <BookOpen size={30} style={{ color: '#34c759' }} />,
+                  color: 'rgba(52, 199, 89, 0.1)',
+                  badgeClass: 'ios-badge-green',
+                  badge: 'Брошурування',
+                  metric: 'Скоба / PUR',
+                  onClick: () => { setOffsetSubTab('multipage'); setMainCategoryTab('offset'); }
+                },
+                {
+                  title: 'Індивідуальне замовлення',
+                  desc: 'Замовити прорахунок комплексного або нестандартного замовлення',
+                  icon: <Settings size={30} style={{ color: '#af52de' }} />,
+                  color: 'rgba(175, 82, 222, 0.1)',
+                  badgeClass: 'ios-badge-purple',
+                  badge: 'Нестандартні',
+                  metric: 'Конструктор',
+                  onClick: () => setStep('editor')
+                },
+                {
+                  title: 'Каширована',
+                  desc: 'Багатошарові візитівки, листівки, запрошення, меню…',
+                  icon: <Layers size={30} style={{ color: '#5856d6' }} />,
+                  color: 'rgba(88, 86, 214, 0.1)',
+                  badgeClass: 'ios-badge-purple',
+                  badge: 'Каширування',
+                  metric: 'Преміум картон',
+                  onClick: () => handleSelectCategory('Візитки')
+                },
+                {
+                  title: 'Друк в листах',
+                  desc: 'Відвантаження в листах без порізки: 320 × 450 мм (SRA3), 320 × 700 (Banner)',
+                  icon: <Printer size={30} style={{ color: '#0ea5e9' }} />,
+                  color: 'rgba(14, 165, 233, 0.1)',
+                  badgeClass: 'ios-badge-blue',
+                  badge: 'SRA3 / Banner',
+                  metric: 'Без порізки',
+                  onClick: () => handleSelectCategory('Листівки')
+                },
+                {
+                  title: 'Конвертна ламінація',
+                  desc: 'Меню, бейджи, документи, вказівники. Можливо для зовнішнього застосування',
+                  icon: <ShieldCheck size={30} style={{ color: '#34c759' }} />,
+                  color: 'rgba(52, 199, 89, 0.1)',
+                  badgeClass: 'ios-badge-green',
+                  badge: '125-250 мкм',
+                  metric: 'HoReCa / Меню',
+                  onClick: () => handleSelectCategory('Меню')
+                },
+                {
+                  title: 'Плотерна порізка',
+                  desc: 'Самоклеючих паперів та плівок. Наліпки, стікери, етикетка…',
+                  icon: <Crop size={30} style={{ color: '#ff9500' }} />,
+                  color: 'rgba(255, 149, 0, 0.1)',
+                  badgeClass: 'ios-badge-orange',
+                  badge: 'Плотер',
+                  metric: 'Самоклейка',
+                  onClick: () => handleSelectCategory('Наклейки')
+                },
+                {
+                  title: 'Фігурна порізка',
+                  desc: 'Від 1 екземпляра, любої форми… Упаковка, коробка, папка, круг, зірка…',
+                  icon: <Sparkles size={30} style={{ color: '#ff2d55' }} />,
+                  color: 'rgba(255, 45, 85, 0.1)',
+                  badgeClass: 'ios-badge-pink',
+                  badge: 'Планшетний плотер',
+                  metric: 'Від 1 екз',
+                  onClick: () => handleSelectCategory('Наклейки')
+                },
+                {
+                  title: 'Папки',
+                  desc: 'Від 1 екземпляра, з вклеєною кишенею…',
+                  icon: <FolderOpen size={30} style={{ color: 'var(--primary)' }} />,
+                  color: 'rgba(0, 122, 255, 0.1)',
+                  badgeClass: 'ios-badge-blue',
+                  badge: 'Вклеєна кишеня',
+                  metric: 'А4 папки',
+                  onClick: () => handleSelectCategory('Папки')
                 }
               ].map(item => (
                 <div
                   key={item.title}
-                  onClick={() => handleSelectCategory(item.cat)}
+                  onClick={item.onClick}
                   className="ios-card bg-white"
                   style={{
                     display: 'flex',
