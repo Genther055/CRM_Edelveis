@@ -1274,162 +1274,145 @@ export const Calculator: React.FC = () => {
                   </button>
                 </div>
               ) : (
-                /* 4 Universal Technology Hero Cards - Cupertino iOS Style */
-                <div style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-                  gap: '20px'
-                }}>
-                  {[
-                    { 
-                      title: 'Листова продукція', 
-                      badge: 'Збірні спуски', 
-                      badgeClass: 'ios-badge-blue',
-                      desc: 'Візитівки, листівки, бланки, буклети, наліпки, плакати, флаєри…', 
-                      subTab: 'sheets', 
-                      icon: <FileText size={30} style={{ color: 'var(--primary)' }} />,
-                      color: 'rgba(0, 122, 255, 0.12)',
-                      accentColor: 'var(--primary)',
-                      bgGradient: 'linear-gradient(145deg, rgba(0, 122, 255, 0.08) 0%, rgba(0, 122, 255, 0.02) 60%, #ffffff 100%)',
-                      borderColor: 'rgba(0, 122, 255, 0.22)',
-                      boxShadow: '0 4px 18px rgba(0, 122, 255, 0.08)',
-                      hoverBorder: 'rgba(0, 122, 255, 0.45)',
-                      metric: 'Офсетні спуски'
-                    },
-                    { 
-                      title: 'Висічна продукція', 
-                      badge: 'Штампи', 
-                      badgeClass: 'ios-badge-orange',
-                      desc: 'Фігурні наліпки, хенгери, папки, кишенькові календарі, підставки…', 
-                      subTab: 'felling', 
-                      icon: <Scissors size={30} style={{ color: '#ff9500' }} />,
-                      color: 'rgba(255, 149, 0, 0.12)',
-                      accentColor: '#ff9500',
-                      bgGradient: 'linear-gradient(145deg, rgba(255, 149, 0, 0.09) 0%, rgba(255, 149, 0, 0.02) 60%, #ffffff 100%)',
-                      borderColor: 'rgba(255, 149, 0, 0.25)',
-                      boxShadow: '0 4px 18px rgba(255, 149, 0, 0.08)',
-                      hoverBorder: 'rgba(255, 149, 0, 0.5)',
-                      metric: 'Готові штампи'
-                    },
-                    { 
-                      title: 'Багатосторінкова', 
-                      badge: 'Брошурування', 
-                      badgeClass: 'ios-badge-green',
-                      desc: 'Каталоги, журнали, брошури, блокноти на пружині, ресторанні меню…', 
-                      subTab: 'multipage', 
-                      icon: <BookOpen size={30} style={{ color: '#34c759' }} />,
-                      color: 'rgba(52, 199, 89, 0.12)',
-                      accentColor: '#34c759',
-                      bgGradient: 'linear-gradient(145deg, rgba(52, 199, 89, 0.09) 0%, rgba(52, 199, 89, 0.02) 60%, #ffffff 100%)',
-                      borderColor: 'rgba(52, 199, 89, 0.25)',
-                      boxShadow: '0 4px 18px rgba(52, 199, 89, 0.08)',
-                      hoverBorder: 'rgba(52, 199, 89, 0.5)',
-                      metric: 'Скоба, PUR клей'
-                    },
-                    { 
-                      title: 'Індивідуальний розрахунок', 
-                      badge: 'Нестандартні', 
-                      badgeClass: 'ios-badge-purple',
-                      desc: 'Комплексні комерційні пропозиції з ручним підбором операцій 1С.', 
-                      subTab: 'custom', 
-                      icon: <Settings size={30} style={{ color: '#af52de' }} />,
-                      color: 'rgba(175, 82, 222, 0.12)',
-                      accentColor: '#af52de',
-                      bgGradient: 'linear-gradient(145deg, rgba(175, 82, 222, 0.09) 0%, rgba(175, 82, 222, 0.02) 60%, #ffffff 100%)',
-                      borderColor: 'rgba(175, 82, 222, 0.25)',
-                      boxShadow: '0 4px 18px rgba(175, 82, 222, 0.08)',
-                      hoverBorder: 'rgba(175, 82, 222, 0.5)',
-                      metric: 'Конструктор 1С'
-                    }
-                  ].map(item => (
-                    <div
-                      key={item.title}
-                      onClick={() => setOffsetSubTab(item.subTab as any)}
-                      className="ios-card"
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'space-between',
-                        padding: '24px',
-                        cursor: 'pointer',
-                        transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                        minHeight: '200px',
-                        position: 'relative',
-                        background: item.bgGradient,
-                        border: `1px solid ${item.borderColor}`,
-                        boxShadow: item.boxShadow
-                      }}
-                      onMouseEnter={(e) => { 
-                        e.currentTarget.style.transform = 'translateY(-3px)'; 
-                        e.currentTarget.style.borderColor = item.hoverBorder;
-                        e.currentTarget.style.boxShadow = `0 8px 24px ${item.color}`;
-                      }}
-                      onMouseLeave={(e) => { 
-                        e.currentTarget.style.transform = 'translateY(0)'; 
-                        e.currentTarget.style.borderColor = item.borderColor;
-                        e.currentTarget.style.boxShadow = item.boxShadow;
-                      }}
-                    >
-                      <div>
-                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                          <div style={{
-                            width: '56px',
-                            height: '56px',
-                            borderRadius: '16px',
-                            backgroundColor: item.color,
-                            border: `1px solid ${item.borderColor}`,
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            boxShadow: `0 2px 8px ${item.color}`
-                          }}>
-                            {item.icon}
-                          </div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                            <span style={{
-                              fontSize: '10px',
-                              fontWeight: '700',
-                              textTransform: 'uppercase',
-                              letterSpacing: '0.4px',
-                              padding: '2px 7px',
-                              borderRadius: '6px',
-                              backgroundColor: item.color,
-                              color: item.accentColor,
-                              border: `0.5px solid ${item.borderColor}`
+                /* 4 Universal Technology Hero Cards - Unified Cupertino Blue Style */
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 4px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: 'var(--primary)' }} />
+                      <h4 style={{ fontSize: '13px', fontWeight: '800', color: 'var(--text-dark)', textTransform: 'uppercase', letterSpacing: '0.5px', margin: 0 }}>
+                        Базові універсальні калькулятори
+                      </h4>
+                    </div>
+                    <span className="ios-badge ios-badge-blue" style={{ fontSize: '11px', padding: '3px 9px' }}>
+                      4 основні напрямки
+                    </span>
+                  </div>
+
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+                    gap: '20px'
+                  }}>
+                    {[
+                      { 
+                        title: 'Листова продукція', 
+                        badge: 'Збірні спуски', 
+                        desc: 'Візитівки, листівки, бланки, буклети, наліпки, плакати, флаєри…', 
+                        subTab: 'sheets', 
+                        icon: <FileText size={28} style={{ color: 'var(--primary)' }} />,
+                        metric: 'Офсетні спуски'
+                      },
+                      { 
+                        title: 'Висічна продукція', 
+                        badge: 'Штампи', 
+                        desc: 'Фігурні наліпки, хенгери, папки, кишенькові календарі, підставки…', 
+                        subTab: 'felling', 
+                        icon: <Scissors size={28} style={{ color: 'var(--primary)' }} />,
+                        metric: 'Готові штампи'
+                      },
+                      { 
+                        title: 'Багатосторінкова', 
+                        badge: 'Брошурування', 
+                        desc: 'Каталоги, журнали, брошури, блокноти на пружині, ресторанні меню…', 
+                        subTab: 'multipage', 
+                        icon: <BookOpen size={28} style={{ color: 'var(--primary)' }} />,
+                        metric: 'Скоба, PUR клей'
+                      },
+                      { 
+                        title: 'Індивідуальний розрахунок', 
+                        badge: 'Нестандартні', 
+                        desc: 'Комплексні комерційні пропозиції з ручним підбором операцій 1С.', 
+                        subTab: 'custom', 
+                        icon: <Settings size={28} style={{ color: 'var(--primary)' }} />,
+                        metric: 'Конструктор 1С'
+                      }
+                    ].map(item => (
+                      <div
+                        key={item.title}
+                        onClick={() => setOffsetSubTab(item.subTab as any)}
+                        className="ios-card"
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          justifyContent: 'space-between',
+                          padding: '22px 24px',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
+                          minHeight: '195px',
+                          position: 'relative',
+                          background: 'linear-gradient(180deg, #f0f7ff 0%, #ffffff 100%)',
+                          border: '1.5px solid rgba(0, 122, 255, 0.22)',
+                          boxShadow: '0 4px 18px rgba(0, 122, 255, 0.05)'
+                        }}
+                        onMouseEnter={(e) => { 
+                          e.currentTarget.style.transform = 'translateY(-3px)'; 
+                          e.currentTarget.style.borderColor = 'var(--primary)';
+                          e.currentTarget.style.boxShadow = '0 8px 24px rgba(0, 122, 255, 0.12)';
+                        }}
+                        onMouseLeave={(e) => { 
+                          e.currentTarget.style.transform = 'translateY(0)'; 
+                          e.currentTarget.style.borderColor = 'rgba(0, 122, 255, 0.22)';
+                          e.currentTarget.style.boxShadow = '0 4px 18px rgba(0, 122, 255, 0.05)';
+                        }}
+                      >
+                        <div>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px' }}>
+                            <div style={{
+                              width: '52px',
+                              height: '52px',
+                              borderRadius: '16px',
+                              backgroundColor: 'rgba(0, 122, 255, 0.1)',
+                              border: '1px solid rgba(0, 122, 255, 0.2)',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              boxShadow: '0 2px 8px rgba(0, 122, 255, 0.08)'
                             }}>
-                              Універсальний
-                            </span>
-                            <span className={`ios-badge ${item.badgeClass}`} style={{ fontSize: '11px', padding: '3px 8px' }}>
+                              {item.icon}
+                            </div>
+                            <span className="ios-badge ios-badge-blue" style={{ fontSize: '11px', padding: '3px 8px' }}>
                               {item.badge}
                             </span>
                           </div>
+
+                          <h4 style={{ fontSize: '16px', fontWeight: '800', marginBottom: '6px', color: 'var(--text-dark)' }}>
+                            {item.title}
+                          </h4>
+                          <p style={{ fontSize: '12px', color: 'var(--text-medium)', lineHeight: '1.45' }}>
+                            {item.desc}
+                          </p>
                         </div>
 
-                        <h4 style={{ fontSize: '16px', fontWeight: '800', marginBottom: '6px', color: 'var(--text-dark)' }}>
-                          {item.title}
-                        </h4>
-                        <p style={{ fontSize: '12px', color: 'var(--text-medium)', lineHeight: '1.45' }}>
-                          {item.desc}
-                        </p>
+                        <div style={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                          borderTop: '0.5px solid rgba(0, 122, 255, 0.15)',
+                          paddingTop: '12px',
+                          marginTop: '16px'
+                        }}>
+                          <span style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-medium)' }}>
+                            {item.metric}
+                          </span>
+                          <span style={{ color: 'var(--primary)', display: 'flex', alignItems: 'center', fontSize: '12px', fontWeight: '800', gap: '2px' }}>
+                            Відкрити <ChevronRight size={14} />
+                          </span>
+                        </div>
                       </div>
+                    ))}
+                  </div>
 
-                      <div style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        borderTop: `0.5px solid ${item.borderColor}`,
-                        paddingTop: '12px',
-                        marginTop: '16px'
-                      }}>
-                        <span style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-medium)' }}>
-                          {item.metric}
-                        </span>
-                        <span style={{ color: item.accentColor, display: 'flex', alignItems: 'center', fontSize: '12px', fontWeight: '800', gap: '2px' }}>
-                          Відкрити <ChevronRight size={14} />
-                        </span>
-                      </div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 4px 0 4px', borderTop: '0.5px solid var(--border-light)', marginTop: '8px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <div style={{ width: '8px', height: '8px', borderRadius: '50%', backgroundColor: 'var(--text-medium)' }} />
+                      <h4 style={{ fontSize: '13px', fontWeight: '800', color: 'var(--text-dark)', textTransform: 'uppercase', letterSpacing: '0.5px', margin: 0 }}>
+                        Каталог готової продукції
+                      </h4>
                     </div>
-                  ))}
+                    <span style={{ fontSize: '11px', color: 'var(--text-medium)', fontWeight: '600' }}>
+                      17 окремих виробів
+                    </span>
+                  </div>
                 </div>
               )}
 
