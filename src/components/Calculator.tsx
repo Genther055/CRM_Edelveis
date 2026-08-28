@@ -95,6 +95,17 @@ export const Calculator: React.FC = () => {
   const [multiInsertPages, setMultiInsertPages] = useState<string>('0'); // Без вставки
   const [multiInsertMaterial, setMultiInsertMaterial] = useState<string>('130');
   const [multiInsertColor, setMultiInsertColor] = useState<string>('2');
+  const [multiCustomWidth, setMultiCustomWidth] = useState<string>('99');
+  const [multiCustomHeight, setMultiCustomHeight] = useState<string>('210');
+  const [multiOrientation, setMultiOrientation] = useState<'vert' | 'horiz'>('vert');
+  const [multiScobaCount, setMultiScobaCount] = useState<string>('2');
+  const [multiCoverLam, setMultiCoverLam] = useState<string>('0');
+  const [multiBlockLam, setMultiBlockLam] = useState<string>('0');
+  const [multiInsertLam, setMultiInsertLam] = useState<string>('0');
+  const [multiPerforation, setMultiPerforation] = useState<string>('0');
+  const [multiPetPacking, setMultiPetPacking] = useState<string>('0');
+  const [multiWithDelivery, setMultiWithDelivery] = useState<boolean>(false);
+  const [multiPerPiece, setMultiPerPiece] = useState<boolean>(false);
 
   // Notepad specific states
   const [notepadSpringColor, setNotepadSpringColor] = useState<'white' | 'black' | 'silver'>('white');
@@ -5079,77 +5090,611 @@ export const Calculator: React.FC = () => {
 
               {/* 3. DIGITAL MULTIPAGE (БАГАТОСТОРІНКОВА) */}
               {digitalSubTab === 'multipage' && (
-                <div className="flex flex-col gap-6">
-                  <div className="ios-card bg-white" style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                      <div style={{ width: '44px', height: '44px', borderRadius: '14px', backgroundColor: 'rgba(0, 122, 255, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)' }}>
-                        <BookOpen size={22} />
+                <div className="flex flex-col gap-5">
+                  {/* Title & Info Bar */}
+                  <div className="ios-card bg-white p-4">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <div className="flex items-center gap-3">
+                        <div style={{ width: '42px', height: '42px', borderRadius: '12px', backgroundColor: 'rgba(0, 122, 255, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)' }}>
+                          <BookOpen size={22} />
+                        </div>
+                        <div>
+                          <h3 className="text-base font-extrabold text-slate-900 m-0">Багатосторінкова</h3>
+                          <span className="text-xs text-slate-500">Оперативний цифровий друк брошур, каталогів, журналів та презентацій</span>
+                        </div>
                       </div>
-                      <div>
-                        <h4 style={{ fontSize: '15px', fontWeight: '800', color: 'var(--text-dark)', margin: 0 }}>Цифрова багатосторінкова продукція</h4>
-                        <span style={{ fontSize: '12px', color: 'var(--text-medium)' }}>Малі тиражі брошур, каталогів, журналів, блокнотів на скобу, пружину або PUR клей</span>
+
+                      {/* Quick Info Badges */}
+                      <div className="flex flex-wrap items-center gap-2">
+                        {[
+                          { label: 'Матеріали', icon: <Layers size={13} className="text-indigo-500" /> },
+                          { label: 'Терміни друку', icon: <Clock size={13} className="text-amber-500" /> },
+                          { label: 'Технічні вимоги', icon: <FileText size={13} className="text-blue-500" /> },
+                          { label: 'Інструкція по оформленню замовлення', icon: <Info size={13} className="text-emerald-500" /> },
+                        ].map((b, idx) => (
+                          <button
+                            key={idx}
+                            type="button"
+                            onClick={() => setActiveInfoModal('modal_instr_digital')}
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200/80 text-[11px] font-semibold text-slate-700 transition-all"
+                          >
+                            {b.icon}
+                            <span>{b.label}</span>
+                          </button>
+                        ))}
                       </div>
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                    {[
-                      { id: '1', title: 'Скоба (металеві скоби)', desc: 'Брошури, методички, каталоги 8-64 стор.' },
-                      { id: '2', title: 'Металева пружина', desc: 'Блокноти, календарі, презентації' },
-                      { id: '3', title: 'PUR Клей (термобіндер)', desc: 'Книги, товсті каталоги 48-300 стор.' },
-                      { id: '4', title: 'Фірмові блокноти', desc: 'З підкладкою та обкладинкою 50 листів' },
-                    ].map(st => (
+                  {/* Section: Зшивання (Stitching Modes) */}
+                  <div className="ios-card bg-white p-5 flex flex-col gap-4">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800 m-0 flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-blue-600"></span>
+                      Зшивання
+                    </h4>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                      {/* Card 1: Скоба */}
                       <button
-                        key={st.id}
                         type="button"
-                        onClick={() => setMultiStitching(st.id)}
-                        className={`p-4 rounded-xl text-left transition-all ${
-                          multiStitching === st.id
-                            ? 'border-2 border-blue-600 bg-blue-50/30 shadow-md text-blue-900'
-                            : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
+                        onClick={() => setMultiStitching('1')}
+                        className={`p-4 rounded-2xl flex flex-col items-center justify-center gap-3 transition-all border text-center ${
+                          multiStitching === '1'
+                            ? 'border-2 border-blue-600 bg-blue-50/40 shadow-sm'
+                            : 'border-slate-200 bg-slate-50/60 hover:bg-slate-100/60'
                         }`}
                       >
-                        <div className="text-xs font-bold">{st.title}</div>
-                        <div className="text-[10px] text-slate-500 mt-1">{st.desc}</div>
+                        <div className="w-24 h-24 rounded-xl bg-white border border-slate-200/80 shadow-xs flex items-center justify-center p-2 relative">
+                          <svg width="60" height="70" viewBox="0 0 60 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 10L30 5L48 10V60L30 65L12 60V10Z" fill="#F8FAFC" stroke="#007AFF" strokeWidth="2" strokeLinejoin="round" />
+                            <path d="M30 5V65" stroke="#007AFF" strokeWidth="2" strokeLinecap="round" />
+                            <rect x="28.5" y="18" width="3" height="8" rx="1.5" fill="#007AFF" />
+                            <rect x="28.5" y="44" width="3" height="8" rx="1.5" fill="#007AFF" />
+                          </svg>
+                        </div>
+                        <span className={`text-xs font-bold ${multiStitching === '1' ? 'text-blue-600 font-extrabold' : 'text-slate-700'}`}>
+                          Скоба (8 — 64 стр)
+                        </span>
                       </button>
-                    ))}
+
+                      {/* Card 2: Пружина */}
+                      <button
+                        type="button"
+                        onClick={() => setMultiStitching('2')}
+                        className={`p-4 rounded-2xl flex flex-col items-center justify-center gap-3 transition-all border text-center ${
+                          multiStitching === '2'
+                            ? 'border-2 border-blue-600 bg-blue-50/40 shadow-sm'
+                            : 'border-slate-200 bg-slate-50/60 hover:bg-slate-100/60'
+                        }`}
+                      >
+                        <div className="w-24 h-24 rounded-xl bg-white border border-slate-200/80 shadow-xs flex items-center justify-center p-2 relative">
+                          <svg width="60" height="70" viewBox="0 0 60 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect x="18" y="8" width="34" height="54" rx="3" fill="#F8FAFC" stroke="#007AFF" strokeWidth="2" />
+                            {[14, 22, 30, 38, 46, 54].map((y, i) => (
+                              <ellipse key={i} cx="18" cy={y} rx="4" ry="2" stroke="#007AFF" strokeWidth="2" fill="#FFFFFF" />
+                            ))}
+                          </svg>
+                        </div>
+                        <span className={`text-xs font-bold ${multiStitching === '2' ? 'text-blue-600 font-extrabold' : 'text-slate-700'}`}>
+                          Пружина (4 — 524 стр)
+                        </span>
+                      </button>
+
+                      {/* Card 3: Клей */}
+                      <button
+                        type="button"
+                        onClick={() => setMultiStitching('3')}
+                        className={`p-4 rounded-2xl flex flex-col items-center justify-center gap-3 transition-all border text-center ${
+                          multiStitching === '3'
+                            ? 'border-2 border-blue-600 bg-blue-50/40 shadow-sm'
+                            : 'border-slate-200 bg-slate-50/60 hover:bg-slate-100/60'
+                        }`}
+                      >
+                        <div className="w-24 h-24 rounded-xl bg-white border border-slate-200/80 shadow-xs flex items-center justify-center p-2 relative">
+                          <svg width="60" height="70" viewBox="0 0 60 70" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M14 12L22 8H48V58H22L14 62V12Z" fill="#F8FAFC" stroke="#007AFF" strokeWidth="2" strokeLinejoin="round" />
+                            <path d="M22 8V58" stroke="#007AFF" strokeWidth="2" />
+                            <path d="M14 12L22 8" stroke="#007AFF" strokeWidth="2" />
+                            <path d="M14 62L22 58" stroke="#007AFF" strokeWidth="2" />
+                          </svg>
+                        </div>
+                        <span className={`text-xs font-bold ${multiStitching === '3' ? 'text-blue-600 font-extrabold' : 'text-slate-700'}`}>
+                          Клей (30 — 608 стр)
+                        </span>
+                      </button>
+                    </div>
                   </div>
 
-                  {/* Pricing Matrix */}
-                  <div className="ios-card bg-white overflow-hidden">
-                    <div className="bg-slate-900 text-white px-5 py-3.5 flex items-center justify-between">
-                      <h4 className="text-xs font-bold uppercase tracking-wider text-slate-200 m-0">Прайс цифрових брошур А5 (148×210 мм, 16 сторінок, 4+4)</h4>
+                  {/* Section: Розмір & Вид готового виробу */}
+                  <div className="ios-card bg-white p-5">
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+                      {/* Left: Size Controls */}
+                      <div className="md:col-span-6 flex flex-col gap-4">
+                        <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800 m-0 flex items-center gap-2">
+                          <span className="w-2 h-2 rounded-full bg-blue-600"></span>
+                          Розмір
+                        </h4>
+
+                        <div>
+                          <label className="text-[11px] font-bold text-slate-600 block mb-1.5">Оберіть стандартний:</label>
+                          <select
+                            value={multiSizePreset}
+                            onChange={(e) => {
+                              const v = e.target.value;
+                              setMultiSizePreset(v);
+                              const sizeMap: Record<string, [string, string]> = {
+                                '212': ['99', '210'],
+                                '206': ['105', '148'],
+                                '208': ['148', '210'],
+                                '211': ['210', '297'],
+                                '227': ['52', '148'],
+                                '226': ['74', '210'],
+                                '210': ['105', '297'],
+                                '228': ['148', '420'],
+                                '214': ['105', '105'],
+                                '215': ['148', '148'],
+                                '216': ['210', '210'],
+                              };
+                              if (sizeMap[v]) {
+                                setMultiCustomWidth(sizeMap[v][0]);
+                                setMultiCustomHeight(sizeMap[v][1]);
+                              }
+                            }}
+                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 focus:bg-white focus:border-blue-600 focus:outline-none transition-all shadow-sm"
+                          >
+                            <option value="212">Євро (198 × 210 в 99 × 210)</option>
+                            <option value="206">А6 (210 × 148 в 105 × 148)</option>
+                            <option value="208">А5 (297 × 210 в 148 × 210)</option>
+                            <option value="211">А4 (420 × 297 в 210 × 297)</option>
+                            <option value="227">1/2 A6 (104 × 148 в 52 × 148)</option>
+                            <option value="226">1/2 A5 (148 × 210 в 74 × 210)</option>
+                            <option value="210">1/2 A4 (210 × 297 в 105 × 297)</option>
+                            <option value="228">1/2 A3 (296 × 420 в 148 × 420)</option>
+                            <option value="214">А6 Квадрат (210 × 105 в 105 × 105)</option>
+                            <option value="215">А5 Квадрат (297 × 148 в 148 × 148)</option>
+                            <option value="216">А4 Квадрат (420 × 210 в 210 × 210)</option>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="text-[11px] font-bold text-slate-600 block mb-1.5">Введіть свій:</label>
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="number"
+                              value={multiCustomWidth}
+                              onChange={(e) => setMultiCustomWidth(e.target.value)}
+                              className="flex-1 px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs font-bold text-slate-900 focus:bg-white focus:border-blue-600 focus:outline-none"
+                              placeholder="Ширина"
+                            />
+                            <span className="text-slate-400 font-bold">×</span>
+                            <input
+                              type="number"
+                              value={multiCustomHeight}
+                              onChange={(e) => setMultiCustomHeight(e.target.value)}
+                              className="flex-1 px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs font-bold text-slate-900 focus:bg-white focus:border-blue-600 focus:outline-none"
+                              placeholder="Висота"
+                            />
+                            <select
+                              value={sheetUnit}
+                              onChange={(e) => setSheetUnit(e.target.value as any)}
+                              className="w-16 bg-slate-50 border border-slate-200 rounded-xl px-2 py-2 text-xs font-bold text-slate-800"
+                            >
+                              <option value="mm">мм</option>
+                              <option value="cm">см</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        {/* Orientation Radios */}
+                        <div className="flex items-center gap-6 pt-1">
+                          <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-800">
+                            <input
+                              type="radio"
+                              name="multi_orient"
+                              checked={multiOrientation === 'vert'}
+                              onChange={() => setMultiOrientation('vert')}
+                              className="text-blue-600 focus:ring-0"
+                            />
+                            <span>Вертикально</span>
+                          </label>
+                          <label className="flex items-center gap-2 cursor-pointer text-xs font-bold text-slate-800">
+                            <input
+                              type="radio"
+                              name="multi_orient"
+                              checked={multiOrientation === 'horiz'}
+                              onChange={() => setMultiOrientation('horiz')}
+                              className="text-blue-600 focus:ring-0"
+                            />
+                            <span>Горизонтально</span>
+                          </label>
+                        </div>
+                      </div>
+
+                      {/* Right: Blueprint Visual Preview */}
+                      <div className="md:col-span-6 flex flex-col items-center justify-center p-6 bg-gradient-to-b from-slate-50 to-slate-100/60 rounded-2xl border border-slate-200/80 min-h-[190px]">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-3">Вид готового виробу:</span>
+                        <div className="relative flex flex-col items-center justify-center">
+                          <div
+                            style={{
+                              width: `${Math.min(160, Math.max(65, Number(multiCustomWidth || 99) * 1.1))}px`,
+                              height: `${Math.min(150, Math.max(80, Number(multiCustomHeight || 210) * 0.7))}px`,
+                              backgroundColor: '#ffffff',
+                              border: '2px solid var(--primary)',
+                              borderRadius: '4px 8px 8px 4px',
+                              boxShadow: '0 8px 24px rgba(0, 122, 255, 0.14)',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              position: 'relative',
+                              transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+                            }}
+                          >
+                            <span className="text-[11px] font-black text-blue-700">
+                              {multiCustomWidth} × {multiCustomHeight} мм
+                            </span>
+                            {/* Height indicator */}
+                            <span className="absolute -left-16 top-1/2 -translate-y-1/2 text-[10px] font-bold text-slate-500">
+                              {multiCustomHeight} мм
+                            </span>
+                            {/* Width indicator */}
+                            <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-[10px] font-bold text-slate-500">
+                              {multiCustomWidth} мм
+                            </span>
+                          </div>
+                        </div>
+                      </div>
                     </div>
+                  </div>
+
+                  {/* Section: Опції (Comprehensive Options Rows) */}
+                  <div className="ios-card bg-white p-5 flex flex-col gap-4">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800 m-0 flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-blue-600"></span>
+                      Опції
+                    </h4>
+
+                    {/* Row 1: Скріплення */}
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-center py-2 border-b border-slate-100">
+                      <div className="md:col-span-2 text-xs font-bold text-slate-800">Скріплення</div>
+                      <div className="md:col-span-4">
+                        <select
+                          value={multiScobaCount}
+                          onChange={(e) => setMultiScobaCount(e.target.value)}
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800"
+                        >
+                          <option value="2">2 скоби</option>
+                          <option value="3">3 скоби</option>
+                          <option value="4">4 скоби</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Row 2: Обкладинка */}
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-center py-2 border-b border-slate-100">
+                      <div className="md:col-span-2 text-xs font-bold text-slate-800">Обкладинка</div>
+                      <div className="md:col-span-3">
+                        <select
+                          value={multiCoverPages}
+                          onChange={(e) => setMultiCoverPages(e.target.value)}
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800"
+                        >
+                          <option value="0">Без обкладинки</option>
+                          <option value="1">4 стор (1 аркуш)</option>
+                          <option value="2">8 стор (2 аркуші)</option>
+                        </select>
+                      </div>
+                      <div className="md:col-span-3">
+                        <select
+                          value={multiCoverMaterial}
+                          onChange={(e) => setMultiCoverMaterial(e.target.value)}
+                          disabled={multiCoverPages === '0'}
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 disabled:opacity-50"
+                        >
+                          <option value="120">Крейд МАТ 80 г/м²</option>
+                          <option value="21">Крейд МАТ 90 г/м²</option>
+                          <option value="22">Крейд МАТ 115 г/м²</option>
+                          <option value="23">Крейд МАТ 130 г/м²</option>
+                          <option value="24">Крейд МАТ 150 г/м²</option>
+                          <option value="25">Крейд МАТ 170 г/м²</option>
+                          <option value="26">Крейд МАТ 200 г/м²</option>
+                          <option value="27">Крейд МАТ 250 г/м²</option>
+                          <option value="28">Крейд МАТ 300 г/м²</option>
+                          <option value="32">Офсет 80 г/м²</option>
+                        </select>
+                      </div>
+                      <div className="md:col-span-2">
+                        <select
+                          value={multiCoverLam}
+                          onChange={(e) => setMultiCoverLam(e.target.value)}
+                          disabled={multiCoverPages === '0'}
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-2 text-xs font-bold text-slate-800 disabled:opacity-50"
+                        >
+                          <option value="0">Без покриття</option>
+                          <option value="7">ГЛ 1+0 25 мкм</option>
+                          <option value="8">ГЛ 1+1 25 мкм</option>
+                          <option value="9">МАТ 1+0 25 мкм</option>
+                          <option value="10">МАТ 1+1 25 мкм</option>
+                          <option value="30">SOFT лам 1+0</option>
+                          <option value="31">SOFT лам 1+1</option>
+                        </select>
+                      </div>
+                      <div className="md:col-span-2">
+                        <select
+                          value={multiCoverColor}
+                          onChange={(e) => setMultiCoverColor(e.target.value)}
+                          disabled={multiCoverPages === '0'}
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-2 text-xs font-bold text-slate-800 disabled:opacity-50"
+                        >
+                          <option value="1">4+0 (R9100)</option>
+                          <option value="2">4+4 (R9100)</option>
+                          <option value="3">1+0</option>
+                          <option value="4">1+1</option>
+                          <option value="0">Без друку</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Row 3: Внутрішній блок */}
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-center py-2 border-b border-slate-100">
+                      <div className="md:col-span-2 text-xs font-bold text-slate-800">Внутрішній блок</div>
+                      <div className="md:col-span-3">
+                        <select
+                          value={multiBlockPages}
+                          onChange={(e) => setMultiBlockPages(e.target.value)}
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800"
+                        >
+                          <option value="2">8 стор (2 аркуші)</option>
+                          <option value="3">12 стор (3 аркуші)</option>
+                          <option value="4">16 стор (4 аркуші)</option>
+                          <option value="5">20 стор (5 аркушів)</option>
+                          <option value="6">24 стор (6 аркушів)</option>
+                          <option value="7">28 стор (7 аркушів)</option>
+                          <option value="8">32 стор (8 аркушів)</option>
+                          <option value="10">40 стор (10 аркушів)</option>
+                          <option value="12">48 стор (12 аркушів)</option>
+                          <option value="16">64 стор (16 аркушів)</option>
+                        </select>
+                      </div>
+                      <div className="md:col-span-3">
+                        <select
+                          value={multiBlockMaterial}
+                          onChange={(e) => setMultiBlockMaterial(e.target.value)}
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800"
+                        >
+                          <option value="120">Крейд МАТ 80 г/м²</option>
+                          <option value="21">Крейд МАТ 90 г/м²</option>
+                          <option value="22">Крейд МАТ 115 г/м²</option>
+                          <option value="23">Крейд МАТ 130 г/м²</option>
+                          <option value="24">Крейд МАТ 150 г/м²</option>
+                          <option value="25">Крейд МАТ 170 г/м²</option>
+                          <option value="26">Крейд МАТ 200 г/м²</option>
+                          <option value="27">Крейд МАТ 250 г/м²</option>
+                          <option value="32">Офсет 80 г/м²</option>
+                        </select>
+                      </div>
+                      <div className="md:col-span-2">
+                        <select
+                          value={multiBlockLam}
+                          onChange={(e) => setMultiBlockLam(e.target.value)}
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-2 text-xs font-bold text-slate-800"
+                        >
+                          <option value="0">Без покриття</option>
+                          <option value="7">ГЛ 1+0 25 мкм</option>
+                          <option value="8">ГЛ 1+1 25 мкм</option>
+                          <option value="9">МАТ 1+0 25 мкм</option>
+                          <option value="10">МАТ 1+1 25 мкм</option>
+                        </select>
+                      </div>
+                      <div className="md:col-span-2">
+                        <select
+                          value={multiBlockColor}
+                          onChange={(e) => setMultiBlockColor(e.target.value)}
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-2 text-xs font-bold text-slate-800"
+                        >
+                          <option value="2">4+4 (R9100)</option>
+                          <option value="4">1+1</option>
+                          <option value="0">Без друку</option>
+                          <option value="1">4+0</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Row 4: Вставка */}
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-center py-2 border-b border-slate-100">
+                      <div className="md:col-span-2 text-xs font-bold text-slate-800">Вставка</div>
+                      <div className="md:col-span-3">
+                        <select
+                          value={multiInsertPages}
+                          onChange={(e) => setMultiInsertPages(e.target.value)}
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800"
+                        >
+                          <option value="0">Без вставки</option>
+                          <option value="1">4 стор (1 аркуш)</option>
+                          <option value="2">8 стор (2 аркуші)</option>
+                        </select>
+                      </div>
+                      <div className="md:col-span-3">
+                        <select
+                          value={multiInsertMaterial}
+                          onChange={(e) => setMultiInsertMaterial(e.target.value)}
+                          disabled={multiInsertPages === '0'}
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 disabled:opacity-50"
+                        >
+                          <option value="120">Крейд МАТ 80 г/м²</option>
+                          <option value="23">Крейд МАТ 130 г/м²</option>
+                          <option value="27">Крейд МАТ 250 г/м²</option>
+                        </select>
+                      </div>
+                      <div className="md:col-span-2">
+                        <select
+                          value={multiInsertLam}
+                          onChange={(e) => setMultiInsertLam(e.target.value)}
+                          disabled={multiInsertPages === '0'}
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-2 text-xs font-bold text-slate-800 disabled:opacity-50"
+                        >
+                          <option value="0">Без покриття</option>
+                          <option value="7">ГЛ 1+0 25 мкм</option>
+                        </select>
+                      </div>
+                      <div className="md:col-span-2">
+                        <select
+                          value={multiInsertColor}
+                          onChange={(e) => setMultiInsertColor(e.target.value)}
+                          disabled={multiInsertPages === '0'}
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-2 text-xs font-bold text-slate-800 disabled:opacity-50"
+                        >
+                          <option value="2">4+4 (R9100)</option>
+                          <option value="1">4+0</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Row 5: Перфорація */}
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-center py-2 border-b border-slate-100">
+                      <div className="md:col-span-2 text-xs font-bold text-slate-800">Перфорація</div>
+                      <div className="md:col-span-3">
+                        <select
+                          value={multiPerforation}
+                          onChange={(e) => setMultiPerforation(e.target.value)}
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800"
+                        >
+                          <option value="0">Ні</option>
+                          <option value="1">Так</option>
+                        </select>
+                      </div>
+                      <div className="md:col-span-3">
+                        <select
+                          disabled={multiPerforation === '0'}
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 disabled:opacity-50"
+                        >
+                          <option value="1">1 аркуш</option>
+                          <option value="2">2 аркуші</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Row 6: Пакування в ПЕТ */}
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-center py-2">
+                      <div className="md:col-span-2 text-xs font-bold text-slate-800">Пакування в ПЕТ</div>
+                      <div className="md:col-span-3">
+                        <select
+                          value={multiPetPacking}
+                          onChange={(e) => setMultiPetPacking(e.target.value)}
+                          className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800"
+                        >
+                          <option value="0">Ні</option>
+                          <option value="5">По 5 шт</option>
+                          <option value="10">По 10 шт</option>
+                          <option value="25">По 25 шт</option>
+                          <option value="50">По 50 шт</option>
+                          <option value="1">Поштучно</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Section: Таблиця та розрахунок тиражів */}
+                  <div className="ios-card bg-white overflow-hidden shadow-md">
+                    {/* Header Controls Bar */}
+                    <div className="bg-slate-900 text-white px-5 py-3.5 flex flex-wrap items-center justify-between gap-4">
+                      <div className="flex items-center gap-4">
+                        <span className="text-xs font-extrabold uppercase tracking-wider text-blue-400">Розрахунок вартості</span>
+                        <div className="flex items-center gap-2 text-xs">
+                          <label className="flex items-center gap-1.5 cursor-pointer text-slate-300 hover:text-white">
+                            <input
+                              type="checkbox"
+                              checked={multiWithDelivery}
+                              onChange={(e) => setMultiWithDelivery(e.target.checked)}
+                              className="rounded text-blue-500 focus:ring-0"
+                            />
+                            <span>З доставкою</span>
+                          </label>
+                          <span className="text-slate-600">|</span>
+                          <label className="flex items-center gap-1.5 cursor-pointer text-slate-300 hover:text-white">
+                            <input
+                              type="checkbox"
+                              checked={multiPerPiece}
+                              onChange={(e) => setMultiPerPiece(e.target.checked)}
+                              className="rounded text-blue-500 focus:ring-0"
+                            />
+                            <span>За екземпляр</span>
+                          </label>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <button
+                          type="button"
+                          onClick={() => alert('Експорт прайс-листа в Excel')}
+                          className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-emerald-400 text-xs font-bold transition-all"
+                          title="Експорт в Excel"
+                        >
+                          <FileSpreadsheet size={16} />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Table Matrix */}
                     <div className="overflow-x-auto">
                       <table className="w-full text-center text-xs border-collapse">
                         <thead>
                           <tr className="bg-slate-800 text-slate-200 text-xs font-semibold uppercase">
-                            <th className="py-3 px-4 text-left border-r border-slate-700/50">Скріплення / Обкладинка</th>
-                            {[10, 25, 50, 100, 200, 500].map(tir => (
-                              <th key={tir} className="py-3 px-3 border-r border-slate-700/50 last:border-r-0 font-bold">{tir} шт.</th>
+                            <th className="py-3 px-4 text-left border-r border-slate-700/50">Розмір та конфігурація</th>
+                            <th className="py-3 px-3 border-r border-slate-700/50">Готовність</th>
+                            {[1, 25, 50, 75, 100, 200, 500].map(tir => (
+                              <th key={tir} className="py-3 px-3 border-r border-slate-700/50 last:border-r-0 font-extrabold text-blue-300">
+                                {tir} шт.
+                              </th>
                             ))}
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
                           {[
-                            { name: 'Скоба (Обкл 250г + Блок 130г 4+4)', r: 18.5 },
-                            { name: 'Скоба (Обкл 350г Лам + Блок 150г 4+4)', r: 24.0 },
-                            { name: 'Металева пружина (Обкл 350г + Блок 50 лист)', r: 38.0 },
-                            { name: 'PUR Клей (Обкл 300г Лам + Блок 64 стор)', r: 52.0 },
-                          ].map((row, idx) => (
-                            <tr key={idx} className="hover:bg-blue-50/20 transition-colors">
-                              <td className="py-2.5 px-4 text-left font-semibold text-slate-800 border-r border-slate-100">{row.name}</td>
-                              {[10, 25, 50, 100, 200, 500].map(tir => (
-                                <td
-                                  key={tir}
-                                  onClick={() => { setQuantity(tir); setCategory('Буклети'); setStep('editor'); }}
-                                  className="py-2.5 px-3 font-bold text-slate-900 border-r border-slate-100 last:border-r-0 hover:bg-blue-600 hover:text-white cursor-pointer transition-all"
-                                >
-                                  {Math.round(tir * row.r + 180)} ₴
+                            { dayLabel: '1д (Терміново)', readyText: 'на завтра', coef: 1.25, color: 'text-amber-700' },
+                            { dayLabel: '2д (Стандарт)', readyText: 'через 2 дні', coef: 1.05, color: 'text-blue-700' },
+                            { dayLabel: '3д (Економ)', readyText: 'через 3 дні', coef: 1.0, color: 'text-emerald-700' },
+                            { dayLabel: '4д (Оптимально)', readyText: 'через 4 дні', coef: 0.95, color: 'text-slate-600' },
+                          ].map((tierRow, idx) => {
+                            const pagesCount = Number(multiBlockPages || 2) * 4;
+                            const sizeText = `Євро (${multiCustomWidth} × ${multiCustomHeight} мм)`;
+
+                            return (
+                              <tr key={idx} className="hover:bg-blue-50/20 transition-colors">
+                                <td className="py-3 px-4 text-left font-bold text-slate-800 border-r border-slate-100">
+                                  <div>{sizeText}</div>
+                                  <div className="text-[10px] text-slate-400 font-normal mt-0.5">
+                                    {pagesCount} сторінок ({multiBlockPages} арк.) | {multiStitching === '1' ? 'Скоба' : multiStitching === '2' ? 'Пружина' : 'Клей'}
+                                  </div>
                                 </td>
-                              ))}
-                            </tr>
-                          ))}
+                                <td className="py-3 px-3 border-r border-slate-100">
+                                  <span className={`px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-slate-100 ${tierRow.color}`}>
+                                    {tierRow.dayLabel}
+                                  </span>
+                                </td>
+                                {[1, 25, 50, 75, 100, 200, 500].map(tir => {
+                                  const basePerBook = (pagesCount * 0.95 + 12) * tierRow.coef;
+                                  const deliveryFee = multiWithDelivery ? 90 : 0;
+                                  const totalCost = Math.round(tir * basePerBook + deliveryFee + 80);
+                                  const displayCost = multiPerPiece ? (totalCost / tir).toFixed(2) : totalCost;
+
+                                  return (
+                                    <td
+                                      key={tir}
+                                      onClick={() => {
+                                        setQuantity(tir);
+                                        setCategory('Буклети');
+                                        setStep('editor');
+                                      }}
+                                      className="py-3 px-3 border-r border-slate-100 last:border-r-0 font-extrabold text-slate-900 hover:bg-blue-600 hover:text-white cursor-pointer transition-all text-sm"
+                                      title="Натисніть для замовлення"
+                                    >
+                                      {displayCost} ₴
+                                    </td>
+                                  );
+                                })}
+                              </tr>
+                            );
+                          })}
                         </tbody>
                       </table>
                     </div>
