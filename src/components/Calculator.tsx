@@ -1784,29 +1784,30 @@ export const Calculator: React.FC = () => {
               {/* DETAILED SHEET CALCULATOR (Офсетний друк / Листова) */}
               {offsetSubTab === 'sheets' && (
                 <div className="flex flex-col gap-6">
-                  {/* Top Product Header & Quick Links Bar */}
-                  <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm flex flex-col gap-4">
-                    <div className="flex items-center justify-between border-b border-slate-100 pb-3.5">
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 font-bold">
-                          <FileText size={20} />
+                  {/* Top Product Header & Quick Links Bar - Cupertino iOS Card */}
+                  <div className="ios-card bg-white" style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '0.5px solid var(--border-light)', paddingBottom: '14px', flexWrap: 'wrap', gap: '12px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                        <div style={{ width: '48px', height: '48px', borderRadius: '14px', backgroundColor: 'rgba(0, 122, 255, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)' }}>
+                          <FileText size={24} />
                         </div>
                         <div>
-                          <div className="flex items-center gap-2 text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px', fontWeight: '700', color: 'var(--text-medium)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                             <span>Офсетний друк</span>
-                            <span>/</span>
-                            <span className="text-blue-600 font-bold">Листова продукція</span>
+                            <span style={{ opacity: 0.5 }}>/</span>
+                            <span style={{ color: 'var(--primary)' }}>Листова продукція</span>
                           </div>
-                          <h3 className="text-xl font-extrabold text-slate-900 m-0 mt-0.5">
+                          <h3 style={{ fontSize: '20px', fontWeight: '800', color: 'var(--text-dark)', margin: '2px 0 0 0' }}>
                             {(category as string) || 'Візитівки'}
                           </h3>
                         </div>
                       </div>
-                      <div className="flex items-center gap-2">
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <button
                           type="button"
                           onClick={() => setStep('editor')}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold shadow-sm transition-all"
+                          className="ios-badge ios-badge-blue"
+                          style={{ padding: '8px 14px', borderRadius: 'var(--radius-md)', fontSize: '12px', fontWeight: '700', cursor: 'pointer', border: 'none', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
                         >
                           <Settings size={14} />
                           <span>Конструктор 1С</span>
@@ -1814,46 +1815,71 @@ export const Calculator: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => setOffsetSubTab('overview')}
-                          className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold shadow-sm transition-all"
+                          style={{
+                            padding: '8px 14px',
+                            borderRadius: 'var(--radius-md)',
+                            border: '0.5px solid var(--border-light)',
+                            backgroundColor: 'var(--bg-card)',
+                            color: 'var(--text-dark)',
+                            fontSize: '12px',
+                            fontWeight: '700',
+                            cursor: 'pointer',
+                            boxShadow: 'var(--shadow-flat)'
+                          }}
                         >
                           ← Назад до категорій
                         </button>
                       </div>
                     </div>
 
-                    {/* Quick Info Links */}
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
-                      <button type="button" onClick={() => setActiveInfoModal('instr')} className="flex items-center gap-2 p-2 rounded-lg text-slate-600 hover:text-blue-600 hover:bg-blue-50/60 text-xs font-semibold transition-colors">
-                        <FileText size={15} className="text-blue-600 flex-shrink-0" />
-                        <span className="truncate">Інструкція</span>
-                      </button>
-                      <button type="button" onClick={() => setActiveInfoModal('materials')} className="flex items-center gap-2 p-2 rounded-lg text-slate-600 hover:text-blue-600 hover:bg-blue-50/60 text-xs font-semibold transition-colors">
-                        <Layers size={15} className="text-blue-600 flex-shrink-0" />
-                        <span className="truncate">Матеріали</span>
-                      </button>
-                      <button type="button" onClick={() => setActiveInfoModal('review')} className="flex items-center gap-2 p-2 rounded-lg text-slate-600 hover:text-blue-600 hover:bg-blue-50/60 text-xs font-semibold transition-colors">
-                        <MessageSquare size={15} className="text-blue-600 flex-shrink-0" />
-                        <span className="truncate">Ваш відгук</span>
-                      </button>
-                      <button type="button" onClick={() => setActiveInfoModal('terms')} className="flex items-center gap-2 p-2 rounded-lg text-slate-600 hover:text-blue-600 hover:bg-blue-50/60 text-xs font-semibold transition-colors">
-                        <Clock size={15} className="text-blue-600 flex-shrink-0" />
-                        <span className="truncate">Термін друку</span>
-                      </button>
-                      <button type="button" onClick={() => setActiveInfoModal('samples')} className="flex items-center gap-2 p-2 rounded-lg text-slate-600 hover:text-blue-600 hover:bg-blue-50/60 text-xs font-semibold transition-colors">
-                        <Tag size={15} className="text-blue-600 flex-shrink-0" />
-                        <span className="truncate">Зразки матеріалів</span>
-                      </button>
-                      <button type="button" onClick={() => setActiveInfoModal('bug')} className="flex items-center gap-2 p-2 rounded-lg text-amber-600 hover:text-amber-700 hover:bg-amber-50/60 text-xs font-semibold transition-colors">
-                        <AlertTriangle size={15} className="text-amber-500 flex-shrink-0" />
-                        <span className="truncate">Знайшли помилку?</span>
-                      </button>
+                    {/* Quick Info Links in sleek Cupertino pill buttons */}
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '8px' }}>
+                      {[
+                        { key: 'instr', label: 'Інструкція', icon: <FileText size={15} style={{ color: 'var(--primary)' }} /> },
+                        { key: 'materials', label: 'Матеріали', icon: <Layers size={15} style={{ color: 'var(--primary)' }} /> },
+                        { key: 'review', label: 'Ваш відгук', icon: <MessageSquare size={15} style={{ color: 'var(--primary)' }} /> },
+                        { key: 'terms', label: 'Термін друку', icon: <Clock size={15} style={{ color: 'var(--primary)' }} /> },
+                        { key: 'samples', label: 'Зразки', icon: <Tag size={15} style={{ color: 'var(--primary)' }} /> },
+                        { key: 'bug', label: 'Знайшли помилку?', icon: <AlertTriangle size={15} style={{ color: '#ff9500' }} />, isAmber: true }
+                      ].map(link => (
+                        <button
+                          key={link.key}
+                          type="button"
+                          onClick={() => setActiveInfoModal(link.key as any)}
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '8px',
+                            padding: '8px 12px',
+                            borderRadius: 'var(--radius-md)',
+                            backgroundColor: 'var(--bg-system)',
+                            border: '0.5px solid var(--border-light)',
+                            color: link.isAmber ? '#ff9500' : 'var(--text-dark)',
+                            fontSize: '12px',
+                            fontWeight: '600',
+                            cursor: 'pointer',
+                            transition: 'all 0.15s ease'
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.backgroundColor = link.isAmber ? 'rgba(255, 149, 0, 0.12)' : 'rgba(0, 122, 255, 0.08)';
+                            e.currentTarget.style.color = link.isAmber ? '#ff9500' : 'var(--primary)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.backgroundColor = 'var(--bg-system)';
+                            e.currentTarget.style.color = link.isAmber ? '#ff9500' : 'var(--text-dark)';
+                          }}
+                        >
+                          {link.icon}
+                          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{link.label}</span>
+                        </button>
+                      ))}
                     </div>
                   </div>
 
                   {/* Product Kind / Folding Type Selection Bar */}
-                  <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm flex flex-col gap-4">
-                    <div className="flex items-center justify-between">
-                      <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider m-0">
+                  <div className="ios-card bg-white" style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                      <h4 style={{ fontSize: '12px', fontWeight: '800', color: 'var(--text-dark)', textTransform: 'uppercase', letterSpacing: '0.5px', margin: 0 }}>
                         {(category as string) === 'Буклети' ? 'Вид складання' :
                          (category as string) === 'Візитки' ? 'Вид готового виробу' :
                          (category as string) === 'Папки' ? 'Конструкція папки' :
@@ -2983,24 +3009,36 @@ export const Calculator: React.FC = () => {
               {offsetSubTab === 'felling' && (
                 <div className="flex flex-col gap-6">
                   {/* Top Information Buttons Bar */}
-                  <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex items-center justify-between flex-wrap gap-3">
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-lg bg-pink-50 text-pink-600 flex items-center justify-center font-bold">
-                        ✂️
+                  <div className="ios-card bg-white" style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <div style={{ width: '44px', height: '44px', borderRadius: '14px', backgroundColor: 'rgba(255, 149, 0, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ff9500' }}>
+                        <Scissors size={22} />
                       </div>
                       <div>
-                        <h4 className="text-sm font-bold text-slate-900 m-0">Висічна продукція (Штампи)</h4>
-                        <span className="text-xs text-slate-400">Оберіть готовий штамп з бази або введіть параметри</span>
+                        <h4 style={{ fontSize: '15px', fontWeight: '800', color: 'var(--text-dark)', margin: 0 }}>Висічна продукція (Штампи)</h4>
+                        <span style={{ fontSize: '12px', color: 'var(--text-medium)' }}>Оберіть готовий штамп з бази або введіть параметри</span>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2 flex-wrap">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
                       <button
                         type="button"
                         onClick={() => setActiveInfoModal('instr')}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-sm transition-colors"
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          padding: '8px 14px',
+                          borderRadius: 'var(--radius-md)',
+                          border: '0.5px solid var(--border-light)',
+                          backgroundColor: 'var(--bg-system)',
+                          color: 'var(--text-dark)',
+                          fontSize: '12px',
+                          fontWeight: '600',
+                          cursor: 'pointer'
+                        }}
                       >
-                        <FileText size={14} className="text-blue-600" />
+                        <FileText size={14} style={{ color: 'var(--primary)' }} />
                         <span>Інструкція</span>
                       </button>
 
@@ -3017,7 +3055,8 @@ export const Calculator: React.FC = () => {
                         }
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 text-xs font-bold shadow-sm transition-colors"
+                        className="ios-badge ios-badge-blue"
+                        style={{ padding: '8px 14px', borderRadius: 'var(--radius-md)', fontSize: '12px', fontWeight: '700', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
                       >
                         <Download size={14} />
                         <span>Шаблон штампу (PDF)</span>
@@ -3026,17 +3065,29 @@ export const Calculator: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => setActiveInfoModal('materials')}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-sm transition-colors"
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          padding: '8px 14px',
+                          borderRadius: 'var(--radius-md)',
+                          border: '0.5px solid var(--border-light)',
+                          backgroundColor: 'var(--bg-system)',
+                          color: 'var(--text-dark)',
+                          fontSize: '12px',
+                          fontWeight: '600',
+                          cursor: 'pointer'
+                        }}
                       >
-                        <Layers size={14} className="text-blue-600" />
+                        <Layers size={14} style={{ color: 'var(--primary)' }} />
                         <span>Матеріали</span>
                       </button>
                     </div>
                   </div>
 
                   {/* Form Selector Header Bar */}
-                  <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm flex flex-col gap-3">
-                    <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider m-0">Форма штампу</h4>
+                  <div className="ios-card bg-white" style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                    <h4 style={{ fontSize: '12px', fontWeight: '800', color: 'var(--text-dark)', textTransform: 'uppercase', letterSpacing: '0.5px', margin: 0 }}>Форма штампу</h4>
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
                       {[
                         { id: '1', name: 'Стандартна', img: 'https://sborka.ua/cside/img/Standart/standart.png' },
@@ -3050,14 +3101,22 @@ export const Calculator: React.FC = () => {
                           <div
                             key={formItem.id}
                             onClick={() => setFellingForm(formItem.id)}
-                            className={`p-3.5 rounded-xl border flex flex-col items-center justify-center gap-2 cursor-pointer transition-all ${
-                              isActive
-                                ? 'border-blue-500 bg-blue-50/40 ring-2 ring-blue-500/20'
-                                : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
-                            }`}
+                            style={{
+                              padding: '14px',
+                              borderRadius: 'var(--radius-md)',
+                              border: isActive ? '2px solid var(--primary)' : '0.5px solid var(--border-light)',
+                              backgroundColor: isActive ? 'rgba(0, 122, 255, 0.05)' : 'var(--bg-system)',
+                              display: 'flex',
+                              flexDirection: 'column',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              gap: '8px',
+                              cursor: 'pointer',
+                              transition: 'all 0.15s ease'
+                            }}
                           >
                             <img src={formItem.img} alt={formItem.name} className="w-14 h-10 object-contain" />
-                            <span className={`text-xs font-bold text-center ${isActive ? 'text-blue-600' : 'text-slate-800'}`}>
+                            <span style={{ fontSize: '12px', fontWeight: '700', textAlign: 'center', color: isActive ? 'var(--primary)' : 'var(--text-dark)' }}>
                               {formItem.name}
                             </span>
                           </div>
@@ -3069,8 +3128,8 @@ export const Calculator: React.FC = () => {
                   {/* Stamp Selection & Interactive Product Preview */}
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {/* Left Column: Die-cut Stamp Selection */}
-                    <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm flex flex-col gap-4">
-                      <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider m-0 border-b border-slate-100 pb-2">
+                    <div className="ios-card bg-white" style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                      <h4 style={{ fontSize: '12px', fontWeight: '800', color: 'var(--text-dark)', textTransform: 'uppercase', letterSpacing: '0.5px', margin: 0, borderBottom: '0.5px solid var(--border-light)', paddingBottom: '8px' }}>
                         Оберіть стандартний штамп
                       </h4>
                       <div>
@@ -3101,17 +3160,17 @@ export const Calculator: React.FC = () => {
                         };
                         const info = stampInfo[fellingStamp] || { title: 'Стандартний штамп', w: 90, h: 200 };
                         return (
-                          <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs">
-                            <div className="font-bold text-slate-900 mb-1">{info.title}</div>
-                            <div className="text-slate-600">Габарити висічки: <strong className="text-blue-600">{info.w} × {info.h} мм</strong></div>
+                          <div style={{ backgroundColor: 'var(--bg-system)', padding: '14px', borderRadius: 'var(--radius-md)', border: '0.5px solid var(--border-light)', fontSize: '12px' }}>
+                            <div style={{ fontWeight: '800', color: 'var(--text-dark)', marginBottom: '4px' }}>{info.title}</div>
+                            <div style={{ color: 'var(--text-medium)' }}>Габарити висічки: <strong style={{ color: 'var(--primary)' }}>{info.w} × {info.h} мм</strong></div>
                           </div>
                         );
                       })()}
                     </div>
 
                     {/* Right Column: Visual Stamp Preview */}
-                    <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm flex flex-col items-center justify-center gap-3">
-                      <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Вид готового виробу</span>
+                    <div className="ios-card bg-white" style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '12px' }}>
+                      <span style={{ fontSize: '12px', fontWeight: '800', color: 'var(--text-medium)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Вид готового виробу</span>
                       <div className="w-full h-48 border-2 border-dashed border-slate-200 bg-slate-50 rounded-xl flex items-center justify-center p-4">
                         {(() => {
                           const stampImgs: Record<string, string> = {
@@ -3136,7 +3195,7 @@ export const Calculator: React.FC = () => {
                   </div>
 
                   {/* Pricing Matrix Table for Die-cut */}
-                  <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+                  <div className="ios-card bg-white" style={{ overflow: 'hidden' }}>
                     <div className="bg-slate-900 text-white px-5 py-3.5 flex items-center justify-between flex-wrap gap-4">
                       <h4 className="text-xs font-bold uppercase tracking-wider text-slate-200 m-0">Специфікація розрахунків та прайс-лист висічки</h4>
 
@@ -3226,40 +3285,64 @@ export const Calculator: React.FC = () => {
               {offsetSubTab === 'multipage' && (
                 <div className="flex flex-col gap-6">
                   {/* Top Information Buttons Bar */}
-                  <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex items-center justify-between flex-wrap gap-3">
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
-                        📖
+                  <div className="ios-card bg-white" style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <div style={{ width: '44px', height: '44px', borderRadius: '14px', backgroundColor: 'rgba(52, 199, 89, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#34c759' }}>
+                        <BookOpen size={22} />
                       </div>
                       <div>
-                        <h4 className="text-sm font-bold text-slate-900 m-0">Багатосторінкова продукція (Каталоги, Журнали)</h4>
-                        <span className="text-xs text-slate-400">Гнучке налаштування обкладинки, блоку та вставки</span>
+                        <h4 style={{ fontSize: '15px', fontWeight: '800', color: 'var(--text-dark)', margin: 0 }}>Багатосторінкова продукція (Каталоги, Журнали)</h4>
+                        <span style={{ fontSize: '12px', color: 'var(--text-medium)' }}>Гнучке налаштування обкладинки, блоку та вставки</span>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                       <button
                         type="button"
                         onClick={() => setActiveInfoModal('tech_pur')}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-sm transition-colors"
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          padding: '8px 14px',
+                          borderRadius: 'var(--radius-md)',
+                          border: '0.5px solid var(--border-light)',
+                          backgroundColor: 'var(--bg-system)',
+                          color: 'var(--text-dark)',
+                          fontSize: '12px',
+                          fontWeight: '600',
+                          cursor: 'pointer'
+                        }}
                       >
-                        <BookOpen size={14} className="text-blue-600" />
+                        <BookOpen size={14} style={{ color: 'var(--primary)' }} />
                         <span>Технічні вимоги</span>
                       </button>
                       <button
                         type="button"
                         onClick={() => setActiveInfoModal('materials')}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-sm transition-colors"
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          padding: '8px 14px',
+                          borderRadius: 'var(--radius-md)',
+                          border: '0.5px solid var(--border-light)',
+                          backgroundColor: 'var(--bg-system)',
+                          color: 'var(--text-dark)',
+                          fontSize: '12px',
+                          fontWeight: '600',
+                          cursor: 'pointer'
+                        }}
                       >
-                        <Layers size={14} className="text-blue-600" />
+                        <Layers size={14} style={{ color: 'var(--primary)' }} />
                         <span>Матеріали</span>
                       </button>
                     </div>
                   </div>
 
                   {/* Stitching Type Selector */}
-                  <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm flex flex-col gap-3">
-                    <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider m-0">Спосіб зшивання</h4>
+                  <div className="ios-card bg-white" style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                    <h4 style={{ fontSize: '12px', fontWeight: '800', color: 'var(--text-dark)', textTransform: 'uppercase', letterSpacing: '0.5px', margin: 0 }}>Спосіб зшивання</h4>
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                       {[
                         { id: '1', name: 'Скоба (8 — 64 стр)', img: 'https://sborka.ua/cside/img/skoba.png' },
@@ -3272,14 +3355,22 @@ export const Calculator: React.FC = () => {
                           <div
                             key={stItem.id}
                             onClick={() => setMultiStitching(stItem.id)}
-                            className={`p-3.5 rounded-xl border flex flex-col items-center justify-center gap-2 cursor-pointer transition-all ${
-                              isActive
-                                ? 'border-blue-500 bg-blue-50/40 ring-2 ring-blue-500/20'
-                                : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
-                            }`}
+                            style={{
+                              padding: '14px',
+                              borderRadius: 'var(--radius-md)',
+                              border: isActive ? '2px solid var(--primary)' : '0.5px solid var(--border-light)',
+                              backgroundColor: isActive ? 'rgba(0, 122, 255, 0.05)' : 'var(--bg-system)',
+                              display: 'flex',
+                              flexDirection: 'column',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              gap: '8px',
+                              cursor: 'pointer',
+                              transition: 'all 0.15s ease'
+                            }}
                           >
                             <img src={stItem.img} alt={stItem.name} className="w-16 h-10 object-contain" />
-                            <span className={`text-xs font-bold text-center ${isActive ? 'text-blue-600' : 'text-slate-800'}`}>
+                            <span style={{ fontSize: '12px', fontWeight: '700', textAlign: 'center', color: isActive ? 'var(--primary)' : 'var(--text-dark)' }}>
                               {stItem.name}
                             </span>
                           </div>
@@ -3291,8 +3382,8 @@ export const Calculator: React.FC = () => {
                   {/* Size Selection & Canvas Visual Preview */}
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     {/* Left Column: Size presets & Custom inputs */}
-                    <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm flex flex-col gap-4">
-                      <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider m-0 border-b border-slate-100 pb-2">Розмір видання</h4>
+                    <div className="ios-card bg-white" style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                      <h4 style={{ fontSize: '12px', fontWeight: '800', color: 'var(--text-dark)', textTransform: 'uppercase', letterSpacing: '0.5px', margin: 0, borderBottom: '0.5px solid var(--border-light)', paddingBottom: '8px' }}>Розмір видання</h4>
                       <div>
                         <label className="text-xs font-semibold text-slate-600 block mb-1.5">Оберіть стандартний:</label>
                         <select
@@ -3354,8 +3445,8 @@ export const Calculator: React.FC = () => {
                     </div>
 
                     {/* Right Column: Visual Preview Canvas */}
-                    <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm flex flex-col items-center justify-center gap-3">
-                      <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Вид готового виробу</span>
+                    <div className="ios-card bg-white" style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '12px' }}>
+                      <span style={{ fontSize: '12px', fontWeight: '800', color: 'var(--text-medium)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Вид готового виробу</span>
                       <div className="w-full h-48 border-2 border-dashed border-slate-200 bg-slate-50 rounded-xl flex flex-col items-center justify-center gap-2 p-4">
                         <div className="w-28 h-36 border-2 border-slate-800 bg-white rounded-md relative shadow-md flex flex-col justify-between p-2">
                           <div className="w-1.5 h-full bg-blue-600 absolute left-0 top-0 rounded-l-sm"></div>
@@ -3371,8 +3462,8 @@ export const Calculator: React.FC = () => {
                   </div>
 
                   {/* Component Specification Options Breakdown */}
-                  <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm flex flex-col gap-4">
-                    <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider m-0 border-b border-slate-100 pb-2">
+                  <div className="ios-card bg-white" style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    <h4 style={{ fontSize: '12px', fontWeight: '800', color: 'var(--text-dark)', textTransform: 'uppercase', letterSpacing: '0.5px', margin: 0, borderBottom: '0.5px solid var(--border-light)', paddingBottom: '8px' }}>
                       Деталізація складників багатосторінкового видання
                     </h4>
 
@@ -3667,110 +3758,581 @@ export const Calculator: React.FC = () => {
 
           {/* TAB 3: DIGITAL PRINTING */}
           {mainCategoryTab === 'digital' && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-              <div onClick={() => handleSelectCategory('Візитки')} className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm hover:shadow-md hover:border-blue-300 transition-all cursor-pointer text-center group">
-                <div className="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                  <Layout size={28} />
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+              gap: '20px'
+            }}>
+              {[
+                {
+                  title: 'Термінові Візитки',
+                  desc: 'Цифровий оперативний друк від 100 шт за 1 годину на крейді 350г/м² або тач-картоні.',
+                  icon: <CreditCard size={30} style={{ color: 'var(--primary)' }} />,
+                  color: 'rgba(0, 122, 255, 0.1)',
+                  badgeClass: 'ios-badge-blue',
+                  badge: 'Від 1 години',
+                  metric: 'Від 100 шт',
+                  cat: 'Візитки'
+                },
+                {
+                  title: 'Цифрові Листівки SRA3',
+                  desc: 'Оперативний листовий друк на Xerox Versant 180 від 10 примірників А6, А5, А4.',
+                  icon: <Image size={30} style={{ color: '#0ea5e9' }} />,
+                  color: 'rgba(14, 165, 233, 0.1)',
+                  badgeClass: 'ios-badge-blue',
+                  badge: 'Xerox Versant',
+                  metric: 'Від 10 шт',
+                  cat: 'Листівки'
+                },
+                {
+                  title: 'Меню з конвертною ламінацією',
+                  desc: 'Захищені ресторанні меню та бейджі з посиленим гарячим ламінуванням 125/250 мкм.',
+                  icon: <Utensils size={30} style={{ color: '#af52de' }} />,
+                  color: 'rgba(175, 82, 222, 0.1)',
+                  badgeClass: 'ios-badge-purple',
+                  badge: 'Ламінація 125-250мкм',
+                  metric: 'HoReCa меню',
+                  cat: 'Меню'
+                },
+                {
+                  title: 'Дипломи та Сертифікати',
+                  desc: 'Персоналізовані дипломи, почесні грамоти та сертифікати з фольгуванням.',
+                  icon: <Sparkles size={30} style={{ color: '#ffcc00' }} />,
+                  color: 'rgba(255, 204, 0, 0.15)',
+                  badgeClass: 'ios-badge-yellow',
+                  badge: 'Фольгування',
+                  metric: 'Іменний друк',
+                  cat: 'Дипломи випускні'
+                },
+                {
+                  title: 'Брошури на скобу',
+                  desc: 'Малотиражні каталоги, презентації та інструкції від 5 примірників.',
+                  icon: <BookOpen size={30} style={{ color: '#34c759' }} />,
+                  color: 'rgba(52, 199, 89, 0.1)',
+                  badgeClass: 'ios-badge-green',
+                  badge: 'Скоба / Пружина',
+                  metric: 'Від 5 шт',
+                  cat: 'Книги'
+                },
+                {
+                  title: 'Фірмові Бланки',
+                  desc: 'Друк фірмових бланків малими тиражами на якісному офсетному папері 80-100г.',
+                  icon: <FileText size={30} style={{ color: 'var(--primary)' }} />,
+                  color: 'rgba(0, 122, 255, 0.1)',
+                  badgeClass: 'ios-badge-blue',
+                  badge: 'Офісні',
+                  metric: 'А4 бланки',
+                  cat: 'Бланки'
+                },
+                {
+                  title: 'Стікери з плотерною надсічкою',
+                  desc: 'Контурна цифрова порізка фігурних наклейок на листах самоклейки Raflatac / Ritrama.',
+                  icon: <Tag size={30} style={{ color: '#ff9500' }} />,
+                  color: 'rgba(255, 149, 0, 0.1)',
+                  badgeClass: 'ios-badge-orange',
+                  badge: 'Плотерна надсічка',
+                  metric: 'Будь-яка форма',
+                  cat: 'Наклейки'
+                },
+                {
+                  title: 'Календарі настільні цифрові',
+                  desc: 'Оперативні календарі-будиночки та перекидні настільні від 5 примірників.',
+                  icon: <Calendar size={30} style={{ color: '#ff3b30' }} />,
+                  color: 'rgba(255, 59, 48, 0.1)',
+                  badgeClass: 'ios-badge-red',
+                  badge: 'Настільні',
+                  metric: 'Від 5 шт',
+                  cat: 'Календарі'
+                }
+              ].map(item => (
+                <div
+                  key={item.title}
+                  onClick={() => handleSelectCategory(item.cat)}
+                  className="ios-card bg-white"
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    padding: '24px',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    minHeight: '200px',
+                    position: 'relative'
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; }}
+                >
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                      <div style={{
+                        width: '56px',
+                        height: '56px',
+                        borderRadius: '16px',
+                        backgroundColor: item.color,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}>
+                        {item.icon}
+                      </div>
+                      <span className={`ios-badge ${item.badgeClass}`} style={{ fontSize: '11px', padding: '3px 8px' }}>
+                        {item.badge}
+                      </span>
+                    </div>
+
+                    <h4 style={{ fontSize: '15px', fontWeight: '800', marginBottom: '6px', color: 'var(--text-dark)' }}>
+                      {item.title}
+                    </h4>
+                    <p style={{ fontSize: '12px', color: 'var(--text-medium)', lineHeight: '1.4' }}>
+                      {item.desc}
+                    </p>
+                  </div>
+
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    borderTop: '0.5px solid var(--border-light)',
+                    paddingTop: '12px',
+                    marginTop: '16px'
+                  }}>
+                    <span style={{ fontSize: '11px', fontWeight: '600', color: 'var(--text-medium)' }}>
+                      {item.metric}
+                    </span>
+                    <span style={{ color: 'var(--primary)', display: 'flex', alignItems: 'center', fontSize: '12px', fontWeight: '700' }}>
+                      Розрахувати <ChevronRight size={14} />
+                    </span>
+                  </div>
                 </div>
-                <h4 className="text-base font-bold text-slate-900 group-hover:text-blue-600 transition-colors mb-1">Термінові Візитки</h4>
-                <p className="text-xs text-slate-500 m-0">Цифровий оперативний друк від 100 шт за 1 годину.</p>
-              </div>
-              <div onClick={() => handleSelectCategory('Листівки')} className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm hover:shadow-md hover:border-blue-300 transition-all cursor-pointer text-center group">
-                <div className="w-14 h-14 rounded-2xl bg-cyan-50 text-cyan-600 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                  <FileText size={28} />
-                </div>
-                <h4 className="text-base font-bold text-slate-900 group-hover:text-blue-600 transition-colors mb-1">Цифрові Листівки SRA3</h4>
-                <p className="text-xs text-slate-500 m-0">Оперативний листовий друк на Xerox Versant 180.</p>
-              </div>
-              <div onClick={() => handleSelectCategory('Меню')} className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm hover:shadow-md hover:border-blue-300 transition-all cursor-pointer text-center group">
-                <div className="w-14 h-14 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                  <Layers size={28} />
-                </div>
-                <h4 className="text-base font-bold text-slate-900 group-hover:text-blue-600 transition-colors mb-1">Конвертна ламінація</h4>
-                <p className="text-xs text-slate-500 m-0">Захищені меню та бейджи з посиленим ламінуванням 125мкм.</p>
-              </div>
+              ))}
             </div>
           )}
 
           {/* TAB 4: WIDE FORMAT */}
           {mainCategoryTab === 'wide' && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div onClick={() => handleSelectCategory('Плакати')} className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm hover:shadow-md hover:border-blue-300 transition-all cursor-pointer text-center group">
-                <div className="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                  <Layout size={28} />
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+              gap: '20px'
+            }}>
+              {[
+                {
+                  title: 'Банери Frontlit / Backlit',
+                  desc: 'Литі та ламіновані банери з проклейкою підворотів та встановленням металевих люверсів.',
+                  icon: <Layout size={30} style={{ color: 'var(--primary)' }} />,
+                  color: 'rgba(0, 122, 255, 0.1)',
+                  badgeClass: 'ios-badge-blue',
+                  badge: 'Люверси / Проклейка',
+                  metric: 'Зовнішня реклама',
+                  cat: 'Плакати'
+                },
+                {
+                  title: 'Плівка ORAJET (самоклейка)',
+                  desc: 'Глянцева, матова, прозора та перфорована One Way Vision плівка для вітрин та авто.',
+                  icon: <Tag size={30} style={{ color: '#ff9500' }} />,
+                  color: 'rgba(255, 149, 0, 0.1)',
+                  badgeClass: 'ios-badge-orange',
+                  badge: 'ORAJET 3164',
+                  metric: 'Вітрини та авто',
+                  cat: 'Наклейки'
+                },
+                {
+                  title: 'Постери Citylight & Blueback',
+                  desc: 'Друк великоформатних постерів для сітілайтів та білбордів 3х6м з вологостійким папером.',
+                  icon: <Image size={30} style={{ color: '#0ea5e9' }} />,
+                  color: 'rgba(14, 165, 233, 0.1)',
+                  badgeClass: 'ios-badge-blue',
+                  badge: 'Citylight / Blueback',
+                  metric: 'Білборди та сітілайти',
+                  cat: 'Плакати'
+                },
+                {
+                  title: 'Картини на полотні (Canvas)',
+                  desc: 'Інтер\'єрний друк фотографій та картин на натуральному полотні з натяжкою на підрамник.',
+                  icon: <Sparkles size={30} style={{ color: '#af52de' }} />,
+                  color: 'rgba(175, 82, 222, 0.1)',
+                  badgeClass: 'ios-badge-purple',
+                  badge: 'Натуральне полотно',
+                  metric: 'Підрамник у зборі',
+                  cat: 'Плакати'
+                },
+                {
+                  title: 'Таблички на ПВХ / Акрилі',
+                  desc: 'Прямий УФ-друк або накатка плівки на пластик ПВХ 3-5мм, акрил чи алюмінієвий композит.',
+                  icon: <FolderOpen size={30} style={{ color: '#34c759' }} />,
+                  color: 'rgba(52, 199, 89, 0.1)',
+                  badgeClass: 'ios-badge-green',
+                  badge: 'ПВХ / Композит',
+                  metric: 'Інформаційні вивіски',
+                  cat: 'Плакати'
+                },
+                {
+                  title: 'Наклейки на скло та вітрини',
+                  desc: 'Перфоровані плівки One Way Vision з ефектом односторонньої прозорості.',
+                  icon: <Layers size={30} style={{ color: '#ff3b30' }} />,
+                  color: 'rgba(255, 59, 48, 0.1)',
+                  badgeClass: 'ios-badge-red',
+                  badge: 'One Way Vision',
+                  metric: 'Оформлення вітрин',
+                  cat: 'Наклейки'
+                }
+              ].map(item => (
+                <div
+                  key={item.title}
+                  onClick={() => handleSelectCategory(item.cat)}
+                  className="ios-card bg-white"
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    padding: '24px',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    minHeight: '200px',
+                    position: 'relative'
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; }}
+                >
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                      <div style={{
+                        width: '56px',
+                        height: '56px',
+                        borderRadius: '16px',
+                        backgroundColor: item.color,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}>
+                        {item.icon}
+                      </div>
+                      <span className={`ios-badge ${item.badgeClass}`} style={{ fontSize: '11px', padding: '3px 8px' }}>
+                        {item.badge}
+                      </span>
+                    </div>
+
+                    <h4 style={{ fontSize: '15px', fontWeight: '800', marginBottom: '6px', color: 'var(--text-dark)' }}>
+                      {item.title}
+                    </h4>
+                    <p style={{ fontSize: '12px', color: 'var(--text-medium)', lineHeight: '1.4' }}>
+                      {item.desc}
+                    </p>
+                  </div>
+
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    borderTop: '0.5px solid var(--border-light)',
+                    paddingTop: '12px',
+                    marginTop: '16px'
+                  }}>
+                    <span style={{ fontSize: '11px', fontWeight: '600', color: 'var(--text-medium)' }}>
+                      {item.metric}
+                    </span>
+                    <span style={{ color: 'var(--primary)', display: 'flex', alignItems: 'center', fontSize: '12px', fontWeight: '700' }}>
+                      Розрахувати <ChevronRight size={14} />
+                    </span>
+                  </div>
                 </div>
-                <h4 className="text-base font-bold text-slate-900 group-hover:text-blue-600 transition-colors mb-1">Банери та Тенти</h4>
-                <p className="text-xs text-slate-500 m-0">Литі та ламеновані банери для зовнішньої реклами з люверсами.</p>
-              </div>
-              <div onClick={() => handleSelectCategory('Наклейки')} className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm hover:shadow-md hover:border-blue-300 transition-all cursor-pointer text-center group">
-                <div className="w-14 h-14 rounded-2xl bg-fuchsia-50 text-fuchsia-600 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                  <Layers size={28} />
-                </div>
-                <h4 className="text-base font-bold text-slate-900 group-hover:text-blue-600 transition-colors mb-1">Плівка ORAJET</h4>
-                <p className="text-xs text-slate-500 m-0">Широкоформатний друк на самоклейці для вітрин та авто.</p>
-              </div>
+              ))}
             </div>
           )}
 
           {/* TAB 5: ROLL PRINTING */}
           {mainCategoryTab === 'roll' && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-              <div onClick={() => handleSelectCategory('Етикетки')} className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm hover:shadow-md hover:border-blue-300 transition-all cursor-pointer text-center group">
-                <div className="w-14 h-14 rounded-2xl bg-teal-50 text-teal-600 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                  <Layers size={28} />
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+              gap: '20px'
+            }}>
+              {[
+                {
+                  title: 'Рулонна Етикетка (Папір)',
+                  desc: 'Самоклеючі етикетки у рулонах на напівглянці для автоматичних аплікаторів та маркування.',
+                  icon: <Tag size={30} style={{ color: '#0ea5e9' }} />,
+                  color: 'rgba(14, 165, 233, 0.1)',
+                  badgeClass: 'ios-badge-blue',
+                  badge: 'Напівглянець',
+                  metric: 'Рулони / бобіни',
+                  cat: 'Етикетки'
+                },
+                {
+                  title: 'Поліпропіленова Етикетка',
+                  desc: 'Вологостійкі та жиростійкі білі або срібні PP наклейки для побутової хімії та продуктів.',
+                  icon: <Layers size={30} style={{ color: '#34c759' }} />,
+                  color: 'rgba(52, 199, 89, 0.1)',
+                  badgeClass: 'ios-badge-green',
+                  badge: 'Поліпропілен PP',
+                  metric: 'Вологостійка',
+                  cat: 'Етикетки'
+                },
+                {
+                  title: 'Прозора рулонна етикетка',
+                  desc: 'Ефект невидимої етикетки (no-look label) для прозорої косметичної та скляної тари.',
+                  icon: <Sparkles size={30} style={{ color: '#af52de' }} />,
+                  color: 'rgba(175, 82, 222, 0.1)',
+                  badgeClass: 'ios-badge-purple',
+                  badge: 'Прозора плівка',
+                  metric: 'No-look label',
+                  cat: 'Етикетки'
+                },
+                {
+                  title: 'Преміум-етикетка з тисненням',
+                  desc: 'Тиснення золотою та срібною фольгою, конгрев та вибірковий УФ-лак у рулонах.',
+                  icon: <Sparkles size={30} style={{ color: '#ffcc00' }} />,
+                  color: 'rgba(255, 204, 0, 0.15)',
+                  badgeClass: 'ios-badge-yellow',
+                  badge: 'Фольга / Конгрев',
+                  metric: 'Преміум серія',
+                  cat: 'Етикетки'
+                }
+              ].map(item => (
+                <div
+                  key={item.title}
+                  onClick={() => handleSelectCategory(item.cat)}
+                  className="ios-card bg-white"
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    padding: '24px',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    minHeight: '200px',
+                    position: 'relative'
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; }}
+                >
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                      <div style={{
+                        width: '56px',
+                        height: '56px',
+                        borderRadius: '16px',
+                        backgroundColor: item.color,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}>
+                        {item.icon}
+                      </div>
+                      <span className={`ios-badge ${item.badgeClass}`} style={{ fontSize: '11px', padding: '3px 8px' }}>
+                        {item.badge}
+                      </span>
+                    </div>
+
+                    <h4 style={{ fontSize: '15px', fontWeight: '800', marginBottom: '6px', color: 'var(--text-dark)' }}>
+                      {item.title}
+                    </h4>
+                    <p style={{ fontSize: '12px', color: 'var(--text-medium)', lineHeight: '1.4' }}>
+                      {item.desc}
+                    </p>
+                  </div>
+
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    borderTop: '0.5px solid var(--border-light)',
+                    paddingTop: '12px',
+                    marginTop: '16px'
+                  }}>
+                    <span style={{ fontSize: '11px', fontWeight: '600', color: 'var(--text-medium)' }}>
+                      {item.metric}
+                    </span>
+                    <span style={{ color: 'var(--primary)', display: 'flex', alignItems: 'center', fontSize: '12px', fontWeight: '700' }}>
+                      Розрахувати <ChevronRight size={14} />
+                    </span>
+                  </div>
                 </div>
-                <h4 className="text-base font-bold text-slate-900 group-hover:text-blue-600 transition-colors mb-1">Рулонна Етикетка</h4>
-                <p className="text-xs text-slate-500 m-0">Самоклеючі етикетки у бобінах та рулонах для маркування.</p>
-              </div>
+              ))}
             </div>
           )}
 
           {/* TAB 6: COLOR FILMS */}
           {mainCategoryTab === 'films' && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-              <div onClick={() => handleSelectCategory('Наклейки')} className="bg-white border border-slate-200 rounded-xl p-6 shadow-sm hover:shadow-md hover:border-blue-300 transition-all cursor-pointer text-center group">
-                <div className="w-14 h-14 rounded-2xl bg-pink-50 text-pink-600 flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform">
-                  <Layers size={28} />
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+              gap: '20px'
+            }}>
+              {[
+                {
+                  title: 'Плотерна порізка ORACAL 641',
+                  desc: 'Точна контурна порізка написів, логотипів та графіки з 60 кольорів вінілових плівок.',
+                  icon: <Scissors size={30} style={{ color: '#ff9500' }} />,
+                  color: 'rgba(255, 149, 0, 0.1)',
+                  badgeClass: 'ios-badge-orange',
+                  badge: 'ORACAL 641',
+                  metric: '60 кольорів',
+                  cat: 'Наклейки'
+                },
+                {
+                  title: 'Трафаретні плівки ORAMASK',
+                  desc: 'Виготовлення одноразових та багаторазових трафаретів для фарбування та аерографії.',
+                  icon: <Layers size={30} style={{ color: '#0ea5e9' }} />,
+                  color: 'rgba(14, 165, 233, 0.1)',
+                  badgeClass: 'ios-badge-blue',
+                  badge: 'Трафарети',
+                  metric: 'Точний контур',
+                  cat: 'Наклейки'
+                },
+                {
+                  title: 'Світловідбиваючі плівки',
+                  desc: 'Спеціальні світлоповертаючі плівки для дорожніх знаків, спецтранспорту та сигнальної розмітки.',
+                  icon: <Zap size={30} style={{ color: '#ffcc00' }} />,
+                  color: 'rgba(255, 204, 0, 0.15)',
+                  badgeClass: 'ios-badge-yellow',
+                  badge: 'Світловідбиваюча',
+                  metric: 'Підвищена видимість',
+                  cat: 'Наклейки'
+                },
+                {
+                  title: 'Монтажна плівка з вибіркою',
+                  desc: 'Вибірка зайвих елементів та нанесення монтажної плівки для швидкого перенесення аплікацій.',
+                  icon: <FileText size={30} style={{ color: 'var(--primary)' }} />,
+                  color: 'rgba(0, 122, 255, 0.1)',
+                  badgeClass: 'ios-badge-blue',
+                  badge: 'Монтажка',
+                  metric: 'Готово до поклейки',
+                  cat: 'Наклейки'
+                },
+                {
+                  title: 'Брендування автотранспорту',
+                  desc: 'Комплексна підготовка плівок та нанесення корпоративної айдентики на легковий і комерційний транспорт.',
+                  icon: <Sparkles size={30} style={{ color: '#34c759' }} />,
+                  color: 'rgba(52, 199, 89, 0.1)',
+                  badgeClass: 'ios-badge-green',
+                  badge: 'Автоайдентика',
+                  metric: 'Автобрендування',
+                  cat: 'Логотипи виготовлення'
+                }
+              ].map(item => (
+                <div
+                  key={item.title}
+                  onClick={() => handleSelectCategory(item.cat)}
+                  className="ios-card bg-white"
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    padding: '24px',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s ease',
+                    minHeight: '200px',
+                    position: 'relative'
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; }}
+                >
+                  <div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                      <div style={{
+                        width: '56px',
+                        height: '56px',
+                        borderRadius: '16px',
+                        backgroundColor: item.color,
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}>
+                        {item.icon}
+                      </div>
+                      <span className={`ios-badge ${item.badgeClass}`} style={{ fontSize: '11px', padding: '3px 8px' }}>
+                        {item.badge}
+                      </span>
+                    </div>
+
+                    <h4 style={{ fontSize: '15px', fontWeight: '800', marginBottom: '6px', color: 'var(--text-dark)' }}>
+                      {item.title}
+                    </h4>
+                    <p style={{ fontSize: '12px', color: 'var(--text-medium)', lineHeight: '1.4' }}>
+                      {item.desc}
+                    </p>
+                  </div>
+
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    borderTop: '0.5px solid var(--border-light)',
+                    paddingTop: '12px',
+                    marginTop: '16px'
+                  }}>
+                    <span style={{ fontSize: '11px', fontWeight: '600', color: 'var(--text-medium)' }}>
+                      {item.metric}
+                    </span>
+                    <span style={{ color: 'var(--primary)', display: 'flex', alignItems: 'center', fontSize: '12px', fontWeight: '700' }}>
+                      Розрахувати <ChevronRight size={14} />
+                    </span>
+                  </div>
                 </div>
-                <h4 className="text-base font-bold text-slate-900 group-hover:text-blue-600 transition-colors mb-1">Плотерна порізка плівок</h4>
-                <p className="text-xs text-slate-500 m-0">Порізка аплікацій з кольорових вінілових плівок ORACAL 641.</p>
-              </div>
+              ))}
             </div>
           )}
         </div>
       ) : (
         <div className="flex flex-col gap-6">
           {/* Editor Header Navigation */}
-          <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex items-center justify-between flex-wrap gap-3">
+          <div className="ios-card bg-white" style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
             <button 
               onClick={() => setStep('catalog')}
-              className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-sm transition-colors"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '8px 14px',
+                borderRadius: 'var(--radius-md)',
+                border: '0.5px solid var(--border-light)',
+                backgroundColor: 'var(--bg-system)',
+                color: 'var(--text-dark)',
+                fontSize: '12px',
+                fontWeight: '700',
+                cursor: 'pointer'
+              }}
             >
-              <ArrowLeft size={14} className="text-blue-600" />
+              <ArrowLeft size={14} style={{ color: 'var(--primary)' }} />
               <span>Каталог виробів</span>
             </button>
             
-            {/* Calculation Mode Selector */}
-            <div className="flex bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs font-semibold">
+            {/* Calculation Mode Selector - Cupertino iOS Segmented Control */}
+            <div style={{ display: 'flex', backgroundColor: 'var(--bg-system)', padding: '4px', borderRadius: 'var(--radius-md)', border: '0.5px solid var(--border-light)' }}>
               <button
                 type="button"
                 onClick={() => setCalcMode('auto')}
-                className={`px-3.5 py-1.5 rounded-lg transition-all ${
-                  calcMode === 'auto'
-                    ? 'bg-white text-blue-600 shadow-sm font-bold'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
+                style={{
+                  padding: '6px 14px',
+                  borderRadius: 'var(--radius-sm)',
+                  fontSize: '12px',
+                  fontWeight: '700',
+                  border: 'none',
+                  cursor: 'pointer',
+                  backgroundColor: calcMode === 'auto' ? 'var(--primary)' : 'transparent',
+                  color: calcMode === 'auto' ? '#ffffff' : 'var(--text-dark)',
+                  boxShadow: calcMode === 'auto' ? '0 2px 6px rgba(0, 122, 255, 0.25)' : 'none',
+                  transition: 'all 0.15s ease'
+                }}
               >
                 Параметричний конструктор
               </button>
               <button
                 type="button"
                 onClick={() => setCalcMode('operations')}
-                className={`px-3.5 py-1.5 rounded-lg transition-all ${
-                  calcMode === 'operations'
-                    ? 'bg-white text-blue-600 shadow-sm font-bold'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
+                style={{
+                  padding: '6px 14px',
+                  borderRadius: 'var(--radius-sm)',
+                  fontSize: '12px',
+                  fontWeight: '700',
+                  border: 'none',
+                  cursor: 'pointer',
+                  backgroundColor: calcMode === 'operations' ? 'var(--primary)' : 'transparent',
+                  color: calcMode === 'operations' ? '#ffffff' : 'var(--text-dark)',
+                  boxShadow: calcMode === 'operations' ? '0 2px 6px rgba(0, 122, 255, 0.25)' : 'none',
+                  transition: 'all 0.15s ease'
+                }}
               >
                 Поопераційний (1С)
               </button>
@@ -3778,7 +4340,8 @@ export const Calculator: React.FC = () => {
 
             <button 
               onClick={() => setShowTemplateModal(true)}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-sm transition-all"
+              className="ios-badge ios-badge-blue"
+              style={{ padding: '8px 16px', borderRadius: 'var(--radius-md)', fontSize: '12px', fontWeight: '700', cursor: 'pointer', border: 'none', display: 'flex', alignItems: 'center', gap: '6px' }}
             >
               <Save size={14} />
               <span>Зберегти шаблон</span>
@@ -3792,8 +4355,8 @@ export const Calculator: React.FC = () => {
             <div className="lg:col-span-2 flex flex-col gap-6">
               
               {/* Product specifications */}
-              <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm flex flex-col gap-4">
-                <h3 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2 m-0">
+              <div className="ios-card bg-white" style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <h3 style={{ fontSize: '15px', fontWeight: '800', color: 'var(--text-dark)', borderBottom: '0.5px solid var(--border-light)', paddingBottom: '10px', margin: 0 }}>
                   Параметри тиражу
                 </h3>
 
@@ -3958,8 +4521,8 @@ export const Calculator: React.FC = () => {
 
               {/* Comprehensive Options Panel */}
               {calcMode === 'auto' && (
-                <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm flex flex-col gap-4">
-                  <h3 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2 m-0">
+                <div className="ios-card bg-white" style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                  <h3 style={{ fontSize: '15px', fontWeight: '800', color: 'var(--text-dark)', borderBottom: '0.5px solid var(--border-light)', paddingBottom: '10px', margin: 0 }}>
                     Технічні специфікації виробу
                   </h3>
 
@@ -4079,8 +4642,8 @@ export const Calculator: React.FC = () => {
 
               {calcMode === 'auto' ? (
                 /* Simple Business Logic Breakdown Output */
-                <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm flex flex-col gap-3">
-                  <h3 className="text-sm font-bold text-slate-900 border-b border-slate-100 pb-2 m-0">
+                <div className="ios-card bg-white" style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                  <h3 style={{ fontSize: '15px', fontWeight: '800', color: 'var(--text-dark)', borderBottom: '0.5px solid var(--border-light)', paddingBottom: '10px', margin: 0 }}>
                     Склад собівартості
                   </h3>
                   <div className="flex flex-col gap-2.5 text-xs">
@@ -4104,7 +4667,7 @@ export const Calculator: React.FC = () => {
                 </div>
               ) : (
                 /* Advanced Operations list - exact 1C Replica */
-                <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+                <div className="ios-card bg-white" style={{ overflow: 'hidden' }}>
                   <div className="bg-slate-900 text-white px-5 py-3.5 flex justify-between items-center">
                     <h3 className="text-xs font-bold uppercase tracking-wider text-slate-200 m-0">
                       Виробничі операції та калькуляція собівартості (1С)
@@ -4394,8 +4957,8 @@ export const Calculator: React.FC = () => {
 
             {/* Right Side Summary panel (span 1 col) */}
             <div className="flex flex-col gap-5">
-              <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm flex flex-col gap-4 sticky top-6">
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider block">Підсумки прорахунку</span>
+              <div className="ios-card bg-white" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px', position: 'sticky', top: '24px' }}>
+                <span style={{ fontSize: '12px', fontWeight: '800', color: 'var(--text-medium)', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block' }}>Підсумки прорахунку</span>
                 
                 <div>
                   <span className="text-xs text-slate-500">Ціна продажу для клієнта:</span>
