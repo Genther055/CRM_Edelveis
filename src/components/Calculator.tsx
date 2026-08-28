@@ -28,7 +28,10 @@ import {
   Bookmark,
   Printer,
   Crop,
-  ShieldCheck
+  ShieldCheck,
+  Info,
+  ChevronDown,
+  FileSpreadsheet
 } from 'lucide-react';
 import html2pdf from 'html2pdf.js';
 
@@ -140,6 +143,24 @@ export const Calculator: React.FC = () => {
   const [digitalPlotterMaterial, setDigitalPlotterMaterial] = useState<string>('raflatac_paper');
   const [digitalPlotterCutType, setDigitalPlotterCutType] = useState<'kiss_cut' | 'through_cut'>('kiss_cut');
   const [digitalCncType, setDigitalCncType] = useState<'package' | 'folder' | 'hanger' | 'custom_shape'>('custom_shape');
+
+  // Digital Sheets Specific Detailed States (as shown in reference)
+  const [digitalSheetSets, setDigitalSheetSets] = useState<number>(1);
+  const [digitalSheetBoxes, setDigitalSheetBoxes] = useState<number>(0);
+  const [digitalSheetMaterialCat, setDigitalSheetMaterialCat] = useState<string>('coated_matte');
+  const [digitalSheetDensity, setDigitalSheetDensity] = useState<string>('350');
+  const [digitalSheetCoating, setDigitalSheetCoating] = useState<string>('none');
+  const [digitalSheetPrintColor, setDigitalSheetPrintColor] = useState<string>('4_4');
+  const [digitalSheetSpotVarnish, setDigitalSheetSpotVarnish] = useState<string>('none');
+  const [digitalSheetWithDelivery, setDigitalSheetWithDelivery] = useState<boolean>(false);
+  const [digitalSheetPerPiece, setDigitalSheetPerPiece] = useState<boolean>(false);
+  const [digitalSheetPostPressOpen, setDigitalSheetPostPressOpen] = useState<boolean>(false);
+  const [digitalSheetCornerCurve, setDigitalSheetCornerCurve] = useState<string>('0');
+  const [digitalSheetDrilling, setDigitalSheetDrilling] = useState<string>('0');
+  const [digitalSheetLuvers, setDigitalSheetLuvers] = useState<string>('0');
+  const [digitalSheetPersonalization, setDigitalSheetPersonalization] = useState<string>('0');
+  const [digitalSheetFolding, setDigitalSheetFolding] = useState<string>('0');
+  const [digitalSheetGluingBlock, setDigitalSheetGluingBlock] = useState<string>('0');
 
   // Helper to transition into specific offset product calculator
   const openOffsetProduct = (params: {
@@ -4306,170 +4327,663 @@ export const Calculator: React.FC = () => {
                 </div>
               )}
 
-              {/* 1. DIGITAL SHEETS CALCULATOR */}
+              {/* 1. DIGITAL SHEETS CALCULATOR (ЛИСТОВА ПРОДУКЦІЯ) */}
               {digitalSubTab === 'sheets' && (
-                <div className="flex flex-col gap-6">
-                  <div className="ios-card bg-white" style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                      <div style={{ width: '44px', height: '44px', borderRadius: '14px', backgroundColor: 'rgba(0, 122, 255, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)' }}>
-                        <FileText size={22} />
+                <div className="flex flex-col gap-5">
+                  {/* Title & Info Bar */}
+                  <div className="ios-card bg-white p-4">
+                    <div className="flex flex-wrap items-center justify-between gap-3">
+                      <div className="flex items-center gap-3">
+                        <div style={{ width: '42px', height: '42px', borderRadius: '12px', backgroundColor: 'rgba(0, 122, 255, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)' }}>
+                          <FileText size={22} />
+                        </div>
+                        <div>
+                          <h3 className="text-base font-extrabold text-slate-900 m-0">Листова</h3>
+                          <span className="text-xs text-slate-500">Цифровий оперативний друк від 1 примірника</span>
+                        </div>
                       </div>
-                      <div>
-                        <h4 style={{ fontSize: '15px', fontWeight: '800', color: 'var(--text-dark)', margin: 0 }}>Цифрова листова продукція</h4>
-                        <span style={{ fontSize: '12px', color: 'var(--text-medium)' }}>Швидкий цифровий друк від 1 листа (візитки, флаєри, листівки, бланки)</span>
+
+                      {/* Quick Info Badges */}
+                      <div className="flex flex-wrap items-center gap-2">
+                        {[
+                          { label: 'Інструкція по оформленню', icon: <Info size={13} className="text-blue-500" /> },
+                          { label: 'Терміни друку', icon: <Clock size={13} className="text-amber-500" /> },
+                          { label: 'Матеріали', icon: <Layers size={13} className="text-indigo-500" /> },
+                          { label: 'Зразки матеріалів', icon: <Tag size={13} className="text-emerald-500" /> },
+                          { label: 'Ваш відгук', icon: <MessageSquare size={13} className="text-cyan-500" /> },
+                          { label: 'Знайшли помилку?', icon: <AlertTriangle size={13} className="text-rose-500" /> },
+                        ].map((b, idx) => (
+                          <button
+                            key={idx}
+                            type="button"
+                            onClick={() => setActiveInfoModal('modal_instr_digital')}
+                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200/80 text-[11px] font-semibold text-slate-700 transition-all"
+                          >
+                            {b.icon}
+                            <span>{b.label}</span>
+                          </button>
+                        ))}
                       </div>
                     </div>
                   </div>
 
-                  {/* Size and Settings */}
-                  <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div className="ios-card bg-white p-5 flex flex-col gap-4">
-                      <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800 m-0">Розмір виробу</h4>
-                      <div className="flex flex-wrap gap-1.5">
-                        {[
-                          { id: '1', label: '90×50 Візитка', w: '90', h: '50' },
-                          { id: '2', label: '85×55 Євровізитка', w: '85', h: '55' },
-                          { id: '3', label: '100×70 Календар', w: '100', h: '70' },
-                          { id: '4', label: '99×210 Флаєр', w: '99', h: '210' },
-                          { id: '5', label: '105×148 А6', w: '105', h: '148' },
-                          { id: '6', label: '148×210 А5', w: '148', h: '210' },
-                          { id: '7', label: '210×297 А4', w: '210', h: '297' },
-                          { id: '8', label: '297×420 А3', w: '297', h: '420' },
-                          { id: '9', label: '306×436 SRA3', w: '306', h: '436' },
-                        ].map(s => (
-                          <button
-                            key={s.id}
-                            type="button"
-                            onClick={() => { setSheetSizePreset(s.id); setSheetCustomWidth(s.w); setSheetCustomHeight(s.h); }}
-                            className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                              sheetCustomWidth === s.w && sheetCustomHeight === s.h
-                                ? 'bg-blue-600 text-white shadow-sm'
-                                : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                            }`}
+                  {/* Section: Розмір & Вид готового виробу */}
+                  <div className="ios-card bg-white p-5">
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+                      {/* Left: Size Selectors */}
+                      <div className="md:col-span-6 flex flex-col gap-4">
+                        <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800 m-0 flex items-center gap-2">
+                          <span className="w-2 h-2 rounded-full bg-blue-600"></span>
+                          Розмір
+                        </h4>
+
+                        <div>
+                          <label className="text-[11px] font-bold text-slate-600 block mb-1.5">Оберіть стандартний:</label>
+                          <select
+                            value={sheetSizePreset}
+                            onChange={(e) => {
+                              const v = e.target.value;
+                              setSheetSizePreset(v);
+                              const presetsMap: Record<string, [string, string]> = {
+                                '1': ['90', '50'],
+                                '2': ['85', '55'],
+                                '3': ['100', '70'],
+                                '4': ['99', '210'],
+                                '5': ['105', '148'],
+                                '6': ['148', '210'],
+                                '7': ['210', '297'],
+                                '8': ['297', '420'],
+                                '9': ['306', '436'],
+                                '10': ['45', '50'],
+                                '11': ['180', '50'],
+                                '12': ['110', '85'],
+                                '13': ['170', '55'],
+                                '14': ['99', '99'],
+                                '15': ['198', '210'],
+                                '16': ['50', '30'],
+                                '17': ['90', '90'],
+                              };
+                              if (presetsMap[v]) {
+                                setSheetCustomWidth(presetsMap[v][0]);
+                                setSheetCustomHeight(presetsMap[v][1]);
+                              }
+                            }}
+                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 focus:bg-white focus:border-blue-600 focus:outline-none transition-all shadow-sm"
                           >
-                            {s.label}
-                          </button>
-                        ))}
+                            <optgroup label="Візитки">
+                              <option value="1">90 × 50 мм — Візитка стандарт</option>
+                              <option value="10">45 × 50 мм — Піввізитки</option>
+                              <option value="11">180 × 50 мм — Подвійна візитка</option>
+                            </optgroup>
+                            <optgroup label="Євровізитки">
+                              <option value="2">55 × 85 мм — Євро візитка</option>
+                              <option value="12">85 × 110 мм — Подвійна євровізитка (гориз)</option>
+                              <option value="13">55 × 170 мм — Подвійна євровізитка (верт)</option>
+                            </optgroup>
+                            <optgroup label="Календарі">
+                              <option value="3">100 × 70 мм — Календар кишеньковий</option>
+                            </optgroup>
+                            <optgroup label="Флаєри">
+                              <option value="4">99 × 210 мм — Флаєр (DL)</option>
+                              <option value="14">99 × 99 мм — Півфлаєра</option>
+                              <option value="15">198 × 210 мм — Подвійний флаєр (буклет)</option>
+                            </optgroup>
+                            <optgroup label="Стандартні формати">
+                              <option value="5">105 × 148 мм — А6</option>
+                              <option value="6">148 × 210 мм — А5</option>
+                              <option value="7">210 × 297 мм — А4</option>
+                              <option value="8">297 × 420 мм — А3</option>
+                              <option value="9">306 × 436 мм — SRA3 цифровий</option>
+                            </optgroup>
+                            <optgroup label="Інші">
+                              <option value="16">30 × 50 мм — Євробірка</option>
+                              <option value="17">90 × 90 мм — Кубарик</option>
+                            </optgroup>
+                          </select>
+                        </div>
+
+                        <div>
+                          <label className="text-[11px] font-bold text-slate-600 block mb-1.5">Введіть свій розмір:</label>
+                          <div className="flex items-center gap-2">
+                            <div className="relative flex-1">
+                              <input
+                                type="number"
+                                value={sheetCustomWidth}
+                                onChange={(e) => setSheetCustomWidth(e.target.value)}
+                                className="w-full pl-3 pr-8 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs font-bold text-slate-900 focus:bg-white focus:border-blue-600 focus:outline-none"
+                                placeholder="Ширина"
+                              />
+                              <span className="absolute right-2.5 top-2 text-[10px] font-bold text-slate-400">Ш</span>
+                            </div>
+                            <span className="text-slate-400 font-bold">×</span>
+                            <div className="relative flex-1">
+                              <input
+                                type="number"
+                                value={sheetCustomHeight}
+                                onChange={(e) => setSheetCustomHeight(e.target.value)}
+                                className="w-full pl-3 pr-8 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs font-bold text-slate-900 focus:bg-white focus:border-blue-600 focus:outline-none"
+                                placeholder="Висота"
+                              />
+                              <span className="absolute right-2.5 top-2 text-[10px] font-bold text-slate-400">В</span>
+                            </div>
+                            <select
+                              value={sheetUnit}
+                              onChange={(e) => setSheetUnit(e.target.value as any)}
+                              className="w-16 bg-slate-50 border border-slate-200 rounded-xl px-2 py-2 text-xs font-bold text-slate-800"
+                            >
+                              <option value="mm">мм</option>
+                              <option value="cm">см</option>
+                            </select>
+                          </div>
+                        </div>
                       </div>
 
-                      <div className="pt-2 border-t border-slate-100">
-                        <label className="text-xs font-semibold text-slate-700 block mb-1">Свій розмір (мм):</label>
-                        <div className="flex items-center gap-2">
-                          <input
-                            type="number"
-                            value={sheetCustomWidth}
-                            onChange={(e) => setSheetCustomWidth(e.target.value)}
-                            className="flex-1 px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 text-xs font-bold"
-                            placeholder="Ширина"
-                          />
-                          <span className="text-slate-400 font-bold">×</span>
-                          <input
-                            type="number"
-                            value={sheetCustomHeight}
-                            onChange={(e) => setSheetCustomHeight(e.target.value)}
-                            className="flex-1 px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 text-xs font-bold"
-                            placeholder="Висота"
-                          />
+                      {/* Right: Blueprint Visual Preview */}
+                      <div className="md:col-span-6 flex flex-col items-center justify-center p-6 bg-gradient-to-b from-slate-50 to-slate-100/60 rounded-2xl border border-slate-200/80 min-h-[170px]">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-3">Вид готового виробу</span>
+                        <div
+                          style={{
+                            width: `${Math.min(180, Math.max(70, Number(sheetCustomWidth || 90) * 1.5))}px`,
+                            height: `${Math.min(130, Math.max(45, Number(sheetCustomHeight || 50) * 1.5))}px`,
+                            backgroundColor: '#ffffff',
+                            border: '2px solid var(--primary)',
+                            borderRadius: digitalSheetCornerCurve !== '0' ? '8px' : '3px',
+                            boxShadow: '0 8px 20px rgba(0, 122, 255, 0.12)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            position: 'relative',
+                            transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+                          }}
+                        >
+                          <span className="text-xs font-extrabold text-blue-700">
+                            {sheetCustomWidth} × {sheetCustomHeight} {sheetUnit}
+                          </span>
                         </div>
                       </div>
                     </div>
+                  </div>
 
-                    <div className="lg:col-span-2 ios-card bg-white p-5 flex flex-col gap-4">
-                      <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800 m-0">Післядрукарська обробка</h4>
-                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                        <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
+                  {/* Section: Післядрукарська обробка (Accordion) */}
+                  <div className="ios-card bg-white overflow-hidden">
+                    <button
+                      type="button"
+                      onClick={() => setDigitalSheetPostPressOpen(!digitalSheetPostPressOpen)}
+                      className="w-full p-4 flex items-center justify-between bg-slate-50/70 hover:bg-slate-100/80 transition-colors border-b border-slate-100"
+                    >
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-extrabold uppercase tracking-wider text-slate-800">Післядрукарська обробка</span>
+                        {(digitalSheetCornerCurve !== '0' || digitalSheetDrilling !== '0' || digitalSheetLuvers !== '0' || digitalSheetPersonalization !== '0' || digitalSheetFolding !== '0' || digitalSheetGluingBlock !== '0') && (
+                          <span className="ios-badge-blue text-[10px] px-2 py-0.5 rounded-full font-bold">Опції обрано</span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-1.5 text-xs font-bold text-blue-600">
+                        <span>{digitalSheetPostPressOpen ? 'Згорнути' : 'Розгорнути'}</span>
+                        <ChevronDown size={16} className={`transition-transform duration-200 ${digitalSheetPostPressOpen ? 'rotate-180' : ''}`} />
+                      </div>
+                    </button>
+
+                    {digitalSheetPostPressOpen && (
+                      <div className="p-5 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 bg-white">
+                        <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
                           <label className="text-[11px] font-bold text-slate-600 block mb-1">Заокруглення кутів:</label>
-                          <select className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-semibold text-slate-800">
-                            <option value="0">Без заокруглення</option>
+                          <select
+                            value={digitalSheetCornerCurve}
+                            onChange={(e) => setDigitalSheetCornerCurve(e.target.value)}
+                            className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800"
+                          >
+                            <option value="0">Ні</option>
                             <option value="4">4 кути (R=5мм)</option>
                             <option value="1">1 кут</option>
                             <option value="2">2 кути</option>
+                            <option value="3">3 кути</option>
                           </select>
                         </div>
-                        <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
+
+                        <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
                           <label className="text-[11px] font-bold text-slate-600 block mb-1">Свердління:</label>
-                          <select className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-semibold text-slate-800">
+                          <select
+                            value={digitalSheetDrilling}
+                            onChange={(e) => setDigitalSheetDrilling(e.target.value)}
+                            className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800"
+                          >
                             <option value="0">Ні</option>
                             <option value="1">1 отвір (Ø 5мм)</option>
                             <option value="2">2 отвори</option>
+                            <option value="3">3 отвори</option>
                             <option value="4">4 отвори</option>
                           </select>
                         </div>
-                        <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
+
+                        <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
                           <label className="text-[11px] font-bold text-slate-600 block mb-1">Люверс (пікколо):</label>
-                          <select className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-semibold text-slate-800">
+                          <select
+                            value={digitalSheetLuvers}
+                            onChange={(e) => setDigitalSheetLuvers(e.target.value)}
+                            className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800"
+                          >
                             <option value="0">Ні</option>
                             <option value="gold">Золотий люверс</option>
                             <option value="silver">Срібний люверс</option>
                           </select>
                         </div>
-                        <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
+
+                        <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
                           <label className="text-[11px] font-bold text-slate-600 block mb-1">Персоналізація:</label>
-                          <select className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-semibold text-slate-800">
+                          <select
+                            value={digitalSheetPersonalization}
+                            onChange={(e) => setDigitalSheetPersonalization(e.target.value)}
+                            className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800"
+                          >
                             <option value="0">Ні</option>
-                            <option value="1">Нумерація / QR-коди</option>
+                            <option value="1">Нумерація / QR</option>
                           </select>
                         </div>
-                        <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
+
+                        <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
                           <label className="text-[11px] font-bold text-slate-600 block mb-1">Фальцовка / Біговка:</label>
-                          <select className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-semibold text-slate-800">
+                          <select
+                            value={digitalSheetFolding}
+                            onChange={(e) => setDigitalSheetFolding(e.target.value)}
+                            className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800"
+                          >
                             <option value="0">Ні</option>
                             <option value="1">1 згин (буклет)</option>
-                            <option value="2">2 згини (євробуклет)</option>
+                            <option value="2">2 згини (євро)</option>
+                            <option value="3">3 згини</option>
                           </select>
                         </div>
-                        <div className="bg-slate-50 p-3 rounded-xl border border-slate-100">
+
+                        <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
                           <label className="text-[11px] font-bold text-slate-600 block mb-1">Проклеювання в блок:</label>
-                          <select className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-semibold text-slate-800">
+                          <select
+                            value={digitalSheetGluingBlock}
+                            onChange={(e) => setDigitalSheetGluingBlock(e.target.value)}
+                            className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800"
+                          >
                             <option value="0">Ні</option>
+                            <option value="25">По 25 листів</option>
                             <option value="50">По 50 листів</option>
                             <option value="100">По 100 листів</option>
                           </select>
                         </div>
                       </div>
+                    )}
+                  </div>
+
+                  {/* Section: Комплектів & Пластиковий бокс Counters */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Sets Counter */}
+                    <div className="ios-card bg-white p-4 flex items-center justify-between gap-4">
+                      <div className="flex items-center gap-3">
+                        <span className="text-xs font-extrabold text-slate-900 whitespace-nowrap">Комплектів:</span>
+                        <div className="flex items-center border border-slate-200 rounded-xl bg-slate-50 overflow-hidden">
+                          <button
+                            type="button"
+                            onClick={() => setDigitalSheetSets(Math.max(1, digitalSheetSets - 1))}
+                            className="w-8 h-8 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-200 transition-colors"
+                          >
+                            -
+                          </button>
+                          <span className="w-10 text-center font-extrabold text-xs text-slate-900 bg-white py-1">
+                            {digitalSheetSets}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => setDigitalSheetSets(digitalSheetSets + 1)}
+                            className="w-8 h-8 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-200 transition-colors"
+                          >
+                            +
+                          </button>
+                        </div>
+                      </div>
+                      <p className="text-[11px] text-slate-500 m-0 text-right leading-tight">
+                        Замовлень з однаковими параметрами, але різними макетами
+                      </p>
+                    </div>
+
+                    {/* Plastic Boxes Counter */}
+                    <div className="ios-card bg-white p-4 flex items-center justify-between gap-4">
+                      <div className="flex items-center gap-3">
+                        <span className="text-xs font-extrabold text-slate-900 whitespace-nowrap">Пластиковий бокс:</span>
+                        <div className="flex items-center border border-slate-200 rounded-xl bg-slate-50 overflow-hidden">
+                          <button
+                            type="button"
+                            onClick={() => setDigitalSheetBoxes(Math.max(0, digitalSheetBoxes - 1))}
+                            className="w-8 h-8 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-200 transition-colors"
+                          >
+                            -
+                          </button>
+                          <span className="w-10 text-center font-extrabold text-xs text-slate-900 bg-white py-1">
+                            {digitalSheetBoxes}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => setDigitalSheetBoxes(digitalSheetBoxes + 1)}
+                            className="w-8 h-8 flex items-center justify-center font-bold text-slate-700 hover:bg-slate-200 transition-colors"
+                          >
+                            +
+                          </button>
+                        </div>
+                      </div>
+                      <p className="text-[11px] text-slate-500 m-0 text-right leading-tight">
+                        Вміщує до 100 візитівок (+15 ₴/бокс)
+                      </p>
                     </div>
                   </div>
 
-                  {/* Pricing Matrix */}
-                  <div className="ios-card bg-white overflow-hidden">
-                    <div className="bg-slate-900 text-white px-5 py-3.5 flex items-center justify-between">
-                      <h4 className="text-xs font-bold uppercase tracking-wider text-slate-200 m-0">Прайс-лист цифрового друку</h4>
-                      <span className="text-xs text-slate-400">Готовність: 1 робочий день</span>
+                  {/* Section: Фільтр (вибір, порівняння) - Full Interactive Matrix */}
+                  <div className="ios-card bg-white p-5 flex flex-col gap-5">
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800 m-0 flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-blue-600"></span>
+                      Фільтр (вибір, порівняння)
+                    </h4>
+
+                    {/* 1. МАТЕРІАЛ Family Row */}
+                    <div className="flex flex-col gap-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[11px] font-extrabold uppercase text-slate-400 w-24">МАТЕРІАЛ:</span>
+                        <div className="flex flex-wrap gap-1.5 flex-1">
+                          {[
+                            { id: 'coated_matte', label: 'Крейдована матова' },
+                            { id: 'coated_gloss', label: 'Крейдована глянцева' },
+                            { id: 'offset_paper', label: 'Офсетний папір' },
+                            { id: 'mondi_dns', label: 'MONDI DNS PREMIUM' },
+                            { id: 'munken_pure', label: 'MUNKEN PURE' },
+                            { id: 'one_side_card', label: 'Односторонній картон' },
+                            { id: 'designer_card', label: 'Дизайнерський картон' },
+                            { id: 'raflatac_paper', label: 'Самоклейка папір', badge: 'NEW' },
+                            { id: 'raflatac_film', label: 'Самоклейка плівка' },
+                            { id: 'synaps', label: 'Синтетичний SYNAPS' },
+                            { id: 'arena_ivory', label: 'Arena Ivory smooth' },
+                          ].map(m => (
+                            <button
+                              key={m.id}
+                              type="button"
+                              onClick={() => setDigitalSheetMaterialCat(m.id)}
+                              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all relative ${
+                                digitalSheetMaterialCat === m.id
+                                  ? 'bg-blue-600 text-white shadow-sm'
+                                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
+                              }`}
+                            >
+                              {m.label}
+                              {m.badge && (
+                                <span className="absolute -top-1.5 -right-1 bg-amber-500 text-white text-[8px] font-black px-1 rounded-full">
+                                  {m.badge}
+                                </span>
+                              )}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Densities for Chosen Material */}
+                      <div className="flex items-center gap-2 pl-24 pt-1">
+                        <div className="flex flex-wrap gap-1.5">
+                          {(digitalSheetMaterialCat === 'offset_paper'
+                            ? ['70', '80', '100', '120', '160']
+                            : digitalSheetMaterialCat === 'designer_card'
+                            ? ['Touch Cover 301', 'Ispira 250', 'Sirio Pearl 300', 'Льон 300', 'Крафт 300']
+                            : digitalSheetMaterialCat === 'raflatac_paper' || digitalSheetMaterialCat === 'raflatac_film'
+                            ? ['Напівглянець', 'Біла PP', 'Прозора PP']
+                            : ['90', '115', '130', '150', '170', '200', '250', '300', '350', '450']
+                          ).map(d => (
+                            <button
+                              key={d}
+                              type="button"
+                              onClick={() => setDigitalSheetDensity(d)}
+                              className={`px-3 py-1 rounded-md text-[11px] font-bold border transition-all ${
+                                digitalSheetDensity === d
+                                  ? 'border-blue-600 bg-blue-50 text-blue-700'
+                                  : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
+                              }`}
+                            >
+                              {digitalSheetMaterialCat.includes('coated') ? `Крейд МАТ ${d}` : d.includes('Touch') || d.includes('PP') ? d : `${d} г/м²`}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
                     </div>
+
+                    {/* 2. ПОКРИТТЯ (Lamination) Rows */}
+                    <div className="flex flex-col gap-2 pt-2 border-t border-slate-100">
+                      <div className="flex items-start gap-2">
+                        <span className="text-[11px] font-extrabold uppercase text-slate-400 w-24 pt-1">ПОКРИТТЯ:</span>
+                        <div className="flex flex-col gap-1.5 flex-1">
+                          {/* Row 1: 25 mic */}
+                          <div className="flex flex-wrap gap-1.5">
+                            {[
+                              { id: 'none', label: 'НІ (без покриття)' },
+                              { id: 'gl_1_0_25', label: 'ГЛ 1+0 25 мкм' },
+                              { id: 'gl_1_1_25', label: 'ГЛ 1+1 25 мкм' },
+                              { id: 'mat_1_0_25', label: 'МАТ 1+0 25 мкм' },
+                              { id: 'mat_1_1_25', label: 'МАТ 1+1 25 мкм' },
+                              { id: 'antiscuff_1_0', label: 'AntiScuff 1+0' },
+                              { id: 'antiscuff_1_1', label: 'AntiScuff 1+1' },
+                              { id: 'soft_1_0', label: 'SOFT лам 1+0' },
+                              { id: 'soft_1_1', label: 'SOFT лам 1+1' },
+                            ].map(c => (
+                              <button
+                                key={c.id}
+                                type="button"
+                                onClick={() => setDigitalSheetCoating(c.id)}
+                                className={`px-2.5 py-1 rounded-md text-[11px] font-bold border transition-all ${
+                                  digitalSheetCoating === c.id
+                                    ? 'border-blue-600 bg-blue-50 text-blue-700 shadow-xs'
+                                    : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'
+                                }`}
+                              >
+                                {c.label}
+                              </button>
+                            ))}
+                          </div>
+
+                          {/* Row 2: Heavy & Pouch (75-250 mic) */}
+                          <div className="flex flex-wrap gap-1.5">
+                            {[
+                              { id: 'gl_1_1_75', label: 'ГЛ 1+1 75 мкм' },
+                              { id: 'gl_1_1_100', label: 'ГЛ 1+1 100 мкм' },
+                              { id: 'gl_1_1_125', label: 'ГЛ 1+1 125 мкм' },
+                              { id: 'gl_1_1_175', label: 'ГЛ 1+1 175 мкм' },
+                              { id: 'gl_1_1_250', label: 'ГЛ 1+1 250 мкм' },
+                              { id: 'mat_1_1_75', label: 'МАТ 1+1 75 мкм' },
+                              { id: 'mat_1_1_125', label: 'МАТ 1+1 125 мкм' },
+                              { id: 'mat_1_1_250', label: 'МАТ 1+1 250 мкм' },
+                            ].map(c => (
+                              <button
+                                key={c.id}
+                                type="button"
+                                onClick={() => setDigitalSheetCoating(c.id)}
+                                className={`px-2.5 py-1 rounded-md text-[10px] font-semibold border transition-all ${
+                                  digitalSheetCoating === c.id
+                                    ? 'border-blue-600 bg-blue-50 text-blue-700 shadow-xs'
+                                    : 'border-slate-200 bg-slate-50/70 text-slate-500 hover:bg-slate-100'
+                                }`}
+                              >
+                                {c.label}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 3. ДРУК (Color mode) Row */}
+                    <div className="flex flex-col gap-2 pt-2 border-t border-slate-100">
+                      <div className="flex items-center gap-2">
+                        <span className="text-[11px] font-extrabold uppercase text-slate-400 w-24">ДРУК:</span>
+                        <div className="flex flex-wrap gap-1.5 flex-1">
+                          {[
+                            { id: 'none', label: 'Без друку' },
+                            { id: '4_0', label: 'Повнокольор. 4+0' },
+                            { id: '4_4', label: 'Повнокольор. 4+4' },
+                            { id: '1_0', label: 'Чорно білий 1+0' },
+                            { id: '1_1', label: 'Чорно білий 1+1' },
+                            { id: 'white_1_0', label: 'WHITE 1+0' },
+                            { id: 'white_1_1', label: 'WHITE 1+1' },
+                            { id: 'white_cmyk_5_0', label: 'WHITE + CMYK 5+0' },
+                            { id: 'white_cmyk_5_5', label: 'WHITE + CMYK 5+5' },
+                            { id: 'cmyk_white_5_0', label: 'CMYK + WHITE 5+0' },
+                          ].map(p => (
+                            <button
+                              key={p.id}
+                              type="button"
+                              onClick={() => setDigitalSheetPrintColor(p.id)}
+                              className={`px-3 py-1.5 rounded-lg text-xs font-bold border transition-all ${
+                                digitalSheetPrintColor === p.id
+                                  ? 'border-blue-600 bg-blue-600 text-white shadow-sm'
+                                  : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-100'
+                              }`}
+                            >
+                              {p.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* 4. ДОДАТИ: Цифровий вибірковий лак */}
+                    <div className="flex items-center gap-3 pt-2 border-t border-slate-100">
+                      <span className="text-[11px] font-extrabold uppercase text-slate-400 w-24">ДОДАТИ:</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-slate-700">Цифровий вибірковий лак (3D / UV):</span>
+                        <select
+                          value={digitalSheetSpotVarnish}
+                          onChange={(e) => setDigitalSheetSpotVarnish(e.target.value)}
+                          className="bg-slate-50 border border-slate-200 rounded-lg px-2.5 py-1 text-xs font-bold text-slate-800"
+                        >
+                          <option value="none">Ні</option>
+                          <option value="1_0">1+0 (з 1 боку)</option>
+                          <option value="1_1">1+1 (з 2 боків)</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Section: Live Pricing Grid with Cupertino Controls */}
+                  <div className="ios-card bg-white overflow-hidden shadow-md">
+                    {/* Header Controls Bar */}
+                    <div className="bg-slate-900 text-white px-5 py-3.5 flex flex-wrap items-center justify-between gap-4">
+                      <div className="flex items-center gap-4">
+                        <span className="text-xs font-extrabold uppercase tracking-wider text-blue-400">Розрахунок вартості</span>
+                        <div className="flex items-center gap-2 text-xs">
+                          <label className="flex items-center gap-1.5 cursor-pointer text-slate-300 hover:text-white">
+                            <input
+                              type="checkbox"
+                              checked={digitalSheetWithDelivery}
+                              onChange={(e) => setDigitalSheetWithDelivery(e.target.checked)}
+                              className="rounded text-blue-500 focus:ring-0"
+                            />
+                            <span>З доставкою</span>
+                          </label>
+                          <span className="text-slate-600">|</span>
+                          <label className="flex items-center gap-1.5 cursor-pointer text-slate-300 hover:text-white">
+                            <input
+                              type="checkbox"
+                              checked={digitalSheetPerPiece}
+                              onChange={(e) => setDigitalSheetPerPiece(e.target.checked)}
+                              className="rounded text-blue-500 focus:ring-0"
+                            />
+                            <span>За екземпляр</span>
+                          </label>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <span className="text-xs text-slate-400">Готовність: 1 робочий день</span>
+                        <button
+                          type="button"
+                          onClick={() => alert('Експорт прайс-листа в Excel')}
+                          className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-emerald-400 text-xs font-bold transition-all"
+                          title="Експорт в Excel"
+                        >
+                          <FileSpreadsheet size={16} />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Table Matrix */}
                     <div className="overflow-x-auto">
                       <table className="w-full text-center text-xs border-collapse">
                         <thead>
-                          <tr className="bg-slate-800 text-slate-200 text-xs font-semibold uppercase tracking-wider">
-                            <th className="py-3 px-4 text-left border-r border-slate-700/50">Матеріал та щільність</th>
-                            <th className="py-3 px-3 border-r border-slate-700/50">Кольоровість</th>
-                            {[50, 100, 200, 500, 1000].map(tir => (
-                              <th key={tir} className="py-3 px-3 border-r border-slate-700/50 last:border-r-0 font-bold">{tir} шт.</th>
+                          <tr className="bg-slate-800 text-slate-200 text-xs font-semibold uppercase">
+                            <th className="py-3 px-4 text-left border-r border-slate-700/50">Матеріал та ламінація</th>
+                            <th className="py-3 px-3 border-r border-slate-700/50">Друк</th>
+                            <th className="py-3 px-3 border-r border-slate-700/50">Готовність</th>
+                            {[1, 25, 50, 75, 100, 200, 500].map(tir => (
+                              <th key={tir} className="py-3 px-3 border-r border-slate-700/50 last:border-r-0 font-extrabold text-blue-300">
+                                {tir} шт.
+                              </th>
                             ))}
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-100">
+                          {/* Current Custom Selected Row */}
+                          <tr className="bg-blue-50/40 font-bold">
+                            <td className="py-3 px-4 text-left border-r border-slate-200 text-blue-950 font-extrabold">
+                              {digitalSheetMaterialCat.includes('coated') ? `Крейдований ${digitalSheetDensity} г/м²` : digitalSheetMaterialCat}
+                              {digitalSheetCoating !== 'none' ? ` + Лам (${digitalSheetCoating})` : ' (без лам.)'}
+                              {digitalSheetBoxes > 0 ? ` + ${digitalSheetBoxes} бокс` : ''}
+                            </td>
+                            <td className="py-3 px-3 border-r border-slate-200 text-blue-600 font-extrabold">
+                              {digitalSheetPrintColor.replace('_', '+')}
+                            </td>
+                            <td className="py-3 px-3 border-r border-slate-200 text-slate-500 font-semibold">
+                              1 день
+                            </td>
+                            {[1, 25, 50, 75, 100, 200, 500].map(tir => {
+                              const baseUnitRate = digitalSheetPrintColor.includes('4_4') ? 2.4 : 1.5;
+                              const lamRate = digitalSheetCoating !== 'none' ? 1.2 : 0;
+                              const postCurveRate = digitalSheetCornerCurve !== '0' ? 0.35 : 0;
+                              const boxCost = digitalSheetBoxes * 15;
+                              const deliveryCost = digitalSheetWithDelivery ? 90 : 0;
+                              const totalCost = Math.round(tir * digitalSheetSets * (baseUnitRate + lamRate + postCurveRate) + boxCost + deliveryCost + 65);
+                              const displayCost = digitalSheetPerPiece ? (totalCost / tir).toFixed(2) : totalCost;
+
+                              return (
+                                <td
+                                  key={tir}
+                                  onClick={() => {
+                                    setQuantity(tir);
+                                    setCategory('Листівки');
+                                    setStep('editor');
+                                  }}
+                                  className="py-3 px-3 border-r border-slate-200 last:border-r-0 text-slate-950 font-black hover:bg-blue-600 hover:text-white cursor-pointer transition-all text-sm"
+                                  title="Натисніть щоб оформити замовлення"
+                                >
+                                  {displayCost} ₴
+                                </td>
+                              );
+                            })}
+                          </tr>
+
+                          {/* Related Material Rows for Fast Comparison */}
                           {[
-                            { name: 'Крейдований 350 г/м² (мат)', col: '4+0', rate: 1.4 },
-                            { name: 'Крейдований 350 г/м² + Лам мат 1+1', col: '4+4', rate: 2.2 },
-                            { name: 'Крейдований 350 г/м² + Soft Touch 1+1', col: '4+4', rate: 3.1 },
-                            { name: 'Крейдований 130 г/м² (глянець)', col: '4+0', rate: 0.8 },
-                            { name: 'Офсетний 80 г/м² (бланки)', col: '4+0', rate: 0.55 },
-                            { name: 'Самоклейка Raflatac напівглянець', col: '4+0', rate: 1.6 },
-                            { name: 'Крафт папір 300 г/м²', col: '4+0', rate: 2.4 },
-                            { name: 'Дизайнерський картон Plike / Touch', col: '4+0', rate: 4.5 },
+                            { mat: 'Крейдований 350 г/м² (мат)', col: '4+4', r: 2.2 },
+                            { mat: 'Крейдований 350 г/м² + Soft Touch 1+1', col: '4+4', r: 3.2 },
+                            { mat: 'Крейдований 300 г/м² + Глянець 1+0', col: '4+0', r: 1.8 },
+                            { mat: 'Офсетний 80 г/м² (бланки)', col: '4+0', r: 0.65 },
+                            { mat: 'Самоклейка Raflatac напівглянець', col: '4+0', r: 1.9 },
+                            { mat: 'Дизайнерський картон Touch Cover 301г', col: '4+4', r: 5.5 },
                           ].map((row, idx) => (
-                            <tr key={idx} className="hover:bg-blue-50/20 transition-colors">
-                              <td className="py-2.5 px-4 text-left font-semibold text-slate-800 border-r border-slate-100">{row.name}</td>
-                              <td className="py-2.5 px-3 font-bold text-blue-600 border-r border-slate-100">{row.col}</td>
-                              {[50, 100, 200, 500, 1000].map(tir => {
-                                const cost = Math.round(tir * row.rate + 90);
+                            <tr key={idx} className="hover:bg-slate-50 transition-colors text-slate-700">
+                              <td className="py-2.5 px-4 text-left font-medium border-r border-slate-100">{row.mat}</td>
+                              <td className="py-2.5 px-3 font-semibold text-slate-600 border-r border-slate-100">{row.col}</td>
+                              <td className="py-2.5 px-3 text-slate-400 border-r border-slate-100">1 день</td>
+                              {[1, 25, 50, 75, 100, 200, 500].map(tir => {
+                                const cost = Math.round(tir * row.r + 75);
                                 return (
                                   <td
                                     key={tir}
-                                    onClick={() => { setQuantity(tir); setCategory('Листівки'); setStep('editor'); }}
-                                    className="py-2.5 px-3 font-bold text-slate-900 border-r border-slate-100 last:border-r-0 hover:bg-blue-600 hover:text-white cursor-pointer transition-all"
+                                    onClick={() => {
+                                      setQuantity(tir);
+                                      setCategory('Листівки');
+                                      setStep('editor');
+                                    }}
+                                    className="py-2.5 px-3 font-bold text-slate-800 border-r border-slate-100 last:border-r-0 hover:bg-blue-600 hover:text-white cursor-pointer transition-all"
                                   >
-                                    {cost} ₴
+                                    {digitalSheetPerPiece ? (cost / tir).toFixed(2) : cost} ₴
                                   </td>
                                 );
                               })}
