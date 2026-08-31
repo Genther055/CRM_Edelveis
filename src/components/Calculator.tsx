@@ -1492,39 +1492,46 @@ export const Calculator: React.FC = () => {
                     border: '1px solid var(--border-light)',
                     position: 'relative'
                   }}>
-                    {/* 1. Cards (Візитівки - Matching exact analog vector with 2 overlapping cards) */}
+                    {/* 1. Cards (ВІЗИТІВКИ) */}
                     {hoveredMegaProduct === 'cards' && (
                       <div className="flex flex-col items-center text-center animate-fadeIn">
                         <svg width="220" height="150" viewBox="0 0 220 150" fill="none">
+                          {/* Back Card (Tilted) */}
                           <g transform="rotate(8 135 65)">
-                            <rect x="55" y="15" width="130" height="80" rx="3" fill="#FFFFFF" stroke="#1E293B" strokeWidth="2.2"/>
-                            <line x1="72" y1="40" x2="168" y2="40" stroke="#1E293B" strokeWidth="2.5" strokeLinecap="round"/>
-                            <line x1="72" y1="52" x2="145" y2="52" stroke="#1E293B" strokeWidth="2.5" strokeLinecap="round"/>
+                            <rect x="55" y="15" width="130" height="80" rx="4" fill="#FFFFFF" stroke="#1E293B" strokeWidth="2"/>
+                            <line x1="72" y1="36" x2="168" y2="36" stroke="#1E293B" strokeWidth="2.2" strokeLinecap="round"/>
+                            <line x1="72" y1="48" x2="145" y2="48" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round"/>
                           </g>
-                          <rect x="25" y="48" width="135" height="82" rx="3" fill="#FFFFFF" stroke="#1E293B" strokeWidth="2.2"/>
-                          <rect x="76" y="62" width="32" height="24" rx="2" fill="none" stroke="#E11D48" strokeWidth="3"/>
-                          <rect x="86" y="70" width="12" height="8" rx="1" fill="#E11D48"/>
-                          <line x1="45" y1="102" x2="140" y2="102" stroke="#1E293B" strokeWidth="2.5" strokeLinecap="round"/>
-                          <line x1="45" y1="114" x2="115" y2="114" stroke="#1E293B" strokeWidth="2.5" strokeLinecap="round"/>
+                          {/* Front Card (Straight) */}
+                          <rect x="25" y="48" width="135" height="82" rx="4" fill="#FFFFFF" stroke="#1E293B" strokeWidth="2.2"/>
+                          {/* Clean circular monogram / icon placeholder */}
+                          <circle cx="52" cy="72" r="14" fill="#007AFF" fillOpacity="0.1" stroke="#007AFF" strokeWidth="1.8"/>
+                          <path d="M48 72L51 75L57 69" stroke="#007AFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                          {/* Card text lines */}
+                          <line x1="74" y1="68" x2="140" y2="68" stroke="#1E293B" strokeWidth="2.5" strokeLinecap="round"/>
+                          <line x1="74" y1="78" x2="120" y2="78" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round"/>
+                          <line x1="45" y1="104" x2="140" y2="104" stroke="#CBD5E1" strokeWidth="1.8" strokeLinecap="round"/>
+                          <line x1="45" y1="114" x2="110" y2="114" stroke="#CBD5E1" strokeWidth="1.8" strokeLinecap="round"/>
                         </svg>
                         <h4 style={{ fontSize: '13.5px', fontWeight: '800', color: '#1e293b', marginTop: '12px' }}>
                           Візитівки (90×50 / 85×55 мм)
                         </h4>
                         <p style={{ fontSize: '11px', color: '#64748b', margin: '4px 0 0 0', maxWidth: '220px' }}>
-                          Офсетний та цифровий друк, SoftTouch ламінація, вибірковий УФ-лак.
+                          Офсетний та цифровий друк, SoftTouch ламінація, вибірковий УФ-лак, округлення кутів.
                         </p>
                       </div>
                     )}
 
-                    {/* 2. Roll Label (Рулонна етикетка) */}
+                    {/* 2. Roll Label (РУЛОННА ЕТИКЕТКА) */}
                     {hoveredMegaProduct === 'roll_label' && (
                       <div className="flex flex-col items-center text-center animate-fadeIn">
                         <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
                           <ellipse cx="100" cy="36" rx="55" ry="16" fill="#F1F5F9" stroke="#1E293B" strokeWidth="2.2"/>
                           <path d="M45 36V100C45 110 70 118 100 118C130 118 155 110 155 100V36" fill="#FFFFFF" stroke="#1E293B" strokeWidth="2.2"/>
                           <ellipse cx="100" cy="100" rx="55" ry="16" fill="#FFFFFF" stroke="#1E293B" strokeWidth="1.8"/>
-                          <path d="M48 88L12 125H72L108 88" fill="#FFFFFF" stroke="#E11D48" strokeWidth="2"/>
-                          <rect x="25" y="98" width="30" height="10" rx="2" fill="#E11D48" fillOpacity="0.8"/>
+                          {/* Unwinding label tape */}
+                          <path d="M48 88L12 125H72L108 88" fill="#FFFFFF" stroke="#007AFF" strokeWidth="2"/>
+                          <rect x="25" y="98" width="30" height="10" rx="2" fill="#007AFF" fillOpacity="0.15" stroke="#007AFF" strokeWidth="1.5"/>
                           <line x1="28" y1="116" x2="55" y2="116" stroke="#1E293B" strokeWidth="2"/>
                           <circle cx="100" cy="36" r="14" fill="#E2E8F0" stroke="#1E293B" strokeWidth="1.8"/>
                         </svg>
@@ -1537,17 +1544,19 @@ export const Calculator: React.FC = () => {
                       </div>
                     )}
 
-                    {/* 3. Banners (Банери) */}
+                    {/* 3. Banners (БАНЕРИ) */}
                     {hoveredMegaProduct === 'banners' && (
                       <div className="flex flex-col items-center text-center animate-fadeIn">
                         <svg width="210" height="140" viewBox="0 0 210 140" fill="none">
                           <rect x="20" y="25" width="170" height="85" rx="4" fill="#FFFFFF" stroke="#1E293B" strokeWidth="2.2"/>
+                          {/* Eyelets */}
                           <circle cx="32" cy="37" r="4.5" fill="#E2E8F0" stroke="#1E293B" strokeWidth="1.8"/>
                           <circle cx="178" cy="37" r="4.5" fill="#E2E8F0" stroke="#1E293B" strokeWidth="1.8"/>
                           <circle cx="32" cy="98" r="4.5" fill="#E2E8F0" stroke="#1E293B" strokeWidth="1.8"/>
                           <circle cx="178" cy="98" r="4.5" fill="#E2E8F0" stroke="#1E293B" strokeWidth="1.8"/>
-                          <rect x="48" y="42" width="114" height="50" rx="3" fill="#E11D48" fillOpacity="0.08" stroke="#E11D48" strokeWidth="1.8"/>
-                          <text x="74" y="73" fill="#E11D48" fontSize="14" fontWeight="900" letterSpacing="2">BANNER</text>
+                          {/* Banner graphic */}
+                          <rect x="48" y="42" width="114" height="50" rx="3" fill="#007AFF" fillOpacity="0.08" stroke="#007AFF" strokeWidth="1.8"/>
+                          <text x="74" y="73" fill="#007AFF" fontSize="14" fontWeight="900" letterSpacing="2">BANNER</text>
                         </svg>
                         <h4 style={{ fontSize: '13.5px', fontWeight: '800', color: '#1e293b', marginTop: '12px' }}>
                           Широкоформатні банери
@@ -1558,13 +1567,14 @@ export const Calculator: React.FC = () => {
                       </div>
                     )}
 
-                    {/* 4. Blanks & Forms (Бланки, Оголошення) */}
+                    {/* 4. Blanks & Forms (БЛАНКИ, ОГОЛОШЕННЯ) */}
                     {hoveredMegaProduct === 'blanks' && (
                       <div className="flex flex-col items-center text-center animate-fadeIn">
                         <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
                           <rect x="45" y="15" width="110" height="120" rx="4" fill="#FFFFFF" stroke="#1E293B" strokeWidth="2.2"/>
-                          <rect x="58" y="28" width="22" height="12" rx="2" fill="#E11D48"/>
-                          <line x1="88" y1="34" x2="142" y2="34" stroke="#1E293B" strokeWidth="2"/>
+                          {/* Clean corporate header mark */}
+                          <circle cx="62" cy="34" r="7" fill="#007AFF" fillOpacity="0.2" stroke="#007AFF" strokeWidth="1.8"/>
+                          <line x1="76" y1="34" x2="142" y2="34" stroke="#1E293B" strokeWidth="2.2"/>
                           <line x1="58" y1="56" x2="142" y2="56" stroke="#94A3B8" strokeWidth="2"/>
                           <line x1="58" y1="70" x2="142" y2="70" stroke="#94A3B8" strokeWidth="2"/>
                           <line x1="58" y1="84" x2="142" y2="84" stroke="#94A3B8" strokeWidth="2"/>
@@ -1579,7 +1589,7 @@ export const Calculator: React.FC = () => {
                       </div>
                     )}
 
-                    {/* 5. Notebooks (Блокноти) */}
+                    {/* 5. Notebooks (БЛОКНОТИ) */}
                     {hoveredMegaProduct === 'notebooks' && (
                       <div className="flex flex-col items-center text-center animate-fadeIn">
                         <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
@@ -1587,7 +1597,7 @@ export const Calculator: React.FC = () => {
                           {[62, 74, 86, 98, 110, 122, 134, 146].map(x => (
                             <ellipse key={x} cx={x} cy="25" rx="3.5" ry="7" fill="#E2E8F0" stroke="#1E293B" strokeWidth="1.8"/>
                           ))}
-                          <rect x="65" y="52" width="75" height="28" rx="3" fill="#E11D48" fillOpacity="0.1" stroke="#E11D48" strokeWidth="1.8"/>
+                          <rect x="65" y="52" width="75" height="28" rx="3" fill="#007AFF" fillOpacity="0.08" stroke="#007AFF" strokeWidth="1.8"/>
                           <line x1="65" y1="95" x2="140" y2="95" stroke="#94A3B8" strokeWidth="2"/>
                           <line x1="65" y1="108" x2="120" y2="108" stroke="#94A3B8" strokeWidth="2"/>
                         </svg>
@@ -1600,13 +1610,13 @@ export const Calculator: React.FC = () => {
                       </div>
                     )}
 
-                    {/* 6. Booklets & Catalogs (Брошури, Каталоги) */}
+                    {/* 6. Booklets & Catalogs (БРОШУРИ, КАТАЛОГИ) */}
                     {hoveredMegaProduct === 'brochures' && (
                       <div className="flex flex-col items-center text-center animate-fadeIn">
                         <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
                           <path d="M100 25C70 20 35 22 25 28V118C35 112 70 110 100 115V25Z" fill="#FFFFFF" stroke="#1E293B" strokeWidth="2.2"/>
                           <path d="M100 25C130 20 165 22 175 28V118C165 112 130 110 100 115V25Z" fill="#FFFFFF" stroke="#1E293B" strokeWidth="2.2"/>
-                          <line x1="100" y1="25" x2="100" y2="115" stroke="#E11D48" strokeWidth="3"/>
+                          <line x1="100" y1="25" x2="100" y2="115" stroke="#007AFF" strokeWidth="3"/>
                           <line x1="40" y1="50" x2="85" y2="48" stroke="#94A3B8" strokeWidth="2"/>
                           <line x1="40" y1="65" x2="85" y2="63" stroke="#94A3B8" strokeWidth="2"/>
                           <line x1="115" y1="48" x2="160" y2="50" stroke="#94A3B8" strokeWidth="2"/>
@@ -1621,16 +1631,16 @@ export const Calculator: React.FC = () => {
                       </div>
                     )}
 
-                    {/* 7. Booklets / Tri-folds (Буклети, Карти) */}
+                    {/* 7. Booklets / Tri-folds (БУКЛЕТИ, КАРТИ) */}
                     {hoveredMegaProduct === 'booklets' && (
                       <div className="flex flex-col items-center text-center animate-fadeIn">
                         <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
                           <rect x="25" y="30" width="48" height="90" rx="2" fill="#FFFFFF" stroke="#1E293B" strokeWidth="2.2"/>
                           <rect x="73" y="30" width="54" height="90" fill="#FFFFFF" stroke="#1E293B" strokeWidth="2.2"/>
                           <rect x="127" y="30" width="48" height="90" rx="2" fill="#FFFFFF" stroke="#1E293B" strokeWidth="2.2"/>
-                          <line x1="73" y1="30" x2="73" y2="120" stroke="#E11D48" strokeWidth="2" strokeDasharray="3 3"/>
-                          <line x1="127" y1="30" x2="127" y2="120" stroke="#E11D48" strokeWidth="2" strokeDasharray="3 3"/>
-                          <rect x="83" y="45" width="34" height="20" rx="2" fill="#E11D48" fillOpacity="0.15"/>
+                          <line x1="73" y1="30" x2="73" y2="120" stroke="#007AFF" strokeWidth="2" strokeDasharray="3 3"/>
+                          <line x1="127" y1="30" x2="127" y2="120" stroke="#007AFF" strokeWidth="2" strokeDasharray="3 3"/>
+                          <rect x="83" y="45" width="34" height="20" rx="2" fill="#007AFF" fillOpacity="0.12"/>
                           <line x1="83" y1="75" x2="117" y2="75" stroke="#1E293B" strokeWidth="2"/>
                         </svg>
                         <h4 style={{ fontSize: '13.5px', fontWeight: '800', color: '#1e293b', marginTop: '12px' }}>
@@ -1642,14 +1652,14 @@ export const Calculator: React.FC = () => {
                       </div>
                     )}
 
-                    {/* 8. Tags & Labels (Бірки, Цінники) */}
+                    {/* 8. Tags & Labels (БІРКИ, ЦІННИКИ) */}
                     {hoveredMegaProduct === 'tags' && (
                       <div className="flex flex-col items-center text-center animate-fadeIn">
                         <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
                           <path d="M80 20L135 20L155 45V125H80V20Z" fill="#FFFFFF" stroke="#1E293B" strokeWidth="2.2"/>
                           <circle cx="130" cy="40" r="5" fill="#E2E8F0" stroke="#1E293B" strokeWidth="2"/>
-                          <path d="M130 35C130 15 160 10 160 25C160 40 135 35 130 45" stroke="#E11D48" strokeWidth="2"/>
-                          <rect x="95" y="60" width="45" height="15" rx="2" fill="#E11D48" fillOpacity="0.12"/>
+                          <path d="M130 35C130 15 160 10 160 25C160 40 135 35 130 45" stroke="#64748B" strokeWidth="2"/>
+                          <rect x="95" y="60" width="45" height="15" rx="2" fill="#007AFF" fillOpacity="0.1"/>
                           <line x1="95" y1="90" x2="140" y2="90" stroke="#1E293B" strokeWidth="2"/>
                           <line x1="95" y1="102" x2="125" y2="102" stroke="#94A3B8" strokeWidth="2"/>
                         </svg>
@@ -1662,11 +1672,10 @@ export const Calculator: React.FC = () => {
                       </div>
                     )}
 
-                    {/* 9. Samples (Зразки матеріалів) */}
+                    {/* 9. Samples (ЗРАЗКИ МАТЕРІАЛІВ) */}
                     {hoveredMegaProduct === 'samples' && (
                       <div className="flex flex-col items-center text-center animate-fadeIn">
                         <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
-                          {/* Fanned out material swatch sheets */}
                           <g transform="rotate(-25 50 120)">
                             <rect x="50" y="30" width="55" height="90" rx="3" fill="#E2E8F0" stroke="#1E293B" strokeWidth="2"/>
                           </g>
@@ -1675,15 +1684,14 @@ export const Calculator: React.FC = () => {
                           </g>
                           <g transform="rotate(5 50 120)">
                             <rect x="50" y="30" width="55" height="90" rx="3" fill="#F8FAFC" stroke="#1E293B" strokeWidth="2"/>
-                            <rect x="58" y="42" width="38" height="12" rx="2" fill="#E11D48"/>
+                            <circle cx="70" cy="50" r="8" fill="#007AFF" fillOpacity="0.2" stroke="#007AFF" strokeWidth="1.5"/>
                           </g>
                           <g transform="rotate(20 50 120)">
                             <rect x="50" y="30" width="55" height="90" rx="3" fill="#FFFFFF" stroke="#1E293B" strokeWidth="2.2"/>
                             <line x1="58" y1="45" x2="95" y2="45" stroke="#1E293B" strokeWidth="2"/>
                             <line x1="58" y1="55" x2="85" y2="55" stroke="#94A3B8" strokeWidth="2"/>
                           </g>
-                          {/* Pivot screw */}
-                          <circle cx="50" cy="115" r="6" fill="#E11D48" stroke="#1E293B" strokeWidth="2"/>
+                          <circle cx="50" cy="115" r="6" fill="#334155" stroke="#1E293B" strokeWidth="2"/>
                           <line x1="47" y1="115" x2="53" y2="115" stroke="#FFFFFF" strokeWidth="2"/>
                         </svg>
                         <h4 style={{ fontSize: '13.5px', fontWeight: '800', color: '#1e293b', marginTop: '12px' }}>
@@ -1695,12 +1703,12 @@ export const Calculator: React.FC = () => {
                       </div>
                     )}
 
-                    {/* 10. Calendar Grids (Календарні сітки) */}
+                    {/* 10. Calendar Grids (КАЛЕНДАРНІ СІТКИ) */}
                     {hoveredMegaProduct === 'calendar_grid' && (
                       <div className="flex flex-col items-center text-center animate-fadeIn">
                         <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
                           <rect x="30" y="20" width="140" height="105" rx="4" fill="#FFFFFF" stroke="#1E293B" strokeWidth="2.2"/>
-                          <rect x="30" y="20" width="140" height="24" fill="#E11D48"/>
+                          <rect x="30" y="20" width="140" height="24" fill="#007AFF"/>
                           <text x="40" y="36" fill="#FFFFFF" fontSize="11" fontWeight="bold">2026 СІЧЕНЬ</text>
                           {[42, 68, 94, 120, 146].map(x => (
                             [54, 74, 94, 114].map(y => (
@@ -1717,13 +1725,13 @@ export const Calculator: React.FC = () => {
                       </div>
                     )}
 
-                    {/* 11. Calendars (Календарі) */}
+                    {/* 11. Calendars (КАЛЕНДАРІ) */}
                     {hoveredMegaProduct === 'calendars' && (
                       <div className="flex flex-col items-center text-center animate-fadeIn">
                         <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
                           <path d="M40 120L100 30L160 120H40Z" fill="#F8FAFC" stroke="#1E293B" strokeWidth="2.2"/>
                           <rect x="65" y="45" width="70" height="65" rx="3" fill="#FFFFFF" stroke="#1E293B" strokeWidth="1.8"/>
-                          <rect x="65" y="45" width="70" height="16" fill="#E11D48"/>
+                          <rect x="65" y="45" width="70" height="16" fill="#007AFF"/>
                           <line x1="72" y1="72" x2="128" y2="72" stroke="#94A3B8" strokeWidth="2"/>
                           <line x1="72" y1="84" x2="128" y2="84" stroke="#94A3B8" strokeWidth="2"/>
                           <line x1="72" y1="96" x2="115" y2="96" stroke="#94A3B8" strokeWidth="2"/>
@@ -1737,18 +1745,17 @@ export const Calculator: React.FC = () => {
                       </div>
                     )}
 
-                    {/* 12. Mounted Box / Hardcover (Каширована продукція) */}
+                    {/* 12. Mounted Box / Hardcover (КАШИРОВАНА ПРОДУКЦІЯ) */}
                     {hoveredMegaProduct === 'mounted' && (
                       <div className="flex flex-col items-center text-center animate-fadeIn">
                         <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
-                          {/* 3D Isometric Rigid Gift Box */}
                           <path d="M100 22L165 52L100 82L35 52L100 22Z" fill="#FFFFFF" stroke="#1E293B" strokeWidth="2.2"/>
                           <path d="M35 52V105L100 135V82L35 52Z" fill="#F1F5F9" stroke="#1E293B" strokeWidth="2.2"/>
                           <path d="M165 52V105L100 135V82L165 52Z" fill="#E2E8F0" stroke="#1E293B" strokeWidth="2.2"/>
-                          {/* Premium Red Ribbon / Foil Stamp */}
-                          <path d="M92 26L157 56L147 61L82 31L92 26Z" fill="#E11D48"/>
-                          <path d="M152 59V112L142 116V63L152 59Z" fill="#BE123C"/>
-                          <rect x="88" y="70" width="24" height="24" rx="2" fill="#E11D48" fillOpacity="0.15" stroke="#E11D48" strokeWidth="1.5"/>
+                          {/* Elegant Royal Blue Ribbon */}
+                          <path d="M92 26L157 56L147 61L82 31L92 26Z" fill="#007AFF"/>
+                          <path d="M152 59V112L142 116V63L152 59Z" fill="#0056B3"/>
+                          <circle cx="100" cy="80" r="8" fill="#F59E0B" stroke="#D97706" strokeWidth="1.5"/>
                         </svg>
                         <h4 style={{ fontSize: '13.5px', fontWeight: '800', color: '#1e293b', marginTop: '12px' }}>
                           Каширована продукція та Упаковка
@@ -1759,28 +1766,24 @@ export const Calculator: React.FC = () => {
                       </div>
                     )}
 
-                    {/* 13. Tickets & Vouchers (Квитки, Купони) */}
+                    {/* 13. Tickets & Vouchers (КВИТКИ, КУПОНИ) */}
                     {hoveredMegaProduct === 'tickets' && (
                       <div className="flex flex-col items-center text-center animate-fadeIn">
                         <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
                           <rect x="25" y="40" width="150" height="75" rx="5" fill="#FFFFFF" stroke="#1E293B" strokeWidth="2.2"/>
-                          {/* Dotted Perforation Line with semicircles */}
                           <line x1="75" y1="40" x2="75" y2="115" stroke="#1E293B" strokeWidth="2" strokeDasharray="4 4"/>
                           <circle cx="75" cy="40" r="5" fill="#FAFBFC" stroke="#1E293B" strokeWidth="2"/>
                           <circle cx="75" cy="115" r="5" fill="#FAFBFC" stroke="#1E293B" strokeWidth="2"/>
-                          {/* Stub elements */}
-                          <rect x="35" y="52" width="28" height="12" rx="2" fill="#E11D48"/>
-                          <text x="37" y="61" fill="#FFFFFF" fontSize="7" fontWeight="bold">TICKET</text>
+                          <rect x="35" y="52" width="28" height="12" rx="2" fill="#007AFF"/>
+                          <text x="38" y="61" fill="#FFFFFF" fontSize="7" fontWeight="bold">PASS</text>
                           <line x1="35" y1="85" x2="65" y2="85" stroke="#1E293B" strokeWidth="2"/>
                           <line x1="35" y1="95" x2="58" y2="95" stroke="#94A3B8" strokeWidth="2"/>
-                          {/* Main ticket body */}
                           <line x1="90" y1="55" x2="160" y2="55" stroke="#1E293B" strokeWidth="2.5"/>
                           <line x1="90" y1="67" x2="145" y2="67" stroke="#94A3B8" strokeWidth="2"/>
-                          {/* Barcode */}
                           {[90, 94, 97, 102, 105, 110, 113, 118, 122].map((bx, i) => (
                             <line key={i} x1={bx} y1="85" x2={bx} y2="105" stroke="#1E293B" strokeWidth={i % 2 === 0 ? 2.5 : 1.5}/>
                           ))}
-                          <text x="135" y="98" fill="#E11D48" fontSize="10" fontWeight="extrabold">№00482</text>
+                          <text x="135" y="98" fill="#007AFF" fontSize="10" fontWeight="extrabold">№00482</text>
                         </svg>
                         <h4 style={{ fontSize: '13.5px', fontWeight: '800', color: '#1e293b', marginTop: '12px' }}>
                           Квитки та Купони
@@ -1791,17 +1794,15 @@ export const Calculator: React.FC = () => {
                       </div>
                     )}
 
-                    {/* 14. Color Films / Oracal (Кольорові плівки) */}
+                    {/* 14. Color Films / Oracal (КОЛЬОРОВІ ПЛІВКИ) */}
                     {hoveredMegaProduct === 'color_films' && (
                       <div className="flex flex-col items-center text-center animate-fadeIn">
                         <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
                           <ellipse cx="50" cy="45" rx="18" ry="8" fill="#E2E8F0" stroke="#1E293B" strokeWidth="2"/>
                           <path d="M32 45V115C32 119.5 40 123 50 123C60 123 68 119.5 68 115V45" fill="#CBD5E1" stroke="#1E293B" strokeWidth="2"/>
                           <ellipse cx="50" cy="115" rx="18" ry="8" fill="#FFFFFF" stroke="#1E293B" strokeWidth="1.5"/>
-                          {/* Unrolled vinyl sheet with plotter cut-out shape */}
-                          <path d="M50 85L170 55V125L50 123" fill="#E11D48" fillOpacity="0.1" stroke="#E11D48" strokeWidth="2"/>
-                          <path d="M90 75L135 65L125 105L80 115Z" fill="#E11D48" stroke="#1E293B" strokeWidth="2"/>
-                          {/* Knife tip */}
+                          <path d="M50 85L170 55V125L50 123" fill="#007AFF" fillOpacity="0.12" stroke="#007AFF" strokeWidth="2"/>
+                          <path d="M90 75L135 65L125 105L80 115Z" fill="#007AFF" stroke="#1E293B" strokeWidth="2"/>
                           <path d="M148 50L135 65L140 70Z" fill="#1E293B"/>
                           <line x1="148" y1="50" x2="165" y2="33" stroke="#1E293B" strokeWidth="3"/>
                         </svg>
@@ -1814,13 +1815,13 @@ export const Calculator: React.FC = () => {
                       </div>
                     )}
 
-                    {/* 15. Envelopes (Конверти) */}
+                    {/* 15. Envelopes (КОНВЕРТИ) */}
                     {hoveredMegaProduct === 'envelopes' && (
                       <div className="flex flex-col items-center text-center animate-fadeIn">
                         <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
                           <rect x="25" y="35" width="150" height="85" rx="4" fill="#FFFFFF" stroke="#1E293B" strokeWidth="2.2"/>
                           <path d="M25 35L100 85L175 35" stroke="#1E293B" strokeWidth="2.2"/>
-                          <rect x="135" y="45" width="26" height="30" rx="2" fill="#E11D48" fillOpacity="0.15" stroke="#E11D48" strokeWidth="1.5"/>
+                          <rect x="135" y="45" width="26" height="30" rx="2" fill="#007AFF" fillOpacity="0.1" stroke="#007AFF" strokeWidth="1.5"/>
                           <line x1="45" y1="95" x2="110" y2="95" stroke="#94A3B8" strokeWidth="2"/>
                           <line x1="45" y1="105" x2="90" y2="105" stroke="#94A3B8" strokeWidth="2"/>
                         </svg>
@@ -1833,14 +1834,14 @@ export const Calculator: React.FC = () => {
                       </div>
                     )}
 
-                    {/* 16. Sticky Notes / Cubes (Листи для запису) */}
+                    {/* 16. Sticky Notes / Cubes (ЛИСТИ ДЛЯ ЗАПИСУ) */}
                     {hoveredMegaProduct === 'cubes' && (
                       <div className="flex flex-col items-center text-center animate-fadeIn">
                         <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
                           <path d="M100 20L160 45L100 70L40 45L100 20Z" fill="#FFFFFF" stroke="#1E293B" strokeWidth="2.2"/>
                           <path d="M40 45V105L100 130V70L40 45Z" fill="#F1F5F9" stroke="#1E293B" strokeWidth="2.2"/>
                           <path d="M160 45V105L100 130V70L160 45Z" fill="#E2E8F0" stroke="#1E293B" strokeWidth="2.2"/>
-                          <line x1="40" y1="60" x2="100" y2="85" stroke="#E11D48" strokeWidth="1.5"/>
+                          <line x1="40" y1="60" x2="100" y2="85" stroke="#007AFF" strokeWidth="1.5"/>
                           <line x1="40" y1="75" x2="100" y2="100" stroke="#CBD5E1" strokeWidth="1.5"/>
                           <line x1="40" y1="90" x2="100" y2="115" stroke="#CBD5E1" strokeWidth="1.5"/>
                         </svg>
@@ -1853,15 +1854,14 @@ export const Calculator: React.FC = () => {
                       </div>
                     )}
 
-                    {/* 17. Postcards & Invitations (Листівки, Запрошення) */}
+                    {/* 17. Postcards & Invitations (ЛИСТІВКИ, ЗАПРОШЕННЯ) */}
                     {hoveredMegaProduct === 'postcards' && (
                       <div className="flex flex-col items-center text-center animate-fadeIn">
                         <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
-                          {/* Standing folded invitation card */}
                           <path d="M40 120L75 35L145 25L110 110L40 120Z" fill="#FFFFFF" stroke="#1E293B" strokeWidth="2.2"/>
                           <path d="M145 25L170 45L135 128L110 110L145 25Z" fill="#F1F5F9" stroke="#1E293B" strokeWidth="2"/>
-                          <circle cx="95" cy="65" r="14" fill="#E11D48" fillOpacity="0.1" stroke="#E11D48" strokeWidth="1.8"/>
-                          <text x="89" y="70" fill="#E11D48" fontSize="13" fontWeight="bold">❦</text>
+                          <circle cx="95" cy="65" r="14" fill="#007AFF" fillOpacity="0.1" stroke="#007AFF" strokeWidth="1.8"/>
+                          <text x="89" y="70" fill="#007AFF" fontSize="13" fontWeight="bold">❦</text>
                           <line x1="68" y1="90" x2="120" y2="83" stroke="#1E293B" strokeWidth="2"/>
                           <line x1="72" y1="98" x2="112" y2="92" stroke="#94A3B8" strokeWidth="2"/>
                         </svg>
@@ -1874,18 +1874,17 @@ export const Calculator: React.FC = () => {
                       </div>
                     )}
 
-                    {/* 18. Flyers (Листівки, Флаєри) */}
+                    {/* 18. Flyers (ЛИСТІВКИ, ФЛАЄРИ) */}
                     {hoveredMegaProduct === 'flyers' && (
                       <div className="flex flex-col items-center text-center animate-fadeIn">
                         <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
                           <rect x="55" y="18" width="90" height="115" rx="4" fill="#FFFFFF" stroke="#1E293B" strokeWidth="2.2"/>
-                          <rect x="65" y="28" width="70" height="35" rx="3" fill="#E11D48" fillOpacity="0.12" stroke="#E11D48" strokeWidth="1.5"/>
-                          <circle cx="80" cy="45" r="7" fill="#E11D48"/>
+                          <rect x="65" y="28" width="70" height="35" rx="3" fill="#007AFF" fillOpacity="0.1" stroke="#007AFF" strokeWidth="1.5"/>
+                          <circle cx="80" cy="45" r="7" fill="#007AFF"/>
                           <line x1="65" y1="74" x2="135" y2="74" stroke="#1E293B" strokeWidth="2.5" strokeLinecap="round"/>
                           <line x1="65" y1="84" x2="125" y2="84" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round"/>
                           <line x1="65" y1="94" x2="130" y2="94" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round"/>
-                          {/* Discount tag badge */}
-                          <rect x="110" y="105" width="26" height="18" rx="2" fill="#E11D48"/>
+                          <rect x="110" y="105" width="26" height="18" rx="2" fill="#007AFF"/>
                           <text x="114" y="118" fill="#FFFFFF" fontSize="9" fontWeight="bold">-%</text>
                         </svg>
                         <h4 style={{ fontSize: '13.5px', fontWeight: '800', color: '#1e293b', marginTop: '12px' }}>
@@ -1897,19 +1896,16 @@ export const Calculator: React.FC = () => {
                       </div>
                     )}
 
-                    {/* 19. Magnets (Магніти) */}
+                    {/* 19. Magnets (МАГНІТИ) */}
                     {hoveredMegaProduct === 'magnets' && (
                       <div className="flex flex-col items-center text-center animate-fadeIn">
                         <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
-                          {/* Horseshoe magnet shape */}
                           <path d="M60 40V80C60 102 78 120 100 120C122 120 140 102 140 80V40H115V80C115 88 108 95 100 95C92 95 85 88 85 80V40H60Z" fill="#FFFFFF" stroke="#1E293B" strokeWidth="2.2"/>
-                          {/* Pole tips */}
-                          <rect x="60" y="40" width="25" height="18" fill="#E11D48" stroke="#1E293B" strokeWidth="2"/>
+                          <rect x="60" y="40" width="25" height="18" fill="#334155" stroke="#1E293B" strokeWidth="2"/>
                           <text x="68" y="53" fill="#FFFFFF" fontSize="10" fontWeight="bold">N</text>
                           <rect x="115" y="40" width="25" height="18" fill="#007AFF" stroke="#1E293B" strokeWidth="2"/>
                           <text x="124" y="53" fill="#FFFFFF" fontSize="10" fontWeight="bold">S</text>
-                          {/* Magnetic wave arcs */}
-                          <path d="M48 40C40 60 40 100 65 125" stroke="#E11D48" strokeWidth="2" strokeDasharray="3 3"/>
+                          <path d="M48 40C40 60 40 100 65 125" stroke="#334155" strokeWidth="2" strokeDasharray="3 3"/>
                           <path d="M152 40C160 60 160 100 135 125" stroke="#007AFF" strokeWidth="2" strokeDasharray="3 3"/>
                         </svg>
                         <h4 style={{ fontSize: '13.5px', fontWeight: '800', color: '#1e293b', marginTop: '12px' }}>
@@ -1921,23 +1917,20 @@ export const Calculator: React.FC = () => {
                       </div>
                     )}
 
-                    {/* 20. Menu (Меню) */}
+                    {/* 20. Menu (МЕНЮ) */}
                     {hoveredMegaProduct === 'menu' && (
                       <div className="flex flex-col items-center text-center animate-fadeIn">
                         <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
-                          {/* Menu folder booklet */}
                           <rect x="45" y="20" width="110" height="110" rx="4" fill="#FFFFFF" stroke="#1E293B" strokeWidth="2.2"/>
                           <rect x="45" y="20" width="15" height="110" fill="#E2E8F0" stroke="#1E293B" strokeWidth="2"/>
-                          {/* Spine screws */}
-                          <circle cx="52" cy="35" r="3" fill="#E11D48"/>
-                          <circle cx="52" cy="75" r="3" fill="#E11D48"/>
-                          <circle cx="52" cy="115" r="3" fill="#E11D48"/>
-                          {/* Fork & Knife emblem */}
-                          <rect x="80" y="38" width="40" height="30" rx="3" fill="#E11D48" fillOpacity="0.1" stroke="#E11D48" strokeWidth="1.5"/>
-                          <text x="88" y="58" fill="#E11D48" fontSize="16" fontWeight="bold">🍴</text>
-                          <line x1="72" y1="80" x2="138" y2="80" stroke="#1E293B" strokeWidth="2"/>
-                          <line x1="72" y1="92" x2="128" y2="92" stroke="#94A3B8" strokeWidth="2"/>
-                          <line x1="72" y1="104" x2="134" y2="104" stroke="#94A3B8" strokeWidth="2"/>
+                          <circle cx="52" cy="35" r="3" fill="#007AFF"/>
+                          <circle cx="52" cy="75" r="3" fill="#007AFF"/>
+                          <circle cx="52" cy="115" r="3" fill="#007AFF"/>
+                          <circle cx="100" cy="50" r="14" fill="#007AFF" fillOpacity="0.1" stroke="#007AFF" strokeWidth="1.5"/>
+                          <text x="92" y="56" fill="#007AFF" fontSize="14" fontWeight="bold">🍴</text>
+                          <line x1="72" y1="78" x2="138" y2="78" stroke="#1E293B" strokeWidth="2"/>
+                          <line x1="72" y1="90" x2="128" y2="90" stroke="#94A3B8" strokeWidth="2"/>
+                          <line x1="72" y1="102" x2="134" y2="102" stroke="#94A3B8" strokeWidth="2"/>
                         </svg>
                         <h4 style={{ fontSize: '13.5px', fontWeight: '800', color: '#1e293b', marginTop: '12px' }}>
                           Меню для ресторанів та HoReCa
@@ -1948,20 +1941,17 @@ export const Calculator: React.FC = () => {
                       </div>
                     )}
 
-                    {/* 21. Mobile Stands (Мобільні стенди) */}
+                    {/* 21. Mobile Stands (МОБІЛЬНІ СТЕНДИ) */}
                     {hoveredMegaProduct === 'stands' && (
                       <div className="flex flex-col items-center text-center animate-fadeIn">
                         <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
-                          {/* Roll-Up stand base */}
                           <rect x="55" y="125" width="90" height="14" rx="3" fill="#E2E8F0" stroke="#1E293B" strokeWidth="2"/>
                           <line x1="45" y1="139" x2="155" y2="139" stroke="#1E293B" strokeWidth="2.5"/>
-                          {/* Center pole */}
                           <line x1="100" y1="20" x2="100" y2="125" stroke="#1E293B" strokeWidth="2" strokeDasharray="3 3"/>
-                          {/* Extended banner cloth */}
                           <rect x="70" y="20" width="60" height="105" rx="2" fill="#FFFFFF" stroke="#1E293B" strokeWidth="2"/>
                           <rect x="68" y="18" width="64" height="6" rx="2" fill="#1E293B"/>
-                          <rect x="78" y="32" width="44" height="25" rx="2" fill="#E11D48" fillOpacity="0.15" stroke="#E11D48" strokeWidth="1.5"/>
-                          <text x="83" y="48" fill="#E11D48" fontSize="8" fontWeight="bold">ROLL-UP</text>
+                          <rect x="78" y="32" width="44" height="25" rx="2" fill="#007AFF" fillOpacity="0.1" stroke="#007AFF" strokeWidth="1.5"/>
+                          <text x="83" y="48" fill="#007AFF" fontSize="8" fontWeight="bold">ROLL-UP</text>
                           <line x1="78" y1="68" x2="122" y2="68" stroke="#1E293B" strokeWidth="2"/>
                           <line x1="78" y1="78" x2="114" y2="78" stroke="#94A3B8" strokeWidth="1.5"/>
                         </svg>
@@ -1974,15 +1964,14 @@ export const Calculator: React.FC = () => {
                       </div>
                     )}
 
-                    {/* 22. Stickers & Labels (Наліпки, Стікери) */}
+                    {/* 22. Stickers & Labels (НАЛІПКИ, СТІКЕРИ, ЕТИКЕТКИ) */}
                     {hoveredMegaProduct === 'stickers' && (
                       <div className="flex flex-col items-center text-center animate-fadeIn">
                         <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
                           <rect x="35" y="25" width="130" height="95" rx="5" fill="#F8FAFC" stroke="#1E293B" strokeWidth="2.2"/>
-                          {/* Peeled sticker corner */}
-                          <path d="M55 45H125V85L105 105H55V45Z" fill="#FFFFFF" stroke="#E11D48" strokeWidth="2.2"/>
+                          <path d="M55 45H125V85L105 105H55V45Z" fill="#FFFFFF" stroke="#007AFF" strokeWidth="2.2"/>
                           <path d="M125 85L105 105L105 85H125Z" fill="#E2E8F0" stroke="#1E293B" strokeWidth="1.8"/>
-                          <circle cx="80" cy="65" r="12" fill="#E11D48" fillOpacity="0.8"/>
+                          <circle cx="80" cy="65" r="12" fill="#007AFF" fillOpacity="0.8"/>
                         </svg>
                         <h4 style={{ fontSize: '13.5px', fontWeight: '800', color: '#1e293b', marginTop: '12px' }}>
                           Наліпки та Стікерпаки
@@ -1993,12 +1982,12 @@ export const Calculator: React.FC = () => {
                       </div>
                     )}
 
-                    {/* 23. Folders (Папки з вклеєною кишенею) */}
+                    {/* 23. Folders (ПАПКИ, З ВКЛЕЄНОЮ КИШЕНЕЮ) */}
                     {hoveredMegaProduct === 'folders' && (
                       <div className="flex flex-col items-center text-center animate-fadeIn">
                         <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
                           <path d="M30 25H105L125 42H170V125H30V25Z" fill="#FFFFFF" stroke="#1E293B" strokeWidth="2.2"/>
-                          <path d="M30 85H115V125H30V85Z" fill="#E11D48" fillOpacity="0.12" stroke="#E11D48" strokeWidth="2"/>
+                          <path d="M30 85H115V125H30V85Z" fill="#007AFF" fillOpacity="0.1" stroke="#007AFF" strokeWidth="2"/>
                           <rect x="42" y="95" width="36" height="18" rx="2" fill="#FFFFFF" stroke="#1E293B" strokeWidth="1.5"/>
                           <line x1="50" y1="52" x2="95" y2="52" stroke="#1E293B" strokeWidth="2"/>
                           <line x1="50" y1="62" x2="85" y2="62" stroke="#94A3B8" strokeWidth="2"/>
@@ -2012,19 +2001,18 @@ export const Calculator: React.FC = () => {
                       </div>
                     )}
 
-                    {/* 24. Posters & Billboards (Плакати, Афіши) */}
+                    {/* 24. Posters & Billboards (ПЛАКАТИ, АФІШИ) */}
                     {hoveredMegaProduct === 'posters' && (
                       <div className="flex flex-col items-center text-center animate-fadeIn">
                         <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
-                          {/* Hanging poster bar */}
                           <line x1="50" y1="18" x2="100" y2="8" stroke="#1E293B" strokeWidth="1.5"/>
                           <line x1="150" y1="18" x2="100" y2="8" stroke="#1E293B" strokeWidth="1.5"/>
-                          <circle cx="100" cy="8" r="3" fill="#E11D48"/>
+                          <circle cx="100" cy="8" r="3" fill="#007AFF"/>
                           <rect x="45" y="18" width="110" height="8" rx="2" fill="#1E293B"/>
                           <rect x="50" y="26" width="100" height="100" rx="2" fill="#FFFFFF" stroke="#1E293B" strokeWidth="2"/>
                           <rect x="45" y="126" width="110" height="8" rx="2" fill="#1E293B"/>
-                          <rect x="62" y="38" width="76" height="40" rx="2" fill="#E11D48" fillOpacity="0.15" stroke="#E11D48" strokeWidth="1.5"/>
-                          <text x="76" y="62" fill="#E11D48" fontSize="12" fontWeight="bold">POSTER</text>
+                          <rect x="62" y="38" width="76" height="40" rx="2" fill="#007AFF" fillOpacity="0.1" stroke="#007AFF" strokeWidth="1.5"/>
+                          <text x="76" y="62" fill="#007AFF" fontSize="12" fontWeight="bold">POSTER</text>
                           <line x1="62" y1="90" x2="138" y2="90" stroke="#1E293B" strokeWidth="2"/>
                           <line x1="62" y1="102" x2="120" y2="102" stroke="#94A3B8" strokeWidth="2"/>
                         </svg>
@@ -2037,7 +2025,7 @@ export const Calculator: React.FC = () => {
                       </div>
                     )}
 
-                    {/* 25. Plastic Cards (Пластикові карти) */}
+                    {/* 25. Plastic Cards (ПЛАСТИКОВІ КАРТИ) */}
                     {hoveredMegaProduct === 'plastic_cards' && (
                       <div className="flex flex-col items-center text-center animate-fadeIn">
                         <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
@@ -2055,12 +2043,12 @@ export const Calculator: React.FC = () => {
                       </div>
                     )}
 
-                    {/* 26. Canvas & Paintings (Полотна, Картини) */}
+                    {/* 26. Canvas & Paintings (ПОЛОТНА, КАРТИНИ) */}
                     {hoveredMegaProduct === 'canvas' && (
                       <div className="flex flex-col items-center text-center animate-fadeIn">
                         <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
                           <rect x="35" y="25" width="130" height="95" rx="3" fill="#FFFFFF" stroke="#1E293B" strokeWidth="2.2"/>
-                          <path d="M35 100L75 55L110 85L135 65L165 100H35Z" fill="#E11D48" fillOpacity="0.15" stroke="#E11D48" strokeWidth="2"/>
+                          <path d="M35 100L75 55L110 85L135 65L165 100H35Z" fill="#007AFF" fillOpacity="0.15" stroke="#007AFF" strokeWidth="2"/>
                           <circle cx="65" cy="50" r="10" fill="#F59E0B"/>
                           <path d="M165 28L175 35V128L165 120V28Z" fill="#CBD5E1" stroke="#1E293B" strokeWidth="1.8"/>
                           <path d="M38 120L48 128H175L165 120H38Z" fill="#94A3B8" stroke="#1E293B" strokeWidth="1.8"/>
@@ -2074,15 +2062,14 @@ export const Calculator: React.FC = () => {
                       </div>
                     )}
 
-                    {/* 27. Paper Posters (Постери) */}
+                    {/* 27. Paper Posters (ПОСТЕРИ) */}
                     {hoveredMegaProduct === 'posters_paper' && (
                       <div className="flex flex-col items-center text-center animate-fadeIn">
                         <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
-                          {/* Framed Citylight Display Box */}
                           <rect x="40" y="18" width="120" height="114" rx="6" fill="#1E293B" stroke="#0F172A" strokeWidth="2.5"/>
                           <rect x="48" y="26" width="104" height="98" rx="3" fill="#FFFFFF"/>
-                          <rect x="58" y="38" width="84" height="42" rx="2" fill="#E11D48" fillOpacity="0.12" stroke="#E11D48" strokeWidth="1.5"/>
-                          <circle cx="72" cy="52" r="8" fill="#E11D48"/>
+                          <rect x="58" y="38" width="84" height="42" rx="2" fill="#007AFF" fillOpacity="0.1" stroke="#007AFF" strokeWidth="1.5"/>
+                          <circle cx="72" cy="52" r="8" fill="#007AFF"/>
                           <line x1="58" y1="92" x2="130" y2="92" stroke="#1E293B" strokeWidth="2"/>
                           <line x1="58" y1="104" x2="115" y2="104" stroke="#94A3B8" strokeWidth="2"/>
                         </svg>
@@ -2095,17 +2082,15 @@ export const Calculator: React.FC = () => {
                       </div>
                     )}
 
-                    {/* 28. Self Adhesive Film (Самоклеюча плівка) */}
+                    {/* 28. Self Adhesive Film (САМОКЛЕЮЧА ПЛІВКА) */}
                     {hoveredMegaProduct === 'self_adhesive_film' && (
                       <div className="flex flex-col items-center text-center animate-fadeIn">
                         <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
                           <ellipse cx="40" cy="40" rx="16" ry="8" fill="#E2E8F0" stroke="#1E293B" strokeWidth="2"/>
                           <path d="M24 40V110C24 114.5 31 118 40 118C49 118 56 114.5 56 110V40" fill="#CBD5E1" stroke="#1E293B" strokeWidth="2"/>
                           <ellipse cx="40" cy="110" rx="16" ry="8" fill="#FFFFFF" stroke="#1E293B" strokeWidth="1.5"/>
-                          {/* Unrolling film strip */}
                           <path d="M40 85L170 50V120L40 115" fill="#FFFFFF" stroke="#1E293B" strokeWidth="2"/>
-                          {/* Squeegee tool */}
-                          <path d="M120 70L155 60L165 75L130 85Z" fill="#E11D48" stroke="#1E293B" strokeWidth="2"/>
+                          <path d="M120 70L155 60L165 75L130 85Z" fill="#007AFF" stroke="#1E293B" strokeWidth="2"/>
                           <line x1="120" y1="70" x2="130" y2="85" stroke="#FFFFFF" strokeWidth="2"/>
                         </svg>
                         <h4 style={{ fontSize: '13.5px', fontWeight: '800', color: '#1e293b', marginTop: '12px' }}>
@@ -2117,7 +2102,7 @@ export const Calculator: React.FC = () => {
                       </div>
                     )}
 
-                    {/* 29. Scratch Cards (Скретч-карти) */}
+                    {/* 29. Scratch Cards (СКРЕТЧ-КАРТИ, ЛОТЕРЕЇ) */}
                     {hoveredMegaProduct === 'scratch' && (
                       <div className="flex flex-col items-center text-center animate-fadeIn">
                         <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
@@ -2136,17 +2121,16 @@ export const Calculator: React.FC = () => {
                       </div>
                     )}
 
-                    {/* 30. Signs & Plates (Таблички, Вивіски) */}
+                    {/* 30. Signs & Plates (ТАБЛИЧКИ, ВИВІСКИ) */}
                     {hoveredMegaProduct === 'signs' && (
                       <div className="flex flex-col items-center text-center animate-fadeIn">
                         <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
-                          {/* Signboard plate with 4 stainless standoffs */}
                           <rect x="30" y="30" width="140" height="90" rx="6" fill="#FFFFFF" stroke="#1E293B" strokeWidth="2.5"/>
                           <circle cx="42" cy="42" r="5" fill="#E2E8F0" stroke="#1E293B" strokeWidth="2"/>
                           <circle cx="158" cy="42" r="5" fill="#E2E8F0" stroke="#1E293B" strokeWidth="2"/>
                           <circle cx="42" cy="108" r="5" fill="#E2E8F0" stroke="#1E293B" strokeWidth="2"/>
                           <circle cx="158" cy="108" r="5" fill="#E2E8F0" stroke="#1E293B" strokeWidth="2"/>
-                          <rect x="65" y="48" width="70" height="24" rx="3" fill="#E11D48"/>
+                          <rect x="65" y="48" width="70" height="24" rx="3" fill="#1E293B"/>
                           <text x="73" y="64" fill="#FFFFFF" fontSize="10" fontWeight="bold">OFFICE 204</text>
                           <line x1="55" y1="88" x2="145" y2="88" stroke="#1E293B" strokeWidth="2"/>
                           <line x1="65" y1="98" x2="135" y2="98" stroke="#94A3B8" strokeWidth="2"/>
@@ -2160,16 +2144,16 @@ export const Calculator: React.FC = () => {
                       </div>
                     )}
 
-                    {/* 31. Door Hangers (Хенгери) */}
+                    {/* 31. Door Hangers (ХЕНГЕРИ) */}
                     {hoveredMegaProduct === 'hangers' && (
                       <div className="flex flex-col items-center text-center animate-fadeIn">
                         <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
                           <path d="M75 18H125V132H75V18Z" fill="#FFFFFF" stroke="#1E293B" strokeWidth="2.2"/>
                           <circle cx="100" cy="45" r="16" fill="#F1F5F9" stroke="#1E293B" strokeWidth="2"/>
                           <path d="M100 61V76" stroke="#1E293B" strokeWidth="2"/>
-                          <rect x="85" y="88" width="30" height="12" rx="2" fill="#E11D48"/>
-                          <line x1="85" y1="108" x2="115" y2="108" stroke="#1E293B" strokeWidth="2"/>
-                          <line x1="85" y1="118" x2="110" y2="118" stroke="#94A3B8" strokeWidth="2"/>
+                          <circle cx="100" cy="94" r="8" fill="#007AFF" fillOpacity="0.2" stroke="#007AFF" strokeWidth="1.5"/>
+                          <line x1="85" y1="110" x2="115" y2="110" stroke="#1E293B" strokeWidth="2"/>
+                          <line x1="85" y1="120" x2="110" y2="120" stroke="#94A3B8" strokeWidth="2"/>
                         </svg>
                         <h4 style={{ fontSize: '13.5px', fontWeight: '800', color: '#1e293b', marginTop: '12px' }}>
                           Дверні хенгери
@@ -2184,16 +2168,15 @@ export const Calculator: React.FC = () => {
                     {hoveredMegaProduct === 'all_products' && (
                       <div className="flex flex-col items-center text-center animate-fadeIn">
                         <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
-                          {/* 3x3 Grid of product tiles */}
                           {[
-                            { x: 45, y: 25, col: '#E11D48' }, { x: 85, y: 25, col: '#007AFF' }, { x: 125, y: 25, col: '#10B981' },
-                            { x: 45, y: 60, col: '#F59E0B' }, { x: 85, y: 60, col: '#8B5CF6' }, { x: 125, y: 60, col: '#EC4899' },
-                            { x: 45, y: 95, col: '#06B6D4' }, { x: 85, y: 95, col: '#6366F1' }, { x: 125, y: 95, col: '#E11D48' }
+                            { x: 45, y: 25, col: '#007AFF' }, { x: 85, y: 25, col: '#3B82F6' }, { x: 125, y: 25, col: '#10B981' },
+                            { x: 45, y: 60, col: '#F59E0B' }, { x: 85, y: 60, col: '#8B5CF6' }, { x: 125, y: 60, col: '#06B6D4' },
+                            { x: 45, y: 95, col: '#64748B' }, { x: 85, y: 95, col: '#6366F1' }, { x: 125, y: 95, col: '#007AFF' }
                           ].map((t, idx) => (
                             <rect key={idx} x={t.x} y={t.y} width="30" height="26" rx="4" fill={t.col} fillOpacity="0.15" stroke={t.col} strokeWidth="2"/>
                           ))}
                         </svg>
-                        <h4 style={{ fontSize: '13.5px', fontWeight: '800', color: '#e11d48', marginTop: '12px' }}>
+                        <h4 style={{ fontSize: '13.5px', fontWeight: '800', color: '#007AFF', marginTop: '12px' }}>
                           Повний каталог продукції
                         </h4>
                         <p style={{ fontSize: '11px', color: '#64748b', margin: '4px 0 0 0', maxWidth: '220px' }}>
