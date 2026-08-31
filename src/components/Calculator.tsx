@@ -66,8 +66,8 @@ export const Calculator: React.FC = () => {
   // Selection step: 'catalog' | 'editor'
   const [step, setStep] = useState<'catalog' | 'editor'>('catalog');
   
-  // Main Category Tab: 'products' | 'offset' | 'digital' | 'wide' | 'roll' | 'films'
-  const [mainCategoryTab, setMainCategoryTab] = useState<'products' | 'offset' | 'digital' | 'wide' | 'roll' | 'films'>('products');
+  // Main Category Tab: 'products' | 'offset' | 'digital' | 'wide' | 'roll' | 'films' | 'notebooks'
+  const [mainCategoryTab, setMainCategoryTab] = useState<'products' | 'offset' | 'digital' | 'wide' | 'roll' | 'films' | 'notebooks'>('products');
 
   // Sub-tabs in Offset printing: 'overview' | 'sheets' | 'felling' | 'multipage' | 'custom'
   const [offsetSubTab, setOffsetSubTab] = useState<'overview' | 'sheets' | 'felling' | 'multipage' | 'custom'>('overview');
@@ -209,6 +209,42 @@ export const Calculator: React.FC = () => {
   const [wideSelectedMaterials, setWideSelectedMaterials] = useState<string[]>(['frontlit_440', 'frontlit_510']);
   const [wideSelectedResolutions, setWideSelectedResolutions] = useState<string[]>(['720', '1440']);
   const [wideSelectedFinishes, setWideSelectedFinishes] = useState<string[]>(['luvers_hemming', 'clean_cut']);
+
+  // Notepad (Блокноти) State Hooks
+  const [notebookPrintMethod, setNotebookPrintMethod] = useState<'digital' | 'offset'>('digital');
+  const [notebookStandardSize, setNotebookStandardSize] = useState<string>('105x148');
+  const [notebookWidth, setNotebookWidth] = useState<string>('105');
+  const [notebookHeight, setNotebookHeight] = useState<string>('148');
+  const [notebookUnit, setNotebookUnit] = useState<'mm' | 'cm'>('mm');
+
+  const [notebookSpringColor, setNotebookSpringColor] = useState<string>('white'); // 'white', 'black', 'silver'
+  const [notebookBindingSide, setNotebookBindingSide] = useState<string>('short'); // 'short' (по короткій), 'long' (по довгій)
+
+  const [notebookCoverPages, setNotebookCoverPages] = useState<string>('2'); // '2' (1 аркуш), '4' (2 аркуші)
+  const [notebookCoverMaterial, setNotebookCoverMaterial] = useState<string>('coat_300'); // 'coat_300', 'coat_350', 'coat_450', 'kraft_275', 'card_250', 'mondi_300', 'dali_285', 'flora_350'
+  const [notebookCoverCovering, setNotebookCoverCovering] = useState<string>('none'); // 'none', 'gloss_10', 'gloss_11', 'mat_10', 'mat_11', 'soft_touch', 'antiscaf'
+  const [notebookCoverPrint, setNotebookCoverPrint] = useState<string>('4+4'); // '4+4', '4+0', '1+0', '1+1', '0+0'
+
+  const [notebookBlockPages, setNotebookBlockPages] = useState<number>(50); // 25, 50, 80, 100
+  const [notebookBlockMaterial, setNotebookBlockMaterial] = useState<string>('offset_80'); // 'offset_80', 'offset_70', 'coat_90', 'kraft_80'
+  const [notebookBlockPrint, setNotebookBlockPrint] = useState<string>('4+4'); // '4+4', '4+0', '1+0', '1+1', '0+0'
+
+  const [notebookInsert, setNotebookInsert] = useState<string>('none'); // 'none', '1', '2'
+  const [notebookInsertMaterial, setNotebookInsertMaterial] = useState<string>('coat_80');
+  const [notebookInsertCovering, setNotebookInsertCovering] = useState<string>('none');
+  const [notebookInsertPrint, setNotebookInsertPrint] = useState<string>('4+4');
+
+  const [notebookBackPages, setNotebookBackPages] = useState<string>('2'); // '2', '4', '0'
+  const [notebookBackMaterial, setNotebookBackMaterial] = useState<string>('coat_300');
+  const [notebookBackCovering, setNotebookBackCovering] = useState<string>('none');
+  const [notebookBackPrint, setNotebookBackPrint] = useState<string>('4+4');
+
+  const [notebookPerforation, setNotebookPerforation] = useState<string>('no'); // 'no', 'yes'
+  const [notebookPerforationScope, setNotebookPerforationScope] = useState<string>('1'); // '1', 'all'
+  const [notebookPackaging, setNotebookPackaging] = useState<string>('no'); // 'no', 'yes'
+
+  const [notebookWithDelivery, setNotebookWithDelivery] = useState<boolean>(false);
+  const [notebookPriceCostVar, setNotebookPriceCostVar] = useState<'per_tirazh' | 'per_item'>('per_tirazh');
 
   // Helper to transition into specific offset product calculator
   const openOffsetProduct = (params: {
@@ -621,22 +657,11 @@ export const Calculator: React.FC = () => {
       setSelectedCoverings(['0', '9', '30']);
       setSelectedPrintColors(['4+0', '4+4']);
     } else if (cat === 'Блокноти') {
-      setMainCategoryTab('offset');
-      setOffsetSubTab('sheets');
+      setMainCategoryTab('notebooks');
       setStep('catalog');
-      setSheetSizePreset('32');
-      setSheetCustomWidth('148');
-      setSheetCustomHeight('210');
-      setCardKind('1');
-      setQuantity(100);
-      setPaperType('offset');
-      setColors('4+0');
-      setSelectedFormat('A5');
-      setBindingType('spring');
-      setLaminationType('none');
-      setSelectedMaterials(['300', '350', '80']);
-      setSelectedCoverings(['0', '7', '9']);
-      setSelectedPrintColors(['4+0', '4+4', '1+0']);
+      setNotebookStandardSize('105x148');
+      setNotebookWidth('105');
+      setNotebookHeight('148');
     } else if (cat === 'Меню') {
       setMainCategoryTab('offset');
       setOffsetSubTab('sheets');
@@ -1201,6 +1226,7 @@ export const Calculator: React.FC = () => {
                   { key: 'products', label: 'Усі Продукти', count: 19 },
                   { key: 'offset', label: 'Офсетний друк', badge: 'Авторозрахунок', count: 17 },
                   { key: 'digital', label: 'Цифровий друк', count: 10 },
+                  { key: 'notebooks', label: 'Блокноти', count: 1 },
                   { key: 'wide', label: 'Широкоформатний', count: 10 },
                   { key: 'roll', label: 'Рулонний друк', count: 4 },
                   { key: 'films', label: 'Кольорові плівки', count: 5 }
@@ -1337,7 +1363,7 @@ export const Calculator: React.FC = () => {
                     {[
                       { id: 'banners', title: 'БАНЕРИ', tab: 'wide', sub: 'banner' },
                       { id: 'blanks', title: 'БЛАНКИ, ОГОЛОШЕННЯ', tab: 'digital', sub: 'sheets' },
-                      { id: 'notebooks', title: 'БЛОКНОТИ', tab: 'offset', sub: 'multipage' },
+                      { id: 'notebooks', title: 'БЛОКНОТИ', tab: 'notebooks' },
                       { id: 'brochures', title: 'БРОШУРИ, КАТАЛОГИ', tab: 'offset', sub: 'multipage' },
                       { id: 'booklets', title: 'БУКЛЕТИ, КАРТИ', tab: 'offset', sub: 'sheets' },
                       { id: 'tags', title: 'БІРКИ, ЦІННИКИ', tab: 'digital', sub: 'felling' },
@@ -9861,6 +9887,1049 @@ export const Calculator: React.FC = () => {
               ))}
             </div>
           )}
+
+          {/* TAB 7: NOTEBOOKS (БЛОКНОТИ) */}
+          {mainCategoryTab === 'notebooks' && (() => {
+            const wNum = Number(notebookWidth || 105);
+            const hNum = Number(notebookHeight || 148);
+            const mult = notebookUnit === 'mm' ? 1 : 10;
+            const wMm = wNum * mult;
+            const hMm = hNum * mult;
+
+            const formatTitle = (wMm === 105 && hMm === 148) ? 'А6' : 
+                                (wMm === 148 && hMm === 210) ? 'А5' : 
+                                (wMm === 210 && hMm === 297) ? 'А4' : 
+                                (wMm === 99 && hMm === 210) ? 'Євро' : 
+                                (wMm === 105 && hMm === 105) ? 'Квадрат А6' : 
+                                (wMm === 148 && hMm === 148) ? 'Квадрат А5' : 
+                                (wMm === 210 && hMm === 210) ? 'Квадрат А4' : 'Свій розмір';
+
+            const blockThickness = (notebookBlockPages || 50) * 0.1;
+            const coverThickness = (Number(notebookCoverPages) / 2) * 0.28;
+            const backThickness = notebookBackPages === '0' ? 0 : (Number(notebookBackPages) / 2) * 0.28;
+            const insertThickness = (notebookInsert === 'none' ? 0 : Number(notebookInsert)) * 0.09;
+            const totalSpineThickness = (blockThickness + coverThickness + backThickness + insertThickness + 0.38).toFixed(2);
+            
+            const totalSheets = (notebookBlockPages || 50) + (Number(notebookCoverPages)/2) + (notebookBackPages === '0' ? 0 : Number(notebookBackPages)/2) + (notebookInsert === 'none' ? 0 : Number(notebookInsert));
+            const spiralPitch = Number(totalSpineThickness) <= 6.5 ? '3:1' : Number(totalSpineThickness) <= 12 ? '3:1' : '2:1';
+
+            const springFill = notebookSpringColor === 'white' ? '#FFFFFF' : notebookSpringColor === 'black' ? '#1E293B' : '#94A3B8';
+            const springStroke = notebookSpringColor === 'white' ? '#CBD5E1' : notebookSpringColor === 'black' ? '#0F172A' : '#64748B';
+
+            const getFormattedFutureDate = (daysToAdd: number) => {
+              const d = new Date();
+              d.setDate(d.getDate() + daysToAdd);
+              const day = String(d.getDate()).padStart(2, '0');
+              const month = String(d.getMonth() + 1).padStart(2, '0');
+              const weekdays = ['нд', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'];
+              const dayName = weekdays[d.getDay()];
+              return `${day}.${month}, ${dayName}`;
+            };
+
+            const computeNotepadPrice = (qty: number, days: number): number => {
+              const areaFactor = Math.max(0.6, (wMm * hMm) / (105 * 148));
+              const blockSheets = notebookBlockPages || 50;
+
+              // Cover
+              let coverMatCost = 3.0;
+              if (notebookCoverMaterial === 'coat_350') coverMatCost = 3.8;
+              else if (notebookCoverMaterial === 'coat_450') coverMatCost = 5.2;
+              else if (notebookCoverMaterial === 'kraft_275') coverMatCost = 4.2;
+              else if (notebookCoverMaterial === 'card_250') coverMatCost = 3.6;
+              else if (notebookCoverMaterial === 'mondi_300') coverMatCost = 6.0;
+              else if (notebookCoverMaterial === 'dali_285') coverMatCost = 7.5;
+              else if (notebookCoverMaterial === 'flora_350') coverMatCost = 8.0;
+
+              let coverPrintCost = 5.0;
+              if (notebookCoverPrint === '4+0') coverPrintCost = 3.2;
+              else if (notebookCoverPrint === '1+0') coverPrintCost = 1.4;
+              else if (notebookCoverPrint === '1+1') coverPrintCost = 2.0;
+              else if (notebookCoverPrint === '0+0') coverPrintCost = 0.0;
+
+              let coverLamCost = 0;
+              if (notebookCoverCovering === 'gloss_10' || notebookCoverCovering === 'mat_10') coverLamCost = 2.4;
+              else if (notebookCoverCovering === 'gloss_11' || notebookCoverCovering === 'mat_11') coverLamCost = 4.4;
+              else if (notebookCoverCovering === 'soft_touch') coverLamCost = 6.0;
+              else if (notebookCoverCovering === 'antiscaf') coverLamCost = 7.0;
+
+              const unitCover = (coverMatCost + coverPrintCost + coverLamCost) * areaFactor;
+
+              // Block
+              let blockMatCost = 0.12;
+              if (notebookBlockMaterial === 'offset_70') blockMatCost = 0.10;
+              else if (notebookBlockMaterial === 'coat_90') blockMatCost = 0.18;
+              else if (notebookBlockMaterial === 'kraft_80') blockMatCost = 0.20;
+
+              let blockPrintCost = 0.28;
+              if (notebookBlockPrint === '4+0') blockPrintCost = 0.18;
+              else if (notebookBlockPrint === '1+1') blockPrintCost = 0.10;
+              else if (notebookBlockPrint === '1+0') blockPrintCost = 0.06;
+              else if (notebookBlockPrint === '0+0') blockPrintCost = 0.0;
+
+              const unitBlock = blockSheets * (blockMatCost + blockPrintCost) * areaFactor;
+
+              // Backing
+              let unitBack = 0;
+              if (notebookBackPages !== '0') {
+                unitBack = (2.8 + (notebookBackPrint === '4+4' ? 4.0 : notebookBackPrint === '4+0' ? 2.5 : 0) + (notebookBackCovering !== 'none' ? 2.2 : 0)) * areaFactor;
+              }
+
+              // Insert
+              let unitInsert = 0;
+              if (notebookInsert === '1') unitInsert = 3.0 * areaFactor;
+              else if (notebookInsert === '2') unitInsert = 5.5 * areaFactor;
+
+              // Spring, punching & binding
+              const unitSpring = 15.0 * (wMm > 160 || hMm > 230 ? 1.35 : 1.0);
+
+              // Extra finishing
+              const unitPerf = notebookPerforation === 'yes' ? 3.5 : 0;
+              const unitPack = notebookPackaging === 'yes' ? 2.8 : 0;
+
+              // Total raw unit cost
+              const rawUnit = unitCover + unitBlock + unitBack + unitInsert + unitSpring + unitPerf + unitPack;
+
+              // Setup base overhead
+              const setupCost = notebookPrintMethod === 'digital' ? 320 : 650;
+
+              let tierMultiplier = 1.0;
+              if (qty === 1) tierMultiplier = 1.0;
+              else if (qty === 25) tierMultiplier = 0.65;
+              else if (qty === 50) tierMultiplier = 0.62;
+              else if (qty === 75) tierMultiplier = 0.60;
+              else if (qty === 100) tierMultiplier = 0.57;
+              else if (qty === 200) tierMultiplier = 0.55;
+              else if (qty === 500) tierMultiplier = 0.53;
+
+              let baseTotal = (setupCost + (rawUnit * qty * 3.8)) * tierMultiplier;
+              if (days === 2) baseTotal *= 1.20;
+              if (notebookWithDelivery) baseTotal += 90;
+
+              return Math.round(baseTotal * 100) / 100;
+            };
+
+            const handleAddNotepadToOrder = (qty: number, days: number, price: number) => {
+              const specNotes = `Блокнот ${formatTitle} (${wMm}×${hMm} мм), ${notebookBlockPages} аркушів (${notebookBlockMaterial}, ${notebookBlockPrint}), Обкладинка: ${notebookCoverPages} стор (${notebookCoverMaterial}, ламінація: ${notebookCoverCovering}, друк: ${notebookCoverPrint}), Пружина: ${notebookSpringColor} (${notebookBindingSide === 'short' ? 'по короткій' : 'по довгій'}), Підкладка: ${notebookBackMaterial}, Перфорація: ${notebookPerforation === 'yes' ? 'Так' : 'Ні'}, Пакування: ${notebookPackaging === 'yes' ? 'ПЕТ' : 'Ні'}, Термін: ${days} дні`;
+
+              addOrder({
+                name: `№ ${orderNumber} - Блокнот ${formatTitle} (${qty} шт)`,
+                clientId: selectedClientId || clients[0]?.id || '1',
+                category: 'Блокноти',
+                quantity: qty,
+                packingCount: 1,
+                paperType: 'offset',
+                colors: notebookBlockPrint,
+                isSamNaSebe: false,
+                designCost: 0,
+                margin: 20,
+                machine: notebookPrintMethod === 'digital' ? 'Цифровий друк' : 'Офсетний друк',
+                format: formatTitle,
+                physicalSheets: qty * notebookBlockPages,
+                itemsPerSheet: 1,
+                subtotal: Math.round(price * 0.8),
+                marginAmount: Math.round(price * 0.2),
+                finalPrice: Math.round(price),
+                unitPrice: Number((price / qty).toFixed(2)),
+                paymentStatus: 'unpaid',
+                prepayment: 0,
+                notes: specNotes
+              });
+
+              alert(`Блокноти (${qty} шт, ${formatTitle}) на суму ${price.toFixed(2)} ₴ успішно додано до замовлень!`);
+              const nextOrderNum = Math.floor(10000 + Math.random() * 90000);
+              setOrderNumber(nextOrderNum);
+            };
+
+            return (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                {/* Header & 6 Info Links */}
+                <div className="flex flex-col gap-3">
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+                    <h2 style={{ fontSize: '24px', fontWeight: '900', color: 'var(--text-dark)', margin: 0 }}>
+                      Блокноти
+                    </h2>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <button
+                        type="button"
+                        onClick={() => setMainCategoryTab('products')}
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          padding: '6px 14px',
+                          borderRadius: 'var(--radius-md)',
+                          border: '0.5px solid var(--border-light)',
+                          backgroundColor: 'var(--bg-card)',
+                          color: 'var(--text-dark)',
+                          fontSize: '12px',
+                          fontWeight: '700',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        ← Всі категорії
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* 6 Info Links */}
+                  <div style={{
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+                    gap: '8px',
+                    backgroundColor: '#FFFFFF',
+                    padding: '12px 16px',
+                    borderRadius: '8px',
+                    border: '0.5px solid var(--border-light)'
+                  }}>
+                    <a href="#instruction" onClick={(e) => { e.preventDefault(); setActiveInfoModal('instruction' as any); }} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#1E293B', fontWeight: '600', textDecoration: 'none' }}>
+                      <span style={{ color: '#C00000', fontSize: '15px' }}>📄</span> Інструкція по оформленню замовлення
+                    </a>
+                    <a href="#materials" onClick={(e) => { e.preventDefault(); setActiveInfoModal('materials' as any); }} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#1E293B', fontWeight: '600', textDecoration: 'none' }}>
+                      <span style={{ color: '#C00000', fontSize: '15px' }}>📦</span> Матеріали
+                    </a>
+                    <a href="#feedback" onClick={(e) => { e.preventDefault(); setActiveInfoModal('feedback' as any); }} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#1E293B', fontWeight: '600', textDecoration: 'none' }}>
+                      <span style={{ color: '#C00000', fontSize: '15px' }}>💬</span> Ваш відгук
+                    </a>
+                    <a href="#timing" onClick={(e) => { e.preventDefault(); setActiveInfoModal('timing' as any); }} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#1E293B', fontWeight: '600', textDecoration: 'none' }}>
+                      <span style={{ color: '#C00000', fontSize: '15px' }}>⏱</span> Терміни друку
+                    </a>
+                    <a href="#samples" onClick={(e) => { e.preventDefault(); setActiveInfoModal('samples' as any); }} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#1E293B', fontWeight: '600', textDecoration: 'none' }}>
+                      <span style={{ color: '#C00000', fontSize: '15px' }}>🎨</span> Зразки матеріалів з друком
+                    </a>
+                    <a href="#error" onClick={(e) => { e.preventDefault(); setActiveInfoModal('error_report' as any); }} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#1E293B', fontWeight: '600', textDecoration: 'none' }}>
+                      <span style={{ color: '#C00000', fontSize: '15px' }}>⚠️</span> Знайшли помилку?
+                    </a>
+                  </div>
+                </div>
+
+                {/* Спосіб виготовлення */}
+                <div>
+                  <h3 style={{ fontSize: '12.5px', fontWeight: '800', color: '#64748B', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '10px' }}>
+                    Спосіб виготовлення
+                  </h3>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '16px' }}>
+                    {/* ЦИФРОВИЙ ДРУК */}
+                    <div
+                      onClick={() => setNotebookPrintMethod('digital')}
+                      style={{
+                        borderRadius: '8px',
+                        border: notebookPrintMethod === 'digital' ? '2px solid #C00000' : '1px solid #E2E8F0',
+                        backgroundColor: '#FFFFFF',
+                        overflow: 'hidden',
+                        cursor: 'pointer',
+                        boxShadow: notebookPrintMethod === 'digital' ? '0 4px 14px rgba(192, 0, 0, 0.12)' : 'none',
+                        transition: 'all 0.15s ease'
+                      }}
+                    >
+                      <div style={{
+                        backgroundColor: notebookPrintMethod === 'digital' ? '#C00000' : '#F1F5F9',
+                        color: notebookPrintMethod === 'digital' ? '#FFFFFF' : '#334155',
+                        padding: '8px 16px',
+                        fontWeight: '800',
+                        fontSize: '13px',
+                        letterSpacing: '0.5px'
+                      }}>
+                        ЦИФРОВИЙ ДРУК
+                      </div>
+                      <div style={{ padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                          <span style={{ backgroundColor: '#FEE2E2', color: '#991B1B', padding: '3px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: '700' }}>
+                            ⏱ Друк за 3 години
+                          </span>
+                          <span style={{ backgroundColor: '#F1F5F9', color: '#334155', padding: '3px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: '700' }}>
+                            📄 від 1 екземпляра
+                          </span>
+                        </div>
+                        <ul style={{ margin: '4px 0 0 0', padding: 0, listStyle: 'none', fontSize: '11.5px', color: '#475569', display: 'flex', flexDirection: 'column', gap: '4px', lineHeight: '1.4' }}>
+                          <li>— Стандартні та ексклюзивні матеріали</li>
+                          <li>— Ламінація глянцева, матова, Soft Velvet з ефектом пластика Soft-touch, Antiscaf стійка до царапин, щільна конвертна</li>
+                          <li>— Персоналізація номером або текстом</li>
+                        </ul>
+                      </div>
+                    </div>
+
+                    {/* ОФСЕТНИЙ ДРУК */}
+                    <div
+                      onClick={() => setNotebookPrintMethod('offset')}
+                      style={{
+                        borderRadius: '8px',
+                        border: notebookPrintMethod === 'offset' ? '2px solid #C00000' : '1px solid #E2E8F0',
+                        backgroundColor: '#FFFFFF',
+                        overflow: 'hidden',
+                        cursor: 'pointer',
+                        boxShadow: notebookPrintMethod === 'offset' ? '0 4px 14px rgba(192, 0, 0, 0.12)' : 'none',
+                        transition: 'all 0.15s ease'
+                      }}
+                    >
+                      <div style={{
+                        backgroundColor: notebookPrintMethod === 'offset' ? '#C00000' : '#E2E8F0',
+                        color: notebookPrintMethod === 'offset' ? '#FFFFFF' : '#334155',
+                        padding: '8px 16px',
+                        fontWeight: '800',
+                        fontSize: '13px',
+                        letterSpacing: '0.5px'
+                      }}>
+                        ОФСЕТНИЙ ДРУК
+                      </div>
+                      <div style={{ padding: '14px 16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+                          <span style={{ backgroundColor: '#F1F5F9', color: '#334155', padding: '3px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: '700' }}>
+                            ⏱ Друк на завтра
+                          </span>
+                          <span style={{ backgroundColor: '#F1F5F9', color: '#334155', padding: '3px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: '700' }}>
+                            📄 Від 100 екземплярів
+                          </span>
+                        </div>
+                        <ul style={{ margin: '4px 0 0 0', padding: 0, listStyle: 'none', fontSize: '11.5px', color: '#475569', display: 'flex', flexDirection: 'column', gap: '4px', lineHeight: '1.4' }}>
+                          <li>— Стандартні матеріали</li>
+                          <li>— Ламінація глянцева, матова</li>
+                          <li>— УФ лак, гібридний вибірковий лак</li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Розмір & Visual Preview */}
+                <div style={{
+                  backgroundColor: '#FFFFFF',
+                  borderRadius: '8px',
+                  border: '1px solid #E2E8F0',
+                  padding: '20px 24px',
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
+                  gap: '24px',
+                  alignItems: 'center'
+                }}>
+                  {/* Left Form */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                    <h3 style={{ fontSize: '13px', fontWeight: '800', color: '#1E293B', textTransform: 'uppercase', letterSpacing: '0.6px', margin: 0 }}>
+                      Розмір
+                    </h3>
+
+                    <div>
+                      <label style={{ fontSize: '11.5px', fontWeight: '700', color: '#475569', display: 'block', marginBottom: '6px' }}>
+                        Оберіть стандартний:
+                      </label>
+                      <select
+                        value={notebookStandardSize}
+                        onChange={(e) => {
+                          const val = e.target.value;
+                          setNotebookStandardSize(val);
+                          if (val !== 'custom') {
+                            const [w, h] = val.split('x');
+                            setNotebookWidth(w);
+                            setNotebookHeight(h);
+                          }
+                        }}
+                        style={{
+                          width: '100%',
+                          padding: '8px 12px',
+                          borderRadius: '6px',
+                          border: '1px solid #CBD5E1',
+                          backgroundColor: '#FFFFFF',
+                          fontSize: '12px',
+                          fontWeight: '700',
+                          color: '#1E293B'
+                        }}
+                      >
+                        <option value="99x210">Євро (99 × 210)</option>
+                        <option value="105x148">А6 (105 × 148)</option>
+                        <option value="148x210">А5 (148 × 210)</option>
+                        <option value="210x297">А4 (210 × 297)</option>
+                        <option value="105x105">Квадрат А6 (105 × 105)</option>
+                        <option value="148x148">Квадрат А5 (148 × 148)</option>
+                        <option value="210x210">Квадрат А4 (210 × 210)</option>
+                        <option value="custom">Свій розмір...</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label style={{ fontSize: '11.5px', fontWeight: '700', color: '#475569', display: 'block', marginBottom: '6px' }}>
+                        Введіть свій:
+                      </label>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <input
+                          type="number"
+                          value={notebookWidth}
+                          onChange={(e) => {
+                            setNotebookWidth(e.target.value);
+                            setNotebookStandardSize('custom');
+                          }}
+                          placeholder="Ширина"
+                          style={{ flex: 1, padding: '7px 10px', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '12px', fontWeight: '700' }}
+                        />
+                        <span style={{ fontWeight: '800', color: '#94A3B8' }}>×</span>
+                        <input
+                          type="number"
+                          value={notebookHeight}
+                          onChange={(e) => {
+                            setNotebookHeight(e.target.value);
+                            setNotebookStandardSize('custom');
+                          }}
+                          placeholder="Висота"
+                          style={{ flex: 1, padding: '7px 10px', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '12px', fontWeight: '700' }}
+                        />
+                        <select
+                          value={notebookUnit}
+                          onChange={(e) => setNotebookUnit(e.target.value as any)}
+                          style={{ padding: '7px 10px', borderRadius: '6px', border: '1px solid #CBD5E1', backgroundColor: '#FFFFFF', fontSize: '12px', fontWeight: '700' }}
+                        >
+                          <option value="mm">мм</option>
+                          <option value="cm">см</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Right Preview */}
+                  <div style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    backgroundColor: '#F8FAFC',
+                    borderRadius: '8px',
+                    border: '1px dashed #CBD5E1',
+                    padding: '24px 16px',
+                    position: 'relative'
+                  }}>
+                    <span style={{ fontSize: '11px', fontWeight: '700', color: '#64748B', position: 'absolute', top: '10px', left: '14px' }}>
+                      Вигляд готового виробу:
+                    </span>
+
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '14px', marginTop: '12px' }}>
+                      {/* Left Dimension */}
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
+                        <div style={{ width: '1px', height: '36px', backgroundColor: '#94A3B8' }}></div>
+                        <span style={{ fontSize: '11.5px', fontWeight: '800', color: '#0F172A', whiteSpace: 'nowrap' }}>
+                          {hMm} мм
+                        </span>
+                        <div style={{ width: '1px', height: '36px', backgroundColor: '#94A3B8' }}></div>
+                      </div>
+
+                      {/* SVG Vector Notepad */}
+                      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        <svg width="180" height="220" viewBox="0 0 180 220" fill="none" style={{ filter: 'drop-shadow(0 6px 14px rgba(0,0,0,0.08))' }}>
+                          <rect x="22" y="18" width="138" height="190" rx="4" fill="#E2E8F0" stroke="#CBD5E1" strokeWidth="1" />
+                          <rect x="20" y="16" width="138" height="190" rx="4" fill="#F1F5F9" stroke="#CBD5E1" strokeWidth="1" />
+                          <rect x="18" y="14" width="138" height="190" rx="4" fill="#FFFFFF" stroke="#64748B" strokeWidth="1.5" />
+                          
+                          <line x1="30" y1="44" x2="144" y2="44" stroke="#F1F5F9" strokeWidth="2" />
+                          <line x1="30" y1="60" x2="144" y2="60" stroke="#F1F5F9" strokeWidth="2" />
+                          <line x1="30" y1="76" x2="144" y2="76" stroke="#F1F5F9" strokeWidth="2" />
+                          <line x1="30" y1="92" x2="144" y2="92" stroke="#F1F5F9" strokeWidth="2" />
+                          <line x1="30" y1="108" x2="144" y2="108" stroke="#F1F5F9" strokeWidth="2" />
+                          <line x1="30" y1="124" x2="144" y2="124" stroke="#F1F5F9" strokeWidth="2" />
+                          <line x1="30" y1="140" x2="144" y2="140" stroke="#F1F5F9" strokeWidth="2" />
+                          <line x1="30" y1="156" x2="144" y2="156" stroke="#F1F5F9" strokeWidth="2" />
+                          <line x1="30" y1="172" x2="144" y2="172" stroke="#F1F5F9" strokeWidth="2" />
+
+                          <rect x="60" y="88" width="54" height="34" rx="6" fill="#F8FAFC" stroke="#CBD5E1" strokeWidth="1.5" />
+                          <text x="87" y="110" fill="#1E293B" fontSize="13.5" fontWeight="800" textAnchor="middle" fontFamily="sans-serif">
+                            {formatTitle}
+                          </text>
+
+                          {notebookBindingSide === 'short' ? (
+                            [28, 40, 52, 64, 76, 88, 100, 112, 124, 136, 148].map((xPos, idx) => (
+                              <g key={idx}>
+                                <rect
+                                  x={xPos - 3}
+                                  y="9"
+                                  width="6"
+                                  height="12"
+                                  rx="3"
+                                  fill={springFill}
+                                  stroke={springStroke}
+                                  strokeWidth="1.5"
+                                />
+                                <circle cx={xPos} cy="18" r="1.5" fill="#334155" />
+                              </g>
+                            ))
+                          ) : (
+                            [26, 42, 58, 74, 90, 106, 122, 138, 154, 170, 186].map((yPos, idx) => (
+                              <g key={idx}>
+                                <rect
+                                  x="13"
+                                  y={yPos - 3}
+                                  width="12"
+                                  height="6"
+                                  rx="3"
+                                  fill={springFill}
+                                  stroke={springStroke}
+                                  strokeWidth="1.5"
+                                />
+                                <circle cx="22" cy={yPos} r="1.5" fill="#334155" />
+                              </g>
+                            ))
+                          )}
+                        </svg>
+
+                        {/* Bottom Dimension */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '6px' }}>
+                          <div style={{ width: '36px', height: '1px', backgroundColor: '#94A3B8' }}></div>
+                          <span style={{ fontSize: '11.5px', fontWeight: '800', color: '#0F172A', whiteSpace: 'nowrap' }}>
+                            {wMm} мм
+                          </span>
+                          <div style={{ width: '36px', height: '1px', backgroundColor: '#94A3B8' }}></div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <span style={{ fontSize: '11px', color: '#64748B', fontWeight: '600', marginTop: '8px' }}>
+                      Пружина: {notebookSpringColor === 'white' ? 'Біла' : notebookSpringColor === 'black' ? 'Чорна' : 'Срібло'}, {notebookBindingSide === 'short' ? 'по короткій стороні' : 'по довгій стороні'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Опції */}
+                <div style={{
+                  backgroundColor: '#FFFFFF',
+                  borderRadius: '8px',
+                  border: '1px solid #E2E8F0',
+                  padding: '20px 24px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '16px'
+                }}>
+                  <h3 style={{ fontSize: '13px', fontWeight: '800', color: '#1E293B', textTransform: 'uppercase', letterSpacing: '0.6px', margin: 0 }}>
+                    Опції
+                  </h3>
+
+                  {/* Row 1: Пружина */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px', alignItems: 'flex-end', borderBottom: '1px solid #F1F5F9', paddingBottom: '14px' }}>
+                    <div>
+                      <label style={{ fontSize: '11px', fontWeight: '700', color: '#64748B', display: 'block', marginBottom: '4px' }}>
+                        Колір пружини
+                      </label>
+                      <select
+                        value={notebookSpringColor}
+                        onChange={(e) => setNotebookSpringColor(e.target.value)}
+                        style={{ width: '100%', padding: '7px 10px', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '12px', fontWeight: '700', backgroundColor: '#FFFFFF' }}
+                      >
+                        <option value="white">Біла</option>
+                        <option value="black">Чорна</option>
+                        <option value="silver">Срібло</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label style={{ fontSize: '11px', fontWeight: '700', color: '#64748B', display: 'block', marginBottom: '4px' }}>
+                        Сторона зшивання
+                      </label>
+                      <select
+                        value={notebookBindingSide}
+                        onChange={(e) => setNotebookBindingSide(e.target.value)}
+                        style={{ width: '100%', padding: '7px 10px', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '12px', fontWeight: '700', backgroundColor: '#FFFFFF' }}
+                      >
+                        <option value="short">Зшивання по короткій стороні</option>
+                        <option value="long">Зшивання по довгій стороні</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Row 2: Обкладинка */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '14px', alignItems: 'flex-end', borderBottom: '1px solid #F1F5F9', paddingBottom: '14px' }}>
+                    <div>
+                      <label style={{ fontSize: '11px', fontWeight: '700', color: '#64748B', display: 'block', marginBottom: '4px' }}>
+                        Обкладинка (стор)
+                      </label>
+                      <select
+                        value={notebookCoverPages}
+                        onChange={(e) => setNotebookCoverPages(e.target.value)}
+                        style={{ width: '100%', padding: '7px 10px', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '12px', fontWeight: '700', backgroundColor: '#FFFFFF' }}
+                      >
+                        <option value="2">2 стор (1 аркуш)</option>
+                        <option value="4">4 стор (2 аркуші)</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label style={{ fontSize: '11px', fontWeight: '700', color: '#64748B', display: 'block', marginBottom: '4px' }}>
+                        Матеріал обкладинки
+                      </label>
+                      <select
+                        value={notebookCoverMaterial}
+                        onChange={(e) => setNotebookCoverMaterial(e.target.value)}
+                        style={{ width: '100%', padding: '7px 10px', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '12px', fontWeight: '700', backgroundColor: '#FFFFFF' }}
+                      >
+                        <option value="coat_300">Крейд МАТ 300 г/м²</option>
+                        <option value="coat_350">Крейд МАТ 350 г/м²</option>
+                        <option value="coat_450">Крейд МАТ 450 г/м²</option>
+                        <option value="kraft_275">Крафт 275 г/м²</option>
+                        <option value="card_250">Картон 250 г/м² (білий зворот)</option>
+                        <option value="mondi_300">Mondi DNS 300 г/м²</option>
+                        <option value="dali_285">Dali bianco 285 г/м²</option>
+                        <option value="flora_350">Flora avorio 350 г/м²</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label style={{ fontSize: '11px', fontWeight: '700', color: '#64748B', display: 'block', marginBottom: '4px' }}>
+                        Ламінація обкладинки
+                      </label>
+                      <select
+                        value={notebookCoverCovering}
+                        onChange={(e) => setNotebookCoverCovering(e.target.value)}
+                        style={{ width: '100%', padding: '7px 10px', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '12px', fontWeight: '700', backgroundColor: '#FFFFFF' }}
+                      >
+                        <option value="none">Без покриття</option>
+                        <option value="gloss_10">Глянцева 1+0</option>
+                        <option value="gloss_11">Глянцева 1+1</option>
+                        <option value="mat_10">Матова 1+0</option>
+                        <option value="mat_11">Матова 1+1</option>
+                        <option value="soft_touch">Soft Velvet (Soft-Touch)</option>
+                        <option value="antiscaf">Anti-Scratch (стійка)</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label style={{ fontSize: '11px', fontWeight: '700', color: '#64748B', display: 'block', marginBottom: '4px' }}>
+                        Колірність обкладинки
+                      </label>
+                      <select
+                        value={notebookCoverPrint}
+                        onChange={(e) => setNotebookCoverPrint(e.target.value)}
+                        style={{ width: '100%', padding: '7px 10px', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '12px', fontWeight: '700', backgroundColor: '#FFFFFF' }}
+                      >
+                        <option value="4+4">4+4</option>
+                        <option value="4+0">4+0</option>
+                        <option value="1+0">1+0</option>
+                        <option value="1+1">1+1</option>
+                        <option value="0+0">Без друку</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Row 3: Внутрішній блок */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '14px', alignItems: 'flex-end', borderBottom: '1px solid #F1F5F9', paddingBottom: '14px' }}>
+                    <div>
+                      <label style={{ fontSize: '11px', fontWeight: '700', color: '#64748B', display: 'block', marginBottom: '4px' }}>
+                        Кількість аркушів блоку
+                      </label>
+                      <select
+                        value={notebookBlockPages}
+                        onChange={(e) => setNotebookBlockPages(Number(e.target.value))}
+                        style={{ width: '100%', padding: '7px 10px', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '12px', fontWeight: '700', backgroundColor: '#FFFFFF' }}
+                      >
+                        <option value={25}>25 аркушів</option>
+                        <option value={50}>50 аркушів</option>
+                        <option value={80}>80 аркушів</option>
+                        <option value={100}>100 аркушів</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label style={{ fontSize: '11px', fontWeight: '700', color: '#64748B', display: 'block', marginBottom: '4px' }}>
+                        Папір блоку
+                      </label>
+                      <select
+                        value={notebookBlockMaterial}
+                        onChange={(e) => setNotebookBlockMaterial(e.target.value)}
+                        style={{ width: '100%', padding: '7px 10px', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '12px', fontWeight: '700', backgroundColor: '#FFFFFF' }}
+                      >
+                        <option value="offset_80">Офсет 80 г/м²</option>
+                        <option value="offset_70">Офсет 70 г/м²</option>
+                        <option value="coat_90">Крейд МАТ 90 г/м²</option>
+                        <option value="kraft_80">Крафт 80 г/м²</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label style={{ fontSize: '11px', fontWeight: '700', color: '#64748B', display: 'block', marginBottom: '4px' }}>
+                        Колірність блоку
+                      </label>
+                      <select
+                        value={notebookBlockPrint}
+                        onChange={(e) => setNotebookBlockPrint(e.target.value)}
+                        style={{ width: '100%', padding: '7px 10px', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '12px', fontWeight: '700', backgroundColor: '#FFFFFF' }}
+                      >
+                        <option value="4+4">4+4</option>
+                        <option value="4+0">4+0</option>
+                        <option value="1+0">1+0</option>
+                        <option value="1+1">1+1</option>
+                        <option value="0+0">Без друку</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Row 4: Вставка */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '14px', alignItems: 'flex-end', borderBottom: '1px solid #F1F5F9', paddingBottom: '14px' }}>
+                    <div>
+                      <label style={{ fontSize: '11px', fontWeight: '700', color: '#64748B', display: 'block', marginBottom: '4px' }}>
+                        Вставка
+                      </label>
+                      <select
+                        value={notebookInsert}
+                        onChange={(e) => setNotebookInsert(e.target.value)}
+                        style={{ width: '100%', padding: '7px 10px', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '12px', fontWeight: '700', backgroundColor: '#FFFFFF' }}
+                      >
+                        <option value="none">Без вставки</option>
+                        <option value="1">1 вставка (1 аркуш)</option>
+                        <option value="2">2 вставки (2 аркуші)</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label style={{ fontSize: '11px', fontWeight: '700', color: '#64748B', display: 'block', marginBottom: '4px' }}>
+                        Папір вставки
+                      </label>
+                      <select
+                        disabled={notebookInsert === 'none'}
+                        value={notebookInsertMaterial}
+                        onChange={(e) => setNotebookInsertMaterial(e.target.value)}
+                        style={{ width: '100%', padding: '7px 10px', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '12px', fontWeight: '700', backgroundColor: notebookInsert === 'none' ? '#F8FAFC' : '#FFFFFF', opacity: notebookInsert === 'none' ? 0.6 : 1 }}
+                      >
+                        <option value="coat_80">Крейд МАТ 80 г/м²</option>
+                        <option value="coat_115">Крейд МАТ 115 г/м²</option>
+                        <option value="coat_150">Крейд МАТ 150 г/м²</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label style={{ fontSize: '11px', fontWeight: '700', color: '#64748B', display: 'block', marginBottom: '4px' }}>
+                        Покриття вставки
+                      </label>
+                      <select
+                        disabled={notebookInsert === 'none'}
+                        value={notebookInsertCovering}
+                        onChange={(e) => setNotebookInsertCovering(e.target.value)}
+                        style={{ width: '100%', padding: '7px 10px', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '12px', fontWeight: '700', backgroundColor: notebookInsert === 'none' ? '#F8FAFC' : '#FFFFFF', opacity: notebookInsert === 'none' ? 0.6 : 1 }}
+                      >
+                        <option value="none">Без покриття</option>
+                        <option value="gloss_10">Глянцева 1+0</option>
+                        <option value="mat_10">Матова 1+0</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label style={{ fontSize: '11px', fontWeight: '700', color: '#64748B', display: 'block', marginBottom: '4px' }}>
+                        Колірність вставки
+                      </label>
+                      <select
+                        disabled={notebookInsert === 'none'}
+                        value={notebookInsertPrint}
+                        onChange={(e) => setNotebookInsertPrint(e.target.value)}
+                        style={{ width: '100%', padding: '7px 10px', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '12px', fontWeight: '700', backgroundColor: notebookInsert === 'none' ? '#F8FAFC' : '#FFFFFF', opacity: notebookInsert === 'none' ? 0.6 : 1 }}
+                      >
+                        <option value="4+4">4+4</option>
+                        <option value="4+0">4+0</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Row 5: Підкладка */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '14px', alignItems: 'flex-end', borderBottom: '1px solid #F1F5F9', paddingBottom: '14px' }}>
+                    <div>
+                      <label style={{ fontSize: '11px', fontWeight: '700', color: '#64748B', display: 'block', marginBottom: '4px' }}>
+                        Підкладка (стор)
+                      </label>
+                      <select
+                        value={notebookBackPages}
+                        onChange={(e) => setNotebookBackPages(e.target.value)}
+                        style={{ width: '100%', padding: '7px 10px', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '12px', fontWeight: '700', backgroundColor: '#FFFFFF' }}
+                      >
+                        <option value="2">2 стор (1 аркуш)</option>
+                        <option value="4">4 стор (2 аркуші)</option>
+                        <option value="0">Без підкладки</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label style={{ fontSize: '11px', fontWeight: '700', color: '#64748B', display: 'block', marginBottom: '4px' }}>
+                        Матеріал підкладки
+                      </label>
+                      <select
+                        disabled={notebookBackPages === '0'}
+                        value={notebookBackMaterial}
+                        onChange={(e) => setNotebookBackMaterial(e.target.value)}
+                        style={{ width: '100%', padding: '7px 10px', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '12px', fontWeight: '700', backgroundColor: notebookBackPages === '0' ? '#F8FAFC' : '#FFFFFF', opacity: notebookBackPages === '0' ? 0.6 : 1 }}
+                      >
+                        <option value="coat_300">Крейд МАТ 300 г/м²</option>
+                        <option value="card_250">Картон 250 г/м²</option>
+                        <option value="kraft_275">Крафт 275 г/м²</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label style={{ fontSize: '11px', fontWeight: '700', color: '#64748B', display: 'block', marginBottom: '4px' }}>
+                        Покриття підкладки
+                      </label>
+                      <select
+                        disabled={notebookBackPages === '0'}
+                        value={notebookBackCovering}
+                        onChange={(e) => setNotebookBackCovering(e.target.value)}
+                        style={{ width: '100%', padding: '7px 10px', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '12px', fontWeight: '700', backgroundColor: notebookBackPages === '0' ? '#F8FAFC' : '#FFFFFF', opacity: notebookBackPages === '0' ? 0.6 : 1 }}
+                      >
+                        <option value="none">Без покриття</option>
+                        <option value="mat_10">Матова 1+0</option>
+                        <option value="gloss_10">Глянцева 1+0</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label style={{ fontSize: '11px', fontWeight: '700', color: '#64748B', display: 'block', marginBottom: '4px' }}>
+                        Колірність підкладки
+                      </label>
+                      <select
+                        disabled={notebookBackPages === '0'}
+                        value={notebookBackPrint}
+                        onChange={(e) => setNotebookBackPrint(e.target.value)}
+                        style={{ width: '100%', padding: '7px 10px', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '12px', fontWeight: '700', backgroundColor: notebookBackPages === '0' ? '#F8FAFC' : '#FFFFFF', opacity: notebookBackPages === '0' ? 0.6 : 1 }}
+                      >
+                        <option value="4+4">4+4</option>
+                        <option value="4+0">4+0</option>
+                        <option value="0+0">Без друку</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  {/* Row 6: Перфорація & Пакування */}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '14px', alignItems: 'flex-end' }}>
+                    <div>
+                      <label style={{ fontSize: '11px', fontWeight: '700', color: '#64748B', display: 'block', marginBottom: '4px' }}>
+                        Перфорація на листах блока
+                      </label>
+                      <select
+                        value={notebookPerforation}
+                        onChange={(e) => setNotebookPerforation(e.target.value)}
+                        style={{ width: '100%', padding: '7px 10px', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '12px', fontWeight: '700', backgroundColor: '#FFFFFF' }}
+                      >
+                        <option value="no">Ні</option>
+                        <option value="yes">Так (лінія відриву)</option>
+                      </select>
+                    </div>
+
+                    {notebookPerforation === 'yes' && (
+                      <div>
+                        <label style={{ fontSize: '11px', fontWeight: '700', color: '#64748B', display: 'block', marginBottom: '4px' }}>
+                          Обсяг перфорації
+                        </label>
+                        <select
+                          value={notebookPerforationScope}
+                          onChange={(e) => setNotebookPerforationScope(e.target.value)}
+                          style={{ width: '100%', padding: '7px 10px', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '12px', fontWeight: '700', backgroundColor: '#FFFFFF' }}
+                        >
+                          <option value="1">1 лист</option>
+                          <option value="all">Усі листи блоку</option>
+                        </select>
+                      </div>
+                    )}
+
+                    <div>
+                      <label style={{ fontSize: '11px', fontWeight: '700', color: '#64748B', display: 'block', marginBottom: '4px' }}>
+                        Пакування в ПЕТ
+                      </label>
+                      <select
+                        value={notebookPackaging}
+                        onChange={(e) => setNotebookPackaging(e.target.value)}
+                        style={{ width: '100%', padding: '7px 10px', borderRadius: '6px', border: '1px solid #CBD5E1', fontSize: '12px', fontWeight: '700', backgroundColor: '#FFFFFF' }}
+                      >
+                        <option value="no">Ні</option>
+                        <option value="yes">Поштучно в термозбіжну плівку (ПЕТ)</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Blue Info Alert */}
+                <div style={{
+                  backgroundColor: '#EFF6FF',
+                  border: '1px solid #BFDBFE',
+                  borderRadius: '8px',
+                  padding: '12px 18px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  color: '#1E40AF',
+                  fontSize: '13px',
+                  fontWeight: '700'
+                }}>
+                  <span style={{ fontSize: '16px' }}>ℹ️</span>
+                  <span>
+                    Для розробки макету — товщина корінця ~ {totalSpineThickness} мм . Пружина — {spiralPitch}
+                  </span>
+                </div>
+
+                {/* Red Price Matrix Table */}
+                <div style={{
+                  backgroundColor: '#FFFFFF',
+                  borderRadius: '8px',
+                  border: '1px solid #E2E8F0',
+                  overflow: 'hidden',
+                  boxShadow: '0 2px 10px rgba(0,0,0,0.04)'
+                }}>
+                  {/* Red Top Bar */}
+                  <div style={{
+                    backgroundColor: '#C00000',
+                    color: '#FFFFFF',
+                    padding: '12px 18px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    flexWrap: 'wrap',
+                    gap: '12px'
+                  }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
+                      <span style={{ fontSize: '13px', fontWeight: '800', letterSpacing: '0.5px' }}>
+                        ВАРТІСТЬ ЗАМОВЛЕННЯ
+                      </span>
+                      {/* Delivery toggle */}
+                      <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', fontWeight: '600', cursor: 'pointer' }}>
+                        <input
+                          type="checkbox"
+                          checked={notebookWithDelivery}
+                          onChange={(e) => setNotebookWithDelivery(e.target.checked)}
+                          style={{ cursor: 'pointer', accentColor: '#FFFFFF' }}
+                        />
+                        <span>з доставкою</span>
+                      </label>
+                      {/* Price Var toggle */}
+                      <div style={{ display: 'flex', alignItems: 'center', backgroundColor: 'rgba(0,0,0,0.2)', padding: '2px 4px', borderRadius: '4px' }}>
+                        <button
+                          type="button"
+                          onClick={() => setNotebookPriceCostVar('per_tirazh')}
+                          style={{
+                            border: 'none',
+                            backgroundColor: notebookPriceCostVar === 'per_tirazh' ? '#FFFFFF' : 'transparent',
+                            color: notebookPriceCostVar === 'per_tirazh' ? '#C00000' : '#FFFFFF',
+                            fontSize: '11px',
+                            fontWeight: '700',
+                            padding: '3px 8px',
+                            borderRadius: '3px',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          За наклад
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setNotebookPriceCostVar('per_item')}
+                          style={{
+                            border: 'none',
+                            backgroundColor: notebookPriceCostVar === 'per_item' ? '#FFFFFF' : 'transparent',
+                            color: notebookPriceCostVar === 'per_item' ? '#C00000' : '#FFFFFF',
+                            fontSize: '11px',
+                            fontWeight: '700',
+                            padding: '3px 8px',
+                            borderRadius: '3px',
+                            cursor: 'pointer'
+                          }}
+                        >
+                          За екземпляр
+                        </button>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => alert('Експорт прайсу блокнотів у Excel згенеровано')}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        border: '1px solid rgba(255,255,255,0.4)',
+                        backgroundColor: 'rgba(255,255,255,0.15)',
+                        color: '#FFFFFF',
+                        padding: '5px 10px',
+                        borderRadius: '4px',
+                        fontSize: '11.5px',
+                        fontWeight: '700',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      <FileText size={13} />
+                      <span>Excel</span>
+                    </button>
+                  </div>
+
+                  {/* Table */}
+                  <div style={{ overflowX: 'auto' }}>
+                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px', textAlign: 'center' }}>
+                      <thead>
+                        <tr style={{ backgroundColor: '#F8FAFC', borderBottom: '1px solid #E2E8F0', color: '#475569', fontWeight: '700' }}>
+                          <th style={{ padding: '10px 14px', textAlign: 'left', minWidth: '180px' }}>Розмір / Опис</th>
+                          <th style={{ padding: '10px 14px', minWidth: '130px' }}>Готовність</th>
+                          {[1, 25, 50, 75, 100, 200, 500].map(qty => (
+                            <th key={qty} style={{ padding: '10px 12px', minWidth: '95px' }}>
+                              <span style={{ fontSize: '13px', fontWeight: '800', color: '#0F172A' }}>{qty}</span>
+                              <span style={{ fontSize: '10px', color: '#94A3B8', display: 'block' }}>шт ▼</span>
+                            </th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {/* Row 1: Urgent 2 Days */}
+                        <tr style={{ borderBottom: '1px solid #F1F5F9', transition: 'background-color 0.1s' }} className="hover:bg-amber-50/40">
+                          <td style={{ padding: '12px 14px', textAlign: 'left', fontWeight: '700', color: '#1E293B' }}>
+                            {formatTitle} ({wMm} × {hMm}) {totalSheets} листів
+                          </td>
+                          <td style={{ padding: '12px 14px' }}>
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', backgroundColor: '#FEF3C7', color: '#92400E', padding: '3px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: '700' }}>
+                              2д на {getFormattedFutureDate(2)}
+                            </span>
+                          </td>
+                          {[1, 25, 50, 75, 100, 200, 500].map(qty => {
+                            const price = computeNotepadPrice(qty, 2);
+                            return (
+                              <td
+                                key={qty}
+                                onClick={() => handleAddNotepadToOrder(qty, 2, price)}
+                                style={{
+                                  padding: '12px 10px',
+                                  fontWeight: '800',
+                                  color: '#C00000',
+                                  cursor: 'pointer',
+                                  fontSize: '12.5px'
+                                }}
+                                className="hover:bg-red-50 hover:underline"
+                                title={`Замовити ${qty} шт за ${price.toFixed(2)} ₴`}
+                              >
+                                {notebookPriceCostVar === 'per_tirazh' ? price.toFixed(2) : (price / qty).toFixed(2)} ₴
+                              </td>
+                            );
+                          })}
+                        </tr>
+
+                        {/* Row 2: Standard 3 Days */}
+                        <tr style={{ transition: 'background-color 0.1s' }} className="hover:bg-blue-50/40">
+                          <td style={{ padding: '12px 14px', textAlign: 'left', fontWeight: '700', color: '#1E293B' }}>
+                            {formatTitle} ({wMm} × {hMm}) {totalSheets} листів
+                          </td>
+                          <td style={{ padding: '12px 14px' }}>
+                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', backgroundColor: '#DBEAFE', color: '#1E40AF', padding: '3px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: '700' }}>
+                              3д на {getFormattedFutureDate(3)}
+                            </span>
+                          </td>
+                          {[1, 25, 50, 75, 100, 200, 500].map(qty => {
+                            const price = computeNotepadPrice(qty, 3);
+                            return (
+                              <td
+                                key={qty}
+                                onClick={() => handleAddNotepadToOrder(qty, 3, price)}
+                                style={{
+                                  padding: '12px 10px',
+                                  fontWeight: '800',
+                                  color: '#0F172A',
+                                  cursor: 'pointer',
+                                  fontSize: '12.5px'
+                                }}
+                                className="hover:bg-blue-50 hover:underline"
+                                title={`Замовити ${qty} шт за ${price.toFixed(2)} ₴`}
+                              >
+                                {notebookPriceCostVar === 'per_tirazh' ? price.toFixed(2) : (price / qty).toFixed(2)} ₴
+                              </td>
+                            );
+                          })}
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+              </div>
+            );
+          })()}
         </div>
       ) : (
         <div className="flex flex-col gap-6">
