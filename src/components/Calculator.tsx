@@ -1496,19 +1496,14 @@ export const Calculator: React.FC = () => {
                     {hoveredMegaProduct === 'cards' && (
                       <div className="flex flex-col items-center text-center animate-fadeIn">
                         <svg width="220" height="150" viewBox="0 0 220 150" fill="none">
-                          {/* Back Card (Tilted slightly) */}
                           <g transform="rotate(8 135 65)">
                             <rect x="55" y="15" width="130" height="80" rx="3" fill="#FFFFFF" stroke="#1E293B" strokeWidth="2.2"/>
                             <line x1="72" y1="40" x2="168" y2="40" stroke="#1E293B" strokeWidth="2.5" strokeLinecap="round"/>
                             <line x1="72" y1="52" x2="145" y2="52" stroke="#1E293B" strokeWidth="2.5" strokeLinecap="round"/>
                           </g>
-
-                          {/* Front Card (Straight) */}
                           <rect x="25" y="48" width="135" height="82" rx="3" fill="#FFFFFF" stroke="#1E293B" strokeWidth="2.2"/>
-                          {/* Red square logo in center */}
                           <rect x="76" y="62" width="32" height="24" rx="2" fill="none" stroke="#E11D48" strokeWidth="3"/>
                           <rect x="86" y="70" width="12" height="8" rx="1" fill="#E11D48"/>
-                          {/* Bottom horizontal text lines */}
                           <line x1="45" y1="102" x2="140" y2="102" stroke="#1E293B" strokeWidth="2.5" strokeLinecap="round"/>
                           <line x1="45" y1="114" x2="115" y2="114" stroke="#1E293B" strokeWidth="2.5" strokeLinecap="round"/>
                         </svg>
@@ -1528,7 +1523,6 @@ export const Calculator: React.FC = () => {
                           <ellipse cx="100" cy="36" rx="55" ry="16" fill="#F1F5F9" stroke="#1E293B" strokeWidth="2.2"/>
                           <path d="M45 36V100C45 110 70 118 100 118C130 118 155 110 155 100V36" fill="#FFFFFF" stroke="#1E293B" strokeWidth="2.2"/>
                           <ellipse cx="100" cy="100" rx="55" ry="16" fill="#FFFFFF" stroke="#1E293B" strokeWidth="1.8"/>
-                          {/* Unwinding label tape */}
                           <path d="M48 88L12 125H72L108 88" fill="#FFFFFF" stroke="#E11D48" strokeWidth="2"/>
                           <rect x="25" y="98" width="30" height="10" rx="2" fill="#E11D48" fillOpacity="0.8"/>
                           <line x1="28" y1="116" x2="55" y2="116" stroke="#1E293B" strokeWidth="2"/>
@@ -1548,12 +1542,10 @@ export const Calculator: React.FC = () => {
                       <div className="flex flex-col items-center text-center animate-fadeIn">
                         <svg width="210" height="140" viewBox="0 0 210 140" fill="none">
                           <rect x="20" y="25" width="170" height="85" rx="4" fill="#FFFFFF" stroke="#1E293B" strokeWidth="2.2"/>
-                          {/* Grommets / eyelets */}
                           <circle cx="32" cy="37" r="4.5" fill="#E2E8F0" stroke="#1E293B" strokeWidth="1.8"/>
                           <circle cx="178" cy="37" r="4.5" fill="#E2E8F0" stroke="#1E293B" strokeWidth="1.8"/>
                           <circle cx="32" cy="98" r="4.5" fill="#E2E8F0" stroke="#1E293B" strokeWidth="1.8"/>
                           <circle cx="178" cy="98" r="4.5" fill="#E2E8F0" stroke="#1E293B" strokeWidth="1.8"/>
-                          {/* Banner graphic */}
                           <rect x="48" y="42" width="114" height="50" rx="3" fill="#E11D48" fillOpacity="0.08" stroke="#E11D48" strokeWidth="1.8"/>
                           <text x="74" y="73" fill="#E11D48" fontSize="14" fontWeight="900" letterSpacing="2">BANNER</text>
                         </svg>
@@ -1592,7 +1584,6 @@ export const Calculator: React.FC = () => {
                       <div className="flex flex-col items-center text-center animate-fadeIn">
                         <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
                           <rect x="50" y="25" width="105" height="105" rx="5" fill="#FFFFFF" stroke="#1E293B" strokeWidth="2.2"/>
-                          {/* Spiral coils along top */}
                           {[62, 74, 86, 98, 110, 122, 134, 146].map(x => (
                             <ellipse key={x} cx={x} cy="25" rx="3.5" ry="7" fill="#E2E8F0" stroke="#1E293B" strokeWidth="1.8"/>
                           ))}
@@ -1613,9 +1604,7 @@ export const Calculator: React.FC = () => {
                     {hoveredMegaProduct === 'brochures' && (
                       <div className="flex flex-col items-center text-center animate-fadeIn">
                         <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
-                          {/* Left page */}
                           <path d="M100 25C70 20 35 22 25 28V118C35 112 70 110 100 115V25Z" fill="#FFFFFF" stroke="#1E293B" strokeWidth="2.2"/>
-                          {/* Right page */}
                           <path d="M100 25C130 20 165 22 175 28V118C165 112 130 110 100 115V25Z" fill="#FFFFFF" stroke="#1E293B" strokeWidth="2.2"/>
                           <line x1="100" y1="25" x2="100" y2="115" stroke="#E11D48" strokeWidth="3"/>
                           <line x1="40" y1="50" x2="85" y2="48" stroke="#94A3B8" strokeWidth="2"/>
@@ -1673,14 +1662,46 @@ export const Calculator: React.FC = () => {
                       </div>
                     )}
 
-                    {/* 9. Calendar Grids (Календарні сітки) */}
+                    {/* 9. Samples (Зразки матеріалів) */}
+                    {hoveredMegaProduct === 'samples' && (
+                      <div className="flex flex-col items-center text-center animate-fadeIn">
+                        <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
+                          {/* Fanned out material swatch sheets */}
+                          <g transform="rotate(-25 50 120)">
+                            <rect x="50" y="30" width="55" height="90" rx="3" fill="#E2E8F0" stroke="#1E293B" strokeWidth="2"/>
+                          </g>
+                          <g transform="rotate(-10 50 120)">
+                            <rect x="50" y="30" width="55" height="90" rx="3" fill="#CBD5E1" stroke="#1E293B" strokeWidth="2"/>
+                          </g>
+                          <g transform="rotate(5 50 120)">
+                            <rect x="50" y="30" width="55" height="90" rx="3" fill="#F8FAFC" stroke="#1E293B" strokeWidth="2"/>
+                            <rect x="58" y="42" width="38" height="12" rx="2" fill="#E11D48"/>
+                          </g>
+                          <g transform="rotate(20 50 120)">
+                            <rect x="50" y="30" width="55" height="90" rx="3" fill="#FFFFFF" stroke="#1E293B" strokeWidth="2.2"/>
+                            <line x1="58" y1="45" x2="95" y2="45" stroke="#1E293B" strokeWidth="2"/>
+                            <line x1="58" y1="55" x2="85" y2="55" stroke="#94A3B8" strokeWidth="2"/>
+                          </g>
+                          {/* Pivot screw */}
+                          <circle cx="50" cy="115" r="6" fill="#E11D48" stroke="#1E293B" strokeWidth="2"/>
+                          <line x1="47" y1="115" x2="53" y2="115" stroke="#FFFFFF" strokeWidth="2"/>
+                        </svg>
+                        <h4 style={{ fontSize: '13.5px', fontWeight: '800', color: '#1e293b', marginTop: '12px' }}>
+                          Віяло зразків матеріалів
+                        </h4>
+                        <p style={{ fontSize: '11px', color: '#64748b', margin: '4px 0 0 0', maxWidth: '220px' }}>
+                          Зразки крейдованого, офсетного, дизайнерського паперу, плівок та ламінації.
+                        </p>
+                      </div>
+                    )}
+
+                    {/* 10. Calendar Grids (Календарні сітки) */}
                     {hoveredMegaProduct === 'calendar_grid' && (
                       <div className="flex flex-col items-center text-center animate-fadeIn">
                         <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
                           <rect x="30" y="20" width="140" height="105" rx="4" fill="#FFFFFF" stroke="#1E293B" strokeWidth="2.2"/>
                           <rect x="30" y="20" width="140" height="24" fill="#E11D48"/>
                           <text x="40" y="36" fill="#FFFFFF" fontSize="11" fontWeight="bold">2026 СІЧЕНЬ</text>
-                          {/* Calendar Cells */}
                           {[42, 68, 94, 120, 146].map(x => (
                             [54, 74, 94, 114].map(y => (
                               <rect key={`${x}-${y}`} x={x} y={y} width="16" height="12" rx="2" fill="#F1F5F9"/>
@@ -1696,13 +1717,11 @@ export const Calculator: React.FC = () => {
                       </div>
                     )}
 
-                    {/* 10. Calendars (Календарі) */}
+                    {/* 11. Calendars (Календарі) */}
                     {hoveredMegaProduct === 'calendars' && (
                       <div className="flex flex-col items-center text-center animate-fadeIn">
                         <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
-                          {/* Desk tent shape */}
                           <path d="M40 120L100 30L160 120H40Z" fill="#F8FAFC" stroke="#1E293B" strokeWidth="2.2"/>
-                          {/* Front face */}
                           <rect x="65" y="45" width="70" height="65" rx="3" fill="#FFFFFF" stroke="#1E293B" strokeWidth="1.8"/>
                           <rect x="65" y="45" width="70" height="16" fill="#E11D48"/>
                           <line x1="72" y1="72" x2="128" y2="72" stroke="#94A3B8" strokeWidth="2"/>
@@ -1718,7 +1737,84 @@ export const Calculator: React.FC = () => {
                       </div>
                     )}
 
-                    {/* 11. Envelopes (Конверти) */}
+                    {/* 12. Mounted Box / Hardcover (Каширована продукція) */}
+                    {hoveredMegaProduct === 'mounted' && (
+                      <div className="flex flex-col items-center text-center animate-fadeIn">
+                        <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
+                          {/* 3D Isometric Rigid Gift Box */}
+                          <path d="M100 22L165 52L100 82L35 52L100 22Z" fill="#FFFFFF" stroke="#1E293B" strokeWidth="2.2"/>
+                          <path d="M35 52V105L100 135V82L35 52Z" fill="#F1F5F9" stroke="#1E293B" strokeWidth="2.2"/>
+                          <path d="M165 52V105L100 135V82L165 52Z" fill="#E2E8F0" stroke="#1E293B" strokeWidth="2.2"/>
+                          {/* Premium Red Ribbon / Foil Stamp */}
+                          <path d="M92 26L157 56L147 61L82 31L92 26Z" fill="#E11D48"/>
+                          <path d="M152 59V112L142 116V63L152 59Z" fill="#BE123C"/>
+                          <rect x="88" y="70" width="24" height="24" rx="2" fill="#E11D48" fillOpacity="0.15" stroke="#E11D48" strokeWidth="1.5"/>
+                        </svg>
+                        <h4 style={{ fontSize: '13.5px', fontWeight: '800', color: '#1e293b', marginTop: '12px' }}>
+                          Каширована продукція та Упаковка
+                        </h4>
+                        <p style={{ fontSize: '11px', color: '#64748b', margin: '4px 0 0 0', maxWidth: '220px' }}>
+                          Тверда палітурка на палітурному картоні 1.5–3 мм, преміум коробки кришка-дно.
+                        </p>
+                      </div>
+                    )}
+
+                    {/* 13. Tickets & Vouchers (Квитки, Купони) */}
+                    {hoveredMegaProduct === 'tickets' && (
+                      <div className="flex flex-col items-center text-center animate-fadeIn">
+                        <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
+                          <rect x="25" y="40" width="150" height="75" rx="5" fill="#FFFFFF" stroke="#1E293B" strokeWidth="2.2"/>
+                          {/* Dotted Perforation Line with semicircles */}
+                          <line x1="75" y1="40" x2="75" y2="115" stroke="#1E293B" strokeWidth="2" strokeDasharray="4 4"/>
+                          <circle cx="75" cy="40" r="5" fill="#FAFBFC" stroke="#1E293B" strokeWidth="2"/>
+                          <circle cx="75" cy="115" r="5" fill="#FAFBFC" stroke="#1E293B" strokeWidth="2"/>
+                          {/* Stub elements */}
+                          <rect x="35" y="52" width="28" height="12" rx="2" fill="#E11D48"/>
+                          <text x="37" y="61" fill="#FFFFFF" fontSize="7" fontWeight="bold">TICKET</text>
+                          <line x1="35" y1="85" x2="65" y2="85" stroke="#1E293B" strokeWidth="2"/>
+                          <line x1="35" y1="95" x2="58" y2="95" stroke="#94A3B8" strokeWidth="2"/>
+                          {/* Main ticket body */}
+                          <line x1="90" y1="55" x2="160" y2="55" stroke="#1E293B" strokeWidth="2.5"/>
+                          <line x1="90" y1="67" x2="145" y2="67" stroke="#94A3B8" strokeWidth="2"/>
+                          {/* Barcode */}
+                          {[90, 94, 97, 102, 105, 110, 113, 118, 122].map((bx, i) => (
+                            <line key={i} x1={bx} y1="85" x2={bx} y2="105" stroke="#1E293B" strokeWidth={i % 2 === 0 ? 2.5 : 1.5}/>
+                          ))}
+                          <text x="135" y="98" fill="#E11D48" fontSize="10" fontWeight="extrabold">№00482</text>
+                        </svg>
+                        <h4 style={{ fontSize: '13.5px', fontWeight: '800', color: '#1e293b', marginTop: '12px' }}>
+                          Квитки та Купони
+                        </h4>
+                        <p style={{ fontSize: '11px', color: '#64748b', margin: '4px 0 0 0', maxWidth: '220px' }}>
+                          З відривною перфорацією, індивідуальною нумерацією та захисними штрих-кодами.
+                        </p>
+                      </div>
+                    )}
+
+                    {/* 14. Color Films / Oracal (Кольорові плівки) */}
+                    {hoveredMegaProduct === 'color_films' && (
+                      <div className="flex flex-col items-center text-center animate-fadeIn">
+                        <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
+                          <ellipse cx="50" cy="45" rx="18" ry="8" fill="#E2E8F0" stroke="#1E293B" strokeWidth="2"/>
+                          <path d="M32 45V115C32 119.5 40 123 50 123C60 123 68 119.5 68 115V45" fill="#CBD5E1" stroke="#1E293B" strokeWidth="2"/>
+                          <ellipse cx="50" cy="115" rx="18" ry="8" fill="#FFFFFF" stroke="#1E293B" strokeWidth="1.5"/>
+                          {/* Unrolled vinyl sheet with plotter cut-out shape */}
+                          <path d="M50 85L170 55V125L50 123" fill="#E11D48" fillOpacity="0.1" stroke="#E11D48" strokeWidth="2"/>
+                          <path d="M90 75L135 65L125 105L80 115Z" fill="#E11D48" stroke="#1E293B" strokeWidth="2"/>
+                          {/* Knife tip */}
+                          <path d="M148 50L135 65L140 70Z" fill="#1E293B"/>
+                          <line x1="148" y1="50" x2="165" y2="33" stroke="#1E293B" strokeWidth="3"/>
+                        </svg>
+                        <h4 style={{ fontSize: '13.5px', fontWeight: '800', color: '#1e293b', marginTop: '12px' }}>
+                          Плотерна порізка ORACAL 641
+                        </h4>
+                        <p style={{ fontSize: '11px', color: '#64748b', margin: '4px 0 0 0', maxWidth: '220px' }}>
+                          Контурна порізка написів, логотипів та графіки з 60 кольорів глянцевих і матових плівок.
+                        </p>
+                      </div>
+                    )}
+
+                    {/* 15. Envelopes (Конверти) */}
                     {hoveredMegaProduct === 'envelopes' && (
                       <div className="flex flex-col items-center text-center animate-fadeIn">
                         <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
@@ -1737,7 +1833,7 @@ export const Calculator: React.FC = () => {
                       </div>
                     )}
 
-                    {/* 12. Sticky Notes / Cubes (Листи для запису) */}
+                    {/* 16. Sticky Notes / Cubes (Листи для запису) */}
                     {hoveredMegaProduct === 'cubes' && (
                       <div className="flex flex-col items-center text-center animate-fadeIn">
                         <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
@@ -1757,65 +1853,128 @@ export const Calculator: React.FC = () => {
                       </div>
                     )}
 
-                    {/* 13. Folders (Папки з вклеєною кишенею) */}
-                    {hoveredMegaProduct === 'folders' && (
+                    {/* 17. Postcards & Invitations (Листівки, Запрошення) */}
+                    {hoveredMegaProduct === 'postcards' && (
                       <div className="flex flex-col items-center text-center animate-fadeIn">
                         <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
-                          <path d="M30 25H105L125 42H170V125H30V25Z" fill="#FFFFFF" stroke="#1E293B" strokeWidth="2.2"/>
-                          <path d="M30 85H115V125H30V85Z" fill="#E11D48" fillOpacity="0.12" stroke="#E11D48" strokeWidth="2"/>
-                          <rect x="42" y="95" width="36" height="18" rx="2" fill="#FFFFFF" stroke="#1E293B" strokeWidth="1.5"/>
-                          <line x1="50" y1="52" x2="95" y2="52" stroke="#1E293B" strokeWidth="2"/>
-                          <line x1="50" y1="62" x2="85" y2="62" stroke="#94A3B8" strokeWidth="2"/>
+                          {/* Standing folded invitation card */}
+                          <path d="M40 120L75 35L145 25L110 110L40 120Z" fill="#FFFFFF" stroke="#1E293B" strokeWidth="2.2"/>
+                          <path d="M145 25L170 45L135 128L110 110L145 25Z" fill="#F1F5F9" stroke="#1E293B" strokeWidth="2"/>
+                          <circle cx="95" cy="65" r="14" fill="#E11D48" fillOpacity="0.1" stroke="#E11D48" strokeWidth="1.8"/>
+                          <text x="89" y="70" fill="#E11D48" fontSize="13" fontWeight="bold">❦</text>
+                          <line x1="68" y1="90" x2="120" y2="83" stroke="#1E293B" strokeWidth="2"/>
+                          <line x1="72" y1="98" x2="112" y2="92" stroke="#94A3B8" strokeWidth="2"/>
                         </svg>
                         <h4 style={{ fontSize: '13.5px', fontWeight: '800', color: '#1e293b', marginTop: '12px' }}>
-                          Папки А4 з кишенею
+                          Листівки та Запрошення
                         </h4>
                         <p style={{ fontSize: '11px', color: '#64748b', margin: '4px 0 0 0', maxWidth: '220px' }}>
-                          Фірмові картонні папки з суцільновисічною або вклеєною кишенею під візитку.
+                          Весільні, святкові та корпоративні запрошення з тисненням фольгою або калькою.
                         </p>
                       </div>
                     )}
 
-                    {/* 14. Plastic Cards (Пластикові карти) */}
-                    {hoveredMegaProduct === 'plastic_cards' && (
+                    {/* 18. Flyers (Листівки, Флаєри) */}
+                    {hoveredMegaProduct === 'flyers' && (
                       <div className="flex flex-col items-center text-center animate-fadeIn">
                         <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
-                          <rect x="30" y="32" width="140" height="86" rx="8" fill="#1E293B" stroke="#0F172A" strokeWidth="2.2"/>
-                          <rect x="30" y="48" width="140" height="18" fill="#0F172A"/>
-                          <rect x="45" y="78" width="28" height="20" rx="3" fill="#F59E0B" stroke="#D97706" strokeWidth="1.5"/>
-                          <text x="85" y="92" fill="#FFFFFF" fontSize="12" fontWeight="bold" letterSpacing="1">VIP CARD</text>
+                          <rect x="55" y="18" width="90" height="115" rx="4" fill="#FFFFFF" stroke="#1E293B" strokeWidth="2.2"/>
+                          <rect x="65" y="28" width="70" height="35" rx="3" fill="#E11D48" fillOpacity="0.12" stroke="#E11D48" strokeWidth="1.5"/>
+                          <circle cx="80" cy="45" r="7" fill="#E11D48"/>
+                          <line x1="65" y1="74" x2="135" y2="74" stroke="#1E293B" strokeWidth="2.5" strokeLinecap="round"/>
+                          <line x1="65" y1="84" x2="125" y2="84" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round"/>
+                          <line x1="65" y1="94" x2="130" y2="94" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round"/>
+                          {/* Discount tag badge */}
+                          <rect x="110" y="105" width="26" height="18" rx="2" fill="#E11D48"/>
+                          <text x="114" y="118" fill="#FFFFFF" fontSize="9" fontWeight="bold">-%</text>
                         </svg>
                         <h4 style={{ fontSize: '13.5px', fontWeight: '800', color: '#1e293b', marginTop: '12px' }}>
-                          Пластикові картки
+                          Рекламні Флаєри та Листівки
                         </h4>
                         <p style={{ fontSize: '11px', color: '#64748b', margin: '4px 0 0 0', maxWidth: '220px' }}>
-                          Товщина 0.76 мм, магнітна смуга HiCo, ембосування та безконтактні чипи RFID.
+                          Єврофлаєри (210×100 мм), А6, А5, А4 на глянцевому або матовому папері 130–350г.
                         </p>
                       </div>
                     )}
 
-                    {/* 15. Posters & Wall Art (Полотна, Картини) */}
-                    {hoveredMegaProduct === 'canvas' && (
+                    {/* 19. Magnets (Магніти) */}
+                    {hoveredMegaProduct === 'magnets' && (
                       <div className="flex flex-col items-center text-center animate-fadeIn">
                         <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
-                          <rect x="35" y="25" width="130" height="95" rx="3" fill="#FFFFFF" stroke="#1E293B" strokeWidth="2.2"/>
-                          {/* Artwork mountain vector */}
-                          <path d="M35 100L75 55L110 85L135 65L165 100H35Z" fill="#E11D48" fillOpacity="0.15" stroke="#E11D48" strokeWidth="2"/>
-                          <circle cx="65" cy="50" r="10" fill="#F59E0B"/>
-                          {/* 3D wooden stretcher depth */}
-                          <path d="M165 28L175 35V128L165 120V28Z" fill="#CBD5E1" stroke="#1E293B" strokeWidth="1.8"/>
-                          <path d="M38 120L48 128H175L165 120H38Z" fill="#94A3B8" stroke="#1E293B" strokeWidth="1.8"/>
+                          {/* Horseshoe magnet shape */}
+                          <path d="M60 40V80C60 102 78 120 100 120C122 120 140 102 140 80V40H115V80C115 88 108 95 100 95C92 95 85 88 85 80V40H60Z" fill="#FFFFFF" stroke="#1E293B" strokeWidth="2.2"/>
+                          {/* Pole tips */}
+                          <rect x="60" y="40" width="25" height="18" fill="#E11D48" stroke="#1E293B" strokeWidth="2"/>
+                          <text x="68" y="53" fill="#FFFFFF" fontSize="10" fontWeight="bold">N</text>
+                          <rect x="115" y="40" width="25" height="18" fill="#007AFF" stroke="#1E293B" strokeWidth="2"/>
+                          <text x="124" y="53" fill="#FFFFFF" fontSize="10" fontWeight="bold">S</text>
+                          {/* Magnetic wave arcs */}
+                          <path d="M48 40C40 60 40 100 65 125" stroke="#E11D48" strokeWidth="2" strokeDasharray="3 3"/>
+                          <path d="M152 40C160 60 160 100 135 125" stroke="#007AFF" strokeWidth="2" strokeDasharray="3 3"/>
                         </svg>
                         <h4 style={{ fontSize: '13.5px', fontWeight: '800', color: '#1e293b', marginTop: '12px' }}>
-                          Друк картин на полотні
+                          Сувенірні та Плоскі Магніти
                         </h4>
                         <p style={{ fontSize: '11px', color: '#64748b', margin: '4px 0 0 0', maxWidth: '220px' }}>
-                          Натуральне бавовняне полотно, галерейна натяжка на дерев'яний підрамник.
+                          Магнітний вініл 0.4–0.7 мм з глянцевою ламінацією та прямою або фігурною висічкою.
                         </p>
                       </div>
                     )}
 
-                    {/* 16. Stickers & Labels (Наліпки, Стікери) */}
+                    {/* 20. Menu (Меню) */}
+                    {hoveredMegaProduct === 'menu' && (
+                      <div className="flex flex-col items-center text-center animate-fadeIn">
+                        <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
+                          {/* Menu folder booklet */}
+                          <rect x="45" y="20" width="110" height="110" rx="4" fill="#FFFFFF" stroke="#1E293B" strokeWidth="2.2"/>
+                          <rect x="45" y="20" width="15" height="110" fill="#E2E8F0" stroke="#1E293B" strokeWidth="2"/>
+                          {/* Spine screws */}
+                          <circle cx="52" cy="35" r="3" fill="#E11D48"/>
+                          <circle cx="52" cy="75" r="3" fill="#E11D48"/>
+                          <circle cx="52" cy="115" r="3" fill="#E11D48"/>
+                          {/* Fork & Knife emblem */}
+                          <rect x="80" y="38" width="40" height="30" rx="3" fill="#E11D48" fillOpacity="0.1" stroke="#E11D48" strokeWidth="1.5"/>
+                          <text x="88" y="58" fill="#E11D48" fontSize="16" fontWeight="bold">🍴</text>
+                          <line x1="72" y1="80" x2="138" y2="80" stroke="#1E293B" strokeWidth="2"/>
+                          <line x1="72" y1="92" x2="128" y2="92" stroke="#94A3B8" strokeWidth="2"/>
+                          <line x1="72" y1="104" x2="134" y2="104" stroke="#94A3B8" strokeWidth="2"/>
+                        </svg>
+                        <h4 style={{ fontSize: '13.5px', fontWeight: '800', color: '#1e293b', marginTop: '12px' }}>
+                          Меню для ресторанів та HoReCa
+                        </h4>
+                        <p style={{ fontSize: '11px', color: '#64748b', margin: '4px 0 0 0', maxWidth: '220px' }}>
+                          Меню-папки на болтах, пружині, плейсмати або водостійка пакетна ламінація.
+                        </p>
+                      </div>
+                    )}
+
+                    {/* 21. Mobile Stands (Мобільні стенди) */}
+                    {hoveredMegaProduct === 'stands' && (
+                      <div className="flex flex-col items-center text-center animate-fadeIn">
+                        <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
+                          {/* Roll-Up stand base */}
+                          <rect x="55" y="125" width="90" height="14" rx="3" fill="#E2E8F0" stroke="#1E293B" strokeWidth="2"/>
+                          <line x1="45" y1="139" x2="155" y2="139" stroke="#1E293B" strokeWidth="2.5"/>
+                          {/* Center pole */}
+                          <line x1="100" y1="20" x2="100" y2="125" stroke="#1E293B" strokeWidth="2" strokeDasharray="3 3"/>
+                          {/* Extended banner cloth */}
+                          <rect x="70" y="20" width="60" height="105" rx="2" fill="#FFFFFF" stroke="#1E293B" strokeWidth="2"/>
+                          <rect x="68" y="18" width="64" height="6" rx="2" fill="#1E293B"/>
+                          <rect x="78" y="32" width="44" height="25" rx="2" fill="#E11D48" fillOpacity="0.15" stroke="#E11D48" strokeWidth="1.5"/>
+                          <text x="83" y="48" fill="#E11D48" fontSize="8" fontWeight="bold">ROLL-UP</text>
+                          <line x1="78" y1="68" x2="122" y2="68" stroke="#1E293B" strokeWidth="2"/>
+                          <line x1="78" y1="78" x2="114" y2="78" stroke="#94A3B8" strokeWidth="1.5"/>
+                        </svg>
+                        <h4 style={{ fontSize: '13.5px', fontWeight: '800', color: '#1e293b', marginTop: '12px' }}>
+                          Мобільні стенди Roll-Up та Павук
+                        </h4>
+                        <p style={{ fontSize: '11px', color: '#64748b', margin: '4px 0 0 0', maxWidth: '220px' }}>
+                          Алюмінієві касети Roll-Up 80×200 / 100×200 см та X-Banner стенди з сумкою-чохлом.
+                        </p>
+                      </div>
+                    )}
+
+                    {/* 22. Stickers & Labels (Наліпки, Стікери) */}
                     {hoveredMegaProduct === 'stickers' && (
                       <div className="flex flex-col items-center text-center animate-fadeIn">
                         <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
@@ -1834,7 +1993,174 @@ export const Calculator: React.FC = () => {
                       </div>
                     )}
 
-                    {/* 17. Door Hangers (Хенгери) */}
+                    {/* 23. Folders (Папки з вклеєною кишенею) */}
+                    {hoveredMegaProduct === 'folders' && (
+                      <div className="flex flex-col items-center text-center animate-fadeIn">
+                        <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
+                          <path d="M30 25H105L125 42H170V125H30V25Z" fill="#FFFFFF" stroke="#1E293B" strokeWidth="2.2"/>
+                          <path d="M30 85H115V125H30V85Z" fill="#E11D48" fillOpacity="0.12" stroke="#E11D48" strokeWidth="2"/>
+                          <rect x="42" y="95" width="36" height="18" rx="2" fill="#FFFFFF" stroke="#1E293B" strokeWidth="1.5"/>
+                          <line x1="50" y1="52" x2="95" y2="52" stroke="#1E293B" strokeWidth="2"/>
+                          <line x1="50" y1="62" x2="85" y2="62" stroke="#94A3B8" strokeWidth="2"/>
+                        </svg>
+                        <h4 style={{ fontSize: '13.5px', fontWeight: '800', color: '#1e293b', marginTop: '12px' }}>
+                          Папки А4 з кишенею
+                        </h4>
+                        <p style={{ fontSize: '11px', color: '#64748b', margin: '4px 0 0 0', maxWidth: '220px' }}>
+                          Фірмові картонні папки з суцільновисічною або вклеєною кишенею під візитку.
+                        </p>
+                      </div>
+                    )}
+
+                    {/* 24. Posters & Billboards (Плакати, Афіши) */}
+                    {hoveredMegaProduct === 'posters' && (
+                      <div className="flex flex-col items-center text-center animate-fadeIn">
+                        <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
+                          {/* Hanging poster bar */}
+                          <line x1="50" y1="18" x2="100" y2="8" stroke="#1E293B" strokeWidth="1.5"/>
+                          <line x1="150" y1="18" x2="100" y2="8" stroke="#1E293B" strokeWidth="1.5"/>
+                          <circle cx="100" cy="8" r="3" fill="#E11D48"/>
+                          <rect x="45" y="18" width="110" height="8" rx="2" fill="#1E293B"/>
+                          <rect x="50" y="26" width="100" height="100" rx="2" fill="#FFFFFF" stroke="#1E293B" strokeWidth="2"/>
+                          <rect x="45" y="126" width="110" height="8" rx="2" fill="#1E293B"/>
+                          <rect x="62" y="38" width="76" height="40" rx="2" fill="#E11D48" fillOpacity="0.15" stroke="#E11D48" strokeWidth="1.5"/>
+                          <text x="76" y="62" fill="#E11D48" fontSize="12" fontWeight="bold">POSTER</text>
+                          <line x1="62" y1="90" x2="138" y2="90" stroke="#1E293B" strokeWidth="2"/>
+                          <line x1="62" y1="102" x2="120" y2="102" stroke="#94A3B8" strokeWidth="2"/>
+                        </svg>
+                        <h4 style={{ fontSize: '13.5px', fontWeight: '800', color: '#1e293b', marginTop: '12px' }}>
+                          Плакати та Афіші (А3–А0)
+                        </h4>
+                        <p style={{ fontSize: '11px', color: '#64748b', margin: '4px 0 0 0', maxWidth: '220px' }}>
+                          Інтер'єрний та широкоформатний фотодрук на папері Citylight 150г або фотопапері 200г.
+                        </p>
+                      </div>
+                    )}
+
+                    {/* 25. Plastic Cards (Пластикові карти) */}
+                    {hoveredMegaProduct === 'plastic_cards' && (
+                      <div className="flex flex-col items-center text-center animate-fadeIn">
+                        <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
+                          <rect x="30" y="32" width="140" height="86" rx="8" fill="#1E293B" stroke="#0F172A" strokeWidth="2.2"/>
+                          <rect x="30" y="48" width="140" height="18" fill="#0F172A"/>
+                          <rect x="45" y="78" width="28" height="20" rx="3" fill="#F59E0B" stroke="#D97706" strokeWidth="1.5"/>
+                          <text x="85" y="92" fill="#FFFFFF" fontSize="12" fontWeight="bold" letterSpacing="1">VIP CARD</text>
+                        </svg>
+                        <h4 style={{ fontSize: '13.5px', fontWeight: '800', color: '#1e293b', marginTop: '12px' }}>
+                          Пластикові картки
+                        </h4>
+                        <p style={{ fontSize: '11px', color: '#64748b', margin: '4px 0 0 0', maxWidth: '220px' }}>
+                          Товщина 0.76 мм, магнітна смуга HiCo, ембосування та безконтактні чипи RFID.
+                        </p>
+                      </div>
+                    )}
+
+                    {/* 26. Canvas & Paintings (Полотна, Картини) */}
+                    {hoveredMegaProduct === 'canvas' && (
+                      <div className="flex flex-col items-center text-center animate-fadeIn">
+                        <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
+                          <rect x="35" y="25" width="130" height="95" rx="3" fill="#FFFFFF" stroke="#1E293B" strokeWidth="2.2"/>
+                          <path d="M35 100L75 55L110 85L135 65L165 100H35Z" fill="#E11D48" fillOpacity="0.15" stroke="#E11D48" strokeWidth="2"/>
+                          <circle cx="65" cy="50" r="10" fill="#F59E0B"/>
+                          <path d="M165 28L175 35V128L165 120V28Z" fill="#CBD5E1" stroke="#1E293B" strokeWidth="1.8"/>
+                          <path d="M38 120L48 128H175L165 120H38Z" fill="#94A3B8" stroke="#1E293B" strokeWidth="1.8"/>
+                        </svg>
+                        <h4 style={{ fontSize: '13.5px', fontWeight: '800', color: '#1e293b', marginTop: '12px' }}>
+                          Друк картин на полотні
+                        </h4>
+                        <p style={{ fontSize: '11px', color: '#64748b', margin: '4px 0 0 0', maxWidth: '220px' }}>
+                          Натуральне бавовняне полотно, галерейна натяжка на дерев'яний підрамник.
+                        </p>
+                      </div>
+                    )}
+
+                    {/* 27. Paper Posters (Постери) */}
+                    {hoveredMegaProduct === 'posters_paper' && (
+                      <div className="flex flex-col items-center text-center animate-fadeIn">
+                        <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
+                          {/* Framed Citylight Display Box */}
+                          <rect x="40" y="18" width="120" height="114" rx="6" fill="#1E293B" stroke="#0F172A" strokeWidth="2.5"/>
+                          <rect x="48" y="26" width="104" height="98" rx="3" fill="#FFFFFF"/>
+                          <rect x="58" y="38" width="84" height="42" rx="2" fill="#E11D48" fillOpacity="0.12" stroke="#E11D48" strokeWidth="1.5"/>
+                          <circle cx="72" cy="52" r="8" fill="#E11D48"/>
+                          <line x1="58" y1="92" x2="130" y2="92" stroke="#1E293B" strokeWidth="2"/>
+                          <line x1="58" y1="104" x2="115" y2="104" stroke="#94A3B8" strokeWidth="2"/>
+                        </svg>
+                        <h4 style={{ fontSize: '13.5px', fontWeight: '800', color: '#1e293b', marginTop: '12px' }}>
+                          Постери Citylight
+                        </h4>
+                        <p style={{ fontSize: '11px', color: '#64748b', margin: '4px 0 0 0', maxWidth: '220px' }}>
+                          Світлорозсіювальний папір для сітілайтів, лайтбоксів та інтер'єрних постерів.
+                        </p>
+                      </div>
+                    )}
+
+                    {/* 28. Self Adhesive Film (Самоклеюча плівка) */}
+                    {hoveredMegaProduct === 'self_adhesive_film' && (
+                      <div className="flex flex-col items-center text-center animate-fadeIn">
+                        <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
+                          <ellipse cx="40" cy="40" rx="16" ry="8" fill="#E2E8F0" stroke="#1E293B" strokeWidth="2"/>
+                          <path d="M24 40V110C24 114.5 31 118 40 118C49 118 56 114.5 56 110V40" fill="#CBD5E1" stroke="#1E293B" strokeWidth="2"/>
+                          <ellipse cx="40" cy="110" rx="16" ry="8" fill="#FFFFFF" stroke="#1E293B" strokeWidth="1.5"/>
+                          {/* Unrolling film strip */}
+                          <path d="M40 85L170 50V120L40 115" fill="#FFFFFF" stroke="#1E293B" strokeWidth="2"/>
+                          {/* Squeegee tool */}
+                          <path d="M120 70L155 60L165 75L130 85Z" fill="#E11D48" stroke="#1E293B" strokeWidth="2"/>
+                          <line x1="120" y1="70" x2="130" y2="85" stroke="#FFFFFF" strokeWidth="2"/>
+                        </svg>
+                        <h4 style={{ fontSize: '13.5px', fontWeight: '800', color: '#1e293b', marginTop: '12px' }}>
+                          Самоклеюча плівка ORAJET
+                        </h4>
+                        <p style={{ fontSize: '11px', color: '#64748b', margin: '4px 0 0 0', maxWidth: '220px' }}>
+                          Біла, прозора, перфорована (One Way Vision) плівка з матовою/глянцевою ламінацією.
+                        </p>
+                      </div>
+                    )}
+
+                    {/* 29. Scratch Cards (Скретч-карти) */}
+                    {hoveredMegaProduct === 'scratch' && (
+                      <div className="flex flex-col items-center text-center animate-fadeIn">
+                        <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
+                          <rect x="30" y="28" width="140" height="90" rx="6" fill="#FFFFFF" stroke="#1E293B" strokeWidth="2.2"/>
+                          <rect x="45" y="45" width="90" height="30" rx="3" fill="#CBD5E1" stroke="#94A3B8" strokeDasharray="4 4"/>
+                          <circle cx="145" cy="85" r="18" fill="#F59E0B" stroke="#D97706" strokeWidth="2.2"/>
+                          <text x="140" y="91" fill="#FFFFFF" fontSize="14" fontWeight="bold">₴</text>
+                          <line x1="45" y1="90" x2="110" y2="90" stroke="#1E293B" strokeWidth="2"/>
+                        </svg>
+                        <h4 style={{ fontSize: '13.5px', fontWeight: '800', color: '#1e293b', marginTop: '12px' }}>
+                          Скретч-карти та Лотереї
+                        </h4>
+                        <p style={{ fontSize: '11px', color: '#64748b', margin: '4px 0 0 0', maxWidth: '220px' }}>
+                          Зі стираним захисним срібним шаром, персоналізацією та змінними промокодами.
+                        </p>
+                      </div>
+                    )}
+
+                    {/* 30. Signs & Plates (Таблички, Вивіски) */}
+                    {hoveredMegaProduct === 'signs' && (
+                      <div className="flex flex-col items-center text-center animate-fadeIn">
+                        <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
+                          {/* Signboard plate with 4 stainless standoffs */}
+                          <rect x="30" y="30" width="140" height="90" rx="6" fill="#FFFFFF" stroke="#1E293B" strokeWidth="2.5"/>
+                          <circle cx="42" cy="42" r="5" fill="#E2E8F0" stroke="#1E293B" strokeWidth="2"/>
+                          <circle cx="158" cy="42" r="5" fill="#E2E8F0" stroke="#1E293B" strokeWidth="2"/>
+                          <circle cx="42" cy="108" r="5" fill="#E2E8F0" stroke="#1E293B" strokeWidth="2"/>
+                          <circle cx="158" cy="108" r="5" fill="#E2E8F0" stroke="#1E293B" strokeWidth="2"/>
+                          <rect x="65" y="48" width="70" height="24" rx="3" fill="#E11D48"/>
+                          <text x="73" y="64" fill="#FFFFFF" fontSize="10" fontWeight="bold">OFFICE 204</text>
+                          <line x1="55" y1="88" x2="145" y2="88" stroke="#1E293B" strokeWidth="2"/>
+                          <line x1="65" y1="98" x2="135" y2="98" stroke="#94A3B8" strokeWidth="2"/>
+                        </svg>
+                        <h4 style={{ fontSize: '13.5px', fontWeight: '800', color: '#1e293b', marginTop: '12px' }}>
+                          Таблички та Фасадні Вивіски
+                        </h4>
+                        <p style={{ fontSize: '11px', color: '#64748b', margin: '4px 0 0 0', maxWidth: '220px' }}>
+                          ПВХ пластик 3–5 мм, алюмінієвий композит, прозорий акрил з дистанційними кріпленнями.
+                        </p>
+                      </div>
+                    )}
+
+                    {/* 31. Door Hangers (Хенгери) */}
                     {hoveredMegaProduct === 'hangers' && (
                       <div className="flex flex-col items-center text-center animate-fadeIn">
                         <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
@@ -1854,37 +2180,24 @@ export const Calculator: React.FC = () => {
                       </div>
                     )}
 
-                    {/* 18. Scratch Cards (Скретч-карти) */}
-                    {hoveredMegaProduct === 'scratch' && (
+                    {/* 32. All Products (ВСІ ПРОДУКТИ) */}
+                    {hoveredMegaProduct === 'all_products' && (
                       <div className="flex flex-col items-center text-center animate-fadeIn">
                         <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
-                          <rect x="30" y="28" width="140" height="90" rx="6" fill="#FFFFFF" stroke="#1E293B" strokeWidth="2.2"/>
-                          {/* Scratch scratch-off box */}
-                          <rect x="45" y="45" width="90" height="30" rx="3" fill="#CBD5E1" stroke="#94A3B8" strokeDasharray="4 4"/>
-                          <circle cx="145" cy="85" r="18" fill="#F59E0B" stroke="#D97706" strokeWidth="2.2"/>
-                          <text x="140" y="91" fill="#FFFFFF" fontSize="14" fontWeight="bold">₴</text>
-                          <line x1="45" y1="90" x2="110" y2="90" stroke="#1E293B" strokeWidth="2"/>
+                          {/* 3x3 Grid of product tiles */}
+                          {[
+                            { x: 45, y: 25, col: '#E11D48' }, { x: 85, y: 25, col: '#007AFF' }, { x: 125, y: 25, col: '#10B981' },
+                            { x: 45, y: 60, col: '#F59E0B' }, { x: 85, y: 60, col: '#8B5CF6' }, { x: 125, y: 60, col: '#EC4899' },
+                            { x: 45, y: 95, col: '#06B6D4' }, { x: 85, y: 95, col: '#6366F1' }, { x: 125, y: 95, col: '#E11D48' }
+                          ].map((t, idx) => (
+                            <rect key={idx} x={t.x} y={t.y} width="30" height="26" rx="4" fill={t.col} fillOpacity="0.15" stroke={t.col} strokeWidth="2"/>
+                          ))}
                         </svg>
-                        <h4 style={{ fontSize: '13.5px', fontWeight: '800', color: '#1e293b', marginTop: '12px' }}>
-                          Скретч-карти та Лотереї
+                        <h4 style={{ fontSize: '13.5px', fontWeight: '800', color: '#e11d48', marginTop: '12px' }}>
+                          Повний каталог продукції
                         </h4>
                         <p style={{ fontSize: '11px', color: '#64748b', margin: '4px 0 0 0', maxWidth: '220px' }}>
-                          Зі стираним захисним срібним шаром, персоналізацією та змінними промокодами.
-                        </p>
-                      </div>
-                    )}
-
-                    {/* Fallback for all other items */}
-                    {!['cards', 'roll_label', 'banners', 'blanks', 'notebooks', 'brochures', 'booklets', 'tags', 'calendar_grid', 'calendars', 'envelopes', 'cubes', 'folders', 'plastic_cards', 'canvas', 'stickers', 'hangers', 'scratch'].includes(hoveredMegaProduct) && (
-                      <div className="flex flex-col items-center text-center animate-fadeIn">
-                        <div style={{ width: '80px', height: '80px', borderRadius: '20px', backgroundColor: 'rgba(0, 122, 255, 0.08)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)', marginBottom: '14px' }}>
-                          <Layers size={40} />
-                        </div>
-                        <h4 style={{ fontSize: '13.5px', fontWeight: '800', color: '#1e293b' }}>
-                          Поліграфічна продукція
-                        </h4>
-                        <p style={{ fontSize: '11px', color: '#64748b', margin: '4px 0 0 0', maxWidth: '220px' }}>
-                          Оберіть виріб для автоматичного прорахунку вартості, матеріалів та термінів.
+                          Перейти до повного списку всіх категорій та послуг друкарні.
                         </p>
                       </div>
                     )}
