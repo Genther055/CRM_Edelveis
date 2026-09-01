@@ -966,6 +966,9 @@ export const Calculator: React.FC = () => {
     setMainCategoryTab('offset');
     setOffsetSubTab(params.subTab || 'sheets');
     setCategory(params.category);
+    if (params.category === 'Буклети') {
+      setTurnType('chuzhyi_oborut');
+    }
     if (params.subCategory) {
       setSubCategory(params.subCategory as any);
       setName(`${params.subCategory} ${params.w ? `${params.w}×${params.h} мм` : ''}`);
@@ -1378,6 +1381,7 @@ export const Calculator: React.FC = () => {
       setMainCategoryTab('offset');
       setOffsetSubTab('sheets');
       setStep('catalog');
+      setTurnType('chuzhyi_oborut');
       setSheetSizePreset('34');
       setSheetCustomWidth('210');
       setSheetCustomHeight('297');
@@ -5481,7 +5485,7 @@ export const Calculator: React.FC = () => {
                                 className={`px-3 py-2 rounded-xl text-xs font-semibold border transition-all ${
                                   isActive
                                     ? 'bg-blue-50 text-blue-700 border-blue-400 font-bold ring-2 ring-blue-500/20'
-                                    : 'bg-slate-100 hover:bg-slate-200/80 text-slate-700 border-slate-200/60'
+                                    : 'bg-slate-50 hover:bg-slate-100/90 text-slate-700 border-slate-200/80 shadow-2xs font-bold'
                                 }`}
                               >
                                 {kindItem.name}
@@ -5863,18 +5867,21 @@ export const Calculator: React.FC = () => {
                                   setSheetCustomWidth(sz.w);
                                   setSheetCustomHeight(sz.h);
                                   setSheetSizePreset('custom');
+                                  if ((category as string) === 'Буклети' || sz.fold) {
+                                    setTurnType('chuzhyi_oborut');
+                                  }
                                   if (sz.fold) {
                                     setPostFolding(sz.fold);
                                   }
                                 }}
-                                className={`px-2.5 py-1.5 rounded-xl text-left flex flex-col justify-center transition-all border ${
+                                className={`px-3 py-2 rounded-xl text-left flex flex-col justify-center transition-all border ${
                                   isCurrent
-                                    ? 'bg-blue-50 border-blue-400 text-blue-900 shadow-2xs'
-                                    : 'bg-slate-50/80 hover:bg-slate-100 border-slate-200/80 text-slate-700'
+                                    ? 'bg-blue-600 border-blue-600 text-white shadow-sm shadow-blue-500/20 font-black'
+                                    : 'bg-slate-50 hover:bg-slate-100/90 border-slate-200/80 text-slate-700 shadow-2xs'
                                 }`}
                               >
-                                <span className="text-[11px] font-extrabold truncate">{sz.label}</span>
-                                <span className="text-[9px] font-medium text-slate-400">{sz.desc}</span>
+                                <span className={`text-[11px] font-extrabold truncate ${isCurrent ? 'text-white' : 'text-slate-800'}`}>{sz.label}</span>
+                                <span className={`text-[9.5px] font-semibold ${isCurrent ? 'text-blue-100' : 'text-slate-400'}`}>{sz.desc}</span>
                               </button>
                             );
                           })}
@@ -5995,8 +6002,8 @@ export const Calculator: React.FC = () => {
                                     }}
                                     className={`px-3 py-1.5 text-xs font-bold rounded-xl border transition-all ${
                                       isSel
-                                        ? 'bg-blue-600 text-white border-blue-600 shadow-2xs font-bold'
-                                        : 'bg-slate-100 hover:bg-slate-200/80 text-slate-700 border-slate-200/60'
+                                        ? 'bg-blue-600 text-white border-blue-600 shadow-sm shadow-blue-500/20 font-black'
+                                        : 'bg-slate-50 hover:bg-slate-100/90 text-slate-700 border-slate-200/80 shadow-2xs font-bold'
                                     }`}
                                   >
                                     {mat.label}
@@ -6033,8 +6040,8 @@ export const Calculator: React.FC = () => {
                                     }}
                                     className={`px-3 py-1.5 text-xs font-bold rounded-xl border transition-all ${
                                       isSel
-                                        ? 'bg-blue-600 text-white border-blue-600 shadow-2xs font-bold'
-                                        : 'bg-slate-100 hover:bg-slate-200/80 text-slate-700 border-slate-200/60'
+                                        ? 'bg-blue-600 text-white border-blue-600 shadow-sm shadow-blue-500/20 font-black'
+                                        : 'bg-slate-50 hover:bg-slate-100/90 text-slate-700 border-slate-200/80 shadow-2xs font-bold'
                                     }`}
                                   >
                                     {cov.label}
@@ -6066,8 +6073,8 @@ export const Calculator: React.FC = () => {
                                     }}
                                     className={`px-3 py-1.5 text-xs font-bold rounded-xl border transition-all ${
                                       isSel
-                                        ? 'bg-blue-600 text-white border-blue-600 shadow-2xs font-bold'
-                                        : 'bg-slate-100 hover:bg-slate-200/80 text-slate-700 border-slate-200/60'
+                                        ? 'bg-blue-600 text-white border-blue-600 shadow-sm shadow-blue-500/20 font-black'
+                                        : 'bg-slate-50 hover:bg-slate-100/90 text-slate-700 border-slate-200/80 shadow-2xs font-bold'
                                     }`}
                                   >
                                     {col.label}
@@ -8599,8 +8606,8 @@ export const Calculator: React.FC = () => {
                                     }}
                                     className={`px-3 py-1.5 text-xs font-bold rounded-xl border transition-all ${
                                       isSel
-                                        ? 'bg-blue-600 text-white border-blue-600 shadow-2xs font-bold'
-                                        : 'bg-slate-100 hover:bg-slate-200/80 text-slate-700 border-slate-200/60'
+                                        ? 'bg-blue-600 text-white border-blue-600 shadow-sm shadow-blue-500/20 font-black'
+                                        : 'bg-slate-50 hover:bg-slate-100/90 text-slate-700 border-slate-200/80 shadow-2xs font-bold'
                                     }`}
                                   >
                                     {mat.label}
@@ -8637,8 +8644,8 @@ export const Calculator: React.FC = () => {
                                     }}
                                     className={`px-3 py-1.5 text-xs font-bold rounded-xl border transition-all ${
                                       isSel
-                                        ? 'bg-blue-600 text-white border-blue-600 shadow-2xs font-bold'
-                                        : 'bg-slate-100 hover:bg-slate-200/80 text-slate-700 border-slate-200/60'
+                                        ? 'bg-blue-600 text-white border-blue-600 shadow-sm shadow-blue-500/20 font-black'
+                                        : 'bg-slate-50 hover:bg-slate-100/90 text-slate-700 border-slate-200/80 shadow-2xs font-bold'
                                     }`}
                                   >
                                     {cov.label}
@@ -8674,8 +8681,8 @@ export const Calculator: React.FC = () => {
                                     }}
                                     className={`px-3 py-1.5 text-xs font-bold rounded-xl border transition-all ${
                                       isSel
-                                        ? 'bg-blue-600 text-white border-blue-600 shadow-2xs font-bold'
-                                        : 'bg-slate-100 hover:bg-slate-200/80 text-slate-700 border-slate-200/60'
+                                        ? 'bg-blue-600 text-white border-blue-600 shadow-sm shadow-blue-500/20 font-black'
+                                        : 'bg-slate-50 hover:bg-slate-100/90 text-slate-700 border-slate-200/80 shadow-2xs font-bold'
                                     }`}
                                   >
                                     {col.label}
@@ -9549,7 +9556,7 @@ export const Calculator: React.FC = () => {
                                 className={`px-3 py-1.5 text-xs font-bold rounded-xl border transition-all ${
                                   isSel
                                     ? 'bg-blue-600 text-white border-blue-600 shadow-sm font-bold'
-                                    : 'bg-slate-100 hover:bg-slate-200/80 text-slate-700 border-slate-200/60'
+                                    : 'bg-slate-50 hover:bg-slate-100/90 text-slate-700 border-slate-200/80 shadow-2xs font-bold'
                                 }`}
                               >
                                 {mat.label}
@@ -9587,7 +9594,7 @@ export const Calculator: React.FC = () => {
                                 className={`px-3 py-1.5 text-xs font-bold rounded-xl border transition-all ${
                                   isSel
                                     ? 'bg-blue-600 text-white border-blue-600 shadow-sm font-bold'
-                                    : 'bg-slate-100 hover:bg-slate-200/80 text-slate-700 border-slate-200/60'
+                                    : 'bg-slate-50 hover:bg-slate-100/90 text-slate-700 border-slate-200/80 shadow-2xs font-bold'
                                 }`}
                               >
                                 {cov.label}
@@ -9622,7 +9629,7 @@ export const Calculator: React.FC = () => {
                                 className={`px-3 py-1.5 text-xs font-bold rounded-xl border transition-all ${
                                   isSel
                                     ? 'bg-blue-600 text-white border-blue-600 shadow-sm font-bold'
-                                    : 'bg-slate-100 hover:bg-slate-200/80 text-slate-700 border-slate-200/60'
+                                    : 'bg-slate-50 hover:bg-slate-100/90 text-slate-700 border-slate-200/80 shadow-2xs font-bold'
                                 }`}
                               >
                                 {col.label}
