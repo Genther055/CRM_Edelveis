@@ -5405,26 +5405,104 @@ export const Calculator: React.FC = () => {
             <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
               {digitalSubTab !== 'overview' ? (
                 /* Top Breadcrumb navigation when inside a sub-tab */
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
-                  <button
-                    type="button"
-                    onClick={() => setDigitalSubTab('overview')}
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '6px',
-                      padding: '6px 14px',
-                      borderRadius: 'var(--radius-md)',
-                      border: '0.5px solid var(--border-light)',
-                      backgroundColor: 'var(--bg-card)',
-                      color: 'var(--text-dark)',
-                      fontSize: '12px',
-                      fontWeight: '700',
-                      cursor: 'pointer'
-                    }}
-                  >
-                    ← Всі категорії цифрового друку
-                  </button>
+                <div style={{
+                  backgroundColor: 'var(--bg-card)',
+                  border: '0.5px solid var(--border-light)',
+                  borderRadius: 'var(--radius-lg)',
+                  padding: '14px 20px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  flexWrap: 'wrap',
+                  gap: '12px',
+                  boxShadow: 'var(--shadow-flat)'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '14px', fontWeight: '700', color: 'var(--text-dark)' }}>
+                    <button
+                      type="button"
+                      onClick={() => setDigitalSubTab('overview')}
+                      style={{ background: 'none', border: 'none', color: 'var(--primary)', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
+                    >
+                      <ArrowLeft size={16} />
+                      <span>Цифровий друк</span>
+                    </button>
+                    <span style={{ color: 'var(--text-medium)', opacity: 0.5 }}>/</span>
+                    <span style={{ fontWeight: '800' }}>
+                      {digitalSubTab === 'sheets' && 'Листова продукція (SRA3)'}
+                      {digitalSubTab === 'felling' && 'Висічна продукція (Штампи)'}
+                      {digitalSubTab === 'multipage' && 'Багатосторінкова продукція'}
+                      {digitalSubTab === 'custom' && 'Індивідуальний прорахунок'}
+                      {digitalSubTab === 'mounted' && 'Каширування на палітурний картон'}
+                      {digitalSubTab === 'in_sheets' && 'Самоклейка в листах'}
+                      {digitalSubTab === 'pouch_lam' && 'Конвертне пакетне ламінування'}
+                      {digitalSubTab === 'plotter_cut' && 'Плоттерна порізка наклейок'}
+                      {digitalSubTab === 'die_cut_custom' && 'Індивідуальна висічка штампом'}
+                      {digitalSubTab === 'folders' && 'Фірмові папки А4'}
+                    </span>
+                  </div>
+
+                  {/* Clean Segmented Category Switcher */}
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    backgroundColor: 'var(--bg-system)',
+                    padding: '4px',
+                    borderRadius: 'var(--radius-md)',
+                    overflowX: 'auto',
+                    maxWidth: '100%'
+                  }}>
+                    {[
+                      { id: 'sheets', label: 'Листова' },
+                      { id: 'felling', label: 'Висічка' },
+                      { id: 'multipage', label: 'Багатостор.' },
+                      { id: 'in_sheets', label: 'Наклейки' },
+                      { id: 'plotter_cut', label: 'Плоттер' },
+                      { id: 'folders', label: 'Папки' },
+                      { id: 'mounted', label: 'Каширування' },
+                      { id: 'pouch_lam', label: 'Ламінація' },
+                    ].map(st => (
+                      <button
+                        key={st.id}
+                        type="button"
+                        onClick={() => setDigitalSubTab(st.id as any)}
+                        style={{
+                          padding: '5px 10px',
+                          fontSize: '11.5px',
+                          fontWeight: '700',
+                          borderRadius: '6px',
+                          border: 'none',
+                          cursor: 'pointer',
+                          whiteSpace: 'nowrap',
+                          transition: 'all 0.15s ease',
+                          backgroundColor: digitalSubTab === st.id ? 'var(--primary)' : 'transparent',
+                          color: digitalSubTab === st.id ? '#ffffff' : 'var(--text-dark)',
+                          boxShadow: digitalSubTab === st.id ? 'var(--shadow-flat)' : 'none'
+                        }}
+                      >
+                        {st.label}
+                      </button>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={() => setDigitalSubTab('overview')}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        padding: '5px 10px',
+                        borderRadius: '6px',
+                        border: 'none',
+                        backgroundColor: 'transparent',
+                        color: 'var(--text-dark)',
+                        fontSize: '11.5px',
+                        fontWeight: '700',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      ← Каталог
+                    </button>
+                  </div>
                 </div>
               ) : (
                 /* 10 CATEGORIES OVERVIEW */
@@ -8027,47 +8105,105 @@ export const Calculator: React.FC = () => {
             <div className="flex flex-col gap-6">
               {/* Top Sub-navigation Bar for Wide Format when inside specific sub-calculator */}
               {wideSubTab !== 'overview' && (
-                <div className="ios-card bg-white p-3 flex items-center justify-between flex-wrap gap-3">
-                  <div className="flex items-center gap-3">
+                <div style={{
+                  backgroundColor: 'var(--bg-card)',
+                  border: '0.5px solid var(--border-light)',
+                  borderRadius: 'var(--radius-lg)',
+                  padding: '14px 20px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'space-between',
+                  flexWrap: 'wrap',
+                  gap: '12px',
+                  boxShadow: 'var(--shadow-flat)'
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '14px', fontWeight: '700', color: 'var(--text-dark)' }}>
                     <button
                       type="button"
                       onClick={() => setWideSubTab('overview')}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-xs font-bold text-slate-700 transition-colors"
+                      style={{ background: 'none', border: 'none', color: 'var(--primary)', fontWeight: '700', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px' }}
                     >
-                      <ArrowLeft size={14} />
-                      <span>Каталог</span>
+                      <ArrowLeft size={16} />
+                      <span>Широкоформатний друк</span>
                     </button>
-                    <div className="h-4 w-px bg-slate-200 hidden sm:block"></div>
-                    <span className="text-xs font-bold text-slate-500 hidden sm:inline">Категорія:</span>
+                    <span style={{ color: 'var(--text-medium)', opacity: 0.5 }}>/</span>
+                    <span style={{ fontWeight: '800' }}>
+                      {wideSubTab === 'banner' && 'Банери (Frontlit, Cast, Сітка)'}
+                      {wideSubTab === 'film' && 'Плівка самоклеюча (ORACAL, Ritrama)'}
+                      {wideSubTab === 'paper' && 'Папір (Citylight, Blueback)'}
+                      {wideSubTab === 'custom' && 'Індивідуальний прорахунок'}
+                      {wideSubTab === 'pvc' && 'Пластик ПВХ'}
+                      {wideSubTab === 'foam_board' && 'Пінокартон'}
+                      {wideSubTab === 'composite' && 'Алюмінієвий композит'}
+                      {wideSubTab === 'acrylic' && 'Акрил (Оргскло)'}
+                      {wideSubTab === 'canvas' && 'Картини на полотні'}
+                      {wideSubTab === 'stands' && 'Мобільні стенди (Roll-Up, X-banner)'}
+                    </span>
                   </div>
 
-                  {/* Sub-tabs Switcher Pills */}
-                  <div className="flex items-center gap-1.5 overflow-x-auto py-1 max-w-full">
+                  {/* Clean Segmented Category Switcher */}
+                  <div style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px',
+                    backgroundColor: 'var(--bg-system)',
+                    padding: '4px',
+                    borderRadius: 'var(--radius-md)',
+                    overflowX: 'auto',
+                    maxWidth: '100%'
+                  }}>
                     {[
                       { id: 'banner', label: 'Банер' },
                       { id: 'film', label: 'Плівка' },
                       { id: 'paper', label: 'Папір' },
-                      { id: 'custom', label: 'Індивідуальне' },
+                      { id: 'custom', label: 'Індивід.' },
                       { id: 'pvc', label: 'ПВХ' },
                       { id: 'foam_board', label: 'Пінокартон' },
                       { id: 'composite', label: 'Композит' },
                       { id: 'acrylic', label: 'Акрил' },
-                      { id: 'canvas', label: 'Полотна' },
-                      { id: 'stands', label: 'Мобільні стенди' },
+                      { id: 'canvas', label: 'Полотно' },
+                      { id: 'stands', label: 'Стенди' },
                     ].map(st => (
                       <button
                         key={st.id}
                         type="button"
                         onClick={() => setWideSubTab(st.id as any)}
-                        className={`px-3 py-1 text-xs font-bold rounded-lg transition-all whitespace-nowrap ${
-                          wideSubTab === st.id
-                            ? 'bg-blue-600 text-white shadow-sm'
-                            : 'bg-slate-100 hover:bg-slate-200/80 text-slate-700'
-                        }`}
+                        style={{
+                          padding: '5px 10px',
+                          fontSize: '11.5px',
+                          fontWeight: '700',
+                          borderRadius: '6px',
+                          border: 'none',
+                          cursor: 'pointer',
+                          whiteSpace: 'nowrap',
+                          transition: 'all 0.15s ease',
+                          backgroundColor: wideSubTab === st.id ? 'var(--primary)' : 'transparent',
+                          color: wideSubTab === st.id ? '#ffffff' : 'var(--text-dark)',
+                          boxShadow: wideSubTab === st.id ? 'var(--shadow-flat)' : 'none'
+                        }}
                       >
                         {st.label}
                       </button>
                     ))}
+                    <button
+                      type="button"
+                      onClick={() => setWideSubTab('overview')}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        padding: '5px 10px',
+                        borderRadius: '6px',
+                        border: 'none',
+                        backgroundColor: 'transparent',
+                        color: 'var(--text-dark)',
+                        fontSize: '11.5px',
+                        fontWeight: '700',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      ← Каталог
+                    </button>
                   </div>
                 </div>
               )}
