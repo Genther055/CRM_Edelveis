@@ -860,7 +860,6 @@ export const Calculator: React.FC = () => {
   const [digitalSheetSets, setDigitalSheetSets] = useState<number>(1);
   const [digitalSheetWithDelivery, setDigitalSheetWithDelivery] = useState<boolean>(false);
   const [digitalSheetPerPiece, setDigitalSheetPerPiece] = useState<boolean>(false);
-  const [digitalSheetPostPressOpen, setDigitalSheetPostPressOpen] = useState<boolean>(false);
   const [digitalSheetCornerCurve, setDigitalSheetCornerCurve] = useState<string>('0');
   const [digitalSheetDrilling, setDigitalSheetDrilling] = useState<string>('0');
   const [digitalSheetLuvers, setDigitalSheetLuvers] = useState<string>('0');
@@ -883,7 +882,6 @@ export const Calculator: React.FC = () => {
   const [wideHeight, setWideHeight] = useState<string>('1000');
   const [wideUnit, setWideUnit] = useState<'mm' | 'cm' | 'm'>('mm');
   const [wideSets, setWideSets] = useState<number>(1);
-  const [widePostPressOpen, setWidePostPressOpen] = useState<boolean>(false);
   const [wideWithDelivery, setWideWithDelivery] = useState<boolean>(false);
   const [widePriceCostVar, setWidePriceCostVar] = useState<'per_tirazh' | 'per_sqm' | 'per_item'>('per_tirazh');
 
@@ -976,7 +974,6 @@ export const Calculator: React.FC = () => {
   };
 
   // Postpress options states
-  const [showPostpressAccordion, setShowPostpressAccordion] = useState<boolean>(false);
   const [postPersonalization, setPostPersonalization] = useState<string>('0');
   const [postLuvers, setPostLuvers] = useState<string>('0');
   const [postLuversCount, setPostLuversCount] = useState<number>(1);
@@ -4552,37 +4549,29 @@ export const Calculator: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Postpress Accordion Section */}
+                  {/* Postpress Options Section (Always Open, 2 Columns) */}
                   <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-                    <div
-                      onClick={() => setShowPostpressAccordion(!showPostpressAccordion)}
-                      className="p-4 bg-slate-50/80 hover:bg-slate-100/80 cursor-pointer flex items-center justify-between transition-colors border-b border-slate-200"
-                    >
+                    <div className="px-5 py-3.5 bg-slate-50/90 flex items-center justify-between border-b border-slate-200">
                       <div className="flex items-center gap-2.5">
                         <SlidersHorizontal size={18} className="text-blue-600" />
                         <h4 className="text-sm font-bold text-slate-900 m-0">Післядрукарська обробка (Нормативи)</h4>
                       </div>
-                      <div className="flex items-center gap-3">
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setPostPersonalization('0'); setPostLuvers('0'); setPostLuversCount(1);
-                            setPostCorners('0'); setPostGluing('0'); setPostDrilling('0');
-                            setPostFolding('0'); setPostCreasing('0'); setPostPerforation('0');
-                            setPostPackingText('');
-                          }}
-                          className="text-xs font-semibold text-slate-500 hover:text-red-600 transition-colors"
-                        >
-                          Очистити
-                        </button>
-                        <span className="text-xs text-slate-400">{showPostpressAccordion ? '▲' : '▼'}</span>
-                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setPostPersonalization('0'); setPostLuvers('0'); setPostLuversCount(1);
+                          setPostCorners('0'); setPostGluing('0'); setPostDrilling('0');
+                          setPostFolding('0'); setPostCreasing('0'); setPostPerforation('0');
+                          setPostPackingText('');
+                        }}
+                        className="text-xs font-semibold px-2.5 py-1 rounded-md bg-white border border-slate-200 text-slate-600 hover:text-red-600 hover:border-red-200 transition-colors shadow-2xs"
+                      >
+                        Очистити
+                      </button>
                     </div>
 
-                    {showPostpressAccordion && (
-                      <div className="p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {/* 1. Персоналізація */}
+                    <div className="p-5 grid grid-cols-1 md:grid-cols-2 gap-4 bg-white">
+                      {/* 1. Персоналізація */}
                         <div>
                           <label className="text-xs font-bold text-slate-700 block mb-1">Персоналізація</label>
                           <select value={postPersonalization} onChange={(e) => setPostPersonalization(e.target.value)} className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold">
@@ -4725,7 +4714,6 @@ export const Calculator: React.FC = () => {
                           />
                         </div>
                       </div>
-                    )}
                   </div>
 
                   {/* Sets Counter Bar */}
@@ -7037,42 +7025,33 @@ export const Calculator: React.FC = () => {
 
                   {/* Section: Післядрукарська обробка (Нормативи) */}
                   <div className="ios-card bg-white overflow-hidden">
-                    <button
-                      type="button"
-                      onClick={() => setDigitalSheetPostPressOpen(!digitalSheetPostPressOpen)}
-                      className="w-full p-4 flex items-center justify-between bg-slate-50/70 hover:bg-slate-100/80 transition-colors border-b border-slate-100"
-                    >
+                    <div className="w-full px-5 py-3.5 flex items-center justify-between bg-slate-50/90 border-b border-slate-200">
                       <div className="flex items-center gap-2">
-                        <SlidersHorizontal size={15} className="text-blue-600" />
+                        <SlidersHorizontal size={16} className="text-blue-600" />
                         <span className="text-xs font-extrabold uppercase tracking-wider text-slate-800">Післядрукарська обробка (Нормативи)</span>
                         {(digitalSheetCornerCurve !== '0' || digitalSheetDrilling !== '0' || digitalSheetLuvers !== '0' || digitalSheetPersonalization !== '0' || digitalSheetFolding !== '0' || digitalSheetGluingBlock !== '0') && (
                           <span className="ios-badge-blue text-[10px] px-2 py-0.5 rounded-full font-bold">Опції обрано</span>
                         )}
                       </div>
-                      <div className="flex items-center gap-2 text-xs font-bold text-blue-600">
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setDigitalSheetCornerCurve('0');
-                            setDigitalSheetDrilling('0');
-                            setDigitalSheetLuvers('0');
-                            setDigitalSheetPersonalization('0');
-                            setDigitalSheetFolding('0');
-                            setDigitalSheetGluingBlock('0');
-                          }}
-                          className="px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-600 text-[11px] font-semibold transition-colors"
-                        >
-                          Очистити
-                        </button>
-                        <ChevronDown size={16} className={`transition-transform duration-200 ${digitalSheetPostPressOpen ? 'rotate-180' : ''}`} />
-                      </div>
-                    </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setDigitalSheetCornerCurve('0');
+                          setDigitalSheetDrilling('0');
+                          setDigitalSheetLuvers('0');
+                          setDigitalSheetPersonalization('0');
+                          setDigitalSheetFolding('0');
+                          setDigitalSheetGluingBlock('0');
+                        }}
+                        className="px-2.5 py-1 rounded-md bg-white border border-slate-200 text-slate-600 hover:text-red-600 text-[11px] font-semibold transition-colors shadow-2xs"
+                      >
+                        Очистити
+                      </button>
+                    </div>
 
-                    {digitalSheetPostPressOpen && (
-                      <div className="p-5 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 bg-white">
-                        <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
-                          <label className="text-[11px] font-bold text-slate-600 block mb-1">Заокруглення кутів:</label>
+                    <div className="p-5 grid grid-cols-1 md:grid-cols-2 gap-4 bg-white">
+                      <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
+                        <label className="text-[11px] font-bold text-slate-600 block mb-1">Заокруглення кутів:</label>
                           <select
                             value={digitalSheetCornerCurve}
                             onChange={(e) => setDigitalSheetCornerCurve(e.target.value)}
@@ -7154,7 +7133,6 @@ export const Calculator: React.FC = () => {
                           </select>
                         </div>
                       </div>
-                    )}
                   </div>
 
                   {/* Section: КОМПЛЕКТІВ МАКЕТІВ Bar */}
@@ -9799,13 +9777,9 @@ export const Calculator: React.FC = () => {
 
                   {/* Section: Післядрукарська обробка (Нормативи) */}
                   <div className="ios-card bg-white overflow-hidden">
-                    <button
-                      type="button"
-                      onClick={() => setWidePostPressOpen(!widePostPressOpen)}
-                      className="w-full p-4 flex items-center justify-between bg-slate-50/70 hover:bg-slate-100/80 transition-colors border-b border-slate-100"
-                    >
+                    <div className="w-full px-5 py-3.5 flex items-center justify-between bg-slate-50/90 border-b border-slate-200">
                       <div className="flex items-center gap-2">
-                        <SlidersHorizontal size={15} className="text-blue-600" />
+                        <SlidersHorizontal size={16} className="text-blue-600" />
                         <span className="text-xs font-extrabold uppercase tracking-wider text-slate-800">
                           Післядрукарська обробка та фурнітура (Нормативи)
                         </span>
@@ -9813,40 +9787,35 @@ export const Calculator: React.FC = () => {
                           <span className="ios-badge-blue text-[10px] px-2 py-0.5 rounded-full font-bold">Опції активні</span>
                         )}
                       </div>
-                      <div className="flex items-center gap-2 text-xs font-bold text-blue-600">
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setWideLuvers('none');
-                            setWideHemming('none');
-                            setWidePocket('0');
-                            setWideLamination('0');
-                            setWidePlotterCut('0');
-                            setWideMountFilm('0');
-                            setWideMilling('0');
-                            setWideHolders('0');
-                            setWideTape3M('0');
-                            setWideStretcher('none');
-                            setWideArtGel('0');
-                          }}
-                          className="px-2 py-0.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-600 text-[11px] font-semibold transition-colors"
-                        >
-                          Очистити
-                        </button>
-                        <ChevronDown size={16} className={`transition-transform duration-200 ${widePostPressOpen ? 'rotate-180' : ''}`} />
-                      </div>
-                    </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setWideLuvers('none');
+                          setWideHemming('none');
+                          setWidePocket('0');
+                          setWideLamination('0');
+                          setWidePlotterCut('0');
+                          setWideMountFilm('0');
+                          setWideMilling('0');
+                          setWideHolders('0');
+                          setWideTape3M('0');
+                          setWideStretcher('none');
+                          setWideArtGel('0');
+                        }}
+                        className="px-2.5 py-1 rounded-md bg-white border border-slate-200 text-slate-600 hover:text-red-600 text-[11px] font-semibold transition-colors shadow-2xs"
+                      >
+                        Очистити
+                      </button>
+                    </div>
 
-                    {widePostPressOpen && (
-                      <div className="p-5 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3.5 bg-white">
-                        {/* Option 1: Люверси (Banners / Canvas) */}
-                        {(wideSubTab === 'banner' || wideSubTab === 'custom') && (
-                          <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
-                            <label className="text-[11px] font-bold text-slate-600 block mb-1">Встановлення люверсів:</label>
-                            <select
-                              value={wideLuvers}
-                              onChange={(e) => setWideLuvers(e.target.value)}
+                    <div className="p-5 grid grid-cols-1 md:grid-cols-2 gap-4 bg-white">
+                      {/* Option 1: Люверси (Banners / Canvas) */}
+                      {(wideSubTab === 'banner' || wideSubTab === 'custom') && (
+                        <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
+                          <label className="text-[11px] font-bold text-slate-600 block mb-1">Встановлення люверсів:</label>
+                          <select
+                            value={wideLuvers}
+                            onChange={(e) => setWideLuvers(e.target.value)}
                               className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800"
                             >
                               <option value="none">Без люверсів</option>
@@ -10036,7 +10005,6 @@ export const Calculator: React.FC = () => {
                           </div>
                         )}
                       </div>
-                    )}
                   </div>
 
                   {/* Section: КОМПЛЕКТІВ МАКЕТІВ Bar */}
