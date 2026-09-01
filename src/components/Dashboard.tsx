@@ -17,7 +17,6 @@ import {
   Coins,
   Sliders,
   Settings as SettingsIcon,
-  PieChart,
   BarChart3,
   TrendingUp
 } from 'lucide-react';
@@ -49,15 +48,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab }) => {
     { name: 'Працівник Е (Старший менеджер)', ordersCount: 22 },
     { name: 'Працівник Д (Друкар-оператор)', ordersCount: 18 }
   ];
-
-  // Dynamic financial parameters calculated from active/ready orders in the context
-  const totalRevenue = orders.reduce((acc, o) => acc + o.finalPrice, 0);
-  const totalProductionCost = orders.reduce((acc, o) => acc + o.subtotal, 0);
-  const fixedExpenses = 15000; // Monthly operations fixed expenses (rent, basic wages, utilities, etc)
-  const totalExpenses = totalProductionCost + fixedExpenses;
-  const netProfit = totalRevenue - totalExpenses;
-  const isLoss = netProfit < 0;
-  const breakEvenPercent = totalExpenses > 0 ? Math.min(100, Math.round((totalRevenue / totalExpenses) * 100)) : 0;
 
   // Filter staff by branch (dummy filter since there is only 1 branch)
   const filteredStaff = staffPerformance;
@@ -277,7 +267,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab }) => {
       </div>
 
       {/* Analytics & Charts Block */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         
         {/* Sales Funnel widget */}
         <div className="ios-card space-y-4 lg:col-span-1" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)' }}>
@@ -338,58 +328,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab }) => {
                 </div>
               </div>
             ))}
-          </div>
-        </div>
-
-        {/* Financial Profitability widget */}
-        <div className="ios-card space-y-4 lg:col-span-1" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)' }}>
-          <h3 style={{ fontSize: '14px', fontWeight: '800', color: 'var(--text-dark)', display: 'flex', alignItems: 'center', gap: '6px', borderBottom: '1px solid var(--border-light)', paddingBottom: '10px' }}>
-            <PieChart size={16} style={{ color: isLoss ? 'var(--danger)' : 'var(--success)' }} />
-            Прибутковість підприємства
-          </h3>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
-              <span style={{ color: 'var(--text-medium)' }}>Загальний дохід (Виручка):</span>
-              <strong style={{ color: 'var(--text-dark)' }}>{totalRevenue.toLocaleString()} ₴</strong>
-            </div>
-
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px' }}>
-              <span style={{ color: 'var(--text-medium)' }}>Витрати (Собівартість + Оренда):</span>
-              <strong style={{ color: 'var(--text-dark)' }}>{totalExpenses.toLocaleString()} ₴</strong>
-            </div>
-
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', borderTop: '1px solid var(--border-light)', paddingTop: '8px', marginTop: '4px' }}>
-              <span style={{ fontWeight: '600', color: 'var(--text-dark)' }}>Чистий результат:</span>
-              <strong style={{ 
-                color: isLoss ? 'var(--danger)' : 'var(--success)', 
-                fontSize: '12px',
-                backgroundColor: isLoss ? 'rgba(239, 68, 68, 0.12)' : 'rgba(16, 185, 129, 0.12)',
-                padding: '2px 8px',
-                borderRadius: '6px',
-                fontWeight: '700'
-              }}>
-                {netProfit.toLocaleString()} ₴ ({isLoss ? 'Збиток' : 'Прибуток'})
-              </strong>
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginTop: '6px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', textTransform: 'uppercase', color: 'var(--text-medium)', fontWeight: '700' }}>
-                <span>Покриття витрат (Точка беззбитковості)</span>
-                <span>{breakEvenPercent}%</span>
-              </div>
-              <div style={{ width: '100%', height: '10px', backgroundColor: 'var(--border-light)', borderRadius: '5px', overflow: 'hidden' }}>
-                <div style={{ 
-                  width: `${breakEvenPercent}%`, 
-                  height: '100%', 
-                  backgroundColor: isLoss ? 'var(--warning)' : 'var(--success)', 
-                  borderRadius: '5px' 
-                }} />
-              </div>
-              <span style={{ fontSize: '10px', color: 'var(--text-medium)', fontStyle: 'italic', marginTop: '2px' }}>
-                {isLoss ? '🚨 Бізнес тимчасово працює в мінус.' : '🎉 Окупність витрат досягнута! Бізнес прибутковий.'}
-              </span>
-            </div>
           </div>
         </div>
       </div>
