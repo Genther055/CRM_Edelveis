@@ -119,6 +119,722 @@ export const defaultMaterialPrices: MaterialPriceItem[] = [
   { id: 'mount_film', name: 'Монтажна плівка з підкладкою', category: 'film', unit: 'грн/м²', price: 45.00 },
 ];
 
+// Helper: Custom SVG Mini-Thumbnails for 12 Booklet Folding Types
+const renderFoldThumbnail = (foldId: string, isActive: boolean) => {
+  const stroke = isActive ? '#2563eb' : '#64748b';
+  const fillLight = isActive ? '#eff6ff' : '#ffffff';
+  const fillMid = isActive ? '#dbeafe' : '#f1f5f9';
+  const fillDark = isActive ? '#bfdbfe' : '#e2e8f0';
+  const dashStroke = isActive ? '#3b82f6' : '#94a3b8';
+  const arrowColor = isActive ? '#2563eb' : '#64748b';
+
+  switch (foldId) {
+    case '1': // Книжка (1 складання / Half Fold)
+      return (
+        <svg width="54" height="36" viewBox="0 0 54 36" fill="none">
+          <polygon points="6,9 27,13 27,33 6,29" fill={fillMid} stroke={stroke} strokeWidth="1.3" strokeLinejoin="round" />
+          <polygon points="27,13 48,9 48,29 27,33" fill={fillLight} stroke={stroke} strokeWidth="1.3" strokeLinejoin="round" />
+          <line x1="27" y1="13" x2="27" y2="33" stroke={dashStroke} strokeWidth="1.4" strokeDasharray="2 1.5" />
+          <path d="M44 6 C38 3 31 4 28 9" stroke={arrowColor} strokeWidth="1.2" strokeLinecap="round" fill="none" />
+          <polygon points="27,11 27,7 31,8" fill={arrowColor} />
+        </svg>
+      );
+
+    case '121': // Асиметричний (1 складання)
+      return (
+        <svg width="54" height="36" viewBox="0 0 54 36" fill="none">
+          <polygon points="6,9 48,9 48,31 6,31" fill={fillMid} stroke={stroke} strokeWidth="1.3" strokeLinejoin="round" />
+          <polygon points="6,12 24,14 24,31 6,31" fill={fillLight} stroke={stroke} strokeWidth="1.3" strokeLinejoin="round" />
+          <line x1="24" y1="9" x2="24" y2="31" stroke={dashStroke} strokeWidth="1.4" strokeDasharray="2 1.5" />
+          <path d="M10 6 C15 3 21 4 23 9" stroke={arrowColor} strokeWidth="1.2" strokeLinecap="round" fill="none" />
+        </svg>
+      );
+
+    case '21': // Намотування (2 складання / C-Fold / Tri-Fold)
+      return (
+        <svg width="54" height="36" viewBox="0 0 54 36" fill="none">
+          <polygon points="19,11 35,11 35,31 19,31" fill={fillDark} stroke={stroke} strokeWidth="1.3" strokeLinejoin="round" />
+          <polygon points="6,8 19,11 19,31 6,28" fill={fillMid} stroke={stroke} strokeWidth="1.3" strokeLinejoin="round" />
+          <polygon points="35,11 48,8 48,28 35,31" fill={fillLight} stroke={stroke} strokeWidth="1.3" strokeLinejoin="round" />
+          <line x1="19" y1="11" x2="19" y2="31" stroke={dashStroke} strokeWidth="1.2" strokeDasharray="2 1.5" />
+          <line x1="35" y1="11" x2="35" y2="31" stroke={dashStroke} strokeWidth="1.2" strokeDasharray="2 1.5" />
+          <path d="M46 5 C37 2 27 3 23 8" stroke={arrowColor} strokeWidth="1.2" strokeLinecap="round" fill="none" />
+          <polygon points="22,10 23,6 26,8" fill={arrowColor} />
+        </svg>
+      );
+
+    case '23': // Вікно (2 складання / Gate Fold)
+      return (
+        <svg width="54" height="36" viewBox="0 0 54 36" fill="none">
+          <rect x="16" y="10" width="22" height="20" fill={fillDark} stroke={stroke} strokeWidth="1.3" />
+          <polygon points="6,7 16,10 16,30 6,27" fill={fillLight} stroke={stroke} strokeWidth="1.3" strokeLinejoin="round" />
+          <polygon points="48,7 38,10 38,30 48,27" fill={fillLight} stroke={stroke} strokeWidth="1.3" strokeLinejoin="round" />
+          <line x1="16" y1="10" x2="16" y2="30" stroke={dashStroke} strokeWidth="1.2" strokeDasharray="2 1.5" />
+          <line x1="38" y1="10" x2="38" y2="30" stroke={dashStroke} strokeWidth="1.2" strokeDasharray="2 1.5" />
+          <path d="M10 5 L15 8" stroke={arrowColor} strokeWidth="1.2" strokeLinecap="round" />
+          <path d="M44 5 L39 8" stroke={arrowColor} strokeWidth="1.2" strokeLinecap="round" />
+        </svg>
+      );
+
+    case '22': // Гармошка (2 складання / Z-Fold)
+      return (
+        <svg width="54" height="36" viewBox="0 0 54 36" fill="none">
+          <polygon points="6,9 19,13 19,33 6,29" fill={fillLight} stroke={stroke} strokeWidth="1.3" strokeLinejoin="round" />
+          <polygon points="19,13 34,8 34,28 19,33" fill={fillMid} stroke={stroke} strokeWidth="1.3" strokeLinejoin="round" />
+          <polygon points="34,8 48,12 48,32 34,28" fill={fillDark} stroke={stroke} strokeWidth="1.3" strokeLinejoin="round" />
+          <line x1="19" y1="13" x2="19" y2="33" stroke={dashStroke} strokeWidth="1.2" strokeDasharray="2 1.5" />
+          <line x1="34" y1="8" x2="34" y2="28" stroke={dashStroke} strokeWidth="1.2" strokeDasharray="2 1.5" />
+        </svg>
+      );
+
+    case '34': // Комбінований (2 складання / Cross Fold)
+      return (
+        <svg width="54" height="36" viewBox="0 0 54 36" fill="none">
+          <rect x="7" y="7" width="40" height="22" rx="2" fill={fillLight} stroke={stroke} strokeWidth="1.3" />
+          <line x1="27" y1="7" x2="27" y2="29" stroke={dashStroke} strokeWidth="1.3" strokeDasharray="2 1.5" />
+          <line x1="7" y1="18" x2="47" y2="18" stroke={dashStroke} strokeWidth="1.3" strokeDasharray="2 1.5" />
+          <rect x="27" y="7" width="20" height="11" fill={fillMid} fillOpacity="0.7" />
+        </svg>
+      );
+
+    case '31': // Намотування (3 складання / 4-Panel Roll)
+      return (
+        <svg width="54" height="36" viewBox="0 0 54 36" fill="none">
+          <polygon points="6,12 15,14 15,32 6,30" fill={fillDark} stroke={stroke} strokeWidth="1.2" strokeLinejoin="round" />
+          <polygon points="15,14 26,12 26,30 15,32" fill={fillMid} stroke={stroke} strokeWidth="1.2" strokeLinejoin="round" />
+          <polygon points="26,12 37,14 37,32 26,30" fill={fillLight} stroke={stroke} strokeWidth="1.2" strokeLinejoin="round" />
+          <polygon points="37,14 48,11 48,29 37,32" fill={fillMid} stroke={stroke} strokeWidth="1.2" strokeLinejoin="round" />
+          <line x1="15" y1="14" x2="15" y2="32" stroke={dashStroke} strokeWidth="1.2" strokeDasharray="2 1.5" />
+          <line x1="26" y1="12" x2="26" y2="30" stroke={dashStroke} strokeWidth="1.2" strokeDasharray="2 1.5" />
+          <line x1="37" y1="14" x2="37" y2="32" stroke={dashStroke} strokeWidth="1.2" strokeDasharray="2 1.5" />
+        </svg>
+      );
+
+    case '32': // Гармошка (3 складання / W-Fold)
+      return (
+        <svg width="54" height="36" viewBox="0 0 54 36" fill="none">
+          <polygon points="5,8 15,13 15,33 5,28" fill={fillLight} stroke={stroke} strokeWidth="1.2" strokeLinejoin="round" />
+          <polygon points="15,13 26,8 26,28 15,33" fill={fillMid} stroke={stroke} strokeWidth="1.2" strokeLinejoin="round" />
+          <polygon points="26,8 37,13 37,33 26,28" fill={fillLight} stroke={stroke} strokeWidth="1.2" strokeLinejoin="round" />
+          <polygon points="37,13 48,8 48,28 37,33" fill={fillDark} stroke={stroke} strokeWidth="1.2" strokeLinejoin="round" />
+          <line x1="15" y1="13" x2="15" y2="33" stroke={dashStroke} strokeWidth="1.2" strokeDasharray="2 1.5" />
+          <line x1="26" y1="8" x2="26" y2="28" stroke={dashStroke} strokeWidth="1.2" strokeDasharray="2 1.5" />
+          <line x1="37" y1="13" x2="37" y2="33" stroke={dashStroke} strokeWidth="1.2" strokeDasharray="2 1.5" />
+        </svg>
+      );
+
+    case '33': // Вікно (3 складання / Double Gate Fold)
+      return (
+        <svg width="54" height="36" viewBox="0 0 54 36" fill="none">
+          <polygon points="6,9 16,11 16,31 6,29" fill={fillLight} stroke={stroke} strokeWidth="1.2" strokeLinejoin="round" />
+          <polygon points="16,11 27,13 27,33 16,31" fill={fillMid} stroke={stroke} strokeWidth="1.2" strokeLinejoin="round" />
+          <polygon points="27,13 38,11 38,31 27,33" fill={fillMid} stroke={stroke} strokeWidth="1.2" strokeLinejoin="round" />
+          <polygon points="38,11 48,9 48,29 38,31" fill={fillLight} stroke={stroke} strokeWidth="1.2" strokeLinejoin="round" />
+          <line x1="16" y1="11" x2="16" y2="31" stroke={dashStroke} strokeWidth="1.2" strokeDasharray="2 1.5" />
+          <line x1="27" y1="13" x2="27" y2="33" stroke={dashStroke} strokeWidth="1.4" strokeDasharray="2 1.5" />
+          <line x1="38" y1="11" x2="38" y2="31" stroke={dashStroke} strokeWidth="1.2" strokeDasharray="2 1.5" />
+        </svg>
+      );
+
+    case '41': // Намотування (4 складання / 5-Panel Roll)
+      return (
+        <svg width="54" height="36" viewBox="0 0 54 36" fill="none">
+          <rect x="6" y="9" width="42" height="19" rx="1.5" fill={fillLight} stroke={stroke} strokeWidth="1.2" />
+          <line x1="14" y1="9" x2="14" y2="28" stroke={dashStroke} strokeWidth="1.1" strokeDasharray="1.5 1.5" />
+          <line x1="22" y1="9" x2="22" y2="28" stroke={dashStroke} strokeWidth="1.1" strokeDasharray="1.5 1.5" />
+          <line x1="30" y1="9" x2="30" y2="28" stroke={dashStroke} strokeWidth="1.1" strokeDasharray="1.5 1.5" />
+          <line x1="38" y1="9" x2="38" y2="28" stroke={dashStroke} strokeWidth="1.1" strokeDasharray="1.5 1.5" />
+        </svg>
+      );
+
+    case '42': // Гармошка (4 складання / 5-Panel Accordion)
+      return (
+        <svg width="54" height="36" viewBox="0 0 54 36" fill="none">
+          <polygon points="5,8 13,12 13,32 5,28" fill={fillLight} stroke={stroke} strokeWidth="1.1" strokeLinejoin="round" />
+          <polygon points="13,12 21,8 21,28 13,32" fill={fillMid} stroke={stroke} strokeWidth="1.1" strokeLinejoin="round" />
+          <polygon points="21,8 29,12 29,32 21,28" fill={fillLight} stroke={stroke} strokeWidth="1.1" strokeLinejoin="round" />
+          <polygon points="29,12 37,8 37,28 29,32" fill={fillMid} stroke={stroke} strokeWidth="1.1" strokeLinejoin="round" />
+          <polygon points="37,8 48,12 48,32 37,28" fill={fillDark} stroke={stroke} strokeWidth="1.1" strokeLinejoin="round" />
+          <line x1="13" y1="12" x2="13" y2="32" stroke={dashStroke} strokeWidth="1" strokeDasharray="2 1.5" />
+          <line x1="21" y1="8" x2="21" y2="28" stroke={dashStroke} strokeWidth="1" strokeDasharray="2 1.5" />
+          <line x1="29" y1="12" x2="29" y2="32" stroke={dashStroke} strokeWidth="1" strokeDasharray="2 1.5" />
+          <line x1="37" y1="8" x2="37" y2="28" stroke={dashStroke} strokeWidth="1" strokeDasharray="2 1.5" />
+        </svg>
+      );
+
+    case '52': // Гармошка (5 складань / 6-Panel Accordion)
+      return (
+        <svg width="54" height="36" viewBox="0 0 54 36" fill="none">
+          <polygon points="4,8 11,12 11,32 4,28" fill={fillLight} stroke={stroke} strokeWidth="1" strokeLinejoin="round" />
+          <polygon points="11,12 18,8 18,28 11,32" fill={fillMid} stroke={stroke} strokeWidth="1" strokeLinejoin="round" />
+          <polygon points="18,8 25,12 25,32 18,28" fill={fillLight} stroke={stroke} strokeWidth="1" strokeLinejoin="round" />
+          <polygon points="25,12 32,8 32,28 25,32" fill={fillMid} stroke={stroke} strokeWidth="1" strokeLinejoin="round" />
+          <polygon points="32,8 39,12 39,32 32,28" fill={fillLight} stroke={stroke} strokeWidth="1" strokeLinejoin="round" />
+          <polygon points="39,12 48,8 48,28 39,32" fill={fillDark} stroke={stroke} strokeWidth="1" strokeLinejoin="round" />
+          <line x1="11" y1="12" x2="11" y2="32" stroke={dashStroke} strokeWidth="0.9" strokeDasharray="1.5 1.5" />
+          <line x1="18" y1="8" x2="18" y2="28" stroke={dashStroke} strokeWidth="0.9" strokeDasharray="1.5 1.5" />
+          <line x1="25" y1="12" x2="25" y2="32" stroke={dashStroke} strokeWidth="0.9" strokeDasharray="1.5 1.5" />
+          <line x1="32" y1="8" x2="32" y2="28" stroke={dashStroke} strokeWidth="0.9" strokeDasharray="1.5 1.5" />
+          <line x1="39" y1="12" x2="39" y2="32" stroke={dashStroke} strokeWidth="0.9" strokeDasharray="1.5 1.5" />
+        </svg>
+      );
+
+    default:
+      return (
+        <svg width="54" height="36" viewBox="0 0 54 36" fill="none">
+          <rect x="7" y="7" width="40" height="22" rx="2" fill={fillLight} stroke={stroke} strokeWidth="1.2" />
+          <line x1="27" y1="7" x2="27" y2="29" stroke={dashStroke} strokeWidth="1.2" strokeDasharray="2 1.5" />
+        </svg>
+      );
+  }
+};
+
+// Helper: Rich Interactive 3D & Blueprint Visualizer for Folding Booklets
+const renderBookletFoldBlueprint = (
+  foldCode: string,
+  widthStr: string,
+  heightStr: string,
+  unit: string,
+  orientation: 'horiz' | 'vert',
+  toggleOrientation: () => void
+) => {
+  const wNum = parseFloat(widthStr) || 297;
+  const hNum = parseFloat(heightStr) || 210;
+
+  interface FoldMeta {
+    title: string;
+    sub: string;
+    creases: number;
+    pages: number;
+    crossSection: string;
+    profileSvg: React.ReactNode;
+    isometricSvg: React.ReactNode;
+    getPanels: (w: number) => { name: string; width: number; ratio: number; tag: string }[];
+    getClosedDimensions: (w: number, h: number) => { w: number; h: number; desc: string };
+  }
+
+  const foldMap: Record<string, FoldMeta> = {
+    '1': {
+      title: 'Книжка (Half Fold)',
+      sub: '1 складання навпіл',
+      creases: 1,
+      pages: 4,
+      crossSection: 'V-подібний (1 згин)',
+      profileSvg: (
+        <svg width="48" height="24" viewBox="0 0 48 24" fill="none">
+          <polyline points="4,4 24,20 44,4" stroke="#2563eb" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+          <circle cx="24" cy="20" r="3" fill="#2563eb" />
+        </svg>
+      ),
+      isometricSvg: (
+        <svg width="140" height="85" viewBox="0 0 140 85" fill="none">
+          <polygon points="12,74 70,82 128,74 70,68" fill="#e2e8f0" />
+          <polygon points="15,22 70,32 70,72 15,62" fill="#dbeafe" stroke="#2563eb" strokeWidth="1.5" strokeLinejoin="round" />
+          <text x="38" y="49" fill="#1e40af" fontSize="9.5" fontWeight="bold" textAnchor="middle">Стор. 4 / 1</text>
+          <polygon points="70,32 125,22 125,62 70,72" fill="#eff6ff" stroke="#2563eb" strokeWidth="1.5" strokeLinejoin="round" />
+          <text x="100" y="49" fill="#2563eb" fontSize="9.5" fontWeight="bold" textAnchor="middle">Титул (Стор. 1)</text>
+          <line x1="70" y1="32" x2="70" y2="72" stroke="#1d4ed8" strokeWidth="2" strokeDasharray="3 2" />
+          <path d="M115 16 C95 8 78 12 72 23" stroke="#2563eb" strokeWidth="1.4" strokeLinecap="round" fill="none" />
+          <polygon points="70,26 72,20 76,24" fill="#2563eb" />
+        </svg>
+      ),
+      getPanels: (w) => [
+        { name: 'Задня обкладинка (Стор. 4)', width: Math.round(w / 2 * 10) / 10, ratio: 0.5, tag: 'Оборотка' },
+        { name: 'Лицьова / Титул (Стор. 1)', width: Math.round(w / 2 * 10) / 10, ratio: 0.5, tag: 'Титул' }
+      ],
+      getClosedDimensions: (w, h) => ({ w: Math.round(w / 2 * 10) / 10, h, desc: 'А5 / Стандарт' })
+    },
+    '121': {
+      title: 'Асиметричний буклет',
+      sub: '1 складання з відкритим полем',
+      creases: 1,
+      pages: 4,
+      crossSection: 'L-подібний клапан',
+      profileSvg: (
+        <svg width="48" height="24" viewBox="0 0 48 24" fill="none">
+          <polyline points="4,4 18,20 44,20" stroke="#2563eb" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+          <circle cx="18" cy="20" r="3" fill="#2563eb" />
+        </svg>
+      ),
+      isometricSvg: (
+        <svg width="140" height="85" viewBox="0 0 140 85" fill="none">
+          <polygon points="12,74 70,82 128,74 70,68" fill="#e2e8f0" />
+          <polygon points="15,18 125,18 125,62 15,62" fill="#dbeafe" stroke="#2563eb" strokeWidth="1.5" />
+          <text x="85" y="42" fill="#1e40af" fontSize="9.5" fontWeight="bold">Основне поле</text>
+          <polygon points="15,26 58,30 58,70 15,66" fill="#eff6ff" stroke="#2563eb" strokeWidth="1.5" />
+          <text x="36" y="50" fill="#2563eb" fontSize="8.5" fontWeight="bold" textAnchor="middle">Клапан</text>
+          <line x1="58" y1="18" x2="58" y2="62" stroke="#3b82f6" strokeWidth="1.5" strokeDasharray="3 2" />
+        </svg>
+      ),
+      getPanels: (w) => {
+        const flap = Math.round(w * 0.35 * 10) / 10;
+        return [
+          { name: 'Короткий клапан', width: flap, ratio: 0.35, tag: 'Клапан 35%' },
+          { name: 'Основне поле (Титул)', width: Math.round((w - flap) * 10) / 10, ratio: 0.65, tag: 'Основа 65%' }
+        ];
+      },
+      getClosedDimensions: (w, h) => ({ w: Math.round(w * 0.65 * 10) / 10, h, desc: 'Широке поле' })
+    },
+    '21': {
+      title: 'Намотування (Євробуклет / C-Fold)',
+      sub: '2 згини у спіраль / C-фальц',
+      creases: 2,
+      pages: 6,
+      crossSection: 'C-подібний (Спіраль)',
+      profileSvg: (
+        <svg width="48" height="24" viewBox="0 0 48 24" fill="none">
+          <path d="M12 18 L36 18 L36 8 L20 8" stroke="#2563eb" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+          <circle cx="36" cy="18" r="2.5" fill="#2563eb" />
+          <circle cx="36" cy="8" r="2.5" fill="#2563eb" />
+        </svg>
+      ),
+      isometricSvg: (
+        <svg width="140" height="85" viewBox="0 0 140 85" fill="none">
+          <polygon points="10,74 70,84 130,74 70,64" fill="#e2e8f0" />
+          <polygon points="45,18 85,18 85,62 45,62" fill="#bfdbfe" stroke="#2563eb" strokeWidth="1.5" />
+          <text x="65" y="42" fill="#1e40af" fontSize="9" fontWeight="bold" textAnchor="middle">Стор. 2 / 5</text>
+          <polygon points="15,24 45,18 45,62 15,68" fill="#dbeafe" stroke="#2563eb" strokeWidth="1.5" />
+          <text x="30" y="46" fill="#1d4ed8" fontSize="8" fontWeight="bold" textAnchor="middle">Клапан (-3мм)</text>
+          <polygon points="85,18 125,24 125,68 85,62" fill="#eff6ff" stroke="#2563eb" strokeWidth="1.5" />
+          <text x="105" y="46" fill="#2563eb" fontSize="8.5" fontWeight="bold" textAnchor="middle">Титул (Стор. 1)</text>
+          <line x1="45" y1="18" x2="45" y2="62" stroke="#1d4ed8" strokeWidth="1.5" strokeDasharray="3 2" />
+          <line x1="85" y1="18" x2="85" y2="62" stroke="#1d4ed8" strokeWidth="1.5" strokeDasharray="3 2" />
+          <path d="M118 14 C95 4 55 6 40 16" stroke="#2563eb" strokeWidth="1.5" strokeLinecap="round" fill="none" />
+          <polygon points="38,18 41,12 44,16" fill="#2563eb" />
+        </svg>
+      ),
+      getPanels: (w) => {
+        const flap = Math.floor(w / 3) - 2;
+        const mid = Math.floor(w / 3) + 1;
+        const front = w - (flap + mid);
+        return [
+          { name: 'Внутрішній клапан', width: flap, ratio: flap / w, tag: 'Клапан (-2..3мм)' },
+          { name: 'Задня обкладинка (Стор. 5)', width: mid, ratio: mid / w, tag: 'Оборотка' },
+          { name: 'Лицьова / Титул (Стор. 1)', width: front, ratio: front / w, tag: 'Титул (100мм)' }
+        ];
+      },
+      getClosedDimensions: (w, h) => ({ w: Math.round(w / 3 * 10) / 10, h, desc: 'Євроформат 100×210' })
+    },
+    '23': {
+      title: 'Вікно (Gate Fold / 2 згини)',
+      sub: '2 стулки, що відкриваються з центру',
+      creases: 2,
+      pages: 6,
+      crossSection: 'П-подібний (Стулки до центру)',
+      profileSvg: (
+        <svg width="48" height="24" viewBox="0 0 48 24" fill="none">
+          <polyline points="10,8 10,18 38,18 38,8" stroke="#2563eb" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+          <circle cx="10" cy="18" r="2.5" fill="#2563eb" />
+          <circle cx="38" cy="18" r="2.5" fill="#2563eb" />
+        </svg>
+      ),
+      isometricSvg: (
+        <svg width="140" height="85" viewBox="0 0 140 85" fill="none">
+          <polygon points="10,74 70,84 130,74 70,64" fill="#e2e8f0" />
+          <rect x="40" y="18" width="60" height="46" rx="1" fill="#bfdbfe" stroke="#2563eb" strokeWidth="1.5" />
+          <text x="70" y="43" fill="#1e40af" fontSize="8.5" fontWeight="bold" textAnchor="middle">Центральний розворот</text>
+          <polygon points="12,23 40,18 40,64 12,69" fill="#eff6ff" stroke="#2563eb" strokeWidth="1.5" />
+          <text x="26" y="45" fill="#2563eb" fontSize="7.5" fontWeight="bold" textAnchor="middle">Ліва стулка</text>
+          <polygon points="100,18 128,23 128,69 100,64" fill="#eff6ff" stroke="#2563eb" strokeWidth="1.5" />
+          <text x="114" y="45" fill="#2563eb" fontSize="7.5" fontWeight="bold" textAnchor="middle">Права стулка</text>
+          <line x1="40" y1="18" x2="40" y2="64" stroke="#1d4ed8" strokeWidth="1.5" strokeDasharray="3 2" />
+          <line x1="100" y1="18" x2="100" y2="64" stroke="#1d4ed8" strokeWidth="1.5" strokeDasharray="3 2" />
+        </svg>
+      ),
+      getPanels: (w) => {
+        const shutter = Math.round(w * 0.25 * 10) / 10;
+        const center = Math.round((w - 2 * shutter) * 10) / 10;
+        return [
+          { name: 'Ліва стулка (25%)', width: shutter, ratio: 0.25, tag: 'Стулка 25%' },
+          { name: 'Центральний розворот (50%)', width: center, ratio: 0.5, tag: 'Розворот 50%' },
+          { name: 'Права стулка (25%)', width: shutter, ratio: 0.25, tag: 'Стулка 25%' }
+        ];
+      },
+      getClosedDimensions: (w, h) => ({ w: Math.round(w / 2 * 10) / 10, h, desc: 'А5 / Закрите вікно' })
+    },
+    '22': {
+      title: 'Гармошка (Z-Fold / 2 згини)',
+      sub: '2 згини зигзагом (3 рівні секції)',
+      creases: 2,
+      pages: 6,
+      crossSection: 'Z-подібний (Зигзаг)',
+      profileSvg: (
+        <svg width="48" height="24" viewBox="0 0 48 24" fill="none">
+          <polyline points="6,6 20,18 34,6 44,18" stroke="#2563eb" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+          <circle cx="20" cy="18" r="2.5" fill="#2563eb" />
+          <circle cx="34" cy="6" r="2.5" fill="#2563eb" />
+        </svg>
+      ),
+      isometricSvg: (
+        <svg width="140" height="85" viewBox="0 0 140 85" fill="none">
+          <polygon points="10,74 70,84 130,74 70,64" fill="#e2e8f0" />
+          <polygon points="12,22 48,30 48,72 12,64" fill="#eff6ff" stroke="#2563eb" strokeWidth="1.5" strokeLinejoin="round" />
+          <text x="30" y="48" fill="#2563eb" fontSize="8.5" fontWeight="bold" textAnchor="middle">Секція 1 (Титул)</text>
+          <polygon points="48,30 86,20 86,62 48,72" fill="#dbeafe" stroke="#2563eb" strokeWidth="1.5" strokeLinejoin="round" />
+          <text x="67" y="46" fill="#1e40af" fontSize="8.5" fontWeight="bold" textAnchor="middle">Секція 2</text>
+          <polygon points="86,20 128,28 128,70 86,62" fill="#bfdbfe" stroke="#2563eb" strokeWidth="1.5" strokeLinejoin="round" />
+          <text x="107" y="46" fill="#1d4ed8" fontSize="8.5" fontWeight="bold" textAnchor="middle">Секція 3</text>
+          <line x1="48" y1="30" x2="48" y2="72" stroke="#1d4ed8" strokeWidth="1.5" strokeDasharray="3 2" />
+          <line x1="86" y1="20" x2="86" y2="62" stroke="#1d4ed8" strokeWidth="1.5" strokeDasharray="3 2" />
+        </svg>
+      ),
+      getPanels: (w) => {
+        const sec = Math.round(w / 3 * 10) / 10;
+        return [
+          { name: 'Секція 1 (Титул)', width: sec, ratio: 0.333, tag: 'Рівна 1/3' },
+          { name: 'Секція 2 (Центр)', width: sec, ratio: 0.333, tag: 'Рівна 1/3' },
+          { name: 'Секція 3 (Задник)', width: sec, ratio: 0.333, tag: 'Рівна 1/3' }
+        ];
+      },
+      getClosedDimensions: (w, h) => ({ w: Math.round(w / 3 * 10) / 10, h, desc: 'Євроформат 99×210' })
+    },
+    '34': {
+      title: 'Комбінований (Cross / Map Fold)',
+      sub: '2 згини: навпіл по горизонталі та вертикалі',
+      creases: 2,
+      pages: 8,
+      crossSection: 'Хрестоподібний (4 квадранти)',
+      profileSvg: (
+        <svg width="48" height="24" viewBox="0 0 48 24" fill="none">
+          <rect x="8" y="4" width="32" height="16" rx="2" stroke="#2563eb" strokeWidth="2" fill="none" />
+          <line x1="24" y1="4" x2="24" y2="20" stroke="#2563eb" strokeWidth="1.5" strokeDasharray="2 1.5" />
+          <line x1="8" y1="12" x2="40" y2="12" stroke="#2563eb" strokeWidth="1.5" strokeDasharray="2 1.5" />
+        </svg>
+      ),
+      isometricSvg: (
+        <svg width="140" height="85" viewBox="0 0 140 85" fill="none">
+          <polygon points="12,18 128,18 128,68 12,68" fill="#eff6ff" stroke="#2563eb" strokeWidth="1.5" />
+          <line x1="70" y1="18" x2="70" y2="68" stroke="#1d4ed8" strokeWidth="2" strokeDasharray="3 2" />
+          <line x1="12" y1="43" x2="128" y2="43" stroke="#1d4ed8" strokeWidth="2" strokeDasharray="3 2" />
+          <rect x="70" y="18" width="58" height="25" fill="#bfdbfe" fillOpacity="0.8" />
+          <text x="99" y="34" fill="#1e40af" fontSize="8.5" fontWeight="bold" textAnchor="middle">Титул (1/4)</text>
+          <text x="41" y="34" fill="#64748b" fontSize="7.5" textAnchor="middle">Квадрант 2</text>
+          <text x="41" y="58" fill="#64748b" fontSize="7.5" textAnchor="middle">Квадрант 3</text>
+          <text x="99" y="58" fill="#64748b" fontSize="7.5" textAnchor="middle">Квадрант 4</text>
+        </svg>
+      ),
+      getPanels: (w) => [
+        { name: 'Ліва половина (вертикальний згин)', width: Math.round(w / 2 * 10) / 10, ratio: 0.5, tag: '50% ширини' },
+        { name: 'Права половина (вертикальний згин)', width: Math.round(w / 2 * 10) / 10, ratio: 0.5, tag: '50% ширини' }
+      ],
+      getClosedDimensions: (w, h) => ({ w: Math.round(w / 2 * 10) / 10, h: Math.round(h / 2 * 10) / 10, desc: 'А6 (1/4 листа)' })
+    },
+    '31': {
+      title: 'Намотування (3 згини / 4 секції)',
+      sub: '3 згини у спіраль (8 сторінок)',
+      creases: 3,
+      pages: 8,
+      crossSection: 'G-подібний (4-секційна спіраль)',
+      profileSvg: (
+        <svg width="48" height="24" viewBox="0 0 48 24" fill="none">
+          <path d="M8 20 L40 20 L40 8 L18 8 L18 14" stroke="#2563eb" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      ),
+      isometricSvg: (
+        <svg width="140" height="85" viewBox="0 0 140 85" fill="none">
+          <polygon points="10,20 130,20 130,66 10,66" fill="#eff6ff" stroke="#2563eb" strokeWidth="1.5" />
+          <line x1="40" y1="20" x2="40" y2="66" stroke="#1d4ed8" strokeWidth="1.5" strokeDasharray="3 2" />
+          <line x1="70" y1="20" x2="70" y2="66" stroke="#1d4ed8" strokeWidth="1.5" strokeDasharray="3 2" />
+          <line x1="100" y1="20" x2="100" y2="66" stroke="#1d4ed8" strokeWidth="1.5" strokeDasharray="3 2" />
+          <text x="25" y="45" fill="#1e40af" fontSize="7.5" fontStyle="italic" textAnchor="middle">Клапан 1</text>
+          <text x="55" y="45" fill="#1e40af" fontSize="7.5" fontStyle="italic" textAnchor="middle">Клапан 2</text>
+          <text x="85" y="45" fill="#1e40af" fontSize="7.5" fontStyle="italic" textAnchor="middle">Задник</text>
+          <text x="115" y="45" fill="#2563eb" fontSize="8.5" fontWeight="bold" textAnchor="middle">Титул</text>
+        </svg>
+      ),
+      getPanels: (w) => {
+        const p1 = Math.round(w * 0.235 * 10) / 10;
+        const p2 = Math.round(w * 0.245 * 10) / 10;
+        const p3 = Math.round(w * 0.26 * 10) / 10;
+        const p4 = Math.round((w - p1 - p2 - p3) * 10) / 10;
+        return [
+          { name: 'Внутрішній клапан 1', width: p1, ratio: 0.235, tag: 'Клапан (-3мм)' },
+          { name: 'Внутрішній клапан 2', width: p2, ratio: 0.245, tag: 'Клапан (-1.5мм)' },
+          { name: 'Оборотка (Стор. 7)', width: p3, ratio: 0.26, tag: 'Основа' },
+          { name: 'Титул (Стор. 1)', width: p4, ratio: 0.26, tag: 'Титул' }
+        ];
+      },
+      getClosedDimensions: (w, h) => ({ w: Math.round(w / 4 * 10) / 10, h, desc: '1/4 ширини' })
+    },
+    '32': {
+      title: 'Гармошка (W-Fold / 3 згини)',
+      sub: '3 згини зигзагом (4 рівні секції)',
+      creases: 3,
+      pages: 8,
+      crossSection: 'W-подібний (4 секції)',
+      profileSvg: (
+        <svg width="48" height="24" viewBox="0 0 48 24" fill="none">
+          <polyline points="4,6 14,18 24,6 34,18 44,6" stroke="#2563eb" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      ),
+      isometricSvg: (
+        <svg width="140" height="85" viewBox="0 0 140 85" fill="none">
+          <polygon points="8,22 38,30 38,72 8,64" fill="#eff6ff" stroke="#2563eb" strokeWidth="1.3" />
+          <polygon points="38,30 68,20 68,62 38,72" fill="#dbeafe" stroke="#2563eb" strokeWidth="1.3" />
+          <polygon points="68,20 98,30 98,72 68,62" fill="#eff6ff" stroke="#2563eb" strokeWidth="1.3" />
+          <polygon points="98,30 128,20 128,62 98,72" fill="#bfdbfe" stroke="#2563eb" strokeWidth="1.3" />
+          <text x="23" y="48" fill="#2563eb" fontSize="7.5" fontWeight="bold" textAnchor="middle">Секц 1</text>
+          <text x="53" y="44" fill="#1e40af" fontSize="7.5" fontWeight="bold" textAnchor="middle">Секц 2</text>
+          <text x="83" y="48" fill="#2563eb" fontSize="7.5" fontWeight="bold" textAnchor="middle">Секц 3</text>
+          <text x="113" y="44" fill="#1e40af" fontSize="7.5" fontWeight="bold" textAnchor="middle">Секц 4</text>
+        </svg>
+      ),
+      getPanels: (w) => {
+        const sec = Math.round(w / 4 * 10) / 10;
+        return [
+          { name: 'Секція 1 (Титул)', width: sec, ratio: 0.25, tag: '1/4' },
+          { name: 'Секція 2', width: sec, ratio: 0.25, tag: '1/4' },
+          { name: 'Секція 3', width: sec, ratio: 0.25, tag: '1/4' },
+          { name: 'Секція 4 (Задник)', width: sec, ratio: 0.25, tag: '1/4' }
+        ];
+      },
+      getClosedDimensions: (w, h) => ({ w: Math.round(w / 4 * 10) / 10, h, desc: '1/4 ширини' })
+    },
+    '33': {
+      title: 'Подвійне вікно (Double Gate Fold)',
+      sub: '3 згини: стулки до центру + складання навпіл',
+      creases: 3,
+      pages: 8,
+      crossSection: 'Подвійні закриті двері',
+      profileSvg: (
+        <svg width="48" height="24" viewBox="0 0 48 24" fill="none">
+          <path d="M8 8 L8 16 L24 16 L24 8 M24 8 L24 16 L40 16 L40 8" stroke="#2563eb" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      ),
+      isometricSvg: (
+        <svg width="140" height="85" viewBox="0 0 140 85" fill="none">
+          <rect x="15" y="18" width="110" height="48" rx="2" fill="#eff6ff" stroke="#2563eb" strokeWidth="1.5" />
+          <line x1="42" y1="18" x2="42" y2="66" stroke="#1d4ed8" strokeWidth="1.5" strokeDasharray="3 2" />
+          <line x1="70" y1="18" x2="70" y2="66" stroke="#1e40af" strokeWidth="2" />
+          <line x1="98" y1="18" x2="98" y2="66" stroke="#1d4ed8" strokeWidth="1.5" strokeDasharray="3 2" />
+          <text x="28" y="44" fill="#2563eb" fontSize="7.5" fontWeight="bold" textAnchor="middle">Стулка 1</text>
+          <text x="56" y="44" fill="#1e40af" fontSize="7.5" fontWeight="bold" textAnchor="middle">Розворот L</text>
+          <text x="84" y="44" fill="#1e40af" fontSize="7.5" fontWeight="bold" textAnchor="middle">Розворот R</text>
+          <text x="112" y="44" fill="#2563eb" fontSize="7.5" fontWeight="bold" textAnchor="middle">Стулка 2</text>
+        </svg>
+      ),
+      getPanels: (w) => {
+        const sec = Math.round(w / 4 * 10) / 10;
+        return [
+          { name: 'Ліва стулка', width: sec, ratio: 0.25, tag: 'Стулка 25%' },
+          { name: 'Центр лівий', width: sec, ratio: 0.25, tag: 'Розворот' },
+          { name: 'Центр правий', width: sec, ratio: 0.25, tag: 'Розворот' },
+          { name: 'Права стулка', width: sec, ratio: 0.25, tag: 'Стулка 25%' }
+        ];
+      },
+      getClosedDimensions: (w, h) => ({ w: Math.round(w / 4 * 10) / 10, h, desc: '1/4 ширини' })
+    },
+    '41': {
+      title: 'Намотування (4 згини / 5 секцій)',
+      sub: '4 згини спіраллю (10 сторінок)',
+      creases: 4,
+      pages: 10,
+      crossSection: '5-секційна спіраль',
+      profileSvg: (
+        <svg width="48" height="24" viewBox="0 0 48 24" fill="none">
+          <path d="M6 20 L42 20 L42 8 L14 8 L14 16 L34 16" stroke="#2563eb" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      ),
+      isometricSvg: (
+        <svg width="140" height="85" viewBox="0 0 140 85" fill="none">
+          <rect x="10" y="20" width="120" height="46" rx="2" fill="#eff6ff" stroke="#2563eb" strokeWidth="1.5" />
+          <line x1="34" y1="20" x2="34" y2="66" stroke="#1d4ed8" strokeWidth="1.2" strokeDasharray="3 2" />
+          <line x1="58" y1="20" x2="58" y2="66" stroke="#1d4ed8" strokeWidth="1.2" strokeDasharray="3 2" />
+          <line x1="82" y1="20" x2="82" y2="66" stroke="#1d4ed8" strokeWidth="1.2" strokeDasharray="3 2" />
+          <line x1="106" y1="20" x2="106" y2="66" stroke="#1d4ed8" strokeWidth="1.2" strokeDasharray="3 2" />
+          <text x="118" y="44" fill="#2563eb" fontSize="7.5" fontWeight="bold" textAnchor="middle">Титул</text>
+        </svg>
+      ),
+      getPanels: (w) => {
+        const sec = Math.round(w / 5 * 10) / 10;
+        return [
+          { name: 'Клапан 1', width: sec, ratio: 0.2, tag: '1/5' },
+          { name: 'Клапан 2', width: sec, ratio: 0.2, tag: '1/5' },
+          { name: 'Клапан 3', width: sec, ratio: 0.2, tag: '1/5' },
+          { name: 'Оборотка', width: sec, ratio: 0.2, tag: '1/5' },
+          { name: 'Титул (Стор. 1)', width: sec, ratio: 0.2, tag: 'Титул' }
+        ];
+      },
+      getClosedDimensions: (w, h) => ({ w: Math.round(w / 5 * 10) / 10, h, desc: '1/5 ширини' })
+    },
+    '42': {
+      title: 'Гармошка (4 згини / 5 секцій)',
+      sub: '4 згини зигзагом (10 сторінок)',
+      creases: 4,
+      pages: 10,
+      crossSection: 'M-зигзаг (5 секцій)',
+      profileSvg: (
+        <svg width="48" height="24" viewBox="0 0 48 24" fill="none">
+          <polyline points="4,6 12,18 20,6 28,18 36,6 44,18" stroke="#2563eb" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      ),
+      isometricSvg: (
+        <svg width="140" height="85" viewBox="0 0 140 85" fill="none">
+          <polygon points="6,22 30,28 30,68 6,62" fill="#eff6ff" stroke="#2563eb" strokeWidth="1.2" />
+          <polygon points="30,28 54,22 54,62 30,68" fill="#dbeafe" stroke="#2563eb" strokeWidth="1.2" />
+          <polygon points="54,22 78,28 78,68 54,62" fill="#eff6ff" stroke="#2563eb" strokeWidth="1.2" />
+          <polygon points="78,28 102,22 102,62 78,68" fill="#dbeafe" stroke="#2563eb" strokeWidth="1.2" />
+          <polygon points="102,22 126,28 126,68 102,62" fill="#bfdbfe" stroke="#2563eb" strokeWidth="1.2" />
+        </svg>
+      ),
+      getPanels: (w) => {
+        const sec = Math.round(w / 5 * 10) / 10;
+        return [
+          { name: 'Секція 1 (Титул)', width: sec, ratio: 0.2, tag: '1/5' },
+          { name: 'Секція 2', width: sec, ratio: 0.2, tag: '1/5' },
+          { name: 'Секція 3', width: sec, ratio: 0.2, tag: '1/5' },
+          { name: 'Секція 4', width: sec, ratio: 0.2, tag: '1/5' },
+          { name: 'Секція 5', width: sec, ratio: 0.2, tag: '1/5' }
+        ];
+      },
+      getClosedDimensions: (w, h) => ({ w: Math.round(w / 5 * 10) / 10, h, desc: '1/5 ширини' })
+    },
+    '52': {
+      title: 'Гармошка (5 згинів / 6 секцій)',
+      sub: '5 згинів зигзагом (12 сторінок)',
+      creases: 5,
+      pages: 12,
+      crossSection: 'MM-зигзаг (6 секцій)',
+      profileSvg: (
+        <svg width="48" height="24" viewBox="0 0 48 24" fill="none">
+          <polyline points="4,6 11,18 18,6 25,18 32,6 39,18 46,6" stroke="#2563eb" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      ),
+      isometricSvg: (
+        <svg width="140" height="85" viewBox="0 0 140 85" fill="none">
+          <rect x="8" y="20" width="124" height="46" rx="2" fill="#eff6ff" stroke="#2563eb" strokeWidth="1.5" />
+          <line x1="28" y1="20" x2="28" y2="66" stroke="#1d4ed8" strokeWidth="1.1" strokeDasharray="3 2" />
+          <line x1="49" y1="20" x2="49" y2="66" stroke="#1d4ed8" strokeWidth="1.1" strokeDasharray="3 2" />
+          <line x1="70" y1="20" x2="70" y2="66" stroke="#1d4ed8" strokeWidth="1.1" strokeDasharray="3 2" />
+          <line x1="91" y1="20" x2="91" y2="66" stroke="#1d4ed8" strokeWidth="1.1" strokeDasharray="3 2" />
+          <line x1="112" y1="20" x2="112" y2="66" stroke="#1d4ed8" strokeWidth="1.1" strokeDasharray="3 2" />
+          <text x="122" y="44" fill="#2563eb" fontSize="7.5" fontWeight="bold" textAnchor="middle">Титул</text>
+        </svg>
+      ),
+      getPanels: (w) => {
+        const sec = Math.round(w / 6 * 10) / 10;
+        return [
+          { name: 'Секція 1', width: sec, ratio: 0.166, tag: '1/6' },
+          { name: 'Секція 2', width: sec, ratio: 0.166, tag: '1/6' },
+          { name: 'Секція 3', width: sec, ratio: 0.166, tag: '1/6' },
+          { name: 'Секція 4', width: sec, ratio: 0.166, tag: '1/6' },
+          { name: 'Секція 5', width: sec, ratio: 0.166, tag: '1/6' },
+          { name: 'Секція 6 (Титул)', width: sec, ratio: 0.166, tag: '1/6' }
+        ];
+      },
+      getClosedDimensions: (w, h) => ({ w: Math.round(w / 6 * 10) / 10, h, desc: '1/6 ширини' })
+    }
+  };
+
+  const fold = foldMap[foldCode] || foldMap['21'];
+  const panels = fold.getPanels(wNum);
+  const closed = fold.getClosedDimensions(wNum, hNum);
+
+  return (
+    <div className="flex flex-col gap-3.5 w-full text-left">
+      {/* Top Banner with Name & Metrics */}
+      <div className="flex items-center justify-between flex-wrap gap-2 pb-2 border-b border-slate-200">
+        <div>
+          <h4 className="text-xs font-black text-slate-800 uppercase tracking-wider m-0 flex items-center gap-1.5">
+            <span className="w-2.5 h-2.5 rounded-full bg-blue-600 animate-pulse"></span>
+            {fold.title}
+          </h4>
+          <span className="text-[11px] font-semibold text-slate-500">{fold.sub}</span>
+        </div>
+        <div className="flex items-center gap-1.5 flex-wrap">
+          <span className="bg-blue-100/80 text-blue-700 font-bold px-2 py-0.5 rounded-md text-[10.5px]">
+            📄 {fold.pages} сторінок
+          </span>
+          <span className="bg-amber-100/80 text-amber-800 font-bold px-2 py-0.5 rounded-md text-[10.5px]">
+            ⚡ {fold.creases} {fold.creases === 1 ? 'згин' : fold.creases < 5 ? 'згини' : 'згинів'}
+          </span>
+        </div>
+      </div>
+
+      {/* 3D Isometric View & Profile Row */}
+      <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 items-center bg-white p-3 rounded-xl border border-slate-200/80 shadow-xs">
+        <div className="sm:col-span-8 flex flex-col items-center justify-center">
+          <div className="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+            3D-модель складання буклету
+          </div>
+          {fold.isometricSvg}
+        </div>
+        <div className="sm:col-span-4 flex flex-col items-center justify-center p-2 rounded-lg bg-slate-50 border border-slate-200/60 text-center">
+          <span className="text-[10px] font-bold text-slate-400 uppercase mb-1">Вигляд з торця</span>
+          {fold.profileSvg}
+          <span className="text-[10.5px] font-bold text-blue-600 mt-1">{fold.crossSection}</span>
+        </div>
+      </div>
+
+      {/* Interactive Flat Blueprint (Розгортка листа) */}
+      <div className="bg-white p-3 rounded-xl border border-slate-200/80 flex flex-col gap-2">
+        <div className="flex items-center justify-between text-[11px] font-bold text-slate-600">
+          <span>📐 Схема розгортки листа:</span>
+          <span className="text-slate-800 bg-slate-100 px-2 py-0.5 rounded font-mono">
+            {wNum} × {hNum} {unit}
+          </span>
+        </div>
+
+        {/* Proportional Paneling Blueprint Bar */}
+        <div className="w-full flex border-2 border-slate-300 rounded-lg overflow-hidden bg-slate-50 relative" style={{ height: '54px' }}>
+          {panels.map((p, idx) => (
+            <div
+              key={idx}
+              style={{ flex: p.ratio }}
+              className={`h-full flex flex-col justify-center items-center text-center p-1 relative border-r-2 last:border-r-0 border-dashed border-blue-400 ${
+                idx % 2 === 0 ? 'bg-blue-50/70' : 'bg-white'
+              }`}
+            >
+              <span className="text-[11px] font-black text-slate-900 font-mono leading-none">
+                {p.width} {unit}
+              </span>
+              <span className="text-[9px] font-semibold text-slate-500 truncate w-full px-1 mt-0.5">
+                {p.tag}
+              </span>
+              {/* Crease marker */}
+              {idx < panels.length - 1 && (
+                <div className="absolute right-0 top-0 bottom-0 w-0 flex items-center justify-center z-10">
+                  <span className="bg-blue-600 text-white text-[8px] font-bold px-1 rounded-full shadow-xs -mr-2.5">
+                    {idx + 1}
+                  </span>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+        <div className="flex justify-between items-center text-[10px] text-slate-400 font-medium px-1">
+          <span>← Зовнішня сторона</span>
+          <span>Пунктир: лінії фальцювання (бігу)</span>
+          <span>Внутрішня сторона →</span>
+        </div>
+      </div>
+
+      {/* Finished Closed Booklet Dimensions Badge */}
+      <div className="p-2.5 rounded-xl bg-gradient-to-r from-blue-50 to-indigo-50/60 border border-blue-200/80 flex items-center justify-between flex-wrap gap-2">
+        <div className="flex items-center gap-2">
+          <div className="w-7 h-7 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-xs shadow-xs">
+            📦
+          </div>
+          <div>
+            <div className="text-[10px] font-bold text-blue-800 uppercase tracking-wide">Розмір у складеному вигляді</div>
+            <div className="text-xs font-black text-slate-900 font-mono">
+              {closed.w} × {closed.h} {unit} <span className="text-slate-500 font-sans font-semibold">({closed.desc})</span>
+            </div>
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={toggleOrientation}
+          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 text-[11px] font-bold text-slate-700 shadow-xs transition-all"
+        >
+          <span>🔄</span>
+          <span>{orientation === 'horiz' ? 'Горизонтальний' : 'Вертикальний'}</span>
+        </button>
+      </div>
+    </div>
+  );
+};
+
 // Clean restored Calculator version 1.0.5
 export const Calculator: React.FC = () => {
   const { clients, materials, norms, addOrder, currentUser, updateNorms } = useApp();
@@ -3319,11 +4035,7 @@ export const Calculator: React.FC = () => {
                                   : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50'
                               }`}
                             >
-                              <div className={`w-9 h-11 rounded border flex justify-between p-0.5 bg-white ${isActive ? 'border-blue-500' : 'border-slate-400'}`}>
-                                <div className="flex-1 border-r border-dashed border-slate-300 h-full"></div>
-                                {fold.creases >= 2 && <div className="flex-1 border-r border-dashed border-slate-300 h-full"></div>}
-                                {fold.creases >= 3 && <div className="flex-1 border-r border-dashed border-slate-300 h-full"></div>}
-                              </div>
+                              {renderFoldThumbnail(fold.folding, isActive)}
                               <span className={`text-xs font-bold text-center leading-tight ${isActive ? 'text-blue-600' : 'text-slate-800'}`}>
                                 {fold.name}
                               </span>
@@ -3858,34 +4570,47 @@ export const Calculator: React.FC = () => {
 
                     {/* Right: Layout Preview Box */}
                     <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 flex flex-col items-center justify-center text-center">
-                      <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Вид готового виробу</p>
-                      
-                      {/* Visual scaled representation rectangle */}
-                      <div
-                        style={{
-                          width: sheetOrientation === 'horiz' ? '180px' : '120px',
-                          height: sheetOrientation === 'horiz' ? '120px' : '180px',
-                          borderRadius: cardKind === '7' || cardKind === '8' ? '50%' : cardKind === '9' ? '16px' : '8px'
-                        }}
-                        className="border-2 border-dashed border-blue-500 bg-white flex items-center justify-center mb-3 shadow-sm transition-all"
-                      >
-                        <span className="text-xs font-bold text-slate-900 bg-slate-100/90 px-2.5 py-1 rounded-md">
-                          {sheetCustomWidth} × {sheetCustomHeight} {sheetUnit}
-                        </span>
-                      </div>
+                      {(category as string) === 'Буклети' ? (
+                        renderBookletFoldBlueprint(
+                          postFolding || '21',
+                          sheetCustomWidth || '297',
+                          sheetCustomHeight || '210',
+                          sheetUnit || 'мм',
+                          sheetOrientation,
+                          () => setSheetOrientation(prev => prev === 'horiz' ? 'vert' : 'horiz')
+                        )
+                      ) : (
+                        <>
+                          <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Вид готового виробу</p>
+                          
+                          {/* Visual scaled representation rectangle */}
+                          <div
+                            style={{
+                              width: sheetOrientation === 'horiz' ? '180px' : '120px',
+                              height: sheetOrientation === 'horiz' ? '120px' : '180px',
+                              borderRadius: cardKind === '7' || cardKind === '8' ? '50%' : cardKind === '9' ? '16px' : '8px'
+                            }}
+                            className="border-2 border-dashed border-blue-500 bg-white flex items-center justify-center mb-3 shadow-sm transition-all"
+                          >
+                            <span className="text-xs font-bold text-slate-900 bg-slate-100/90 px-2.5 py-1 rounded-md">
+                              {sheetCustomWidth} × {sheetCustomHeight} {sheetUnit}
+                            </span>
+                          </div>
 
-                      <div className="flex items-center gap-3 text-xs font-semibold">
-                        <span className={sheetOrientation === 'horiz' ? 'text-blue-600 font-bold' : 'text-slate-500'}>Горизонтальний</span>
-                        <button
-                          type="button"
-                          onClick={() => setSheetOrientation(prev => prev === 'horiz' ? 'vert' : 'horiz')}
-                          className="w-8 h-8 rounded-full border border-slate-200 bg-white hover:bg-slate-50 shadow-sm flex items-center justify-center text-slate-700 transition-colors"
-                          title="Повернути макет"
-                        >
-                          🔄
-                        </button>
-                        <span className={sheetOrientation === 'vert' ? 'text-blue-600 font-bold' : 'text-slate-500'}>Вертикальний</span>
-                      </div>
+                          <div className="flex items-center gap-3 text-xs font-semibold">
+                            <span className={sheetOrientation === 'horiz' ? 'text-blue-600 font-bold' : 'text-slate-500'}>Горизонтальний</span>
+                            <button
+                              type="button"
+                              onClick={() => setSheetOrientation(prev => prev === 'horiz' ? 'vert' : 'horiz')}
+                              className="w-8 h-8 rounded-full border border-slate-200 bg-white hover:bg-slate-50 shadow-sm flex items-center justify-center text-slate-700 transition-colors"
+                              title="Повернути макет"
+                            >
+                              🔄
+                            </button>
+                            <span className={sheetOrientation === 'vert' ? 'text-blue-600 font-bold' : 'text-slate-500'}>Вертикальний</span>
+                          </div>
+                        </>
+                      )}
                     </div>
                   </div>
 
