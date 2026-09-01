@@ -6310,16 +6310,16 @@ export const Calculator: React.FC = () => {
 
                     <div className="overflow-x-auto">
                       <table className="w-full text-center text-xs border-collapse">
-                        <thead>
-                          <tr className="bg-slate-800/95 text-slate-200 text-xs font-semibold uppercase tracking-wider border-b border-slate-700">
-                            <th className="py-3 px-4 text-left border-r border-slate-700/50 min-w-[140px]">Матеріал та покриття</th>
-                            <th className="py-3 px-3 border-r border-slate-700/50">Друк</th>
-                            <th className="py-3 px-3 border-r border-slate-700/50 min-w-[70px]">Готовність</th>
+                        <thead className="bg-slate-200/95 border-b-2 border-slate-300">
+                          <tr className="text-slate-800 text-xs font-black uppercase tracking-wider">
+                            <th className="py-3 px-4 text-left border-r border-slate-300 min-w-[140px] text-slate-900 font-black">Матеріал та покриття</th>
+                            <th className="py-3 px-3 border-r border-slate-300 text-slate-900 font-black">Друк</th>
+                            <th className="py-3 px-3 border-r border-slate-300 min-w-[70px] text-slate-900 font-black">Готовність</th>
                             {(category === 'Бланки'
                               ? [50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950, 1000]
                               : [100, 250, 500, 1000, 1500, 2500, 5000, 10000]
                             ).map(tir => (
-                              <th key={tir} className="py-2.5 px-2 font-black border-r border-slate-700/50 whitespace-nowrap">{tir}</th>
+                              <th key={tir} className="py-2.5 px-2 font-black border-r border-slate-300 text-slate-900 whitespace-nowrap">{tir}</th>
                             ))}
                           </tr>
                         </thead>
@@ -6452,7 +6452,7 @@ export const Calculator: React.FC = () => {
                                           postpressSum = postpressTotalPerItem * tir;
                                           rawTotal += postpressSum + deliveryCost;
                                           itemCost = rawTotal / tir;
-                                          const costShare = rawTotal / (marginPercent / 100 || 1);
+                                          const costShare = rawTotal;
                                           basePaperCost = costShare * 0.48;
                                           printCost = costShare * 0.52;
                                         } else {
@@ -6478,7 +6478,7 @@ export const Calculator: React.FC = () => {
                                             key={tir}
                                             onClick={() => {
                                               const finalTargetPrice = Math.round(rawTotal);
-                                              const exactCostBasis = finalTargetPrice / (marginPercent / 100 || 1);
+                                              const exactCostBasis = finalTargetPrice;
                                               setSelectedSheetCalc({
                                                 matId,
                                                 matName,
@@ -6622,7 +6622,9 @@ export const Calculator: React.FC = () => {
                     };
 
                     // Recompute live with current margin
-                    const liveFinalPrice = Math.round(activeCalc.rawCost * (marginPercent / 100));
+                    const liveFinalPrice = marginPercent === 100 && activeCalc.finalPrice
+                      ? activeCalc.finalPrice
+                      : Math.round(activeCalc.rawCost * (marginPercent / 100));
                     const liveUnitPrice = liveFinalPrice / activeCalc.tirazh;
                     const liveMarginAmount = Math.max(0, liveFinalPrice - activeCalc.rawCost);
 
