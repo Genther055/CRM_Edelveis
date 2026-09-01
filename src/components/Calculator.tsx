@@ -748,7 +748,7 @@ const renderBookletFoldBlueprint = (
           onClick={toggleOrientation}
           className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white border border-slate-200 hover:bg-slate-50 text-[11px] font-bold text-slate-700 shadow-xs transition-all"
         >
-          <span>🔄</span>
+          <span></span>
           <span>{orientation === 'horiz' ? 'Горизонтальний' : 'Вертикальний'}</span>
         </button>
       </div>
@@ -1098,6 +1098,8 @@ export const Calculator: React.FC = () => {
   const [isSamNaSebe, setIsSamNaSebe] = useState(true);
   const [turnType, setTurnType] = useState<'sam_na_sebe' | 'bez_oborotu' | 'chuzhyi_oborut'>('sam_na_sebe');
   const [selectedClientId, setSelectedClientId] = useState(clients[0]?.id || '');
+  const [customClientName, setCustomClientName] = useState<string>('');
+  const [isNewClientMode, setIsNewClientMode] = useState<boolean>(false);
   const [marginPercent, setMarginPercent] = useState<number>(100);
 
   // EXPANDED PREMIUM IDRUK OPTIONS
@@ -1204,6 +1206,10 @@ export const Calculator: React.FC = () => {
   const activeClient = useMemo(() => {
     return clients.find(c => c.id === selectedClientId) || null;
   }, [clients, selectedClientId]);
+
+  const effectiveClientName = isNewClientMode && customClientName.trim() 
+    ? customClientName.trim() 
+    : (activeClient?.name || 'Замовник');
 
   const [customDesignPrice, setCustomDesignPrice] = useState<string>('34');
 
@@ -2126,30 +2132,10 @@ export const Calculator: React.FC = () => {
     const element = document.getElementById('invoice-preview-container');
     if (!element) return;
 
-    const matchNum = (name || '').match(/№\s*(\d+)/);
-    const num = matchNum ? matchNum[1] : (orderNumber || '33811');
+    const safeClient = (effectiveClientName || 'Замовник').replace(/[\\/:*?"<>|]/g, '').trim().replace(/\s+/g, '_');
+    const safeProd = (category === 'Бланки' ? subCategory : (category as string) || 'Продукція').replace(/[\\/:*?"<>|]/g, '').trim().replace(/\s+/g, '_');
+    const fileName = `№${orderNumber}_Рахунок_${safeProd}_${safeClient}.pdf`;
 
-    let rawProd = subCategory || category || 'Бланки';
-    if (!rawProd || (rawProd as string) === 'Основна' || (rawProd as string).includes('Угода')) {
-      if ((name || '').toLowerCase().includes('бланк')) {
-        rawProd = 'Бланки';
-      } else if ((name || '').toLowerCase().includes('листівк')) {
-        rawProd = 'Листівки';
-      } else {
-        rawProd = 'Бланки';
-      }
-    }
-    const safeProdName = rawProd.replace(/[\\/:*?"<>|]/g, '').trim().replace(/\s+/g, '_');
-
-    const rawClient = activeClient?.name || 'Замовник №1';
-    const safeClientName = rawClient.replace(/[\\/:*?"<>|]/g, '').trim().replace(/\s+/g, '_');
-
-    const paperShort = paperType === 'offset' ? 'Офс._70г' : paperType === 'gazetka' ? 'Газ._45г' : 'Крейда_130г';
-    const turnShort = turnType === 'sam_na_sebe' ? 'сс' : turnType === 'bez_oborotu' ? 'без_обор' : 'чо';
-
-    const fileName = `№${num}_${safeProdName}_—_${safeClientName}_(${selectedFormat},_${paperShort},_${colors},_${turnShort},_${quantity}_шт.).pdf`;
-
-    // Clone element to a temporary clean container on document.body to eliminate modal position Y-offset blank page bug
     const tempContainer = document.createElement('div');
     tempContainer.style.position = 'absolute';
     tempContainer.style.left = '-9999px';
@@ -2166,7 +2152,6 @@ export const Calculator: React.FC = () => {
     clone.style.backgroundColor = '#FFFFFF';
     clone.style.color = '#1C1C1E';
 
-    // Traverse clone and replace any CSS variables with explicit high-contrast print colors so sheet stays white in Dark Theme
     const allElements = [clone, ...Array.from(clone.querySelectorAll('*'))] as HTMLElement[];
     allElements.forEach(el => {
       const style = el.getAttribute('style') || '';
@@ -2187,7 +2172,7 @@ export const Calculator: React.FC = () => {
     document.body.appendChild(tempContainer);
 
     const opt = {
-      margin:       [6, 6, 6, 6] as [number, number, number, number],
+      margin:       [8, 8, 8, 8] as [number, number, number, number],
       filename:     fileName,
       image:        { type: 'jpeg' as const, quality: 0.98 },
       html2canvas:  { 
@@ -5257,7 +5242,7 @@ export const Calculator: React.FC = () => {
                     {/* Specialized Product Options Configurator */}
                     {category === 'Папки' && (
                       <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 flex flex-col gap-3">
-                        <h4 className="text-xs font-bold text-blue-600 uppercase tracking-wider m-0">📁 Параметри висічної папки А4</h4>
+                        <h4 className="text-xs font-bold text-blue-600 uppercase tracking-wider m-0"> Параметри висічної папки А4</h4>
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
                           <div>
                             <label className="text-xs font-semibold text-slate-600 block mb-1">Штамп та корінець:</label>
@@ -5296,7 +5281,7 @@ export const Calculator: React.FC = () => {
 
                     {category === 'Блокноти' && (
                       <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 flex flex-col gap-3">
-                        <h4 className="text-xs font-bold text-blue-600 uppercase tracking-wider m-0">📒 Конфігуратор фірмового блокнота на пружині</h4>
+                        <h4 className="text-xs font-bold text-blue-600 uppercase tracking-wider m-0"> Конфігуратор фірмового блокнота на пружині</h4>
                         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
                           <div>
                             <label className="text-xs font-semibold text-slate-600 block mb-1">Колір пружини:</label>
@@ -5365,7 +5350,7 @@ export const Calculator: React.FC = () => {
 
                     {(category === 'Бланки' && ((subCategory as string) === 'Конверт' || (name || '').includes('Конверт'))) && (
                       <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 flex flex-col gap-3">
-                        <h4 className="text-xs font-bold text-blue-600 uppercase tracking-wider m-0">✉️ Параметри фірмового конверта</h4>
+                        <h4 className="text-xs font-bold text-blue-600 uppercase tracking-wider m-0"> Параметри фірмового конверта</h4>
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                           <div>
                             <label className="text-xs font-semibold text-slate-600 block mb-1">Формат конверта:</label>
@@ -5388,7 +5373,7 @@ export const Calculator: React.FC = () => {
 
                     {(category === 'Календарики кишенькові' || category === 'Календарі' || ((subCategory as string) === 'Календарні сітки' || (name || '').includes('сітки'))) && (
                       <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 flex flex-col gap-3">
-                        <h4 className="text-xs font-bold text-blue-600 uppercase tracking-wider m-0">📅 Параметри календарної сітки для квартальних календарів</h4>
+                        <h4 className="text-xs font-bold text-blue-600 uppercase tracking-wider m-0"> Параметри календарної сітки для квартальних календарів</h4>
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                           <div>
                             <label className="text-xs font-semibold text-slate-600 block mb-1">Рік календарної сітки:</label>
@@ -5606,7 +5591,7 @@ export const Calculator: React.FC = () => {
                               className="w-8 h-8 rounded-full border border-slate-200 bg-white hover:bg-slate-50 shadow-sm flex items-center justify-center text-slate-700 transition-colors"
                               title="Повернути макет"
                             >
-                              🔄
+                              
                             </button>
                             <span className={sheetOrientation === 'vert' ? 'text-blue-600 font-bold' : 'text-slate-500'}>Вертикальний</span>
                           </div>
@@ -5615,171 +5600,9 @@ export const Calculator: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Side-by-Side 2 Columns (50% / 50%): Left = Postpress, Right = Materials Filter & Sets */}
+                  {/* Side-by-Side 2 Columns (50% / 50%): Left = Materials Filter & Sets, Right = Postpress */}
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-stretch">
-                    {/* Left Column (50%): Післядрукарська обробка */}
-                    <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden flex flex-col h-full">
-                      <div className="px-5 py-3.5 bg-slate-50/90 flex items-center justify-between border-b border-slate-200">
-                        <div className="flex items-center gap-2.5">
-                          <SlidersHorizontal size={18} className="text-blue-600" />
-                          <h4 className="text-sm font-bold text-slate-900 m-0">Післядрукарська обробка (Нормативи)</h4>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setPostPersonalization('0'); setPostLuvers('0'); setPostLuversCount(1);
-                            setPostCorners('0'); setPostGluing('0'); setPostDrilling('0');
-                            setPostFolding('0'); setPostCreasing('0'); setPostPerforation('0');
-                            setPostPackingText('');
-                          }}
-                          className="text-xs font-semibold px-2.5 py-1 rounded-md bg-white border border-slate-200 text-slate-600 hover:text-red-600 hover:border-red-200 transition-colors shadow-2xs"
-                        >
-                          Очистити
-                        </button>
-                      </div>
-
-                      <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-3 bg-white flex-1">
-                        {/* 1. Персоналізація */}
-                        <div>
-                          <label className="text-[11px] font-bold text-slate-700 block mb-1">Персоналізація</label>
-                          <select value={postPersonalization} onChange={(e) => setPostPersonalization(e.target.value)} className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold">
-                            <option value="0">Ні</option>
-                            <option value="1">Є — змінні дані</option>
-                          </select>
-                        </div>
-
-                        {/* 2. Люверс */}
-                        <div>
-                          <label className="text-[11px] font-bold text-slate-700 block mb-1">Люверс</label>
-                          <div className="flex gap-1.5">
-                            <select value={postLuvers} onChange={(e) => setPostLuvers(e.target.value)} className="flex-1 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold">
-                              <option value="0">Ні</option>
-                              <option value="93">Золотий</option>
-                              <option value="92">Срібний</option>
-                            </select>
-                            {postLuvers !== '0' && (
-                              <input type="number" value={postLuversCount} onChange={(e) => setPostLuversCount(parseInt(e.target.value) || 1)} min={1} className="w-14 px-1.5 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-center" />
-                            )}
-                          </div>
-                        </div>
-
-                        {/* 3. Закруглення кутів */}
-                        <div>
-                          <label className="text-[11px] font-bold text-slate-700 block mb-1">Закруглення кутів</label>
-                          <select value={postCorners} onChange={(e) => setPostCorners(e.target.value)} className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold">
-                            <option value="0">Ні</option>
-                            <option value="4">4 кути</option>
-                            <option value="1">1 кут</option>
-                            <option value="2">2 кути</option>
-                            <option value="3">3 кути</option>
-                          </select>
-                        </div>
-
-                        {/* 4. Проклейка в блок */}
-                        <div>
-                          <label className="text-[11px] font-bold text-slate-700 block mb-1">Проклейка в блок</label>
-                          <div className="flex gap-1.5">
-                            <select value={postGluing} onChange={(e) => setPostGluing(e.target.value)} className="flex-1 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold">
-                              <option value="0">Ні</option>
-                              <option value="25">25 листів</option>
-                              <option value="50">50 листів</option>
-                              <option value="100">100 листів</option>
-                            </select>
-                            {postGluing !== '0' && (
-                              <select value={postGluingSide} onChange={(e) => setPostGluingSide(e.target.value)} className="w-24 px-1.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold">
-                                <option value="1">По короткій</option>
-                                <option value="2">По довгій</option>
-                              </select>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* 5. Свердління */}
-                        <div>
-                          <label className="text-[11px] font-bold text-slate-700 block mb-1">Свердління</label>
-                          <div className="flex gap-1.5">
-                            <select value={postDrilling} onChange={(e) => setPostDrilling(e.target.value)} className="flex-1 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold">
-                              <option value="0">Ні</option>
-                              <option value="1">1 отвір</option>
-                              <option value="2">2 отвори</option>
-                              <option value="3">3 отвори</option>
-                              <option value="4">4 отвори</option>
-                            </select>
-                            {postDrilling !== '0' && (
-                              <select value={postDrillingDia} onChange={(e) => setPostDrillingDia(e.target.value)} className="w-20 px-1.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold">
-                                <option value="3">Ø 3 мм</option>
-                                <option value="4">Ø 4 мм</option>
-                                <option value="5">Ø 5 мм</option>
-                              </select>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* 6. Згинання (Фальцовка) */}
-                        <div>
-                          <label className="text-[11px] font-bold text-slate-700 block mb-1">Згинання / Фальцовка</label>
-                          <div className="flex gap-1.5">
-                            <select value={postFolding} onChange={(e) => setPostFolding(e.target.value)} className="flex-1 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold">
-                              <option value="0">Ні</option>
-                              <option value="1">1 Згинання (навпіл)</option>
-                              <option value="121">1 Згинання (асиметрія)</option>
-                              <option value="21">2 Згинання (намотка)</option>
-                              <option value="22">2 Згинання (гармошка)</option>
-                              <option value="23">2 Згинання (вікно)</option>
-                              <option value="31">3 Згинання (намотка)</option>
-                              <option value="32">3 Згинання (гармошка)</option>
-                              <option value="41">4 Згинання</option>
-                              <option value="52">5 Згинань</option>
-                            </select>
-                            {postFolding === '121' && (
-                              <input
-                                type="number"
-                                value={postFoldingOffset}
-                                onChange={(e) => setPostFoldingOffset(e.target.value)}
-                                placeholder="мм"
-                                className="w-14 px-1.5 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-center"
-                              />
-                            )}
-                          </div>
-                        </div>
-
-                        {/* 7. Біговка */}
-                        <div>
-                          <label className="text-[11px] font-bold text-slate-700 block mb-1">Біговка</label>
-                          <select value={postCreasing} onChange={(e) => setPostCreasing(e.target.value)} className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold">
-                            <option value="0">Ні</option>
-                            {[1,2,3,4,5,6].map(n => (
-                              <option key={n} value={n.toString()}>{n} {n === 1 ? 'біг' : 'біги'}</option>
-                            ))}
-                          </select>
-                        </div>
-
-                        {/* 8. Перфорація */}
-                        <div>
-                          <label className="text-[11px] font-bold text-slate-700 block mb-1">Перфорація</label>
-                          <select value={postPerforation} onChange={(e) => setPostPerforation(e.target.value)} className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold">
-                            <option value="0">Ні</option>
-                            {[1,2,3,4].map(n => (
-                              <option key={n} value={n.toString()}>{n} {n === 1 ? 'прохід' : 'проходи'}</option>
-                            ))}
-                          </select>
-                        </div>
-
-                        {/* 9. Розфасовка (full span in left card) */}
-                        <div className="sm:col-span-2">
-                          <label className="text-[11px] font-bold text-slate-700 block mb-1">Розфасовка (упаковка)</label>
-                          <input
-                            type="text"
-                            value={postPackingText}
-                            onChange={(e) => setPostPackingText(e.target.value)}
-                            placeholder="наприклад: по 100, 200 шт"
-                            className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold"
-                          />
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Right Column (50%): Filter Options & Sets Counter */}
+                    {/* Left Column (50%): Filter Options & Sets Counter */}
                     <div className="flex flex-col gap-4">
                       {/* Filter Options (Materials, Coating, Color Printing) */}
                       <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden flex-1">
@@ -5937,6 +5760,168 @@ export const Calculator: React.FC = () => {
                         <span className="text-xs text-slate-400 font-medium">
                           (Кількість однакових замовлень)
                         </span>
+                      </div>
+                    </div>
+
+                    {/* Right Column (50%): Післядрукарська обробка */}
+                    <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden flex flex-col h-full">
+                      <div className="px-5 py-3.5 bg-slate-50/90 flex items-center justify-between border-b border-slate-200">
+                        <div className="flex items-center gap-2.5">
+                          <SlidersHorizontal size={18} className="text-blue-600" />
+                          <h4 className="text-sm font-bold text-slate-900 m-0">Післядрукарська обробка (Нормативи 1С)</h4>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setPostPersonalization('0'); setPostLuvers('0'); setPostLuversCount(1);
+                            setPostCorners('0'); setPostGluing('0'); setPostDrilling('0');
+                            setPostFolding('0'); setPostCreasing('0'); setPostPerforation('0');
+                            setPostPackingText('');
+                          }}
+                          className="text-xs font-semibold px-2.5 py-1 rounded-md bg-white border border-slate-200 text-slate-600 hover:text-red-600 hover:border-red-200 transition-colors shadow-2xs"
+                        >
+                          Очистити
+                        </button>
+                      </div>
+
+                      <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-3 bg-white flex-1">
+                        {/* 1. Персоналізація */}
+                        <div>
+                          <label className="text-[11px] font-bold text-slate-700 block mb-1">Персоналізація</label>
+                          <select value={postPersonalization} onChange={(e) => setPostPersonalization(e.target.value)} className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold">
+                            <option value="0">Ні</option>
+                            <option value="1">Є — змінні дані (+0.35 ₴/шт)</option>
+                          </select>
+                        </div>
+
+                        {/* 2. Люверс */}
+                        <div>
+                          <label className="text-[11px] font-bold text-slate-700 block mb-1">Люверс</label>
+                          <div className="flex gap-1.5">
+                            <select value={postLuvers} onChange={(e) => setPostLuvers(e.target.value)} className="flex-1 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold">
+                              <option value="0">Ні</option>
+                              <option value="93">Золотий (+1.20 ₴/шт)</option>
+                              <option value="92">Срібний (+1.20 ₴/шт)</option>
+                            </select>
+                            {postLuvers !== '0' && (
+                              <input type="number" value={postLuversCount} onChange={(e) => setPostLuversCount(parseInt(e.target.value) || 1)} min={1} className="w-14 px-1.5 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-center" />
+                            )}
+                          </div>
+                        </div>
+
+                        {/* 3. Закруглення кутів */}
+                        <div>
+                          <label className="text-[11px] font-bold text-slate-700 block mb-1">Закруглення кутів</label>
+                          <select value={postCorners} onChange={(e) => setPostCorners(e.target.value)} className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold">
+                            <option value="0">Ні</option>
+                            <option value="4">4 кути (+0.15 ₴/шт)</option>
+                            <option value="1">1 кут (+0.15 ₴/шт)</option>
+                            <option value="2">2 кути (+0.15 ₴/шт)</option>
+                            <option value="3">3 кути (+0.15 ₴/шт)</option>
+                          </select>
+                        </div>
+
+                        {/* 4. Проклейка в блок */}
+                        <div>
+                          <label className="text-[11px] font-bold text-slate-700 block mb-1">Проклейка в блок</label>
+                          <div className="flex gap-1.5">
+                            <select value={postGluing} onChange={(e) => setPostGluing(e.target.value)} className="flex-1 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold">
+                              <option value="0">Ні</option>
+                              <option value="25">25 листів (+0.20 ₴)</option>
+                              <option value="50">50 листів (+0.20 ₴)</option>
+                              <option value="100">100 листів (+0.20 ₴)</option>
+                            </select>
+                            {postGluing !== '0' && (
+                              <select value={postGluingSide} onChange={(e) => setPostGluingSide(e.target.value)} className="w-24 px-1.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold">
+                                <option value="1">По короткій</option>
+                                <option value="2">По довгій</option>
+                              </select>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* 5. Свердління */}
+                        <div>
+                          <label className="text-[11px] font-bold text-slate-700 block mb-1">Свердління</label>
+                          <div className="flex gap-1.5">
+                            <select value={postDrilling} onChange={(e) => setPostDrilling(e.target.value)} className="flex-1 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold">
+                              <option value="0">Ні</option>
+                              <option value="1">1 отвір (+0.15 ₴)</option>
+                              <option value="2">2 отвори (+0.30 ₴)</option>
+                              <option value="3">3 отвори (+0.45 ₴)</option>
+                              <option value="4">4 отвори (+0.60 ₴)</option>
+                            </select>
+                            {postDrilling !== '0' && (
+                              <select value={postDrillingDia} onChange={(e) => setPostDrillingDia(e.target.value)} className="w-20 px-1.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold">
+                                <option value="3">Ø 3 мм</option>
+                                <option value="4">Ø 4 мм</option>
+                                <option value="5">Ø 5 мм</option>
+                              </select>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* 6. Згинання (Фальцовка) */}
+                        <div>
+                          <label className="text-[11px] font-bold text-slate-700 block mb-1">Згинання / Фальцовка</label>
+                          <div className="flex gap-1.5">
+                            <select value={postFolding} onChange={(e) => setPostFolding(e.target.value)} className="flex-1 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold">
+                              <option value="0">Ні</option>
+                              <option value="1">1 Згинання навпіл ({norms.foldingPrice} ₴)</option>
+                              <option value="121">1 Згинання асиметрія ({norms.foldingPrice} ₴)</option>
+                              <option value="21">2 Згинання намотка ({norms.foldingPrice * 2} ₴)</option>
+                              <option value="22">2 Згинання гармошка ({norms.foldingPrice * 2} ₴)</option>
+                              <option value="23">2 Згинання вікно ({norms.foldingPrice * 2} ₴)</option>
+                              <option value="31">3 Згинання намотка ({norms.foldingPrice * 3} ₴)</option>
+                              <option value="32">3 Згинання гармошка ({norms.foldingPrice * 3} ₴)</option>
+                              <option value="41">4 Згинання ({norms.foldingPrice * 4} ₴)</option>
+                              <option value="52">5 Згинань ({norms.foldingPrice * 5} ₴)</option>
+                            </select>
+                            {postFolding === '121' && (
+                              <input
+                                type="number"
+                                value={postFoldingOffset}
+                                onChange={(e) => setPostFoldingOffset(e.target.value)}
+                                placeholder="мм"
+                                className="w-14 px-1.5 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-center"
+                              />
+                            )}
+                          </div>
+                        </div>
+
+                        {/* 7. Біговка */}
+                        <div>
+                          <label className="text-[11px] font-bold text-slate-700 block mb-1">Біговка</label>
+                          <select value={postCreasing} onChange={(e) => setPostCreasing(e.target.value)} className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold">
+                            <option value="0">Ні</option>
+                            {[1,2,3,4,5,6].map(n => (
+                              <option key={n} value={n.toString()}>{n} {n === 1 ? 'біг' : 'біги'} ({n * norms.foldingPrice} ₴)</option>
+                            ))}
+                          </select>
+                        </div>
+
+                        {/* 8. Перфорація */}
+                        <div>
+                          <label className="text-[11px] font-bold text-slate-700 block mb-1">Перфорація</label>
+                          <select value={postPerforation} onChange={(e) => setPostPerforation(e.target.value)} className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold">
+                            <option value="0">Ні</option>
+                            {[1,2,3,4].map(n => (
+                              <option key={n} value={n.toString()}>{n} {n === 1 ? 'прохід' : 'проходи'} ({n * 0.15} ₴)</option>
+                            ))}
+                          </select>
+                        </div>
+
+                        {/* 9. Розфасовка (full span in right card) */}
+                        <div className="sm:col-span-2">
+                          <label className="text-[11px] font-bold text-slate-700 block mb-1">Розфасовка (упаковка)</label>
+                          <input
+                            type="text"
+                            value={postPackingText}
+                            onChange={(e) => setPostPackingText(e.target.value)}
+                            placeholder="наприклад: по 100, 200 шт"
+                            className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold"
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -6242,20 +6227,26 @@ export const Calculator: React.FC = () => {
                     const liveUnitPrice = liveFinalPrice / activeCalc.tirazh;
                     const liveMarginAmount = Math.max(0, liveFinalPrice - activeCalc.rawCost);
 
+                    const effectiveClient = isNewClientMode && customClientName.trim()
+                      ? customClientName.trim()
+                      : (activeClient?.name || 'Замовник');
+                    const turnShortLabel = turnType === 'sam_na_sebe' ? 'с/с' : turnType === 'bez_oborotu' ? 'без обор.' : 'ч/о';
+                    const fullComposedName = `№ ${orderNumber} - ${category === 'Бланки' ? subCategory : (category as string)} ${sheetCustomWidth}×${sheetCustomHeight} ${sheetUnit} — ${effectiveClient} (${activeCalc.matName}, ${activeCalc.covName}, ${activeCalc.colStr}, ${turnShortLabel}, ${activeCalc.tirazh} шт.)`;
+
                     return (
                       <div id="detailed-sheet-calculation" className="ios-card bg-white" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px', border: '1px solid #bfdbfe', boxShadow: '0 10px 25px -5px rgba(59, 130, 246, 0.1)' }}>
-                        {/* Header */}
+                        {/* Section Header */}
                         <div className="flex items-center justify-between flex-wrap gap-3 pb-3 border-b border-slate-100">
                           <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center text-lg font-bold shadow-sm">
-                              📊
+                            <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center text-sm font-bold shadow-sm">
+                              <FileText size={18} />
                             </div>
                             <div>
                               <h4 className="text-base font-black text-slate-900 m-0">
-                                Кошторис та оформлення замовлення: {category === 'Бланки' ? subCategory : (category as string)}
+                                Оформлення та кошторис замовлення: {category === 'Бланки' ? subCategory : (category as string)}
                               </h4>
                               <span className="text-xs text-slate-500 font-medium">
-                                Повний розрахунок вартості, виробничих норм 1С та собівартості для обраних параметрів
+                                Параметри розрахунку, розцінки 1С та формування документів
                               </span>
                             </div>
                           </div>
@@ -6264,53 +6255,181 @@ export const Calculator: React.FC = () => {
                               {activeCalc.tirazh} шт
                             </span>
                             <span className="text-xs font-bold px-3 py-1 rounded-full bg-slate-100 text-slate-700">
-                              {activeCalc.colStr}
+                              {activeCalc.colStr} ({turnShortLabel})
                             </span>
                           </div>
                         </div>
 
                         {/* 2-Column Grid */}
                         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                          {/* Left Column: Full Specification & Cost Breakdown (7 cols) */}
+                          {/* Left Column: Order Parameters Form & Specs (7 cols) */}
                           <div className="lg:col-span-7 flex flex-col gap-4">
-                            {/* Specs Grid */}
-                            <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 flex flex-col gap-2">
-                              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wide">
-                                Параметри специфікації:
-                              </span>
-                              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 text-xs">
-                                <div>
-                                  <span className="text-slate-400 block text-[10px]">Розмір готового виробу:</span>
-                                  <strong className="text-slate-800 font-mono">{sheetCustomWidth} × {sheetCustomHeight} {sheetUnit}</strong>
+                            {/* Row 1: Order Number and Client Selector / Manual Entry */}
+                            <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
+                              {/* Order Number */}
+                              <div className="sm:col-span-4 flex flex-col gap-1">
+                                <label className="text-[11px] font-bold text-slate-600 uppercase">Номер замовлення:</label>
+                                <div className="flex items-center gap-1.5">
+                                  <input
+                                    type="text"
+                                    value={`№ ${orderNumber}`}
+                                    onChange={(e) => {
+                                      const n = parseInt(e.target.value.replace(/\D/g, ''));
+                                      if (n) setOrderNumber(n);
+                                    }}
+                                    className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-extrabold text-blue-700"
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => setOrderNumber(Math.floor(10000 + Math.random() * 90000))}
+                                    className="px-2 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 text-slate-600 text-xs font-bold"
+                                    title="Згенерувати новий номер"
+                                  >
+                                    <RotateCcw size={13} />
+                                  </button>
                                 </div>
-                                <div>
-                                  <span className="text-slate-400 block text-[10px]">Матеріал:</span>
-                                  <strong className="text-slate-800">{activeCalc.matName}</strong>
+                              </div>
+
+                              {/* Customer Selector or Manual Input */}
+                              <div className="sm:col-span-8 flex flex-col gap-1">
+                                <div className="flex items-center justify-between">
+                                  <label className="text-[11px] font-bold text-slate-600 uppercase">Замовник (Клієнт):</label>
+                                  <button
+                                    type="button"
+                                    onClick={() => setIsNewClientMode(!isNewClientMode)}
+                                    className="text-[10px] font-bold text-blue-600 hover:text-blue-800 underline"
+                                  >
+                                    {isNewClientMode ? 'Вибрати з бази' : '+ Вписати нового'}
+                                  </button>
                                 </div>
-                                <div>
-                                  <span className="text-slate-400 block text-[10px]">Покриття:</span>
-                                  <strong className="text-slate-800">{activeCalc.covName}</strong>
+
+                                {isNewClientMode ? (
+                                  <input
+                                    type="text"
+                                    placeholder="Введіть назву замовника (напр. ТОВ Едельвейс)"
+                                    value={customClientName}
+                                    onChange={(e) => setCustomClientName(e.target.value)}
+                                    className="w-full px-3 py-1.5 rounded-lg border border-blue-400 bg-white text-xs font-bold text-slate-900 focus:outline-none ring-2 ring-blue-500/20"
+                                    autoFocus
+                                  />
+                                ) : (
+                                  <select
+                                    value={selectedClientId}
+                                    onChange={(e) => setSelectedClientId(e.target.value)}
+                                    className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-bold text-slate-800 focus:outline-none"
+                                  >
+                                    <option value="">-- Оберіть замовника з бази --</option>
+                                    {clients.map(c => (
+                                      <option key={c.id} value={c.id}>{c.name}</option>
+                                    ))}
+                                  </select>
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Row 2: Full Descriptive Product Name */}
+                            <div className="flex flex-col gap-1 p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
+                              <div className="flex items-center justify-between">
+                                <label className="text-[11px] font-bold text-slate-600 uppercase">Назва продукту для бази та документів:</label>
+                                <span className="text-[10px] text-slate-400 font-medium">Автоматично підтягується</span>
+                              </div>
+                              <input
+                                type="text"
+                                value={name || fullComposedName}
+                                onChange={(e) => setName(e.target.value)}
+                                className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-xs font-semibold text-slate-800"
+                              />
+                            </div>
+
+                            {/* Row 3: Turns Type (Спуск / Обороти), Quantity & Margin */}
+                            <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
+                              {/* Turns (Спуск) */}
+                              <div className="sm:col-span-6 flex flex-col gap-1">
+                                <label className="text-[11px] font-bold text-slate-600 uppercase">Спуск / Обороти:</label>
+                                <div className="grid grid-cols-3 gap-1 bg-white p-1 rounded-lg border border-slate-200">
+                                  {[
+                                    { id: 'sam_na_sebe', label: 'Сам на себе' },
+                                    { id: 'chuzhyi_oborut', label: 'Чужий (ч/о)' },
+                                    { id: 'bez_oborotu', label: 'Без обор.' }
+                                  ].map(t => (
+                                    <button
+                                      key={t.id}
+                                      type="button"
+                                      onClick={() => handleSelectTurnType(t.id as any)}
+                                      className={`py-1 px-1.5 rounded text-[10px] font-bold transition-all text-center ${
+                                        turnType === t.id
+                                          ? 'bg-blue-600 text-white shadow-2xs'
+                                          : 'text-slate-600 hover:bg-slate-100'
+                                      }`}
+                                    >
+                                      {t.label}
+                                    </button>
+                                  ))}
                                 </div>
-                                <div>
-                                  <span className="text-slate-400 block text-[10px]">Кольоровість:</span>
-                                  <strong className="text-slate-800 font-mono">{activeCalc.colStr}</strong>
-                                </div>
-                                <div>
-                                  <span className="text-slate-400 block text-[10px]">Тираж (Наклад):</span>
-                                  <strong className="text-blue-600 font-mono font-bold">{activeCalc.tirazh} шт</strong>
-                                </div>
-                                <div>
-                                  <span className="text-slate-400 block text-[10px]">Комплектів макетів:</span>
-                                  <strong className="text-slate-800 font-mono">{sheetSetsCount || 1} шт</strong>
+                              </div>
+
+                              {/* Quantity */}
+                              <div className="sm:col-span-3 flex flex-col gap-1">
+                                <label className="text-[11px] font-bold text-slate-600 uppercase">Наклад (шт):</label>
+                                <input
+                                  type="number"
+                                  value={activeCalc.tirazh}
+                                  onChange={(e) => {
+                                    const val = parseInt(e.target.value) || 100;
+                                    setSelectedSheetCalc(prev => prev ? { ...prev, tirazh: val } : null);
+                                  }}
+                                  className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-bold text-slate-900 text-center"
+                                />
+                              </div>
+
+                              {/* Margin % */}
+                              <div className="sm:col-span-3 flex flex-col gap-1">
+                                <label className="text-[11px] font-bold text-slate-600 uppercase">Націнка (%):</label>
+                                <div className="flex items-center gap-1 bg-white p-1 rounded-lg border border-slate-200">
+                                  <input
+                                    type="number"
+                                    value={marginPercent}
+                                    onChange={(e) => setMarginPercent(Number(e.target.value) || 0)}
+                                    className="w-full text-xs font-bold text-center border-none focus:outline-none"
+                                  />
+                                  <span className="text-xs font-bold text-slate-400 pr-1">%</span>
                                 </div>
                               </div>
                             </div>
 
-                            {/* Cost Breakdown */}
-                            <div className="p-3.5 rounded-xl bg-white border border-slate-200 flex flex-col gap-2.5">
+                            {/* Row 4: Summary Specification Badges */}
+                            <div className="p-3.5 rounded-xl bg-white border border-slate-200 flex flex-col gap-2">
+                              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wide">
+                                Специфікація виробу:
+                              </span>
+                              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                                <div className="bg-slate-50 p-2 rounded-lg border border-slate-100">
+                                  <span className="text-slate-400 block text-[10px]">Розмір:</span>
+                                  <strong className="text-slate-800 font-mono">{sheetCustomWidth} × {sheetCustomHeight} {sheetUnit}</strong>
+                                </div>
+                                <div className="bg-slate-50 p-2 rounded-lg border border-slate-100">
+                                  <span className="text-slate-400 block text-[10px]">Матеріал:</span>
+                                  <strong className="text-slate-800">{activeCalc.matName}</strong>
+                                </div>
+                                <div className="bg-slate-50 p-2 rounded-lg border border-slate-100">
+                                  <span className="text-slate-400 block text-[10px]">Покриття:</span>
+                                  <strong className="text-slate-800">{activeCalc.covName}</strong>
+                                </div>
+                                <div className="bg-slate-50 p-2 rounded-lg border border-slate-100">
+                                  <span className="text-slate-400 block text-[10px]">Друк:</span>
+                                  <strong className="text-slate-800 font-mono">{activeCalc.colStr} ({turnShortLabel})</strong>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Right Column: Cost Breakdown, Total Price & Actions (5 cols) */}
+                          <div className="lg:col-span-5 flex flex-col justify-between gap-4">
+                            {/* Cost Breakdown List */}
+                            <div className="p-3.5 rounded-xl bg-white border border-slate-200 flex flex-col gap-2.5 shadow-2xs">
                               <div className="flex justify-between items-center pb-2 border-b border-slate-100">
                                 <span className="text-xs font-bold text-slate-800 uppercase tracking-wide">
-                                  Собівартість виробництва (Прямі норми 1С):
+                                  Собівартість виробництва (Норми 1С):
                                 </span>
                                 <strong className="text-sm font-extrabold text-slate-900 font-mono">
                                   {activeCalc.rawCost.toFixed(2)} ₴
@@ -6321,14 +6440,14 @@ export const Calculator: React.FC = () => {
                                 <div className="flex justify-between text-slate-600">
                                   <span className="flex items-center gap-1.5">
                                     <span className="w-2 h-2 rounded-full bg-amber-500"></span>
-                                    Папір / Матеріал:
+                                    Матеріали / Папір:
                                   </span>
                                   <span className="font-mono font-semibold text-slate-800">{activeCalc.basePaperCost.toFixed(2)} ₴</span>
                                 </div>
                                 <div className="flex justify-between text-slate-600">
                                   <span className="flex items-center gap-1.5">
                                     <span className="w-2 h-2 rounded-full bg-blue-500"></span>
-                                    Друк & CTP-форми:
+                                    Друкарські роботи & CTP:
                                   </span>
                                   <span className="font-mono font-semibold text-slate-800">{activeCalc.printCost.toFixed(2)} ₴</span>
                                 </div>
@@ -6336,7 +6455,7 @@ export const Calculator: React.FC = () => {
                                   <div className="flex justify-between text-slate-600">
                                     <span className="flex items-center gap-1.5">
                                       <span className="w-2 h-2 rounded-full bg-indigo-500"></span>
-                                      Ламінування (плівка + робота):
+                                      Ламінація / Покриття:
                                     </span>
                                     <span className="font-mono font-semibold text-slate-800">{activeCalc.lamCost.toFixed(2)} ₴</span>
                                   </div>
@@ -6345,7 +6464,7 @@ export const Calculator: React.FC = () => {
                                   <div className="flex justify-between text-slate-600">
                                     <span className="flex items-center gap-1.5">
                                       <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-                                      Післядрук (фальцювання, бігування, порізка):
+                                      Післядрукарські роботи:
                                     </span>
                                     <span className="font-mono font-semibold text-slate-800">{activeCalc.postpressSum.toFixed(2)} ₴</span>
                                   </div>
@@ -6368,77 +6487,81 @@ export const Calculator: React.FC = () => {
                                 </span>
                               </div>
                             </div>
-                          </div>
 
-                          {/* Right Column: Margin, Price & Actions (5 cols) */}
-                          <div className="lg:col-span-5 flex flex-col justify-between gap-4">
-                            {/* Big Final Price Box */}
-                            <div className="p-4 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50/70 border border-blue-200/80">
+                            {/* Final Total Price Box */}
+                            <div className="p-4 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50/70 border border-blue-200/80 shadow-2xs">
                               <div className="flex justify-between items-baseline">
-                                <span className="text-xs font-bold text-slate-600">Фінальна вартість для клієнта:</span>
+                                <span className="text-xs font-bold text-slate-700 uppercase tracking-wide">РАЗОМ ДО СПЛАТИ:</span>
                                 <span className="text-xs font-bold text-emerald-600 font-mono">
-                                  +{liveMarginAmount.toFixed(2)} ₴ прибуток
+                                  +{liveMarginAmount.toFixed(2)} ₴ маржа
                                 </span>
                               </div>
                               <p className="text-3xl font-black text-blue-600 my-1 font-mono tracking-tight">
                                 {liveFinalPrice} <span className="text-base font-bold text-slate-600">₴</span>
                               </p>
                               <div className="flex justify-between items-center text-xs pt-2 border-t border-blue-200/60 font-semibold text-blue-900">
-                                <span>Ціна за 1 шт:</span>
+                                <span>Ціна за 1 екземпляр:</span>
                                 <strong className="font-mono font-bold">{liveUnitPrice.toFixed(2)} ₴ / шт</strong>
                               </div>
                             </div>
 
-                            {/* Margin Selector */}
-                            <div className="flex flex-col gap-2">
-                              <div className="flex justify-between items-center text-xs">
-                                <label className="font-semibold text-slate-600">Націнка (Маржа друкарні):</label>
-                                <span className="font-extrabold text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
-                                  {marginPercent}%
-                                </span>
-                              </div>
-                              <input 
-                                type="range"
-                                min="0"
-                                max="300"
-                                step="5"
-                                value={marginPercent}
-                                onChange={(e) => setMarginPercent(Number(e.target.value))}
-                                className="w-full cursor-pointer accent-blue-600"
-                              />
-                              <div className="flex gap-1 bg-slate-100 p-1 rounded-lg">
-                                {[20, 35, 50, 100, 150].map(m => (
-                                  <button
-                                    key={m}
-                                    type="button"
-                                    onClick={() => setMarginPercent(m)}
-                                    className={`flex-1 py-1 text-[11px] font-bold rounded transition-all ${
-                                      marginPercent === m
-                                        ? 'bg-blue-600 text-white shadow-xs'
-                                        : 'text-slate-600 hover:text-slate-900'
-                                    }`}
-                                  >
-                                    {m}%
-                                  </button>
-                                ))}
-                              </div>
-                            </div>
-
-                            {/* Action Buttons */}
+                            {/* Action Buttons Bar: Шаблон, ПДФ, КП, Виробництво */}
                             <div className="flex flex-col gap-2 pt-1">
+                              <div className="grid grid-cols-3 gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setShowTemplateModal(true);
+                                  }}
+                                  className="py-2 px-2.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold shadow-2xs transition-colors text-center"
+                                >
+                                  Шаблон
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setName(fullComposedName);
+                                    setShowInvoice(true);
+                                  }}
+                                  className="py-2 px-2.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold shadow-2xs transition-colors text-center"
+                                >
+                                  ПДФ
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const text = `Комерційна пропозиція № ${orderNumber}
+Замовник: ${effectiveClient}
+Продукція: ${category === 'Бланки' ? subCategory : (category as string)}
+Розмір: ${sheetCustomWidth} × ${sheetCustomHeight} ${sheetUnit}
+Матеріал: ${activeCalc.matName}
+Покриття: ${activeCalc.covName}
+Друк: ${activeCalc.colStr} (Оборот: ${turnShortLabel})
+Тираж: ${activeCalc.tirazh} шт
+Вартість замовлення: ${liveFinalPrice} грн (${liveUnitPrice.toFixed(2)} грн/шт)
+Друкарня "Едельвейс і К"`;
+                                    navigator.clipboard.writeText(text);
+                                    alert('Комерційну пропозицію (КП) скопійовано в буфер обміну.');
+                                  }}
+                                  className="py-2 px-2.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold shadow-2xs transition-colors text-center"
+                                >
+                                  КП
+                                </button>
+                              </div>
+
                               <button
                                 type="button"
                                 onClick={() => {
                                   addOrder({
-                                    name: `№ ${orderNumber} - ${category === 'Бланки' ? subCategory : (category as string)}`,
-                                    clientId: selectedClientId,
+                                    name: name || fullComposedName,
+                                    clientId: isNewClientMode ? (customClientName || 'Новий клієнт') : selectedClientId,
                                     category: category === 'Бланки' ? subCategory : (category as string),
                                     quantity: activeCalc.tirazh,
                                     packingCount: 1,
                                     paperType: activeCalc.matId === '80' ? 'offset' : 'coated',
                                     colors: activeCalc.colStr,
-                                    isSamNaSebe: false,
-                                    designCost: 0,
+                                    isSamNaSebe: turnType === 'sam_na_sebe',
+                                    designCost: designCost,
                                     margin: marginPercent,
                                     machine: 'Офсетна машина',
                                     format: `${sheetCustomWidth}×${sheetCustomHeight}`,
@@ -6450,41 +6573,15 @@ export const Calculator: React.FC = () => {
                                     unitPrice: liveUnitPrice,
                                     paymentStatus: 'unpaid',
                                     prepayment: 0,
-                                    notes: `Специфікація: ${category === 'Бланки' ? subCategory : (category as string)}, ${sheetCustomWidth}×${sheetCustomHeight} ${sheetUnit}, ${activeCalc.matName}, ${activeCalc.covName}, ${activeCalc.colStr}, ${activeCalc.tirazh} шт.`
+                                    notes: `Специфікація: ${name || fullComposedName}, ${sheetCustomWidth}×${sheetCustomHeight} ${sheetUnit}, ${activeCalc.matName}, ${activeCalc.covName}, ${activeCalc.colStr}, ${activeCalc.tirazh} шт.`
                                   });
-                                  alert(`Замовлення № ${orderNumber} успішно створено та надіслано у виробництво!`);
+                                  alert(`Замовлення № ${orderNumber} створено та передано у виробництво.`);
                                   setOrderNumber(Math.floor(10000 + Math.random() * 90000));
                                 }}
                                 className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md shadow-blue-500/20 transition-all text-center"
                               >
-                                🚀 Запустити у виробництво
+                                Виробництво
                               </button>
-                              <div className="grid grid-cols-2 gap-2">
-                                <button
-                                  type="button"
-                                  onClick={() => setShowInvoice(true)}
-                                  className="py-2 px-3 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-xs transition-colors text-center"
-                                >
-                                  Рахунок PDF
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    const text = `Розрахунок замовлення: ${category === 'Бланки' ? subCategory : (category as string)}
-Формат: ${sheetCustomWidth} × ${sheetCustomHeight} ${sheetUnit}
-Матеріал: ${activeCalc.matName} (${activeCalc.covName})
-Друк: ${activeCalc.colStr}
-Наклад: ${activeCalc.tirazh} шт
-Ціна для клієнта: ${liveFinalPrice} грн (${liveUnitPrice.toFixed(2)} грн/шт)
-Друкарня "Едельвейс і К"`;
-                                    navigator.clipboard.writeText(text);
-                                    alert('Специфікацію та КП скопійовано для клієнта!');
-                                  }}
-                                  className="py-2 px-3 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-xs transition-colors text-center"
-                                >
-                                  Копіювати КП
-                                </button>
-                              </div>
                             </div>
 
                           </div>
@@ -8114,121 +8211,9 @@ export const Calculator: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Side-by-Side 2 Columns (50% / 50%): Left = Postpress, Right = Materials Filter & Sets */}
+                  {/* Side-by-Side 2 Columns (50% / 50%): Left = Materials Filter & Sets, Right = Postpress */}
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-stretch">
-                    {/* Left Column (50%): Післядрукарська обробка */}
-                    <div className="ios-card bg-white overflow-hidden flex flex-col h-full">
-                      <div className="w-full px-5 py-3.5 flex items-center justify-between bg-slate-50/90 border-b border-slate-200">
-                        <div className="flex items-center gap-2">
-                          <SlidersHorizontal size={16} className="text-blue-600" />
-                          <span className="text-xs font-extrabold uppercase tracking-wider text-slate-800">Післядрукарська обробка (Нормативи)</span>
-                          {(digitalSheetCornerCurve !== '0' || digitalSheetDrilling !== '0' || digitalSheetLuvers !== '0' || digitalSheetPersonalization !== '0' || digitalSheetFolding !== '0' || digitalSheetGluingBlock !== '0') && (
-                            <span className="ios-badge-blue text-[10px] px-2 py-0.5 rounded-full font-bold">Опції обрано</span>
-                          )}
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setDigitalSheetCornerCurve('0');
-                            setDigitalSheetDrilling('0');
-                            setDigitalSheetLuvers('0');
-                            setDigitalSheetPersonalization('0');
-                            setDigitalSheetFolding('0');
-                            setDigitalSheetGluingBlock('0');
-                          }}
-                          className="px-2.5 py-1 rounded-md bg-white border border-slate-200 text-slate-600 hover:text-red-600 text-[11px] font-semibold transition-colors shadow-2xs"
-                        >
-                          Очистити
-                        </button>
-                      </div>
-
-                      <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-3 bg-white flex-1">
-                        <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
-                          <label className="text-[11px] font-bold text-slate-600 block mb-1">Заокруглення кутів:</label>
-                          <select
-                            value={digitalSheetCornerCurve}
-                            onChange={(e) => setDigitalSheetCornerCurve(e.target.value)}
-                            className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800"
-                          >
-                            <option value="0">Ні</option>
-                            <option value="4">4 кути (R=5мм)</option>
-                            <option value="1">1 кут</option>
-                            <option value="2">2 кути</option>
-                            <option value="3">3 кути</option>
-                          </select>
-                        </div>
-
-                        <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
-                          <label className="text-[11px] font-bold text-slate-600 block mb-1">Свердління:</label>
-                          <select
-                            value={digitalSheetDrilling}
-                            onChange={(e) => setDigitalSheetDrilling(e.target.value)}
-                            className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800"
-                          >
-                            <option value="0">Ні</option>
-                            <option value="1">1 отвір (Ø 5мм)</option>
-                            <option value="2">2 отвори</option>
-                            <option value="3">3 отвори</option>
-                            <option value="4">4 отвори</option>
-                          </select>
-                        </div>
-
-                        <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
-                          <label className="text-[11px] font-bold text-slate-600 block mb-1">Люверс (пікколо):</label>
-                          <select
-                            value={digitalSheetLuvers}
-                            onChange={(e) => setDigitalSheetLuvers(e.target.value)}
-                            className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800"
-                          >
-                            <option value="0">Ні</option>
-                            <option value="gold">Золотий люверс</option>
-                            <option value="silver">Срібний люверс</option>
-                          </select>
-                        </div>
-
-                        <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
-                          <label className="text-[11px] font-bold text-slate-600 block mb-1">Персоналізація:</label>
-                          <select
-                            value={digitalSheetPersonalization}
-                            onChange={(e) => setDigitalSheetPersonalization(e.target.value)}
-                            className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800"
-                          >
-                            <option value="0">Ні</option>
-                            <option value="1">Нумерація / QR</option>
-                          </select>
-                        </div>
-
-                        <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
-                          <label className="text-[11px] font-bold text-slate-600 block mb-1">Фальцовка / Біговка:</label>
-                          <select
-                            value={digitalSheetFolding}
-                            onChange={(e) => setDigitalSheetFolding(e.target.value)}
-                            className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800"
-                          >
-                            <option value="0">Ні</option>
-                            <option value="1">1 згин (буклет)</option>
-                            <option value="2">2 згини (євро)</option>
-                            <option value="3">3 згини</option>
-                          </select>
-                        </div>
-
-                        <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
-                          <label className="text-[11px] font-bold text-slate-600 block mb-1">Проклеювання в блок:</label>
-                          <select
-                            value={digitalSheetGluingBlock}
-                            onChange={(e) => setDigitalSheetGluingBlock(e.target.value)}
-                            className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800"
-                          >
-                            <option value="0">Ні</option>
-                            <option value="25">По 25 листів</option>
-                            <option value="50">По 50 листів</option>
-                            <option value="100">По 100 листів</option>
-                          </select>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Right Column (50%): Filter & Sets Counter */}
+                    {/* Left Column (50%): Filter & Sets Counter */}
                     <div className="flex flex-col gap-4">
                       {/* Section: Фільтр специфікацій та матеріалів (Exact CRM Offset Pill Buttons) */}
                       <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden flex-1">
@@ -8391,6 +8376,118 @@ export const Calculator: React.FC = () => {
                         <span className="text-xs text-slate-400 font-medium">
                           (Кількість однакових замовлень)
                         </span>
+                      </div>
+                    </div>
+
+                    {/* Right Column (50%): Післядрукарська обробка */}
+                    <div className="ios-card bg-white overflow-hidden flex flex-col h-full">
+                      <div className="w-full px-5 py-3.5 flex items-center justify-between bg-slate-50/90 border-b border-slate-200">
+                        <div className="flex items-center gap-2">
+                          <SlidersHorizontal size={16} className="text-blue-600" />
+                          <span className="text-xs font-extrabold uppercase tracking-wider text-slate-800">Післядрукарська обробка (Нормативи)</span>
+                          {(digitalSheetCornerCurve !== '0' || digitalSheetDrilling !== '0' || digitalSheetLuvers !== '0' || digitalSheetPersonalization !== '0' || digitalSheetFolding !== '0' || digitalSheetGluingBlock !== '0') && (
+                            <span className="ios-badge-blue text-[10px] px-2 py-0.5 rounded-full font-bold">Опції обрано</span>
+                          )}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setDigitalSheetCornerCurve('0');
+                            setDigitalSheetDrilling('0');
+                            setDigitalSheetLuvers('0');
+                            setDigitalSheetPersonalization('0');
+                            setDigitalSheetFolding('0');
+                            setDigitalSheetGluingBlock('0');
+                          }}
+                          className="px-2.5 py-1 rounded-md bg-white border border-slate-200 text-slate-600 hover:text-red-600 text-[11px] font-semibold transition-colors shadow-2xs"
+                        >
+                          Очистити
+                        </button>
+                      </div>
+
+                      <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-3 bg-white flex-1">
+                        <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
+                          <label className="text-[11px] font-bold text-slate-600 block mb-1">Заокруглення кутів:</label>
+                          <select
+                            value={digitalSheetCornerCurve}
+                            onChange={(e) => setDigitalSheetCornerCurve(e.target.value)}
+                            className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800"
+                          >
+                            <option value="0">Ні</option>
+                            <option value="4">4 кути (R=5мм)</option>
+                            <option value="1">1 кут</option>
+                            <option value="2">2 кути</option>
+                            <option value="3">3 кути</option>
+                          </select>
+                        </div>
+
+                        <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
+                          <label className="text-[11px] font-bold text-slate-600 block mb-1">Свердління:</label>
+                          <select
+                            value={digitalSheetDrilling}
+                            onChange={(e) => setDigitalSheetDrilling(e.target.value)}
+                            className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800"
+                          >
+                            <option value="0">Ні</option>
+                            <option value="1">1 отвір (Ø 5мм)</option>
+                            <option value="2">2 отвори</option>
+                            <option value="3">3 отвори</option>
+                            <option value="4">4 отвори</option>
+                          </select>
+                        </div>
+
+                        <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
+                          <label className="text-[11px] font-bold text-slate-600 block mb-1">Люверс (пікколо):</label>
+                          <select
+                            value={digitalSheetLuvers}
+                            onChange={(e) => setDigitalSheetLuvers(e.target.value)}
+                            className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800"
+                          >
+                            <option value="0">Ні</option>
+                            <option value="gold">Золотий люверс</option>
+                            <option value="silver">Срібний люверс</option>
+                          </select>
+                        </div>
+
+                        <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
+                          <label className="text-[11px] font-bold text-slate-600 block mb-1">Персоналізація:</label>
+                          <select
+                            value={digitalSheetPersonalization}
+                            onChange={(e) => setDigitalSheetPersonalization(e.target.value)}
+                            className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800"
+                          >
+                            <option value="0">Ні</option>
+                            <option value="1">Нумерація / QR</option>
+                          </select>
+                        </div>
+
+                        <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
+                          <label className="text-[11px] font-bold text-slate-600 block mb-1">Фальцовка / Біговка:</label>
+                          <select
+                            value={digitalSheetFolding}
+                            onChange={(e) => setDigitalSheetFolding(e.target.value)}
+                            className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800"
+                          >
+                            <option value="0">Ні</option>
+                            <option value="1">1 згин (буклет)</option>
+                            <option value="2">2 згини (євро)</option>
+                            <option value="3">3 згини</option>
+                          </select>
+                        </div>
+
+                        <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
+                          <label className="text-[11px] font-bold text-slate-600 block mb-1">Проклеювання в блок:</label>
+                          <select
+                            value={digitalSheetGluingBlock}
+                            onChange={(e) => setDigitalSheetGluingBlock(e.target.value)}
+                            className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800"
+                          >
+                            <option value="0">Ні</option>
+                            <option value="25">По 25 листів</option>
+                            <option value="50">По 50 листів</option>
+                            <option value="100">По 100 листів</option>
+                          </select>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -10873,7 +10970,7 @@ export const Calculator: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Side-by-Side 2 Columns (50% / 50%): Left = Postpress & Hardware, Right = Materials Filter & Sets */}
+                  {/* Side-by-Side 2 Columns (50% / 50%): Left = Materials Filter & Sets, Right = Postpress & Hardware */}
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-stretch">
                     {/* Left Column (50%): Післядрукарська обробка та фурнітура */}
                     <div className="ios-card bg-white overflow-hidden flex flex-col h-full">
@@ -13252,164 +13349,209 @@ export const Calculator: React.FC = () => {
       )}
 
       {/* Invoice preview modal */}
-      {showInvoice && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-3xl w-full shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
-            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
-              <h3 className="text-base font-bold text-slate-900 m-0">Рахунок-Специфікація замовлення</h3>
-              <button onClick={() => setShowInvoice(false)} className="text-slate-400 hover:text-slate-700 w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center transition-colors">✕</button>
-            </div>
-            
-            <div className="p-6 overflow-y-auto" id="invoice-preview-container">
-              {/* Document Header */}
-              <div className="flex justify-between items-start border-b-2 border-slate-900 pb-3 mb-4 gap-4">
+      {showInvoice && (() => {
+        const clientDisplayName = isNewClientMode && customClientName.trim()
+          ? customClientName.trim()
+          : (activeClient?.name || 'Замовник');
+        
+        const matNameDisplay = selectedSheetCalc 
+          ? selectedSheetCalc.matName 
+          : (paperType === 'offset' ? 'Офсетний 70г' : paperType === 'gazetka' ? 'Газетний 45г' : 'Крейдований 130г');
+        
+        const covNameDisplay = selectedSheetCalc 
+          ? selectedSheetCalc.covName 
+          : (laminationType === 'none' ? 'Без покриття' : laminationType === 'gloss' ? 'Глянцева ламінація' : laminationType === 'matte' ? 'Матова ламінація' : 'Soft-touch');
+        
+        const colStrDisplay = selectedSheetCalc ? selectedSheetCalc.colStr : colors;
+        const tirazhDisplay = selectedSheetCalc ? selectedSheetCalc.tirazh : (Number(quantity) || 1000);
+        const formatDisplay = `${sheetCustomWidth} × ${sheetCustomHeight} ${sheetUnit}`;
+        const turnLabelDisplay = turnType === 'sam_na_sebe' ? 'Сам на себе (с/с)' : turnType === 'bez_oborotu' ? 'Без обороту' : 'Чужий оборот (ч/о)';
+        
+        const livePrice = selectedSheetCalc 
+          ? Math.round(selectedSheetCalc.rawCost * (marginPercent / 100))
+          : calculatedOps.finalPrice;
+        const unitPrice = livePrice / (tirazhDisplay || 1);
+
+        return (
+          <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-2xl max-w-3xl w-full shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
+              {/* Modal Top Bar */}
+              <div className="px-6 py-3.5 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+                <div className="flex items-center gap-2">
+                  <FileText size={18} className="text-blue-600" />
+                  <h3 className="text-sm font-extrabold text-slate-900 m-0">Рахунок-Специфікація замовлення № {orderNumber}</h3>
+                </div>
+                <button onClick={() => setShowInvoice(false)} className="text-slate-400 hover:text-slate-700 w-8 h-8 rounded-lg hover:bg-slate-200/60 flex items-center justify-center font-bold text-sm transition-colors">✕</button>
+              </div>
+              
+              {/* Scrollable Printable Container */}
+              <div className="p-6 overflow-y-auto flex-1 max-h-[75vh]" id="invoice-preview-container">
+                {/* Document Header */}
+                <div className="flex justify-between items-start border-b-2 border-slate-900 pb-3 mb-4 gap-4">
+                  <div>
+                    <h4 className="text-lg font-black tracking-tight text-slate-900 m-0">РАХУНОК-СПЕЦИФІКАЦІЯ № {orderNumber}</h4>
+                    <p className="text-xs text-slate-500 m-0 mt-0.5">Поліграфічна компанія «Едельвейс і К»</p>
+                  </div>
+                  <div className="text-right bg-slate-50 p-2.5 px-3.5 rounded-xl border border-slate-200 text-xs">
+                    <p className="font-bold text-slate-900 m-0">Дата: {new Date().toLocaleDateString('uk-UA')}</p>
+                    <p className="text-slate-600 m-0 mt-1 font-semibold">
+                      Покупець: <span className="font-bold text-blue-700">{clientDisplayName}</span>
+                    </p>
+                  </div>
+                </div>
+
+                {/* Product Specification & Quantity Banner */}
+                <div className="grid grid-cols-3 gap-3 mb-4 text-xs">
+                  <div className="col-span-2 bg-slate-50 p-3 rounded-xl border border-slate-200">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">Продукція / Специфікація</span>
+                    <p className="text-sm font-bold text-slate-900 m-0">{name || `${category} ${formatDisplay}`}</p>
+                  </div>
+                  <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 text-right">
+                    <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">Тираж замовлення</span>
+                    <p className="text-sm font-black text-blue-600 m-0">{tirazhDisplay} шт.</p>
+                  </div>
+                </div>
+
+                {/* 1. Матеріали та параметри друку */}
+                <div className="mb-4">
+                  <h5 className="text-xs font-bold border-b border-slate-100 pb-1 mb-2 text-blue-600 uppercase tracking-wider m-0">
+                    1. Матеріали та параметри виробу
+                  </h5>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs">
+                    <div>
+                      <span className="text-slate-400 block text-[10px]">Матеріал:</span>
+                      <strong className="text-slate-900">{matNameDisplay}</strong>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 block text-[10px]">Розмір виробу:</span>
+                      <strong className="text-slate-900">{formatDisplay}</strong>
+                    </div>
+                    <div>
+                      <span className="text-slate-400 block text-[10px]">Покриття:</span>
+                      <strong className="text-slate-900">{covNameDisplay}</strong>
+                    </div>
+                  </div>
+                </div>
+
+                {/* 2. Процес друку */}
+                <div className="mb-4">
+                  <h5 className="text-xs font-bold border-b border-slate-100 pb-1 mb-2 text-blue-600 uppercase tracking-wider m-0">
+                    2. Друк та спуск
+                  </h5>
+                  <table className="w-full text-xs border border-slate-200 rounded-xl overflow-hidden">
+                    <tbody>
+                      <tr className="border-b border-slate-100 bg-slate-50">
+                        <td className="py-2 px-3 text-slate-500 w-1/3">Технологія друку:</td>
+                        <td className="py-2 px-3 font-bold text-slate-900 w-1/6">Офсетний / Цифровий</td>
+                        <td className="py-2 px-3 text-slate-500 w-1/3">Кольоровість:</td>
+                        <td className="py-2 px-3 font-bold text-slate-900 w-1/6">{colStrDisplay}</td>
+                      </tr>
+                      <tr className="border-b border-slate-100">
+                        <td className="py-2 px-3 text-slate-500">Спуск макету / оборот:</td>
+                        <td className="py-2 px-3 font-bold text-slate-900" colSpan={3}>{turnLabelDisplay}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* 3. Післядрукарська обробка */}
+                <div className="mb-4">
+                  <h5 className="text-xs font-bold border-b border-slate-100 pb-1 mb-2 text-blue-600 uppercase tracking-wider m-0">
+                    3. Післядрукарські роботи
+                  </h5>
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div className="p-2.5 border border-slate-200 rounded-xl bg-slate-50">
+                      <span className="text-slate-500">Порізка тиражу:</span> <strong className="text-slate-900">У розмір {formatDisplay}</strong>
+                    </div>
+                    <div className="p-2.5 border border-slate-200 rounded-xl bg-slate-50">
+                      <span className="text-slate-500">Ламінування:</span> <strong className="text-slate-900">{covNameDisplay}</strong>
+                    </div>
+                    {postCorners !== '0' && (
+                      <div className="p-2.5 border border-slate-200 rounded-xl bg-slate-50">
+                        <span className="text-slate-500">Скруглення кутів:</span> <strong className="text-slate-900">{postCorners} кути</strong>
+                      </div>
+                    )}
+                    {postLuvers !== '0' && (
+                      <div className="p-2.5 border border-slate-200 rounded-xl bg-slate-50">
+                        <span className="text-slate-500">Люверси:</span> <strong className="text-slate-900">{postLuversCount} шт ({postLuvers === '93' ? 'Золотий' : 'Срібний'})</strong>
+                      </div>
+                    )}
+                    {postFolding !== '0' && (
+                      <div className="p-2.5 border border-slate-200 rounded-xl bg-slate-50">
+                        <span className="text-slate-500">Фальцювання:</span> <strong className="text-slate-900">Згинання ({postFolding})</strong>
+                      </div>
+                    )}
+                    {postCreasing !== '0' && (
+                      <div className="p-2.5 border border-slate-200 rounded-xl bg-slate-50">
+                        <span className="text-slate-500">Біговка:</span> <strong className="text-slate-900">{postCreasing} біги</strong>
+                      </div>
+                    )}
+                    {postDrilling !== '0' && (
+                      <div className="p-2.5 border border-slate-200 rounded-xl bg-slate-50">
+                        <span className="text-slate-500">Свердління:</span> <strong className="text-slate-900">{postDrilling} отв (Ø {postDrillingDia} мм)</strong>
+                      </div>
+                    )}
+                    {postGluing !== '0' && (
+                      <div className="p-2.5 border border-slate-200 rounded-xl bg-slate-50">
+                        <span className="text-slate-500">Проклейка в блок:</span> <strong className="text-slate-900">По {postGluing} листів</strong>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* 4. Фінансовий розрахунок вартості */}
                 <div>
-                  <h4 className="text-lg font-black tracking-tight text-slate-900 m-0">РАХУНОК-СПЕЦИФІКАЦІЯ № {orderNumber}</h4>
-                  <p className="text-xs text-slate-500 m-0 mt-0.5">Поліграфічна компанія «Едельвейс і К»</p>
-                </div>
-                <div className="text-right bg-slate-50 p-2.5 px-3.5 rounded-xl border border-slate-200 text-xs">
-                  <p className="font-bold text-slate-900 m-0">Дата: {new Date().toLocaleDateString('uk-UA')}</p>
-                  <p className="text-slate-500 m-0 mt-1 font-medium">
-                    Покупець: <span className="font-bold text-blue-600">{activeClient?.name || '—'}</span>
-                  </p>
-                </div>
-              </div>
-
-              {/* Product Specification & Quantity Banner */}
-              <div className="grid grid-cols-3 gap-3 mb-4 text-xs">
-                <div className="col-span-2 bg-slate-50 p-3 rounded-xl border border-slate-200">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">Продукція / Специфікація</span>
-                  <p className="text-sm font-bold text-slate-900 m-0">{name}</p>
-                </div>
-                <div className="bg-slate-50 p-3 rounded-xl border border-slate-200 text-right">
-                  <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">Тираж замовлення</span>
-                  <p className="text-sm font-black text-blue-600 m-0">{quantity} шт.</p>
-                </div>
-              </div>
-
-              {/* 1. Матеріали та специфікація паперу */}
-              <div className="mb-4">
-                <h5 className="text-xs font-bold border-b border-slate-100 pb-1 mb-2 text-blue-600 uppercase tracking-wider m-0">
-                  1. Матеріали та сировина
-                </h5>
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs">
-                  <div>
-                    <span className="text-slate-400 block text-[10px]">Матеріал паперу:</span>
-                    <strong className="text-slate-900">{paperType === 'offset' ? 'Офсетний 70г' : paperType === 'gazetka' ? 'Газетний 45г' : 'Крейдований 130г'}</strong>
-                  </div>
-                  <div>
-                    <span className="text-slate-400 block text-[10px]">Розмір друкарського листа:</span>
-                    <strong className="text-slate-900">{calculatedOps.format} ({calculatedOps.format === 'A1' ? '594x841 мм' : calculatedOps.format === 'A2' ? '420x594 мм' : '297x420 мм'})</strong>
-                  </div>
-                  <div>
-                    <span className="text-slate-400 block text-[10px]">Обсяг матеріалу:</span>
-                    <strong className="text-slate-900">{calculatedOps.physicalSheets} арк. (+{Math.ceil(calculatedOps.physicalSheets * 0.05)} тех. відх.)</strong>
-                  </div>
+                  <h5 className="text-xs font-bold border-b border-slate-100 pb-1 mb-2 text-blue-600 uppercase tracking-wider m-0">
+                    4. Фінансовий підсумок
+                  </h5>
+                  <table className="w-full text-xs">
+                    <thead>
+                      <tr className="border-b-2 border-slate-900 text-left">
+                        <th className="py-2 font-bold text-slate-900">Складова замовлення</th>
+                        <th className="py-2 text-center font-bold text-slate-900">Обсяг</th>
+                        <th className="py-2 text-right font-bold text-slate-900">Сума (грн)</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-100">
+                      <tr>
+                        <td className="py-2 text-slate-800">Матеріали, поліграфічний друк та післядрукарські роботи</td>
+                        <td className="py-2 text-center text-slate-600">{tirazhDisplay} шт.</td>
+                        <td className="py-2 text-right font-mono font-bold text-slate-900">{livePrice.toFixed(2)} ₴</td>
+                      </tr>
+                    </tbody>
+                    <tfoot>
+                      <tr className="text-sm font-bold border-t-2 border-slate-900">
+                        <td className="pt-3 text-slate-900">РАЗОМ ДО СПЛАТИ:</td>
+                        <td className="pt-3 text-center text-xs text-slate-500">Ціна за 1 шт: {unitPrice.toFixed(2)} ₴</td>
+                        <td className="pt-3 text-right text-blue-600 text-base font-extrabold">{livePrice.toFixed(2)} ₴</td>
+                      </tr>
+                    </tfoot>
+                  </table>
                 </div>
               </div>
 
-              {/* 2. Процес друку */}
-              <div className="mb-4">
-                <h5 className="text-xs font-bold border-b border-slate-100 pb-1 mb-2 text-blue-600 uppercase tracking-wider m-0">
-                  2. Процес друку (Друкарська машина & Параметри)
-                </h5>
-                <table className="w-full text-xs border border-slate-200 rounded-xl overflow-hidden">
-                  <tbody>
-                    <tr className="border-b border-slate-100 bg-slate-50">
-                      <td className="py-2 px-3 text-slate-500 w-1/3">Друкарська машина:</td>
-                      <td className="py-2 px-3 font-bold text-slate-900 w-1/6">{calculatedOps.machine}</td>
-                      <td className="py-2 px-3 text-slate-500 w-1/3">Красочність (кольоровість):</td>
-                      <td className="py-2 px-3 font-bold text-slate-900 w-1/6">{colors} ({['1+1', '4+4'].includes(colors) ? '2-стор' : '1-стор'})</td>
-                    </tr>
-                    <tr className="border-b border-slate-100">
-                      <td className="py-2 px-3 text-slate-500">Однотипних листів (на арк):</td>
-                      <td className="py-2 px-3 font-bold text-slate-900">{calculatedOps.itemsPerSheet} шт./арк</td>
-                      <td className="py-2 px-3 text-slate-500">Спуск макету / оборот:</td>
-                      <td className="py-2 px-3 font-bold text-slate-900">{turnType === 'sam_na_sebe' ? 'Сам на себе (с/с)' : turnType === 'bez_oborotu' ? 'Без обороту' : 'Чужий оборот (ч/о)'}</td>
-                    </tr>
-                    <tr className="border-b border-slate-100 bg-slate-50">
-                      <td className="py-2 px-3 text-slate-500">Кількість друкованих листів:</td>
-                      <td className="py-2 px-3 font-bold text-slate-900">{calculatedOps.physicalSheets} арк</td>
-                      <td className="py-2 px-3 text-slate-500">Фактичні прогони:</td>
-                      <td className="py-2 px-3 font-bold text-slate-900">{calculatedOps.physicalSheets * (['1+1', '4+4'].includes(colors) ? 2 : 1)} прог.</td>
-                    </tr>
-                    <tr>
-                      <td className="py-2 px-3 text-slate-500">Приладка / Форми:</td>
-                      <td className="py-2 px-3 font-bold text-slate-900">{['1+1', '4+4'].includes(colors) ? 2 : 1} компл.</td>
-                      <td className="py-2 px-3 text-slate-500">Технічні відходи:</td>
-                      <td className="py-2 px-3 font-bold text-slate-900">+{Math.ceil(calculatedOps.physicalSheets * 0.05)} арк. (5%)</td>
-                    </tr>
-                  </tbody>
-                </table>
-              </div>
-
-              {/* 3. Післядрукарська обробка (Післядрук) */}
-              <div className="mb-4">
-                <h5 className="text-xs font-bold border-b border-slate-100 pb-1 mb-2 text-blue-600 uppercase tracking-wider m-0">
-                  3. Післядрукарська обробка (Післядрук)
-                </h5>
-                <div className="grid grid-cols-2 gap-2 text-xs">
-                  <div className="p-2.5 border border-slate-200 rounded-xl bg-slate-50">
-                    <span className="text-slate-500">Порізка тиражу:</span> <strong className="text-slate-900">Формат {selectedFormat}</strong>
-                  </div>
-                  <div className="p-2.5 border border-slate-200 rounded-xl bg-slate-50">
-                    <span className="text-slate-500">Ламінування:</span> <strong className="text-slate-900">{laminationType === 'none' ? 'Без ламінування' : laminationType === 'gloss' ? 'Глянцева плівка' : laminationType === 'matte' ? 'Матова плівка' : 'Soft-touch оксамит'}</strong>
-                  </div>
-                  <div className="p-2.5 border border-slate-200 rounded-xl bg-slate-50">
-                    <span className="text-slate-500">Бігування / Фальцювання:</span> <strong className="text-slate-900">{Number(creaseCount) > 0 ? `${creaseCount} бігів (згинів)` : 'Ні'}</strong>
-                  </div>
-                  <div className="p-2.5 border border-slate-200 rounded-xl bg-slate-50">
-                    <span className="text-slate-500">Скріплення:</span> <strong className="text-slate-900">{bindingType === 'none' ? 'Без скріплення' : bindingType === 'staple' ? 'Скоба (шиття)' : bindingType === 'spring' ? 'Пружина' : bindingType === 'glue' ? 'Клей (КБС)' : 'Тверда палітурка'}</strong>
-                  </div>
-                  <div className="p-2.5 border border-slate-200 rounded-xl bg-slate-50 col-span-2">
-                    <span className="text-slate-500">Пакування та укладання:</span> <strong className="text-slate-900">{Number(packingCount) > 0 ? `${calculatedOps.totalPackages} пак. по ${packingCount} шт.` : 'Стандартне пакування'}</strong>
-                  </div>
+              {/* Modal Footer Actions */}
+              <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-3">
+                <button
+                  type="button"
+                  onClick={() => window.print()}
+                  className="px-4 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold shadow-2xs transition-colors flex items-center gap-1.5"
+                >
+                  <Printer size={14} />
+                  <span>Друк</span>
+                </button>
+                <div className="flex items-center gap-3">
+                  <button onClick={() => setShowInvoice(false)} className="px-4 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold shadow-2xs transition-colors">Закрити</button>
+                  <button onClick={generatePDF} className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-sm transition-all flex items-center gap-1.5">
+                    <Download size={14} />
+                    <span>Завантажити PDF</span>
+                  </button>
                 </div>
               </div>
-
-              {/* 4. Фінансовий розрахунок вартості */}
-              <div>
-                <h5 className="text-xs font-bold border-b border-slate-100 pb-1 mb-2 text-blue-600 uppercase tracking-wider m-0">
-                  4. Фінансовий підсумок
-                </h5>
-                <table className="w-full text-xs">
-                  <thead>
-                    <tr className="border-b-2 border-slate-900 text-left">
-                      <th className="py-2 font-bold text-slate-900">Складова замовлення</th>
-                      <th className="py-2 text-center font-bold text-slate-900">Обсяг</th>
-                      <th className="py-2 text-right font-bold text-slate-900">Сума (грн)</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100">
-                    <tr>
-                      <td className="py-2 text-slate-800">Макет та переддрук (Оборот: {turnType === 'sam_na_sebe' ? 'с/с' : turnType === 'bez_oborotu' ? 'без обор.' : 'ч/о'})</td>
-                      <td className="py-2 text-center text-slate-600">1 посл.</td>
-                      <td className="py-2 text-right font-mono font-bold text-slate-900">{designCost.toFixed(2)} ₴</td>
-                    </tr>
-                    <tr>
-                      <td className="py-2 text-slate-800">Матеріали + Поліграфічний друк + Післядрукарські операції</td>
-                      <td className="py-2 text-center text-slate-600">{quantity} шт.</td>
-                      <td className="py-2 text-right font-mono font-bold text-slate-900">{(calculatedOps.finalPrice - designCost).toFixed(2)} ₴</td>
-                    </tr>
-                  </tbody>
-                  <tfoot>
-                    <tr className="text-sm font-bold border-t-2 border-slate-900">
-                      <td className="pt-3 text-slate-900">РАЗОМ ДО СПЛАТИ:</td>
-                      <td className="pt-3 text-center text-xs text-slate-500">Ціна за 1 шт: {calculatedOps.unitPrice.toFixed(2)} ₴</td>
-                      <td className="pt-3 text-right text-blue-600 text-base font-extrabold">{calculatedOps.finalPrice.toFixed(2)} ₴</td>
-                    </tr>
-                  </tfoot>
-                </table>
-              </div>
-            </div>
-
-            <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-3">
-              <button onClick={() => setShowInvoice(false)} className="px-4 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-sm transition-colors">Закрити</button>
-              <button onClick={generatePDF} className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-sm transition-all">Завантажити PDF</button>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* Save Template Modal */}
       {showTemplateModal && (
