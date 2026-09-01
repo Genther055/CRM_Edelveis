@@ -3084,7 +3084,7 @@ export const Calculator: React.FC = () => {
                             cursor: 'pointer'
                           }}
                         >
-                          За наклад
+                          За тираж
                         </button>
                         <button
                           type="button"
@@ -6264,7 +6264,7 @@ export const Calculator: React.FC = () => {
                                 : 'text-slate-400 hover:text-white'
                             }`}
                           >
-                            за наклад
+                            за тираж
                           </button>
                           <button
                             type="button"
@@ -6671,7 +6671,7 @@ export const Calculator: React.FC = () => {
 
                               {/* Tirazh Input */}
                               <div className="flex flex-col gap-1.5">
-                                <label className="text-xs font-extrabold text-slate-700 uppercase">НАКЛАД (ШТ):</label>
+                                <label className="text-xs font-extrabold text-slate-700 uppercase">ТИРАЖ (ШТ):</label>
                                 <input
                                   type="number"
                                   value={activeCalc.tirazh}
@@ -6687,7 +6687,17 @@ export const Calculator: React.FC = () => {
                               <div className="flex flex-col gap-2">
                                 <div className="flex items-center justify-between text-xs">
                                   <label className="text-xs font-extrabold text-slate-700 uppercase">НАЦІНКА (МАРЖА):</label>
-                                  <span className="font-extrabold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-lg border border-blue-200">{marginPercent}%</span>
+                                  <div className="flex items-center gap-1">
+                                    <input
+                                      type="number"
+                                      min="0"
+                                      max="500"
+                                      value={marginPercent}
+                                      onChange={(e) => setMarginPercent(Math.max(0, parseInt(e.target.value) || 0))}
+                                      className="w-16 px-2 py-0.5 rounded-lg border border-blue-300 bg-white font-black text-blue-600 text-xs text-center focus:outline-none focus:border-blue-600 shadow-2xs"
+                                    />
+                                    <span className="font-extrabold text-blue-600">%</span>
+                                  </div>
                                 </div>
                                 <input
                                   type="range"
@@ -7226,7 +7236,7 @@ export const Calculator: React.FC = () => {
                               priceCostVar === 'per_tirazh' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
                             }`}
                           >
-                            За наклад
+                            За тираж
                           </button>
                           <button
                             type="button"
@@ -7615,7 +7625,7 @@ export const Calculator: React.FC = () => {
                               priceCostVar === 'per_tirazh' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
                             }`}
                           >
-                            За наклад
+                            За тираж
                           </button>
                           <button
                             type="button"
@@ -8801,7 +8811,7 @@ export const Calculator: React.FC = () => {
                                 : 'text-slate-400 hover:text-white'
                             }`}
                           >
-                            за наклад
+                            за тираж
                           </button>
                           <button
                             type="button"
@@ -9131,7 +9141,7 @@ export const Calculator: React.FC = () => {
 
                               {/* Tirazh Input */}
                               <div className="flex flex-col gap-1.5">
-                                <label className="text-xs font-extrabold text-slate-700 uppercase">НАКЛАД (ШТ):</label>
+                                <label className="text-xs font-extrabold text-slate-700 uppercase">ТИРАЖ (ШТ):</label>
                                 <input
                                   type="number"
                                   value={digTir}
@@ -9162,7 +9172,17 @@ export const Calculator: React.FC = () => {
                               <div className="flex flex-col gap-2">
                                 <div className="flex items-center justify-between text-xs">
                                   <label className="text-xs font-extrabold text-slate-700 uppercase">НАЦІНКА (МАРЖА):</label>
-                                  <span className="font-extrabold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-lg border border-blue-200">{marginPercent}%</span>
+                                  <div className="flex items-center gap-1">
+                                    <input
+                                      type="number"
+                                      min="0"
+                                      max="500"
+                                      value={marginPercent}
+                                      onChange={(e) => setMarginPercent(Math.max(0, parseInt(e.target.value) || 0))}
+                                      className="w-16 px-2 py-0.5 rounded-lg border border-blue-300 bg-white font-black text-blue-600 text-xs text-center focus:outline-none focus:border-blue-600 shadow-2xs"
+                                    />
+                                    <span className="font-extrabold text-blue-600">%</span>
+                                  </div>
                                 </div>
                                 <input
                                   type="range"
@@ -9622,7 +9642,7 @@ export const Calculator: React.FC = () => {
                                 : 'text-slate-400 hover:text-white'
                             }`}
                           >
-                            за наклад
+                            за тираж
                           </button>
                           <button
                             type="button"
@@ -11987,7 +12007,7 @@ export const Calculator: React.FC = () => {
                                 : 'text-slate-400 hover:text-white'
                             }`}
                           >
-                            за наклад
+                            за тираж
                           </button>
                           <button
                             type="button"
@@ -12329,7 +12349,7 @@ export const Calculator: React.FC = () => {
 
                               {/* Tirazh Input */}
                               <div className="flex flex-col gap-1.5">
-                                <label className="text-xs font-extrabold text-slate-700 uppercase">НАКЛАД (ШТ):</label>
+                                <label className="text-xs font-extrabold text-slate-700 uppercase">ТИРАЖ (ШТ):</label>
                                 <input
                                   type="number"
                                   value={wideTir}
@@ -12360,7 +12380,17 @@ export const Calculator: React.FC = () => {
                               <div className="flex flex-col gap-2">
                                 <div className="flex items-center justify-between text-xs">
                                   <label className="text-xs font-extrabold text-slate-700 uppercase">НАЦІНКА (МАРЖА):</label>
-                                  <span className="font-extrabold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-lg border border-blue-200">{marginPercent}%</span>
+                                  <div className="flex items-center gap-1">
+                                    <input
+                                      type="number"
+                                      min="0"
+                                      max="500"
+                                      value={marginPercent}
+                                      onChange={(e) => setMarginPercent(Math.max(0, parseInt(e.target.value) || 0))}
+                                      className="w-16 px-2 py-0.5 rounded-lg border border-blue-300 bg-white font-black text-blue-600 text-xs text-center focus:outline-none focus:border-blue-600 shadow-2xs"
+                                    />
+                                    <span className="font-extrabold text-blue-600">%</span>
+                                  </div>
                                 </div>
                                 <input
                                   type="range"
@@ -13038,7 +13068,7 @@ export const Calculator: React.FC = () => {
                           priceCostVar === 'per_tirazh' ? 'bg-blue-600 text-white shadow-sm' : 'text-slate-400 hover:text-white'
                         }`}
                       >
-                        За наклад
+                        За тираж
                       </button>
                       <button
                         type="button"
