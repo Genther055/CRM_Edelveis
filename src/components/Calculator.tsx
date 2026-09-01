@@ -3267,7 +3267,7 @@ export const Calculator: React.FC = () => {
 
                 {[
                   { key: 'products', label: 'Усі Продукти', count: 34 },
-                  { key: 'offset', label: 'Офсетний друк', badge: 'Авторозрахунок', count: 18 },
+                  { key: 'offset', label: 'Офсетний друк', count: 18 },
                   { key: 'digital', label: 'Цифровий друк', count: 11 },
                   { key: 'wide', label: 'Широкоформатний', count: 10 },
                   { key: 'roll', label: 'Рулонний друк', count: 4 },
@@ -3300,18 +3300,6 @@ export const Calculator: React.FC = () => {
                       }}
                     >
                       <span>{tab.label}</span>
-                      {tab.badge && (
-                        <span style={{
-                          fontSize: '10px',
-                          padding: '2px 6px',
-                          borderRadius: '10px',
-                          fontWeight: '700',
-                          backgroundColor: isActive ? 'rgba(255, 255, 255, 0.25)' : 'rgba(0, 122, 255, 0.12)',
-                          color: isActive ? '#ffffff' : 'var(--primary)'
-                        }}>
-                          {tab.badge}
-                        </span>
-                      )}
                       <span style={{
                         fontSize: '10px',
                         padding: '2px 6px',
@@ -6659,7 +6647,7 @@ export const Calculator: React.FC = () => {
                           <div className="md:col-span-5 flex flex-col gap-1">
                             <div className="flex items-center justify-between">
                               <label className="text-[11px] font-extrabold text-slate-700 uppercase">Продукція:</label>
-                              <span className="text-[9px] font-bold text-blue-700 bg-blue-100 px-1.5 py-0.2 rounded">авто</span>
+                              
                             </div>
                             <input
                               type="text"
@@ -6739,7 +6727,7 @@ export const Calculator: React.FC = () => {
                                       key={m}
                                       type="button"
                                       onClick={() => setMarginPercent(m)}
-                                      className={`py-1.5 text-xs font-bold rounded-lg transition-all ${
+                                      className={`py-2 text-xs font-bold rounded-lg transition-all text-center flex items-center justify-center ${
                                         marginPercent === m
                                           ? 'bg-blue-600 text-white shadow-2xs'
                                           : 'text-slate-600 hover:bg-white'
@@ -9066,7 +9054,7 @@ export const Calculator: React.FC = () => {
                           <div className="md:col-span-5 flex flex-col gap-1">
                             <div className="flex items-center justify-between">
                               <label className="text-[11px] font-extrabold text-slate-700 uppercase">Продукція:</label>
-                              <span className="text-[9px] font-bold text-blue-700 bg-blue-100 px-1.5 py-0.2 rounded">авто</span>
+                              
                             </div>
                             <input
                               type="text"
@@ -9161,7 +9149,7 @@ export const Calculator: React.FC = () => {
                                       key={m}
                                       type="button"
                                       onClick={() => setMarginPercent(m)}
-                                      className={`py-1.5 text-xs font-bold rounded-lg transition-all ${
+                                      className={`py-2 text-xs font-bold rounded-lg transition-all text-center flex items-center justify-center ${
                                         marginPercent === m
                                           ? 'bg-blue-600 text-white shadow-2xs'
                                           : 'text-slate-600 hover:bg-white'
@@ -12283,7 +12271,7 @@ export const Calculator: React.FC = () => {
                           <div className="md:col-span-5 flex flex-col gap-1">
                             <div className="flex items-center justify-between">
                               <label className="text-[11px] font-extrabold text-slate-700 uppercase">Продукція:</label>
-                              <span className="text-[9px] font-bold text-blue-700 bg-blue-100 px-1.5 py-0.2 rounded">авто</span>
+                              
                             </div>
                             <input
                               type="text"
@@ -12354,7 +12342,7 @@ export const Calculator: React.FC = () => {
                                       key={m}
                                       type="button"
                                       onClick={() => setMarginPercent(m)}
-                                      className={`py-1.5 text-xs font-bold rounded-lg transition-all ${
+                                      className={`py-2 text-xs font-bold rounded-lg transition-all text-center flex items-center justify-center ${
                                         marginPercent === m
                                           ? 'bg-blue-600 text-white shadow-2xs'
                                           : 'text-slate-600 hover:bg-white'
@@ -13231,7 +13219,7 @@ export const Calculator: React.FC = () => {
                         <div className="md:col-span-5 flex flex-col gap-1">
                           <div className="flex items-center justify-between">
                             <label className="text-[11px] font-extrabold text-slate-700 uppercase">Продукція:</label>
-                            <span className="text-[9px] font-bold text-blue-700 bg-blue-100 px-1.5 py-0.2 rounded">авто</span>
+                            
                           </div>
                           <input
                             type="text"
@@ -13292,7 +13280,7 @@ export const Calculator: React.FC = () => {
                                     key={m}
                                     type="button"
                                     onClick={() => setMarginPercent(m)}
-                                    className={`py-1.5 text-xs font-bold rounded-lg transition-all ${
+                                    className={`py-2 text-xs font-bold rounded-lg transition-all text-center flex items-center justify-center ${
                                       marginPercent === m
                                         ? 'bg-blue-600 text-white shadow-2xs'
                                         : 'text-slate-600 hover:bg-white'
