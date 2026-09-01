@@ -82,7 +82,7 @@ export const Calculator: React.FC = () => {
 
   // Die-cut (Felling) Offset Calculator specific states
   const [fellingForm, setFellingForm] = useState<string>('1'); // '1': Стандартна, '2': Кругла, '3': Овальна, '4': Прямокутна, '5': Етикетка
-  const [fellingStamp, setFellingStamp] = useState<string>('128'); // Default stamp '128' (Хенгер вид 1)
+  const [fellingStamp, setFellingStamp] = useState<string>('160'); // Default stamp '160' (Будинок)
 
   // Multipage Offset Calculator specific states
   const [multiStitching, setMultiStitching] = useState<string>('1'); // '1': Скоба, '2': Пружина, '3': Клей, '4': Блокноти
@@ -158,7 +158,7 @@ export const Calculator: React.FC = () => {
   const [digitalPouchFormat, setDigitalPouchFormat] = useState<string>('a4');
   const [digitalPlotterMaterial, setDigitalPlotterMaterial] = useState<string>('raflatac_paper');
   const [digitalPlotterCutType, setDigitalPlotterCutType] = useState<'kiss_cut' | 'through_cut'>('kiss_cut');
-  const [digitalCncType, setDigitalCncType] = useState<'package' | 'folder' | 'hanger' | 'custom_shape'>('custom_shape');
+  const [digitalCncType, setDigitalCncType] = useState<'package' | 'folder' | 'wobbler' | 'custom_shape'>('custom_shape');
 
   // Digital Sheets Specific Detailed States (as shown in reference)
   const [digitalSheetSets, setDigitalSheetSets] = useState<number>(1);
@@ -1469,7 +1469,6 @@ export const Calculator: React.FC = () => {
                       { id: 'self_adhesive_film', title: 'САМОКЛЕЮЧА ПЛІВКА', tab: 'wide', sub: 'film' },
                       { id: 'scratch', title: 'СКРЕТЧ-КАРТИ, ЛОТЕРЕЇ', tab: 'digital', sub: 'felling' },
                       { id: 'signs', title: 'ТАБЛИЧКИ, ВИВІСКИ', tab: 'wide', sub: 'pvc' },
-                      { id: 'hangers', title: 'ХЕНГЕРИ', tab: 'digital', sub: 'die_cut_custom' },
                       { id: 'all_products', title: 'ВСІ ПРОДУКТИ', tab: 'products', isRed: true },
                     ].map(item => {
                       const isHovered = hoveredMegaProduct === item.id;
@@ -2170,26 +2169,6 @@ export const Calculator: React.FC = () => {
                       </div>
                     )}
 
-                    {/* 31. Door Hangers (ХЕНГЕРИ) */}
-                    {hoveredMegaProduct === 'hangers' && (
-                      <div className="flex flex-col items-center text-center animate-fadeIn">
-                        <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
-                          <path d="M75 18H125V132H75V18Z" fill="#FFFFFF" stroke="#1E293B" strokeWidth="2.2"/>
-                          <circle cx="100" cy="45" r="16" fill="#F1F5F9" stroke="#1E293B" strokeWidth="2"/>
-                          <path d="M100 61V76" stroke="#1E293B" strokeWidth="2"/>
-                          <circle cx="100" cy="94" r="8" fill="#007AFF" fillOpacity="0.2" stroke="#007AFF" strokeWidth="1.5"/>
-                          <line x1="85" y1="110" x2="115" y2="110" stroke="#1E293B" strokeWidth="2"/>
-                          <line x1="85" y1="120" x2="110" y2="120" stroke="#94A3B8" strokeWidth="2"/>
-                        </svg>
-                        <h4 style={{ fontSize: '13.5px', fontWeight: '800', color: '#1e293b', marginTop: '12px' }}>
-                          Дверні хенгери
-                        </h4>
-                        <p style={{ fontSize: '11px', color: '#64748b', margin: '4px 0 0 0', maxWidth: '220px' }}>
-                          Висічні рекламні гачки на ручки дверей готелів, офісів та промо-кампаній.
-                        </p>
-                      </div>
-                    )}
-
                     {/* 32. All Products (ВСІ ПРОДУКТИ) */}
                     {hoveredMegaProduct === 'all_products' && (
                       <div className="flex flex-col items-center text-center animate-fadeIn">
@@ -2390,7 +2369,7 @@ export const Calculator: React.FC = () => {
                       { 
                         title: 'Висічна продукція', 
                         badge: 'Штампи', 
-                        desc: 'Фігурні наліпки, хенгери, папки, кишенькові календарі, підставки…', 
+                        desc: 'Фігурні наліпки, папки, кишенькові календарі, бирки, підставки…', 
                         subTab: 'felling', 
                         icon: <Scissors size={28} style={{ color: 'var(--primary)' }} />,
                         metric: 'Готові штампи'
@@ -4311,10 +4290,10 @@ export const Calculator: React.FC = () => {
                           onChange={(e) => setFellingStamp(e.target.value)}
                           className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-xs font-semibold text-slate-800"
                         >
-                          <option value="128">Хенгер вид 1 (90 × 200 мм)</option>
-                          <option value="133">Хенгер вид 2 (90 × 200 мм)</option>
-                          <option value="160">Будинок (210 × 300 мм)</option>
+                          <option value="160">Будинок (210 × 300 мм) — настільний календар</option>
                           <option value="161">Пірамідка (305 × 134 мм)</option>
+                          <option value="130">Підставка під чашку (Ø 90 мм) — костер</option>
+                          <option value="131">Календар кишеньковий (100 × 70 мм)</option>
                           <option value="58">Папка А4 корінець 5 мм</option>
                           <option value="59">Папка А4 корінець 7 мм</option>
                         </select>
@@ -4323,14 +4302,14 @@ export const Calculator: React.FC = () => {
                       {/* Selected Stamp Details */}
                       {(() => {
                         const stampInfo: Record<string, { title: string; w: number; h: number }> = {
-                          '128': { title: 'Хенгер вид 1', w: 90, h: 200 },
-                          '133': { title: 'Хенгер вид 2', w: 90, h: 200 },
                           '160': { title: 'Будинок (Календар)', w: 210, h: 300 },
                           '161': { title: 'Пірамідка', w: 305, h: 134 },
+                          '130': { title: 'Підставка під чашку (Костер)', w: 90, h: 90 },
+                          '131': { title: 'Календар кишеньковий', w: 100, h: 70 },
                           '58': { title: 'Папка А4 (корінець 5мм)', w: 484, h: 377 },
                           '59': { title: 'Папка А4 (корінець 7мм)', w: 544, h: 393 },
                         };
-                        const info = stampInfo[fellingStamp] || { title: 'Стандартний штамп', w: 90, h: 200 };
+                        const info = stampInfo[fellingStamp] || { title: 'Стандартний штамп', w: 210, h: 300 };
                         return (
                           <div style={{ backgroundColor: 'var(--bg-system)', padding: '14px', borderRadius: 'var(--radius-md)', border: '0.5px solid var(--border-light)', fontSize: '12px' }}>
                             <div style={{ fontWeight: '800', color: 'var(--text-dark)', marginBottom: '4px' }}>{info.title}</div>
@@ -5113,7 +5092,7 @@ export const Calculator: React.FC = () => {
                       {
                         title: 'Висічна продукція',
                         badge: 'Штампи',
-                        desc: 'Фігурні наліпки, візитівки, листівки, підставки, хенгери…',
+                        desc: 'Фігурні наліпки, візитівки, листівки, бирки, підставки…',
                         icon: <Scissors size={28} style={{ color: 'var(--primary)' }} />,
                         metric: 'Готові форми',
                         onClick: () => setDigitalSubTab('felling')
@@ -6074,7 +6053,7 @@ export const Calculator: React.FC = () => {
                         </div>
                         <div>
                           <h3 className="text-base font-extrabold text-slate-900 m-0">Висічна продукція</h3>
-                          <span className="text-xs text-slate-500">Швидка цифрова висічка готових форм (хенгери, підставки, кишенькові календарі)</span>
+                          <span className="text-xs text-slate-500">Швидка цифрова висічка готових форм (підставки, кишенькові календарі, бирки)</span>
                         </div>
                       </div>
 
@@ -6111,7 +6090,7 @@ export const Calculator: React.FC = () => {
 
                     <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
                       {[
-                        { id: '1', title: 'Стандартна', desc: 'Хенгери, доміки' },
+                        { id: '1', title: 'Стандартна', desc: 'Бирки, підставки, доміки' },
                         { id: '2', title: 'Кругла', desc: 'Костери, наліпки' },
                         { id: '3', title: 'Овальна', desc: 'Овальні форми' },
                         { id: '4', title: 'Прямокутна', desc: 'Із заокругленням' },
@@ -6150,8 +6129,6 @@ export const Calculator: React.FC = () => {
                             onChange={(e) => setFellingStamp(e.target.value)}
                             className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 focus:bg-white focus:border-blue-600 focus:outline-none transition-all shadow-sm"
                           >
-                            <option value="128">Хенгер вид 1 (90 × 200 мм) — з круглим отвором та розрізом</option>
-                            <option value="133">Хенгер вид 2 (90 × 200 мм) — з гачком на ручку дверей</option>
                             <option value="160">Будинок (210 × 300 мм) — календар настільний</option>
                             <option value="161">Пірамідка (305 × 134 мм) — настільна рекламна піраміда</option>
                             <option value="130">Підставка під чашку (Ø 90 мм) — круглий костер</option>
@@ -6174,7 +6151,7 @@ export const Calculator: React.FC = () => {
                         <div className="w-32 h-44 rounded-xl bg-white border-2 border-blue-600 shadow-md flex flex-col items-center justify-center relative p-3 text-center">
                           <div className="w-8 h-8 rounded-full border-2 border-blue-400 mb-2"></div>
                           <span className="text-xs font-black text-blue-700">
-                            {fellingStamp === '128' || fellingStamp === '133' ? '90 × 200 мм' : fellingStamp === '160' ? '210 × 300 мм' : '100 × 70 мм'}
+                            {fellingStamp === '160' ? '210 × 300 мм' : fellingStamp === '161' ? '305 × 134 мм' : fellingStamp === '130' ? 'Ø 90 мм' : '100 × 70 мм'}
                           </span>
                           <span className="text-[10px] text-slate-400 mt-1">Висічний контур</span>
                         </div>
@@ -6436,7 +6413,7 @@ export const Calculator: React.FC = () => {
                                   return (
                                     <tr key={`${matId}-${covId}-${colId}`} className="hover:bg-blue-50/30 transition-colors border-b border-slate-100">
                                       <td className="py-3 px-4 text-left font-bold text-slate-800 border-r border-slate-100">
-                                        Хенгер №{fellingStamp} — {fullMatName}
+                                        Висічний виріб №{fellingStamp} — {fullMatName}
                                       </td>
                                       <td className="py-3 px-3 font-bold text-rose-600 border-r border-slate-100">
                                         {colId}
@@ -7561,7 +7538,7 @@ export const Calculator: React.FC = () => {
                       </div>
                       <div>
                         <h4 style={{ fontSize: '15px', fontWeight: '800', color: 'var(--text-dark)', margin: 0 }}>Фігурна планшетна порізка (CNC Flatbed)</h4>
-                        <span style={{ fontSize: '12px', color: 'var(--text-medium)' }}>Виготовлення упаковки, коробок, папок, хенгерів без виготовлення дорогого штампу від 1 екземпляра</span>
+                        <span style={{ fontSize: '12px', color: 'var(--text-medium)' }}>Виготовлення упаковки, коробок, папок, бирок без виготовлення дорогого штампу від 1 екземпляра</span>
                       </div>
                     </div>
                   </div>
@@ -7570,7 +7547,7 @@ export const Calculator: React.FC = () => {
                     {[
                       { id: 'package', title: 'Упаковка / Коробка', desc: 'Порізка + біговка картону' },
                       { id: 'folder', title: 'Фігурна папка', desc: 'Індивідуальний клапан' },
-                      { id: 'hanger', title: 'Хенгер / Воблер', desc: 'Фігурні гачки на ручки' },
+                      { id: 'wobbler', title: 'Воблер / Шелфтокер', desc: 'Рекламні стопери та бірки' },
                       { id: 'custom_shape', title: 'Довільна форма', desc: 'Зірка, круг, шестірня…' },
                     ].map(p => (
                       <button
@@ -7607,7 +7584,7 @@ export const Calculator: React.FC = () => {
                         <tbody className="divide-y divide-slate-100">
                           {[
                             { name: 'Коробка картонна 300г з біговкою', r: 35 },
-                            { name: 'Фігурний хенгер / шелфтокер', r: 18 },
+                            { name: 'Фігурний воблер / шелфтокер', r: 18 },
                             { name: 'Кругла підставка / костер (картон 350г)', r: 12 },
                             { name: 'Складна фігурна листівка', r: 22 },
                           ].map((row, idx) => (

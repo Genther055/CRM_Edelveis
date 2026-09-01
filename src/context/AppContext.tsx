@@ -188,7 +188,7 @@ const initialClients: Client[] = [
     email: 'reception@grandhotel.ua', 
     discount: 8, 
     city: 'Львів',
-    tags: ['Готель', 'Хенгери', 'Висічка'],
+    tags: ['Готель', 'Блокноти', 'Висічка'],
     files: [],
     type: 'client'
   },

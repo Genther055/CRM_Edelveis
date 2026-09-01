@@ -179,7 +179,7 @@ export const Leads: React.FC = () => {
     },
     {
       id: 'L-111',
-      name: 'Хенгери на двері готелю 2 000 шт.',
+      name: 'Блокноти з пружиною для готелю 1 000 шт.',
       contactPerson: 'Ольга Яковенко (Готель "Гранд")',
       phone: '+380962223344',
       email: 'reception@grandhotel.ua',
@@ -187,10 +187,10 @@ export const Leads: React.FC = () => {
       source: 'Instagram',
       status: 'review',
       date: '2026-07-14',
-      notes: 'Щільний картон 300г, вирубка штампом гачка на ручку дверей.',
-      tags: ['Хенгери', 'Висічка'],
-      files: ['Hanger_DoNotDisturb.ai'],
-      customFieldValues: { 'Ширина': 100, 'Висота': 230 }
+      notes: 'Формат А6, 50 аркушів, обкладинка 300г з матовою ламінацією, біла пружина.',
+      tags: ['Блокноти', 'Пружина'],
+      files: ['GrandHotel_Notebook_A6.pdf'],
+      customFieldValues: { 'Ширина': 105, 'Висота': 148 }
     },
     {
       id: 'L-112',
