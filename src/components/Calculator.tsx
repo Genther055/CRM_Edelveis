@@ -6312,18 +6312,21 @@ export const Calculator: React.FC = () => {
                       <table className="w-full text-center text-xs border-collapse">
                         <thead>
                           <tr className="bg-slate-800/95 text-slate-200 text-xs font-semibold uppercase tracking-wider border-b border-slate-700">
-                            <th className="py-3 px-4 text-left border-r border-slate-700/50">Матеріал та покриття</th>
+                            <th className="py-3 px-4 text-left border-r border-slate-700/50 min-w-[140px]">Матеріал та покриття</th>
                             <th className="py-3 px-3 border-r border-slate-700/50">Друк</th>
-                            <th className="py-3 px-3 border-r border-slate-700/50">Готовність</th>
-                            {[100, 250, 500, 1000, 1500, 2500, 5000, 10000].map(tir => (
-                              <th key={tir} style={{ padding: '9px 8px', border: '1px solid #a00000' }}>{tir}</th>
+                            <th className="py-3 px-3 border-r border-slate-700/50 min-w-[70px]">Готовність</th>
+                            {(category === 'Бланки'
+                              ? [50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950, 1000, 1500, 2500, 5000, 10000]
+                              : [100, 250, 500, 1000, 1500, 2500, 5000, 10000]
+                            ).map(tir => (
+                              <th key={tir} className="py-2.5 px-2 font-black border-r border-slate-700/50 whitespace-nowrap">{tir}</th>
                             ))}
                           </tr>
                         </thead>
                         <tbody>
                           {selectedMaterials.length === 0 || selectedCoverings.length === 0 || selectedPrintColors.length === 0 ? (
                             <tr>
-                              <td colSpan={11} style={{ padding: '30px', color: '#888', fontStyle: 'italic', backgroundColor: '#fafafa' }}>
+                              <td colSpan={27} style={{ padding: '30px', color: '#888', fontStyle: 'italic', backgroundColor: '#fafafa' }}>
                                 Щоб сформувати прайс оберіть матеріал, покриття, тип друку у фільтрі вище
                               </td>
                             </tr>
@@ -6390,6 +6393,39 @@ export const Calculator: React.FC = () => {
                                   const dieCutCostPerItem = (cardKind === '7' || cardKind === '8' || cardKind === '9') ? norms.dieCuttingPrice : 0;
                                   const postpressTotalPerItem = personalizationCost + luversCost + cornersCost + gluingCost + drillingCost + foldingCostPerItem + creasingCostPerItem + perforationCost + dieCutCostPerItem;
 
+                                  // Exact calibrated price list for Blanks (Бланки А4, Офсет 70г, 1+0)
+                                  const blankExactMap: Record<number, number> = {
+                                    50: 4.19,
+                                    100: 2.47,
+                                    150: 1.88,
+                                    200: 1.58,
+                                    250: 1.41,
+                                    300: 1.29,
+                                    350: 1.20,
+                                    400: 1.14,
+                                    450: 1.09,
+                                    500: 1.05,
+                                    550: 1.02,
+                                    600: 0.99,
+                                    650: 0.97,
+                                    700: 0.95,
+                                    750: 0.93,
+                                    800: 0.92,
+                                    850: 0.90,
+                                    900: 0.894,
+                                    950: 0.886,
+                                    1000: 0.776,
+                                    1500: 0.65,
+                                    2500: 0.52,
+                                    5000: 0.44,
+                                    10000: 0.38
+                                  };
+
+                                  const activeTirList = (category === 'Бланки'
+                                    ? [50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950, 1000, 1500, 2500, 5000, 10000]
+                                    : [100, 250, 500, 1000, 1500, 2500, 5000, 10000]
+                                  );
+
                                   return (
                                     <tr key={`${matId}-${covId}-${colStr}-${rowIdx}`} style={{ backgroundColor: rowIdx % 2 === 0 ? '#ffffff' : '#fafafa', borderBottom: '1px solid #e8e8e8' }}>
                                       <td style={{ padding: '8px 12px', textAlign: 'left', fontWeight: '600', color: '#222', borderRight: '1px solid #e0e0e0' }}>
@@ -6401,15 +6437,36 @@ export const Calculator: React.FC = () => {
                                       <td style={{ padding: '8px', fontSize: '11px', color: '#666', borderRight: '1px solid #e0e0e0' }}>
                                         1-2 дні
                                       </td>
-                                      {[100, 250, 500, 1000, 1500, 2500, 5000, 10000].map(tir => {
-                                        const basePaperCost = areaM2 * (matDensity * 0.08) * tir;
-                                        const printCost = (isDouble ? 0.35 : 0.20) * tir + (tir > 500 ? 80 : 120);
-                                        const lamCost = (covId !== '0' && covId !== '') ? areaM2 * norms.laminationMattePrice * tir * (covId.includes('1+1') ? 2 : 1) : 0;
-                                        const postpressSum = postpressTotalPerItem * tir;
-                                        const deliveryCost = includeDelivery ? 80 : 0;
-                                        
-                                        const rawTotal = (basePaperCost + printCost + lamCost + postpressSum + deliveryCost) * (marginPercent / 100) * (sheetSetsCount || 1);
-                                        const itemCost = rawTotal / tir;
+                                      {activeTirList.map(tir => {
+                                        let itemCost = 0;
+                                        let rawTotal = 0;
+                                        let basePaperCost = 0;
+                                        let printCost = 0;
+                                        let lamCost = 0;
+                                        let postpressSum = 0;
+                                        let deliveryCost = includeDelivery ? 80 : 0;
+
+                                        if (category === 'Бланки' && blankExactMap[tir]) {
+                                          let baseUnit = blankExactMap[tir];
+                                          let matMod = matId === 'offset_70' ? 1.0 : matId === 'gazetka_45' ? 0.90 : matId === 'offset_65' ? 0.95 : matId === '80' ? 1.05 : matId === 'offset_100' ? 1.18 : matId === 'samokopir_55' ? 1.60 : 1.15;
+                                          let colMod = colStr === '1+0' ? 1.0 : colStr === '1+1' ? 1.25 : colStr === '4+0' ? 1.50 : 1.90;
+                                          let areaMod = Math.max(0.25, areaM2 / (0.210 * 0.297));
+                                          itemCost = baseUnit * matMod * colMod * areaMod;
+                                          rawTotal = itemCost * tir;
+                                          basePaperCost = rawTotal * 0.45;
+                                          printCost = rawTotal * 0.45;
+                                          postpressSum = postpressTotalPerItem * tir;
+                                          rawTotal += postpressSum + deliveryCost;
+                                          itemCost = rawTotal / tir;
+                                        } else {
+                                          basePaperCost = areaM2 * (matDensity * 0.08) * tir;
+                                          printCost = (isDouble ? 0.35 : 0.20) * tir + (tir > 500 ? 80 : 120);
+                                          lamCost = (covId !== '0' && covId !== '') ? areaM2 * norms.laminationMattePrice * tir * (covId.includes('1+1') ? 2 : 1) : 0;
+                                          postpressSum = postpressTotalPerItem * tir;
+                                          rawTotal = (basePaperCost + printCost + lamCost + postpressSum + deliveryCost) * (marginPercent / 100) * (sheetSetsCount || 1);
+                                          itemCost = rawTotal / tir;
+                                        }
+
                                         const displayVal = priceCostVar === 'per_item' ? itemCost.toFixed(2) : Math.round(rawTotal).toString();
 
                                         const isSelectedCell = selectedSheetCalc && 
