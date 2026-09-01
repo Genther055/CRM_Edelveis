@@ -6534,7 +6534,9 @@ export const Calculator: React.FC = () => {
                     const creasingCostPerItem = postCreasing !== '0' ? parseInt(postCreasing) * norms.foldingPrice : 0;
                     const perforationCost = postPerforation !== '0' ? 0.15 : 0;
                     const dieCutCostPerItem = (cardKind === '7' || cardKind === '8' || cardKind === '9') ? norms.dieCuttingPrice : 0;
-                    const postpressTotalPerItem = personalizationCost + luversCost + cornersCost + gluingCost + drillingCost + foldingCostPerItem + creasingCostPerItem + perforationCost + dieCutCostPerItem;
+                    const parsedPackSizeAct = parseInt(postPackingText.replace(/\D/g, '')) || 0;
+                    const packCostPerItemAct = postPackingText.trim() ? (parsedPackSizeAct > 0 ? (4.5 / parsedPackSizeAct) : 0.045) : 0;
+                    const postpressTotalPerItem = personalizationCost + luversCost + cornersCost + gluingCost + drillingCost + foldingCostPerItem + creasingCostPerItem + perforationCost + dieCutCostPerItem + packCostPerItemAct;
 
                     const defPaperCost = hasMaterial ? areaM2 * (matDensity * 0.08) * tir : 0;
                     const defPrintCost = hasMaterial ? (isDouble ? 0.35 : 0.20) * tir + (tir > 500 ? 80 : 120) : 0;
@@ -14617,7 +14619,7 @@ export const Calculator: React.FC = () => {
                 {/* 3. Післядрукарська обробка */}
                 <div className="mb-4">
                   <h5 className="text-xs font-bold border-b border-slate-100 pb-1 mb-2 text-blue-600 uppercase tracking-wider m-0">
-                    3. Післядрукарські роботи
+                    3. Післядрукарські роботи та комплектація
                   </h5>
                   <div className="grid grid-cols-2 gap-2 text-xs">
                     <div className="p-2.5 border border-slate-200 rounded-xl bg-slate-50">
@@ -14626,6 +14628,20 @@ export const Calculator: React.FC = () => {
                     <div className="p-2.5 border border-slate-200 rounded-xl bg-slate-50">
                       <span className="text-slate-500">Ламінування:</span> <strong className="text-slate-900">{covNameDisplay}</strong>
                     </div>
+                    {postPackingText.trim() && (() => {
+                      const pSize = parseInt(postPackingText.replace(/\D/g, '')) || 0;
+                      const pCount = pSize > 0 ? Math.ceil(tirazhDisplay / pSize) : 0;
+                      return (
+                        <div className="p-2.5 border border-slate-200 rounded-xl bg-slate-50 col-span-2">
+                          <span className="text-slate-500">Упаковка та фасування:</span> <strong className="text-slate-900">{postPackingText.trim()}{pCount > 0 ? ` (${pCount} пачок по ${pSize} шт)` : ''}</strong>
+                        </div>
+                      );
+                    })()}
+                    {postPersonalization !== '0' && (
+                      <div className="p-2.5 border border-slate-200 rounded-xl bg-slate-50">
+                        <span className="text-slate-500">Персоналізація:</span> <strong className="text-slate-900">{postPersonalization === '1' ? 'Нумерація / Штрихкод' : 'Змінні дані'}</strong>
+                      </div>
+                    )}
                     {postCorners !== '0' && (
                       <div className="p-2.5 border border-slate-200 rounded-xl bg-slate-50">
                         <span className="text-slate-500">Скруглення кутів:</span> <strong className="text-slate-900">{postCorners} кути</strong>
@@ -14656,37 +14672,108 @@ export const Calculator: React.FC = () => {
                         <span className="text-slate-500">Проклейка в блок:</span> <strong className="text-slate-900">По {postGluing} листів</strong>
                       </div>
                     )}
+                    {postPerforation !== '0' && (
+                      <div className="p-2.5 border border-slate-200 rounded-xl bg-slate-50">
+                        <span className="text-slate-500">Перфорація:</span> <strong className="text-slate-900">Так (відривна лінія)</strong>
+                      </div>
+                    )}
                   </div>
                 </div>
 
-                {/* 4. Фінансовий розрахунок вартості */}
+                {/* 4. Фінансовий розрахунок вартості (Деталізована специфікація) */}
                 <div>
                   <h5 className="text-xs font-bold border-b border-slate-100 pb-1 mb-2 text-blue-600 uppercase tracking-wider m-0">
-                    4. Фінансовий підсумок
+                    4. Фінансова специфікація вартості
                   </h5>
-                  <table className="w-full text-xs">
-                    <thead>
-                      <tr className="border-b-2 border-slate-900 text-left">
-                        <th className="py-2 font-bold text-slate-900">Складова замовлення</th>
-                        <th className="py-2 text-center font-bold text-slate-900">Обсяг</th>
-                        <th className="py-2 text-right font-bold text-slate-900">Сума (грн)</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100">
-                      <tr>
-                        <td className="py-2 text-slate-800">Матеріали, поліграфічний друк та післядрукарські роботи</td>
-                        <td className="py-2 text-center text-slate-600">{tirazhDisplay} шт.</td>
-                        <td className="py-2 text-right font-mono font-bold text-slate-900">{livePrice.toFixed(2)} ₴</td>
-                      </tr>
-                    </tbody>
-                    <tfoot>
-                      <tr className="text-sm font-bold border-t-2 border-slate-900">
-                        <td className="pt-3 text-slate-900">РАЗОМ ДО СПЛАТИ:</td>
-                        <td className="pt-3 text-center text-xs text-slate-500">Ціна за 1 шт: {unitPrice.toFixed(2)} ₴</td>
-                        <td className="pt-3 text-right text-blue-600 text-base font-extrabold">{livePrice.toFixed(2)} ₴</td>
-                      </tr>
-                    </tfoot>
-                  </table>
+                  {(() => {
+                    const marginMultiplier = (marginPercent || 100) / 100;
+                    
+                    // Specific sub-costs
+                    const pSizeInv = parseInt(postPackingText.replace(/\D/g, '')) || 0;
+                    const pCountInv = pSizeInv > 0 ? Math.ceil(tirazhDisplay / pSizeInv) : (postPackingText.trim() ? Math.ceil(tirazhDisplay / 100) : 0);
+                    const rawPacking = postPackingText.trim() ? Math.max(15, (pCountInv || 1) * 4.5) : 0;
+                    const packingPrice = Math.round(rawPacking * marginMultiplier);
+
+                    const rawDelivery = includeDelivery ? 80 : 0;
+                    const deliveryPrice = Math.round(rawDelivery * marginMultiplier);
+
+                    const rawPostpressOnly = (
+                      (postPersonalization !== '0' ? 0.35 : 0) +
+                      (postLuvers !== '0' ? (postLuversCount || 1) * 1.20 : 0) +
+                      (postCorners !== '0' ? 0.15 : 0) +
+                      (postGluing !== '0' ? 0.20 : 0) +
+                      (postDrilling !== '0' ? 0.15 : 0) +
+                      (postFolding !== '0' ? norms.foldingPrice : 0) +
+                      (postCreasing !== '0' ? parseInt(postCreasing) * norms.foldingPrice : 0) +
+                      (postPerforation !== '0' ? 0.15 : 0)
+                    ) * tirazhDisplay;
+                    const postpressPrice = Math.round(rawPostpressOnly * marginMultiplier);
+
+                    const baseManufacturePrice = Math.max(0, livePrice - packingPrice - deliveryPrice - postpressPrice);
+
+                    return (
+                      <table className="w-full text-xs">
+                        <thead>
+                          <tr className="border-b-2 border-slate-900 text-left">
+                            <th className="py-2 font-bold text-slate-900">№</th>
+                            <th className="py-2 font-bold text-slate-900">Складова замовлення / Специфікація</th>
+                            <th className="py-2 text-center font-bold text-slate-900">Обсяг</th>
+                            <th className="py-2 text-right font-bold text-slate-900">Сума (грн)</th>
+                          </tr>
+                        </thead>
+                        <tbody className="divide-y divide-slate-100">
+                          <tr>
+                            <td className="py-2 text-slate-500 font-mono">1</td>
+                            <td className="py-2 text-slate-800">
+                              <span className="font-bold">{category === 'Бланки' ? subCategory : (category as string)}</span> ({matNameDisplay}, {covNameDisplay}, {colStrDisplay}, {formatDisplay})
+                            </td>
+                            <td className="py-2 text-center text-slate-600 font-mono">{tirazhDisplay} шт.</td>
+                            <td className="py-2 text-right font-mono font-bold text-slate-900">{baseManufacturePrice.toFixed(2)} ₴</td>
+                          </tr>
+
+                          {postpressPrice > 0 && (
+                            <tr>
+                              <td className="py-2 text-slate-500 font-mono">2</td>
+                              <td className="py-2 text-slate-800">
+                                Післядрукарська обробка (порізка, {postCorners !== '0' ? 'скруглення, ' : ''}{postFolding !== '0' ? 'фальцювання, ' : ''}{postCreasing !== '0' ? 'біговка, ' : ''}{postDrilling !== '0' ? 'свердління, ' : ''}{postGluing !== '0' ? 'проклейка, ' : ''}{postLuvers !== '0' ? 'люверси' : ''})
+                              </td>
+                              <td className="py-2 text-center text-slate-600 font-mono">{tirazhDisplay} шт.</td>
+                              <td className="py-2 text-right font-mono font-bold text-slate-900">{postpressPrice.toFixed(2)} ₴</td>
+                            </tr>
+                          )}
+
+                          {postPackingText.trim() && (
+                            <tr>
+                              <td className="py-2 text-slate-500 font-mono">{postpressPrice > 0 ? '3' : '2'}</td>
+                              <td className="py-2 text-slate-800">
+                                Фасування та упаковка продукції: <span className="font-semibold">{postPackingText.trim()}</span>
+                              </td>
+                              <td className="py-2 text-center text-slate-600 font-mono">{pCountInv > 0 ? `${pCountInv} пач.` : '1 тираж'}</td>
+                              <td className="py-2 text-right font-mono font-bold text-slate-900">{packingPrice.toFixed(2)} ₴</td>
+                            </tr>
+                          )}
+
+                          {deliveryPrice > 0 && (
+                            <tr>
+                              <td className="py-2 text-slate-500 font-mono">{(postpressPrice > 0 && postPackingText.trim()) ? '4' : (postpressPrice > 0 || postPackingText.trim()) ? '3' : '2'}</td>
+                              <td className="py-2 text-slate-800">
+                                Доставка замовлення
+                              </td>
+                              <td className="py-2 text-center text-slate-600 font-mono">1 відпр.</td>
+                              <td className="py-2 text-right font-mono font-bold text-slate-900">{deliveryPrice.toFixed(2)} ₴</td>
+                            </tr>
+                          )}
+                        </tbody>
+                        <tfoot>
+                          <tr className="text-sm font-bold border-t-2 border-slate-900">
+                            <td colSpan={2} className="pt-3 text-slate-900">РАЗОМ ДО СПЛАТИ:</td>
+                            <td className="pt-3 text-center text-xs text-slate-500">Ціна за 1 шт: {unitPrice.toFixed(2)} ₴</td>
+                            <td className="pt-3 text-right text-blue-600 text-base font-extrabold">{livePrice.toFixed(2)} ₴</td>
+                          </tr>
+                        </tfoot>
+                      </table>
+                    );
+                  })()}
                 </div>
               </div>
 
