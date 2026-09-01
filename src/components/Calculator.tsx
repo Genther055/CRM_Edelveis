@@ -14632,63 +14632,146 @@ export const Calculator: React.FC = () => {
         </div>
       )}
 
-      {/* Invoice preview modal - Crisp Monochrome B&W Accounting & Production Specification */}
+      {/* Production Work Order Passport - Exact match to physical print shop work order (media_1788270931536.png) */}
       {showInvoice && (() => {
         const clientDisplayName = isNewClientMode && customClientName.trim()
           ? customClientName.trim()
           : (activeClient?.name || 'Замовник');
         
-        const matNameDisplay = selectedSheetCalc 
-          ? selectedSheetCalc.matName 
-          : (paperType === 'offset' ? 'Офсетний 70г' : paperType === 'gazetka' ? 'Газетний 45г' : 'Крейдований 130г');
+        const isWide = mainCategoryTab === 'wide';
+        const isDig = mainCategoryTab === 'digital';
+        const isRoll = mainCategoryTab === 'roll';
+        const isOffset = mainCategoryTab === 'offset';
+
+        // 1. Material Name
+        const wideMatRatesMap: Record<string, { label: string; sqmPrice: number }> = {
+          frontlit_440: { label: 'Банер Frontlit 440 ламінований', sqmPrice: 220 },
+          frontlit_510: { label: 'Банер Frontlit 510 литий (міцний)', sqmPrice: 290 },
+          blockout_510: { label: 'Банер Blockout 510 двосторонній', sqmPrice: 380 },
+          mesh_banner: { label: 'Банерна сітка Mesh з підкладкою', sqmPrice: 260 },
+          backlit_510: { label: 'Банер Backlit 510 для лайтбоксів', sqmPrice: 340 },
+          oracal_matte: { label: 'Плівка ORAJET матова біла', sqmPrice: 240 },
+          oracal_gloss: { label: 'Плівка ORAJET глянцева біла', sqmPrice: 240 },
+          oracal_clear: { label: 'Плівка ORAJET прозора', sqmPrice: 260 },
+          ritrama_matte: { label: 'Плівка Ritrama перманентна', sqmPrice: 220 },
+          one_way_vision: { label: 'Перфорована плівка One Way Vision', sqmPrice: 390 },
+          translucent: { label: 'Транслюцентна плівка для світлових вивісок', sqmPrice: 360 },
+          car_cast: { label: 'Автомобільна лита плівка Cast', sqmPrice: 580 },
+          citylight_150: { label: 'Папір Citylight 150г просвітний', sqmPrice: 160 },
+          blueback_115: { label: 'Папір Blueback 115г для бігбордів', sqmPrice: 110 },
+          photo_satin_200: { label: 'Фотопапір Satin 200г', sqmPrice: 310 },
+          photo_gloss_220: { label: 'Фотопапір Gloss 220г', sqmPrice: 330 },
+          pvc_3mm: { label: 'ПВХ пластик 3 мм + друк', sqmPrice: 680 },
+          pvc_4mm: { label: 'ПВХ пластик 4 мм + друк', sqmPrice: 790 },
+          pvc_5mm: { label: 'ПВХ пластик 5 мм + друк', sqmPrice: 890 },
+          pvc_8mm: { label: 'ПВХ пластик 8 мм + друк', sqmPrice: 1250 },
+          pvc_10mm: { label: 'ПВХ пластик 10 мм + друк', sqmPrice: 1480 },
+          foam_5mm: { label: 'Пінокартон білий 5 мм', sqmPrice: 620 },
+          foam_10mm: { label: 'Пінокартон білий 10 мм', sqmPrice: 780 },
+          foam_black_5mm: { label: 'Пінокартон чорний 5 мм', sqmPrice: 840 },
+          comp_white_3mm: { label: 'Композит білий 3 мм', sqmPrice: 1350 },
+          comp_silver_3mm: { label: 'Композит срібло браш 3 мм', sqmPrice: 1550 },
+          comp_black_3mm: { label: 'Композит чорний 3 мм', sqmPrice: 1450 },
+          comp_gold_3mm: { label: 'Композит золото браш 3 мм', sqmPrice: 1600 },
+          acryl_clear_3mm: { label: 'Акрил прозорий 3 мм', sqmPrice: 1650 },
+          acryl_clear_5mm: { label: 'Акрил прозорий 5 мм', sqmPrice: 2200 },
+          acryl_milky_3mm: { label: 'Акрил молочний 3 мм', sqmPrice: 1750 },
+          acryl_black_3mm: { label: 'Акрил чорний глянець 3 мм', sqmPrice: 1850 },
+          canvas_cotton_380: { label: 'Натуральне бавовняне полотно 380г', sqmPrice: 580 },
+          canvas_synthetic_280: { label: 'Синтетичне полотно 280г', sqmPrice: 420 },
+          canvas_gloss_350: { label: 'Глянцеве фотополотно 350г', sqmPrice: 510 },
+          stand_banner_440: { label: 'Стенд + Frontlit 440г', sqmPrice: 750 },
+          stand_banner_510: { label: 'Стенд + Blockout 510г', sqmPrice: 890 },
+          stand_pp_film: { label: 'Стенд + PP Film без загину', sqmPrice: 1050 },
+        };
+
+        const matNameDisplay = isWide 
+          ? (wideMatRatesMap[wideSelectedMaterials[0]]?.label || 'Банер Frontlit 440 ламінований')
+          : isDig
+          ? `Крейдований ${digitalSelectedMaterials[0] || '350'} г/м²`
+          : isRoll
+          ? `Самоклейка Raflatac (${rollMaterial})`
+          : (selectedSheetCalc ? selectedSheetCalc.matName : (paperType === 'offset' ? 'Офсетний 70г' : 'Крейдований 130г'));
         
-        const covNameDisplay = selectedSheetCalc 
-          ? selectedSheetCalc.covName 
-          : (laminationType === 'none' ? 'Без покриття' : laminationType === 'gloss' ? 'Глянцева ламінація' : laminationType === 'matte' ? 'Матова ламінація' : 'Soft-touch');
+        // 2. Format / Size
+        const formatDisplay = isWide
+          ? `${wideWidth} × ${wideHeight} ${wideUnit}`
+          : isRoll
+          ? `${rollWidth} × ${rollHeight} мм`
+          : `${sheetCustomWidth} × ${sheetCustomHeight} ${sheetUnit}`;
+
+        // 3. Quantity / Tirazh
+        const wideTirVal = selectedSheetCalc?.tirazh || (typeof quantity === 'number' ? quantity : parseInt(quantity) || 1);
+        const tirazhDisplay = isWide
+          ? wideTirVal
+          : isRoll
+          ? (rollQuantity || 1000)
+          : (selectedSheetCalc ? selectedSheetCalc.tirazh : (Number(quantity) || 1000));
+
+        // 4. Colors / Resolution
+        const colStrDisplay = isWide
+          ? `${wideSelectedResolutions[0] || '1440'} dpi`
+          : isDig
+          ? (digitalSelectedPrints[0] || '4+0')
+          : isRoll
+          ? '4+0 (CMYK)'
+          : (selectedSheetCalc ? selectedSheetCalc.colStr : colors);
+
+        // 5. Turn / Imposition
+        const turnLabelDisplay = isWide
+          ? '1 сторона (б/о)'
+          : isRoll
+          ? 'Рулон'
+          : (turnType === 'sam_na_sebe' ? 'с/с' : turnType === 'bez_oborotu' ? 'б/о' : 'ч/о');
+
+        // 6. Equipment
+        const machineName = isWide
+          ? 'Широкоформатний плотер Flora / Mimaki'
+          : isDig
+          ? 'Цифрова машина Konica Minolta 7090'
+          : isRoll
+          ? 'Флексографічна лінія Mark Andy'
+          : 'Офсетна машина Heidelberg PM 52-4';
+
+        // 7. Area & Sheets calculation
+        const wideAreaM2 = isWide
+          ? ((Number(wideWidth || 2000) * Number(wideHeight || 1000)) / (wideUnit === 'mm' ? 1000000 : wideUnit === 'cm' ? 10000 : 1)) * wideTirVal
+          : 0;
         
-        const colStrDisplay = selectedSheetCalc ? selectedSheetCalc.colStr : colors;
-        const tirazhDisplay = selectedSheetCalc ? selectedSheetCalc.tirazh : (Number(quantity) || 1000);
-        const formatDisplay = `${sheetCustomWidth} × ${sheetCustomHeight} ${sheetUnit}`;
-        const turnLabelDisplay = turnType === 'sam_na_sebe' ? 'Сам на себе (с/с)' : turnType === 'bez_oborotu' ? 'Без обороту' : 'Чужий оборот (ч/о)';
-        
+        const fit1 = Math.floor(450 / (parseFloat(sheetCustomWidth) || 210)) * Math.floor(320 / (parseFloat(sheetCustomHeight) || 297));
+        const fit2 = Math.floor(450 / (parseFloat(sheetCustomHeight) || 297)) * Math.floor(320 / (parseFloat(sheetCustomWidth) || 210));
+        const itemsPerSheetCalc = isWide ? 1 : isRoll ? 1 : Math.max(1, fit1, fit2);
+        const physSheetsCalc = isWide 
+          ? `${wideAreaM2.toFixed(2)} м²`
+          : isRoll 
+          ? `${Math.round(((rollQuantity || 1000) * (parseFloat(rollHeight) || 25 + 4)) / 1000)} м.п.`
+          : `${Math.ceil(tirazhDisplay / itemsPerSheetCalc)} арк.`;
+
+        const priladkaCalc = isWide ? '0.5 м.п.' : isDig ? '2 арк.' : isRoll ? '15 м.п.' : (turnType === 'sam_na_sebe' ? '30 арк.' : turnType === 'chuzhyi_oborut' ? '50 арк.' : '20 арк.');
+        const wasteCalc = isWide ? '5%' : isDig ? '2 арк.' : isRoll ? '10 м.п.' : `${Math.max(10, Math.ceil((typeof physSheetsCalc === 'number' ? physSheetsCalc : 100) * 0.04))} арк.`;
+
+        const totalInPrintCalc = isWide
+          ? `${(wideAreaM2 * 1.05).toFixed(2)} м²`
+          : isRoll
+          ? `${Math.round(((rollQuantity || 1000) * (parseFloat(rollHeight) || 25 + 4)) / 1000 + 25)} м.п.`
+          : isDig
+          ? `${parseInt(physSheetsCalc) + 4} арк.`
+          : `${parseInt(physSheetsCalc) + parseInt(priladkaCalc) + parseInt(wasteCalc)} арк.`;
+
+        // 8. Financials
         const livePrice = selectedSheetCalc 
           ? Math.round(selectedSheetCalc.rawCost * (marginPercent / 100))
           : calculatedOps.finalPrice;
-        const unitPrice = livePrice / (tirazhDisplay || 1);
 
-        const prodTitle = name || (customTitleMap[mainCategoryTab]) || `${category === 'Бланки' ? subCategory : (category as string)} ${formatDisplay}`;
-
-        const marginMultiplier = (marginPercent || 100) / 100;
-        const pSizeInv = parseInt(postPackingText.replace(/\D/g, '')) || 0;
-        const pCountInv = pSizeInv > 0 ? Math.ceil(tirazhDisplay / pSizeInv) : (postPackingText.trim() ? Math.ceil(tirazhDisplay / 100) : 0);
-        const rawPacking = postPackingText.trim() ? Math.max(15, (pCountInv || 1) * 4.5) : 0;
-        const packingPrice = Math.round(rawPacking * marginMultiplier);
-
-        const rawDelivery = includeDelivery ? 80 : 0;
-        const deliveryPrice = Math.round(rawDelivery * marginMultiplier);
-
-        const rawPostpressOnly = (
-          (postPersonalization !== '0' ? 0.35 : 0) +
-          (postLuvers !== '0' ? (postLuversCount || 1) * 1.20 : 0) +
-          (postCorners !== '0' ? 0.15 : 0) +
-          (postGluing !== '0' ? 0.20 : 0) +
-          (postDrilling !== '0' ? 0.15 : 0) +
-          (postFolding !== '0' ? norms.foldingPrice : 0) +
-          (postCreasing !== '0' ? parseInt(postCreasing) * norms.foldingPrice : 0) +
-          (postPerforation !== '0' ? 0.15 : 0)
-        ) * tirazhDisplay;
-        const postpressPrice = Math.round(rawPostpressOnly * marginMultiplier);
-
-        const baseManufacturePrice = Math.max(0, livePrice - packingPrice - deliveryPrice - postpressPrice);
-        const baseUnitPrice = baseManufacturePrice / (tirazhDisplay || 1);
-
-        // Tech sheets calculation
-        const fit1 = Math.floor(450 / (parseFloat(sheetCustomWidth) || 210)) * Math.floor(320 / (parseFloat(sheetCustomHeight) || 297));
-        const fit2 = Math.floor(450 / (parseFloat(sheetCustomHeight) || 297)) * Math.floor(320 / (parseFloat(sheetCustomWidth) || 210));
-        const itemsPerSheetCalc = Math.max(1, fit1, fit2);
-        const physSheetsCalc = Math.ceil(tirazhDisplay / itemsPerSheetCalc);
-        const priladkaCalc = turnType === 'sam_na_sebe' ? 30 : turnType === 'chuzhyi_oborut' ? 50 : 20;
-        const wasteCalc = Math.max(10, Math.ceil(physSheetsCalc * 0.04));
+        const prodTitle = customTitleMap[mainCategoryTab] || name || (
+          isWide 
+            ? `Банер (${matNameDisplay}) ${formatDisplay}`
+            : isDig
+            ? `Цифровий друк ${formatDisplay}`
+            : isRoll
+            ? `Рулонна етикетка ${formatDisplay}`
+            : `Бланки ${formatDisplay}`
+        );
 
         let postOpIndex = 1;
 
@@ -14699,261 +14782,252 @@ export const Calculator: React.FC = () => {
               <div className="px-5 py-3 border-b border-black flex items-center justify-between bg-slate-100">
                 <div className="flex items-center gap-2">
                   <FileText size={16} className="text-black" />
-                  <h3 className="text-xs font-black uppercase text-black m-0 tracking-wider">Рахунок-Специфікація замовлення № {orderNumber}</h3>
+                  <h3 className="text-xs font-black uppercase text-black m-0 tracking-wider">Технологічний наряд № {orderNumber}</h3>
                 </div>
                 <button onClick={() => setShowInvoice(false)} className="text-black hover:bg-black hover:text-white px-2 py-0.5 border border-black font-bold text-xs transition-colors">✕ Закрити</button>
               </div>
               
               {/* Printable Monochrome Document Container */}
               <div className="p-6 md:p-8 overflow-y-auto flex-1 max-h-[78vh] bg-white text-black font-sans text-xs" id="invoice-preview-container">
-                {/* 1. Header & Requisites */}
-                <div className="border-b-2 border-black pb-3 mb-4">
-                  <div className="flex justify-between items-start flex-wrap gap-3">
-                    <div>
-                      <h2 className="text-sm font-black tracking-tight text-black m-0 uppercase">Поліграфічне підприємство «Едельвейс і К»</h2>
-                      <p className="text-[11px] text-slate-700 m-0 mt-0.5">м. Вінниця, вул. Соборна • Тел: +38 (067) 000-00-00 • Email: info@edelveis.ua</p>
-                      <p className="text-[10px] text-slate-600 m-0 mt-0.5">Платник єдиного податку 3 групи (без ПДВ) • Р/р в АТ КБ "ПриватБанк"</p>
+                
+                {/* 1. Header Block matching physical work order (media_1788270931536.png) */}
+                <div className="border border-black p-3 mb-4 bg-white">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Left info column */}
+                    <div className="flex flex-col gap-1.5 text-[11px]">
+                      <div className="flex">
+                        <span className="w-32 font-bold text-slate-700">№ наряда:</span>
+                        <strong className="font-mono font-black text-black text-xs">{orderNumber}</strong>
+                      </div>
+                      <div className="flex">
+                        <span className="w-32 font-bold text-slate-700">Заказчик:</span>
+                        <strong className="font-bold text-black">{clientDisplayName}</strong>
+                      </div>
+                      <div className="flex">
+                        <span className="w-32 font-bold text-slate-700">Продукция:</span>
+                        <strong className="font-bold text-black">{prodTitle}</strong>
+                      </div>
+                      <div className="flex">
+                        <span className="w-32 font-bold text-slate-700">Тираж:</span>
+                        <strong className="font-mono font-black text-black">{tirazhDisplay} шт.</strong>
+                      </div>
+                      <div className="flex">
+                        <span className="w-32 font-bold text-slate-700">Дата приема:</span>
+                        <span className="font-semibold text-black">{new Date().toLocaleDateString('uk-UA')}</span>
+                        <span className="ml-4 font-bold text-slate-700">Сдачи:</span>
+                        <span className="ml-2 font-semibold text-black">1-2 дні</span>
+                      </div>
+                      <div className="flex">
+                        <span className="w-32 font-bold text-slate-700">Менеджер:</span>
+                        <span className="font-semibold text-black">Менеджер</span>
+                      </div>
+                      <div className="flex pt-1 border-t border-slate-300">
+                        <span className="w-32 font-bold text-slate-700">Итого расчетная стоимость:</span>
+                        <strong className="font-mono font-black text-black">{livePrice.toFixed(2)} грн.</strong>
+                      </div>
                     </div>
-                    <div className="text-right border border-black p-2 min-w-[210px] bg-slate-50">
-                      <h3 className="text-xs font-black text-black m-0 uppercase">РАХУНОК-СПЕЦИФІКАЦІЯ № {orderNumber}</h3>
-                      <p className="text-[11px] font-bold text-black m-0 mt-1">від {new Date().toLocaleDateString('uk-UA')}</p>
-                    </div>
-                  </div>
 
-                  {/* Customer / Supplier Bar */}
-                  <div className="grid grid-cols-2 gap-4 mt-3 pt-2 border-t border-slate-300 text-[11px]">
-                    <div>
-                      <span className="text-slate-500 block text-[10px] uppercase font-bold">Виконавець:</span>
-                      <strong className="text-black font-bold">Поліграфія «Едельвейс і К»</strong>
-                    </div>
-                    <div>
-                      <span className="text-slate-500 block text-[10px] uppercase font-bold">Замовник (Платник):</span>
-                      <strong className="text-black font-bold">{clientDisplayName}</strong>
+                    {/* Right materials column */}
+                    <div className="border-l border-slate-300 pl-4 flex flex-col justify-between text-[11px]">
+                      <div>
+                        <span className="font-black uppercase tracking-wider block mb-1.5 text-black">Материалы:</span>
+                        <div className="flex justify-between items-center py-1 border-b border-slate-200">
+                          <span className="text-slate-800 font-semibold">{matNameDisplay}</span>
+                          <span className="font-mono font-bold text-black">Кол-во: {physSheetsCalc}</span>
+                        </div>
+                      </div>
+                      <div className="text-slate-500 text-[10px] italic">
+                        * Відвантаження сировини зі складу згідно технологічних норм приладки та відходів.
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                {/* 2. Таблиця Рахунку-Фактури (Фінансова специфікація) */}
+                {/* 2. Таблиця «ПЕЧАТЬ» (ДРУК) */}
                 <div className="mb-4">
-                  <div className="flex justify-between items-center mb-1.5">
-                    <h4 className="text-[11px] font-black uppercase text-black m-0">1. Фінансова специфікація робіт та матеріалів</h4>
-                    <span className="text-[10.5px] text-slate-600 font-semibold">Валюта розрахунку: Гривня (UAH)</span>
-                  </div>
-                  <table className="w-full border-collapse border border-black text-left text-[11px]">
+                  <h4 className="text-[11px] font-black uppercase text-black m-0 mb-1 tracking-wider">ПЕЧАТЬ</h4>
+                  <table className="w-full border-collapse border border-black text-[10.5px] text-center">
                     <thead>
                       <tr className="bg-slate-100 border-b border-black text-black font-bold">
-                        <th className="p-1.5 border-r border-black w-8 text-center">№</th>
-                        <th className="p-1.5 border-r border-black">Найменування продукції / робіт</th>
-                        <th className="p-1.5 border-r border-black w-36">Параметри / Матеріал</th>
-                        <th className="p-1.5 border-r border-black w-16 text-center">К-сть</th>
-                        <th className="p-1.5 border-r border-black w-14 text-center">Од.</th>
-                        <th className="p-1.5 border-r border-black w-20 text-right">Ціна, ₴</th>
-                        <th className="p-1.5 text-right w-24">Сума, ₴</th>
+                        <th className="p-1.5 border-r border-black w-8">№ п/п</th>
+                        <th className="p-1.5 border-r border-black text-left">Оборудование</th>
+                        <th className="p-1.5 border-r border-black text-left">Бумага / Материал</th>
+                        <th className="p-1.5 border-r border-black">Размер, мм</th>
+                        <th className="p-1.5 border-r border-black">Красочность</th>
+                        <th className="p-1.5 border-r border-black">К-во на листе</th>
+                        <th className="p-1.5 border-r border-black">Кол-во печат. лист.</th>
+                        <th className="p-1.5 border-r border-black">Приладка</th>
+                        <th className="p-1.5 border-r border-black">Тех. отходы</th>
+                        <th className="p-1.5 border-r border-black font-black">Фактически в печать</th>
+                        <th className="p-1.5">Оборот с/с, б/о, ч/о</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-300">
-                      <tr>
-                        <td className="p-1.5 text-center border-r border-black font-mono">1</td>
-                        <td className="p-1.5 border-r border-black font-bold text-black">
-                          {prodTitle}
-                        </td>
-                        <td className="p-1.5 border-r border-black text-slate-800">
-                          {matNameDisplay}, {covNameDisplay}, {colStrDisplay}
-                        </td>
-                        <td className="p-1.5 text-center border-r border-black font-mono font-bold">{tirazhDisplay}</td>
-                        <td className="p-1.5 text-center border-r border-black">шт.</td>
-                        <td className="p-1.5 text-right border-r border-black font-mono">{baseUnitPrice.toFixed(2)}</td>
-                        <td className="p-1.5 text-right font-mono font-bold text-black">{baseManufacturePrice.toFixed(2)}</td>
-                      </tr>
-
-                      {postpressPrice > 0 && (
-                        <tr>
-                          <td className="p-1.5 text-center border-r border-black font-mono">2</td>
-                          <td className="p-1.5 border-r border-black text-black">
-                            Комплексна післядрукарська обробка ({postCorners !== '0' ? 'скруглення, ' : ''}{postFolding !== '0' ? 'фальцювання, ' : ''}{postCreasing !== '0' ? 'біговка, ' : ''}{postDrilling !== '0' ? 'свердління, ' : ''}{postGluing !== '0' ? 'проклейка, ' : ''}{postLuvers !== '0' ? 'люверси' : ''})
-                          </td>
-                          <td className="p-1.5 border-r border-black text-slate-800">Згідно специфікації</td>
-                          <td className="p-1.5 text-center border-r border-black font-mono">{tirazhDisplay}</td>
-                          <td className="p-1.5 text-center border-r border-black">посл.</td>
-                          <td className="p-1.5 text-right border-r border-black font-mono">{(postpressPrice / (tirazhDisplay || 1)).toFixed(2)}</td>
-                          <td className="p-1.5 text-right font-mono font-bold text-black">{postpressPrice.toFixed(2)}</td>
-                        </tr>
-                      )}
-
-                      {postPackingText.trim() && (
-                        <tr>
-                          <td className="p-1.5 text-center border-r border-black font-mono">{postpressPrice > 0 ? '3' : '2'}</td>
-                          <td className="p-1.5 border-r border-black text-black">
-                            Фасування та пакування в пачки ({postPackingText.trim()})
-                          </td>
-                          <td className="p-1.5 border-r border-black text-slate-800">{pCountInv > 0 ? `${pCountInv} пачок по ${pSizeInv || 100} шт` : 'Пачки'}</td>
-                          <td className="p-1.5 text-center border-r border-black font-mono">{pCountInv > 0 ? pCountInv : 1}</td>
-                          <td className="p-1.5 text-center border-r border-black">{pCountInv > 0 ? 'пач.' : 'тир.'}</td>
-                          <td className="p-1.5 text-right border-r border-black font-mono">{pCountInv > 0 ? (packingPrice / pCountInv).toFixed(2) : packingPrice.toFixed(2)}</td>
-                          <td className="p-1.5 text-right font-mono font-bold text-black">{packingPrice.toFixed(2)}</td>
-                        </tr>
-                      )}
-
-                      {deliveryPrice > 0 && (
-                        <tr>
-                          <td className="p-1.5 text-center border-r border-black font-mono">{(postpressPrice > 0 && postPackingText.trim()) ? '4' : (postpressPrice > 0 || postPackingText.trim()) ? '3' : '2'}</td>
-                          <td className="p-1.5 border-r border-black text-black">Доставка кур'єром / перевізником</td>
-                          <td className="p-1.5 border-r border-black text-slate-800">Нова Пошта / Самовивіз</td>
-                          <td className="p-1.5 text-center border-r border-black font-mono">1</td>
-                          <td className="p-1.5 text-center border-r border-black">відпр.</td>
-                          <td className="p-1.5 text-right border-r border-black font-mono">{deliveryPrice.toFixed(2)}</td>
-                          <td className="p-1.5 text-right font-mono font-bold text-black">{deliveryPrice.toFixed(2)}</td>
-                        </tr>
-                      )}
-                    </tbody>
-                    <tfoot>
-                      <tr className="border-t-2 border-black font-bold">
-                        <td colSpan={5} className="p-2 text-right uppercase text-xs">РАЗОМ ДО СПЛАТИ:</td>
-                        <td colSpan={2} className="p-2 text-right font-black text-sm text-black font-mono">
-                          {livePrice.toFixed(2)} ₴
-                        </td>
-                      </tr>
-                      <tr>
-                        <td colSpan={7} className="p-1.5 bg-slate-50 border-t border-slate-300 text-[10.5px] italic text-slate-700">
-                          Сума до сплати: {livePrice.toFixed(2)} грн. Без ПДВ. Ціна за одиницю виробу: {unitPrice.toFixed(2)} грн/шт.
-                        </td>
-                      </tr>
-                    </tfoot>
-                  </table>
-                </div>
-
-                {/* 3. Технологічна картка та параметри для виробництва */}
-                <div className="mb-4">
-                  <h4 className="text-[11px] font-black uppercase text-black m-0 mb-1.5">2. Технологічні норми та параметри виробу (Виробничий паспорт)</h4>
-                  <table className="w-full border-collapse border border-black text-[10.5px]">
                     <tbody>
                       <tr className="border-b border-slate-300">
-                        <td className="p-1.5 bg-slate-100 font-bold w-1/4 border-r border-black">Виріб / Формат:</td>
-                        <td className="p-1.5 font-bold text-black w-1/4 border-r border-black">{formatDisplay}</td>
-                        <td className="p-1.5 bg-slate-100 font-bold w-1/4 border-r border-black">Загальний наклад:</td>
-                        <td className="p-1.5 font-bold font-mono text-black w-1/4">{tirazhDisplay} шт.</td>
-                      </tr>
-                      <tr className="border-b border-slate-300">
-                        <td className="p-1.5 bg-slate-100 font-bold border-r border-black">Матеріал та щільність:</td>
-                        <td className="p-1.5 text-black border-r border-black">{matNameDisplay}</td>
-                        <td className="p-1.5 bg-slate-100 font-bold border-r border-black">Кольоровість (Друк):</td>
-                        <td className="p-1.5 font-bold text-black">{colStrDisplay}</td>
-                      </tr>
-                      <tr className="border-b border-slate-300">
-                        <td className="p-1.5 bg-slate-100 font-bold border-r border-black">Спуск макету / Оборот:</td>
-                        <td className="p-1.5 text-black border-r border-black">{turnLabelDisplay}</td>
-                        <td className="p-1.5 bg-slate-100 font-bold border-r border-black">Захисне покриття:</td>
-                        <td className="p-1.5 text-black">{covNameDisplay}</td>
-                      </tr>
-                      <tr>
-                        <td className="p-1.5 bg-slate-100 font-bold border-r border-black">Витрата паперу зі складу:</td>
-                        <td className="p-1.5 font-mono text-black border-r border-black">{physSheetsCalc} арк. (+{priladkaCalc} приладка + {wasteCalc} відх.)</td>
-                        <td className="p-1.5 bg-slate-100 font-bold border-r border-black">Обладнання:</td>
-                        <td className="p-1.5 text-black font-semibold">Офсетна машина Heidelberg PM 52-4</td>
+                        <td className="p-1.5 border-r border-black font-mono">1</td>
+                        <td className="p-1.5 border-r border-black text-left font-bold text-black">{machineName}</td>
+                        <td className="p-1.5 border-r border-black text-left text-slate-800">{matNameDisplay}</td>
+                        <td className="p-1.5 border-r border-black font-mono">{formatDisplay}</td>
+                        <td className="p-1.5 border-r border-black font-bold text-black">{colStrDisplay}</td>
+                        <td className="p-1.5 border-r border-black font-mono">{itemsPerSheetCalc}</td>
+                        <td className="p-1.5 border-r border-black font-mono">{physSheetsCalc}</td>
+                        <td className="p-1.5 border-r border-black font-mono">{priladkaCalc}</td>
+                        <td className="p-1.5 border-r border-black font-mono">{wasteCalc}</td>
+                        <td className="p-1.5 border-r border-black font-mono font-black text-black">{totalInPrintCalc}</td>
+                        <td className="p-1.5 font-bold text-black">{turnLabelDisplay}</td>
                       </tr>
                     </tbody>
                   </table>
                 </div>
 
-                {/* 4. Таблиця післядрукарської обробки та пакування */}
+                {/* 3. Таблиця «ДОПЕЧАТНЫЙ ПРОЦЕСС» */}
                 <div className="mb-4">
-                  <h4 className="text-[11px] font-black uppercase text-black m-0 mb-1.5">3. Післядрукарські роботи та комплектація</h4>
-                  <table className="w-full border-collapse border border-black text-left text-[10.5px]">
+                  <h4 className="text-[11px] font-black uppercase text-black m-0 mb-1 tracking-wider">ДОПЕЧАТНЫЙ ПРОЦЕСС</h4>
+                  <table className="w-full border-collapse border border-black text-[10.5px]">
                     <thead>
-                      <tr className="bg-slate-100 border-b border-black font-bold">
-                        <th className="p-1.5 border-r border-black w-8 text-center">№</th>
-                        <th className="p-1.5 border-r border-black w-44">Операція</th>
-                        <th className="p-1.5 border-r border-black">Технічні параметри / Деталі</th>
-                        <th className="p-1.5 border-r border-black w-24 text-center">Обсяг</th>
-                        <th className="p-1.5 w-32 text-center">Відмітка / Підпис</th>
+                      <tr className="bg-slate-100 border-b border-black text-black font-bold text-left">
+                        <th className="p-1.5 border-r border-black w-10 text-center">№ п/п</th>
+                        <th className="p-1.5 border-r border-black">Операция</th>
+                        <th className="p-1.5 text-center w-36">К-во операций</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-slate-300">
-                      <tr>
-                        <td className="p-1.5 text-center border-r border-black">{postOpIndex++}</td>
-                        <td className="p-1.5 font-bold border-r border-black">Порізка тиражу</td>
-                        <td className="p-1.5 border-r border-black">У готовий розмір {formatDisplay}</td>
-                        <td className="p-1.5 text-center font-mono border-r border-black">{tirazhDisplay} шт</td>
-                        <td className="p-1.5 text-center text-slate-400">_______ / __:__</td>
+                    <tbody>
+                      <tr className="border-b border-slate-300">
+                        <td className="p-1.5 text-center border-r border-black font-mono">1</td>
+                        <td className="p-1.5 border-r border-black font-semibold text-black">
+                          {isWide ? 'RIP растровка макету та калібрування профілю друку' : isRoll ? 'Підготовка макету та виготовлення флексоформи' : `Перевірка макету, калібрування та спуск смуг (${formatDisplay})`}
+                        </td>
+                        <td className="p-1.5 text-center font-mono font-bold">1 спуск</td>
                       </tr>
-                      {covNameDisplay !== 'Без покриття' && (
-                        <tr>
-                          <td className="p-1.5 text-center border-r border-black">{postOpIndex++}</td>
-                          <td className="p-1.5 font-bold border-r border-black">Ламінування</td>
-                          <td className="p-1.5 border-r border-black">{covNameDisplay}</td>
-                          <td className="p-1.5 text-center font-mono border-r border-black">{physSheetsCalc} арк</td>
-                          <td className="p-1.5 text-center text-slate-400">_______ / __:__</td>
+                      {isOffset && (
+                        <tr className="border-b border-slate-300">
+                          <td className="p-1.5 text-center border-r border-black font-mono">2</td>
+                          <td className="p-1.5 border-r border-black font-semibold text-black">Виведення офсетних CTP форм / термопластин</td>
+                          <td className="p-1.5 text-center font-mono font-bold">{colors === '4+4' ? (turnType === 'sam_na_sebe' ? 4 : 8) : colors === '4+0' ? 4 : 2} пластин</td>
                         </tr>
                       )}
-                      {postCorners !== '0' && (
-                        <tr>
-                          <td className="p-1.5 text-center border-r border-black">{postOpIndex++}</td>
-                          <td className="p-1.5 font-bold border-r border-black">Скруглення кутів</td>
-                          <td className="p-1.5 border-r border-black">{postCorners} кути (радіус 6 мм)</td>
-                          <td className="p-1.5 text-center font-mono border-r border-black">{tirazhDisplay} шт</td>
-                          <td className="p-1.5 text-center text-slate-400">_______ / __:__</td>
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* 4. Таблиця «ПОСЛЕПЕЧАТНЫЙ ПРОЦЕСС» */}
+                <div className="mb-4">
+                  <h4 className="text-[11px] font-black uppercase text-black m-0 mb-1 tracking-wider">ПОСЛЕПЕЧАТНЫЙ ПРОЦЕСС</h4>
+                  <table className="w-full border-collapse border border-black text-[10.5px]">
+                    <thead>
+                      <tr className="bg-slate-100 border-b border-black text-black font-bold text-left">
+                        <th className="p-1.5 border-r border-black w-8 text-center">№ п/п</th>
+                        <th className="p-1.5 border-r border-black">Операция</th>
+                        <th className="p-1.5 border-r border-black text-center w-28">К-во операций</th>
+                        <th className="p-1.5 border-r border-black text-center w-28">Фамилия</th>
+                        <th className="p-1.5 border-r border-black text-center w-20">Время</th>
+                        <th className="p-1.5 border-r border-black text-center w-28">Фамилия</th>
+                        <th className="p-1.5 text-center w-20">Время</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {/* Cutting / Trimming */}
+                      <tr className="border-b border-slate-300">
+                        <td className="p-1.5 text-center border-r border-black font-mono">{postOpIndex++}</td>
+                        <td className="p-1.5 border-r border-black font-semibold text-black">
+                          {isWide ? 'Порізка по периметру (чистий обріз в габарит)' : `Порізка в готовий розмір (${formatDisplay})`}
+                        </td>
+                        <td className="p-1.5 text-center border-r border-black font-mono font-bold">{tirazhDisplay} шт</td>
+                        <td className="p-1.5 border-r border-black text-center text-slate-400">________</td>
+                        <td className="p-1.5 border-r border-black text-center text-slate-400">__:__</td>
+                        <td className="p-1.5 border-r border-black text-center text-slate-400">________</td>
+                        <td className="p-1.5 text-center text-slate-400">__:__</td>
+                      </tr>
+
+                      {/* Wide Grommets */}
+                      {isWide && wideLuvers !== 'none' && (
+                        <tr className="border-b border-slate-300">
+                          <td className="p-1.5 text-center border-r border-black font-mono">{postOpIndex++}</td>
+                          <td className="p-1.5 border-r border-black font-semibold text-black">
+                            Встановлення люверсів ({wideLuvers === '30cm' ? 'кожні 30 см' : wideLuvers === '50cm' ? 'кожні 50 см' : 'по 4 кутах'})
+                          </td>
+                          <td className="p-1.5 text-center border-r border-black font-mono font-bold">
+                            {wideLuvers === 'corners' ? 4 * tirazhDisplay : Math.round(((2 * (Number(wideWidth || 2000) + Number(wideHeight || 1000))) / (wideUnit === 'mm' ? 1000 : 1)) / (wideLuvers === '30cm' ? 0.3 : 0.5)) * tirazhDisplay} шт
+                          </td>
+                          <td className="p-1.5 border-r border-black text-center text-slate-400">________</td>
+                          <td className="p-1.5 border-r border-black text-center text-slate-400">__:__</td>
+                          <td className="p-1.5 border-r border-black text-center text-slate-400">________</td>
+                          <td className="p-1.5 text-center text-slate-400">__:__</td>
                         </tr>
                       )}
-                      {postFolding !== '0' && (
-                        <tr>
-                          <td className="p-1.5 text-center border-r border-black">{postOpIndex++}</td>
-                          <td className="p-1.5 font-bold border-r border-black">Фальцювання</td>
-                          <td className="p-1.5 border-r border-black">Згинання ({postFolding})</td>
-                          <td className="p-1.5 text-center font-mono border-r border-black">{tirazhDisplay} шт</td>
-                          <td className="p-1.5 text-center text-slate-400">_______ / __:__</td>
+
+                      {/* Wide Hemming */}
+                      {isWide && wideHemming !== 'none' && (
+                        <tr className="border-b border-slate-300">
+                          <td className="p-1.5 text-center border-r border-black font-mono">{postOpIndex++}</td>
+                          <td className="p-1.5 border-r border-black font-semibold text-black">
+                            Проварка / підгин краю ({wideHemming === 'perimeter' ? 'по периметру' : 'верх і низ'})
+                          </td>
+                          <td className="p-1.5 text-center border-r border-black font-mono font-bold">
+                            {((2 * (Number(wideWidth || 2000) + Number(wideHeight || 1000))) / (wideUnit === 'mm' ? 1000 : 1) * tirazhDisplay).toFixed(1)} м.п.
+                          </td>
+                          <td className="p-1.5 border-r border-black text-center text-slate-400">________</td>
+                          <td className="p-1.5 border-r border-black text-center text-slate-400">__:__</td>
+                          <td className="p-1.5 border-r border-black text-center text-slate-400">________</td>
+                          <td className="p-1.5 text-center text-slate-400">__:__</td>
                         </tr>
                       )}
-                      {postCreasing !== '0' && (
-                        <tr>
-                          <td className="p-1.5 text-center border-r border-black">{postOpIndex++}</td>
-                          <td className="p-1.5 font-bold border-r border-black">Біговка</td>
-                          <td className="p-1.5 border-r border-black">{postCreasing} біги</td>
-                          <td className="p-1.5 text-center font-mono border-r border-black">{tirazhDisplay * parseInt(postCreasing)} бігів</td>
-                          <td className="p-1.5 text-center text-slate-400">_______ / __:__</td>
+
+                      {/* Offset/Dig Postpress operations */}
+                      {!isWide && postCorners !== '0' && (
+                        <tr className="border-b border-slate-300">
+                          <td className="p-1.5 text-center border-r border-black font-mono">{postOpIndex++}</td>
+                          <td className="p-1.5 border-r border-black font-semibold text-black">Скруглення кутів ({postCorners} кути)</td>
+                          <td className="p-1.5 text-center border-r border-black font-mono font-bold">{tirazhDisplay} шт</td>
+                          <td className="p-1.5 border-r border-black text-center text-slate-400">________</td>
+                          <td className="p-1.5 border-r border-black text-center text-slate-400">__:__</td>
+                          <td className="p-1.5 border-r border-black text-center text-slate-400">________</td>
+                          <td className="p-1.5 text-center text-slate-400">__:__</td>
                         </tr>
                       )}
-                      {postDrilling !== '0' && (
-                        <tr>
-                          <td className="p-1.5 text-center border-r border-black">{postOpIndex++}</td>
-                          <td className="p-1.5 font-bold border-r border-black">Свердління</td>
-                          <td className="p-1.5 border-r border-black">{postDrilling} отв (Ø {postDrillingDia} мм)</td>
-                          <td className="p-1.5 text-center font-mono border-r border-black">{tirazhDisplay * parseInt(postDrilling)} отв</td>
-                          <td className="p-1.5 text-center text-slate-400">_______ / __:__</td>
+
+                      {!isWide && postFolding !== '0' && (
+                        <tr className="border-b border-slate-300">
+                          <td className="p-1.5 text-center border-r border-black font-mono">{postOpIndex++}</td>
+                          <td className="p-1.5 border-r border-black font-semibold text-black">Фальцювання (згинання)</td>
+                          <td className="p-1.5 text-center border-r border-black font-mono font-bold">{tirazhDisplay} шт</td>
+                          <td className="p-1.5 border-r border-black text-center text-slate-400">________</td>
+                          <td className="p-1.5 border-r border-black text-center text-slate-400">__:__</td>
+                          <td className="p-1.5 border-r border-black text-center text-slate-400">________</td>
+                          <td className="p-1.5 text-center text-slate-400">__:__</td>
                         </tr>
                       )}
-                      {postGluing !== '0' && (
-                        <tr>
-                          <td className="p-1.5 text-center border-r border-black">{postOpIndex++}</td>
-                          <td className="p-1.5 font-bold border-r border-black">Проклейка в блок</td>
-                          <td className="p-1.5 border-r border-black">По {postGluing} листів у блоці</td>
-                          <td className="p-1.5 text-center font-mono border-r border-black">{Math.ceil(tirazhDisplay / parseInt(postGluing))} блоків</td>
-                          <td className="p-1.5 text-center text-slate-400">_______ / __:__</td>
+
+                      {!isWide && postCreasing !== '0' && (
+                        <tr className="border-b border-slate-300">
+                          <td className="p-1.5 text-center border-r border-black font-mono">{postOpIndex++}</td>
+                          <td className="p-1.5 border-r border-black font-semibold text-black">Біговка ({postCreasing} біги)</td>
+                          <td className="p-1.5 text-center border-r border-black font-mono font-bold">{tirazhDisplay * parseInt(postCreasing)} бігів</td>
+                          <td className="p-1.5 border-r border-black text-center text-slate-400">________</td>
+                          <td className="p-1.5 border-r border-black text-center text-slate-400">__:__</td>
+                          <td className="p-1.5 border-r border-black text-center text-slate-400">________</td>
+                          <td className="p-1.5 text-center text-slate-400">__:__</td>
                         </tr>
                       )}
-                      <tr>
-                        <td className="p-1.5 text-center border-r border-black">{postOpIndex++}</td>
-                        <td className="p-1.5 font-bold border-r border-black">Фасування та пакування</td>
-                        <td className="p-1.5 border-r border-black">{postPackingText.trim() ? postPackingText.trim() : 'Стандартна упаковка в папір/стрейч'}</td>
-                        <td className="p-1.5 text-center font-mono border-r border-black">{pCountInv > 0 ? `${pCountInv} пачок` : '1 тираж'}</td>
-                        <td className="p-1.5 text-center text-slate-400">_______ / __:__</td>
+
+                      {/* Packaging */}
+                      <tr className="border-b border-slate-300">
+                        <td className="p-1.5 text-center border-r border-black font-mono">{postOpIndex++}</td>
+                        <td className="p-1.5 border-r border-black font-semibold text-black">
+                          {isWide ? 'Упаковка в рулон / захисну стрейч-плівку' : `Фасування та пакування продукції (${postPackingText.trim() || 'стандартна упаковка'})`}
+                        </td>
+                        <td className="p-1.5 text-center border-r border-black font-mono font-bold">
+                          {isWide ? `${tirazhDisplay} шт` : (postPackingText.trim() ? `${Math.ceil(tirazhDisplay / (parseInt(postPackingText.replace(/\D/g, '')) || 100))} пачок` : '1 тираж')}
+                        </td>
+                        <td className="p-1.5 border-r border-black text-center text-slate-400">________</td>
+                        <td className="p-1.5 border-r border-black text-center text-slate-400">__:__</td>
+                        <td className="p-1.5 border-r border-black text-center text-slate-400">________</td>
+                        <td className="p-1.5 text-center text-slate-400">__:__</td>
                       </tr>
                     </tbody>
                   </table>
                 </div>
 
-                {/* 5. Підписи сторін */}
-                <div className="grid grid-cols-2 gap-8 pt-3 mt-4 border-t-2 border-black text-[11px]">
-                  <div>
-                    <p className="font-bold text-black mb-5">Від Виконавця (Менеджер):</p>
-                    <div className="border-b border-black w-44 mb-1"></div>
-                    <span className="text-[10px] text-slate-500">(підпис відповідальної особи, М.П.)</span>
-                  </div>
-                  <div>
-                    <p className="font-bold text-black mb-5">Замовлення прийняв / затвердив:</p>
-                    <div className="border-b border-black w-44 mb-1"></div>
-                    <span className="text-[10px] text-slate-500">(підпис Замовника, М.П.)</span>
-                  </div>
-                </div>
               </div>
 
               {/* Modal Bottom Buttons */}
