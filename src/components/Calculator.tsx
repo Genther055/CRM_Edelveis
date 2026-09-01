@@ -12604,33 +12604,110 @@ export const Calculator: React.FC = () => {
 
             {/* Right Side Summary panel (span 1 col) */}
             <div className="flex flex-col gap-5">
-              <div className="ios-card bg-white" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px', position: 'sticky', top: '24px' }}>
-                <span style={{ fontSize: '12px', fontWeight: '800', color: 'var(--text-medium)', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block' }}>Підсумки прорахунку</span>
-                
+              <div className="ios-card bg-white" style={{ padding: '22px', display: 'flex', flexDirection: 'column', gap: '15px', position: 'sticky', top: '24px' }}>
+                {/* 5-Step Progress & Process Header */}
                 <div>
-                  <span className="text-xs text-slate-500">Ціна продажу для клієнта:</span>
-                  <p className="text-3xl font-extrabold text-blue-600 my-1">
-                    {calculatedOps.finalPrice.toFixed(2)} <span className="text-sm font-bold text-slate-500">₴</span>
+                  <div className="flex items-center justify-between mb-2">
+                    <span style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-medium)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+                      Калькуляція замовлення
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setShowNorms(true)}
+                      className="text-[10.5px] font-bold px-2 py-0.5 rounded-md bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-200/60 transition-colors"
+                      title="Відкрити базу технологічних норм 1С"
+                    >
+                      ⚙️ Норми 1С
+                    </button>
+                  </div>
+
+                  {/* 5-Step Visual Mini-Tracker */}
+                  <div className="grid grid-cols-5 gap-1 p-1 rounded-lg bg-slate-100 text-center text-[9px] font-bold text-slate-500">
+                    <span className="py-1 px-0.5 rounded bg-white text-blue-700 shadow-2xs truncate">1. Параметри</span>
+                    <span className="py-1 px-0.5 rounded bg-white text-blue-700 shadow-2xs truncate">2. Норми</span>
+                    <span className="py-1 px-0.5 rounded bg-white text-blue-700 shadow-2xs truncate">3. Витрати</span>
+                    <span className="py-1 px-0.5 rounded bg-white text-blue-700 shadow-2xs truncate">4. Собіварт.</span>
+                    <span className="py-1 px-0.5 rounded bg-blue-600 text-white shadow-xs truncate">5. Ціна</span>
+                  </div>
+                </div>
+
+                {/* Step 5 Highlight: Final Price to Client */}
+                <div className="p-3.5 rounded-xl bg-gradient-to-br from-blue-50/70 to-indigo-50/50 border border-blue-200/80">
+                  <div className="flex justify-between items-baseline">
+                    <span className="text-xs font-bold text-slate-600">Ціна для клієнта:</span>
+                    <span className="text-[11px] font-bold text-blue-700 font-mono">
+                      {calculatedOps.unitPrice.toFixed(2)} ₴ / шт
+                    </span>
+                  </div>
+                  <p className="text-3xl font-black text-blue-600 my-1 font-mono tracking-tight">
+                    {calculatedOps.finalPrice.toFixed(2)} <span className="text-base font-bold text-slate-600">₴</span>
                   </p>
-                  
-                  <div className="flex flex-col gap-1.5 border-t border-slate-100 pt-3 mt-2 text-xs">
-                    <div className="flex justify-between text-slate-600">
-                      <span>Собівартість виробництва:</span>
-                      <strong className="text-slate-900 font-semibold">{calculatedOps.subtotal.toFixed(2)} ₴</strong>
-                    </div>
-                    <div className="flex justify-between text-slate-600">
-                      <span>Маржа ({marginPercent}%):</span>
-                      <strong className="text-emerald-600 font-semibold">+{calculatedOps.marginAmount.toFixed(2)} ₴</strong>
-                    </div>
-                    <div className="flex justify-between text-slate-600">
-                      <span>Ціна за одиницю (шт):</span>
-                      <strong className="text-blue-600 font-mono font-bold">{calculatedOps.unitPrice.toFixed(4)} ₴</strong>
-                    </div>
+                </div>
+
+                {/* Step 3 & 4: Cost Structure Breakdown */}
+                <div className="flex flex-col gap-2 p-3 rounded-xl bg-slate-50 border border-slate-200/80 text-xs">
+                  <div className="flex justify-between items-center pb-1.5 border-b border-slate-200">
+                    <span className="font-bold text-slate-700 uppercase text-[10px] tracking-wider">
+                      4. Собівартість виробництва:
+                    </span>
+                    <strong className="font-extrabold text-slate-900 font-mono">
+                      {calculatedOps.subtotal.toFixed(2)} ₴
+                    </strong>
+                  </div>
+
+                  {/* Multi-segment visual bar */}
+                  {(() => {
+                    const sub = calculatedOps.subtotal || 1;
+                    const paperP = Math.round((calculatedOps.paperCost / sub) * 100) || 0;
+                    const printP = Math.round((calculatedOps.printingCost / sub) * 100) || 0;
+                    const postP = Math.max(0, 100 - paperP - printP);
+                    const postCost = Math.max(0, calculatedOps.subtotal - calculatedOps.paperCost - calculatedOps.printingCost);
+
+                    return (
+                      <>
+                        <div className="w-full h-2 rounded-full overflow-hidden flex bg-slate-200 my-0.5">
+                          <div style={{ width: `${paperP}%` }} className="bg-amber-500 h-full" title={`Папір: ${paperP}%`}></div>
+                          <div style={{ width: `${printP}%` }} className="bg-blue-500 h-full" title={`Друк: ${printP}%`}></div>
+                          <div style={{ width: `${postP}%` }} className="bg-indigo-500 h-full" title={`Післядрук: ${postP}%`}></div>
+                        </div>
+
+                        <div className="flex flex-col gap-1 text-[11px]">
+                          <div className="flex justify-between text-slate-600">
+                            <span className="flex items-center gap-1.5">
+                              <span className="w-2 h-2 rounded-full bg-amber-500"></span>
+                              Папір ({calculatedOps.physicalSheets} л.):
+                            </span>
+                            <span className="font-mono font-semibold text-slate-800">{calculatedOps.paperCost.toFixed(2)} ₴ ({paperP}%)</span>
+                          </div>
+                          <div className="flex justify-between text-slate-600">
+                            <span className="flex items-center gap-1.5">
+                              <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                              Друк & CTP:
+                            </span>
+                            <span className="font-mono font-semibold text-slate-800">{calculatedOps.printingCost.toFixed(2)} ₴ ({printP}%)</span>
+                          </div>
+                          <div className="flex justify-between text-slate-600">
+                            <span className="flex items-center gap-1.5">
+                              <span className="w-2 h-2 rounded-full bg-indigo-500"></span>
+                              Післядрук & Порізка:
+                            </span>
+                            <span className="font-mono font-semibold text-slate-800">{postCost.toFixed(2)} ₴ ({postP}%)</span>
+                          </div>
+                        </div>
+                      </>
+                    );
+                  })()}
+
+                  <div className="flex justify-between items-center pt-1.5 border-t border-slate-200 font-semibold text-slate-500 text-[10.5px]">
+                    <span>Собівартість за 1 шт:</span>
+                    <span className="font-mono font-bold text-slate-800">
+                      {(calculatedOps.subtotal / (Number(quantity) || 1)).toFixed(4)} ₴/шт
+                    </span>
                   </div>
                 </div>
 
                 {/* Warehouse Stock Check */}
-                <div className={`p-3 rounded-xl border text-xs ${
+                <div className={`p-2.5 rounded-xl border text-xs ${
                   paperWarehouseStatus.hasEnough 
                     ? 'bg-emerald-50 text-emerald-800 border-emerald-200' 
                     : 'bg-amber-50 text-amber-800 border-amber-200'
@@ -12641,10 +12718,13 @@ export const Calculator: React.FC = () => {
                 {/* Margin manual percentage selector with Range Slider */}
                 <div>
                   <div className="flex justify-between items-center mb-1.5">
-                    <label className="text-xs font-semibold text-slate-600">Відсоток націнки (маржа):</label>
-                    <span className="text-sm font-extrabold text-blue-600">{marginPercent}%</span>
+                    <label className="text-xs font-semibold text-slate-600">5. Націнка (Маржа друкарні):</label>
+                    <div className="flex items-center gap-1">
+                      <span className="text-xs font-bold text-emerald-600 font-mono">+{calculatedOps.marginAmount.toFixed(2)} ₴</span>
+                      <span className="text-xs font-extrabold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">({marginPercent}%)</span>
+                    </div>
                   </div>
-                  <div className="flex flex-col gap-2.5">
+                  <div className="flex flex-col gap-2">
                     <input 
                       type="range"
                       min="0"
@@ -12663,7 +12743,7 @@ export const Calculator: React.FC = () => {
                         className="w-16 px-2 py-1 text-center text-xs font-bold rounded-lg border border-slate-200 bg-white text-slate-800"
                       />
                       <div className="flex gap-1 bg-slate-100 border border-slate-200 p-1 rounded-lg flex-grow">
-                        {[0, 50, 100, 150, 200].map(m => (
+                        {[20, 35, 50, 100, 150].map(m => (
                           <button
                             key={m}
                             type="button"
@@ -12683,7 +12763,7 @@ export const Calculator: React.FC = () => {
                 </div>
 
                 {/* Send & Invoice Buttons */}
-                <div className="flex flex-col gap-2 pt-2">
+                <div className="flex flex-col gap-2 pt-1">
                   <button 
                     onClick={handleSendToProduction}
                     disabled={!paperWarehouseStatus.hasEnough}
@@ -12706,13 +12786,13 @@ export const Calculator: React.FC = () => {
                     <button 
                       type="button" 
                       onClick={() => {
-                        const text = `Ціна: ${calculatedOps.finalPrice.toFixed(2)} грн за ${quantity} шт (ціна за шт: ${calculatedOps.unitPrice.toFixed(2)} грн). Розраховано в Едельвейс і К.`;
+                        const text = `Розрахунок замовлення: ${category}\nНаклад: ${quantity} шт\nСобівартість: ${calculatedOps.subtotal.toFixed(2)} грн\nМаржа: ${marginPercent}%\nЦіна для клієнта: ${calculatedOps.finalPrice.toFixed(2)} грн (${calculatedOps.unitPrice.toFixed(2)} грн/шт)\nДрукарня "Едельвейс і К"`;
                         navigator.clipboard.writeText(text);
-                        alert('Текст скопійовано!');
+                        alert('Специфікацію та ціну скопійовано для клієнта!');
                       }} 
                       className="py-2 px-3 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-sm transition-colors text-center"
                     >
-                      Копіювати
+                      Копіювати КП
                     </button>
                   </div>
                 </div>
