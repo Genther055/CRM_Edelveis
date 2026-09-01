@@ -12983,6 +12983,14 @@ export const Calculator: React.FC = () => {
                     <label className="text-xs font-semibold text-slate-600 block mb-1">Вставка блока</label>
                     <input type="number" step="any" value={tempNorms.blockInsertionPrice} onChange={(e) => setTempNorms({ ...tempNorms, blockInsertionPrice: Number(e.target.value) })} className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold" />
                   </div>
+                  <div>
+                    <label className="text-xs font-semibold text-slate-600 block mb-1">Виготовлення кришки</label>
+                    <input type="number" step="any" value={tempNorms.coverMakingPrice} onChange={(e) => setTempNorms({ ...tempNorms, coverMakingPrice: Number(e.target.value) })} className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold" />
+                  </div>
+                  <div>
+                    <label className="text-xs font-semibold text-slate-600 block mb-1">Обробка блока</label>
+                    <input type="number" step="any" value={tempNorms.blockProcessingPrice} onChange={(e) => setTempNorms({ ...tempNorms, blockProcessingPrice: Number(e.target.value) })} className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold" />
+                  </div>
                 </div>
 
               </div>
