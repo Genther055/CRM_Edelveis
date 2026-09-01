@@ -6665,7 +6665,7 @@ export const Calculator: React.FC = () => {
                         {/* 2-Column Main Section: Left = ОБОРОТ (СПУСК) | Right = РОЗРАХУНОК + Горизонтальні кнопки */}
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-7 items-stretch">
                           {/* 1. Left Column (50%): ОБОРОТ (СПУСК) & Параметри тиражу */}
-                          <div className="ios-card bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-5">
+                          <div className="ios-card bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-5 h-full">
                             <div className="flex flex-col gap-4">
                               {/* Header */}
                               <div className="flex items-center justify-between pb-2 border-b border-slate-100">
@@ -6752,7 +6752,7 @@ export const Calculator: React.FC = () => {
                           </div>
 
                           {/* 2. Right Column (50%): РОЗРАХУНОК + ГОРИЗОНТАЛЬНІ КНОПКИ СПРАВА */}
-                          <div className="ios-card bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-5">
+                          <div className="ios-card bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-5 h-full">
                             <div className="flex flex-col gap-3">
                               <div className="flex justify-between items-center pb-2 border-b border-slate-100">
                                 <span className="text-xs font-black text-slate-800 uppercase tracking-wide">
@@ -8551,7 +8551,7 @@ export const Calculator: React.FC = () => {
                   {/* Side-by-Side 2 Columns (50% / 50%): Left = Materials Filter & Sets, Right = Postpress */}
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-7 items-stretch">
                     {/* Left Column (50%): Filter & Sets Counter */}
-                    <div className="flex flex-col gap-4">
+                    <div className="flex flex-col gap-4 h-full justify-between">
                       {/* Section: Фільтр специфікацій та матеріалів (Exact CRM Offset Pill Buttons) */}
                       <div className="ios-card bg-white rounded-2xl border border-slate-200/80 shadow-2xs overflow-hidden flex-1">
                         <div className="px-5 py-3.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
@@ -9155,7 +9155,7 @@ export const Calculator: React.FC = () => {
                         {/* 2-Column Main Section: Left = ОБОРОТ (СПУСК) | Right = РОЗРАХУНОК + Горизонтальні кнопки */}
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-7 items-stretch">
                           {/* 1. Left Column (50%): ОБОРОТ (СПУСК) & Параметри тиражу */}
-                          <div className="ios-card bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-5">
+                          <div className="ios-card bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-5 h-full">
                             <div className="flex flex-col gap-4">
                               {/* Header */}
                               <div className="flex items-center justify-between pb-2 border-b border-slate-100">
@@ -9257,7 +9257,7 @@ export const Calculator: React.FC = () => {
                           </div>
 
                           {/* 2. Right Column (50%): РОЗРАХУНОК + ГОРИЗОНТАЛЬНІ КНОПКИ СПРАВА */}
-                          <div className="ios-card bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-5">
+                          <div className="ios-card bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-5 h-full">
                             <div className="flex flex-col gap-3">
                               <div className="flex justify-between items-center pb-2 border-b border-slate-100">
                                 <span className="text-xs font-black text-slate-800 uppercase tracking-wide">
@@ -11504,7 +11504,7 @@ export const Calculator: React.FC = () => {
                   {/* Row 1 (50% / 50%): Left = РОЗМІР, Right = ВІЗУАЛІЗАЦІЯ & ПРОПОРЦІЯ */}
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-7 items-stretch">
                     {/* Left: РОЗМІР */}
-                    <div className="ios-card bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-5">
+                    <div className="ios-card bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-5 h-full">
                       <div className="flex flex-col gap-3">
                         <div className="flex items-center justify-between pb-2 border-b border-slate-100">
                           <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wider">РОЗМІР:</span>
@@ -11628,7 +11628,7 @@ export const Calculator: React.FC = () => {
                     </div>
 
                     {/* Right: ВІЗУАЛІЗАЦІЯ & ПРОПОРЦІЯ */}
-                    <div className="ios-card bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col items-center justify-between text-center min-h-[220px]">
+                    <div className="ios-card bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col items-center justify-between text-center h-full">
                       <div className="w-full flex items-center justify-between pb-2 border-b border-slate-100">
                         <span className="text-[11px] font-extrabold text-slate-700 uppercase tracking-wider">
                           ВІЗУАЛІЗАЦІЯ & ПРОПОРЦІЯ МАКЕТУ
@@ -11673,7 +11673,7 @@ export const Calculator: React.FC = () => {
                   {/* Row 2 (50% / 50%): Left = МАТЕРІАЛИ ТА ЯКІСТЬ ДРУКУ, Right = ПІСЛЯДРУКАРСЬКА ОБРОБКА ТА ФУРНІТУРА */}
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-7 items-stretch">
                     {/* Left Column (50%): Фільтр матеріалів та параметрів */}
-                    <div className="ios-card bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-5">
+                    <div className="ios-card bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-5 h-full">
                       <div className="flex flex-col gap-3">
                         <div className="flex items-center justify-between pb-2 border-b border-slate-100">
                           <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wider">
@@ -11838,7 +11838,7 @@ export const Calculator: React.FC = () => {
                     </div>
 
                     {/* Right Column (50%): Післядрукарська обробка та фурнітура */}
-                    <div className="ios-card bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-5">
+                    <div className="ios-card bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-5 h-full">
                       <div className="flex flex-col gap-3">
                         <div className="flex items-center justify-between pb-2 border-b border-slate-100">
                           <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wider">
@@ -12430,7 +12430,7 @@ export const Calculator: React.FC = () => {
                         {/* 2-Column Main Section: Left = НАКЛАД ТА НАЦІНКА | Right = РОЗРАХУНОК + Горизонтальні кнопки */}
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-7 items-stretch">
                           {/* 1. Left Column (50%): Параметри тиражу та націнка */}
-                          <div className="ios-card bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-5">
+                          <div className="ios-card bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-5 h-full">
                             <div className="flex flex-col gap-4">
                               <div className="flex items-center justify-between pb-2 border-b border-slate-100">
                                 <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wider">ПАРАМЕТРИ ТИРАЖУ:</span>
@@ -12505,7 +12505,7 @@ export const Calculator: React.FC = () => {
                           </div>
 
                           {/* 2. Right Column (50%): РОЗРАХУНОК + ГОРИЗОНТАЛЬНІ КНОПКИ СПРАВА */}
-                          <div className="ios-card bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-5">
+                          <div className="ios-card bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-5 h-full">
                             <div className="flex flex-col gap-3">
                               <div className="flex justify-between items-center pb-2 border-b border-slate-100">
                                 <span className="text-xs font-black text-slate-800 uppercase tracking-wide">
@@ -13447,7 +13447,7 @@ export const Calculator: React.FC = () => {
                         </div>
 
                         {/* 2. Right Column (50%): РОЗРАХУНОК + ГОРИЗОНТАЛЬНІ КНОПКИ СПРАВА */}
-                        <div className="ios-card bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-5">
+                        <div className="ios-card bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-5 h-full">
                           <div className="flex flex-col gap-3">
                             <div className="flex justify-between items-center pb-2 border-b border-slate-100">
                               <span className="text-xs font-black text-slate-800 uppercase tracking-wide">
