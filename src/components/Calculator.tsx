@@ -29,7 +29,6 @@ import {
   Printer,
   Crop,
   ShieldCheck,
-  Info,
   ChevronDown,
   Menu,
   FileSpreadsheet,
@@ -3274,49 +3273,6 @@ export const Calculator: React.FC = () => {
                         </button>
                       </div>
                     </div>
-
-                    {/* Quick Info Links in sleek Cupertino pill buttons */}
-                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '8px' }}>
-                      {[
-                        { key: 'instr', label: 'Інструкція', icon: <FileText size={15} style={{ color: 'var(--primary)' }} /> },
-                        { key: 'materials', label: 'Матеріали', icon: <Layers size={15} style={{ color: 'var(--primary)' }} /> },
-                        { key: 'review', label: 'Ваш відгук', icon: <MessageSquare size={15} style={{ color: 'var(--primary)' }} /> },
-                        { key: 'terms', label: 'Термін друку', icon: <Clock size={15} style={{ color: 'var(--primary)' }} /> },
-                        { key: 'samples', label: 'Зразки', icon: <Tag size={15} style={{ color: 'var(--primary)' }} /> },
-                        { key: 'bug', label: 'Знайшли помилку?', icon: <AlertTriangle size={15} style={{ color: '#ff9500' }} />, isAmber: true }
-                      ].map(link => (
-                        <button
-                          key={link.key}
-                          type="button"
-                          onClick={() => setActiveInfoModal(link.key as any)}
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '8px',
-                            padding: '8px 12px',
-                            borderRadius: 'var(--radius-md)',
-                            backgroundColor: 'var(--bg-system)',
-                            border: '0.5px solid var(--border-light)',
-                            color: link.isAmber ? '#ff9500' : 'var(--text-dark)',
-                            fontSize: '12px',
-                            fontWeight: '600',
-                            cursor: 'pointer',
-                            transition: 'all 0.15s ease'
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.backgroundColor = link.isAmber ? 'rgba(255, 149, 0, 0.12)' : 'rgba(0, 122, 255, 0.08)';
-                            e.currentTarget.style.color = link.isAmber ? '#ff9500' : 'var(--primary)';
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.backgroundColor = 'var(--bg-system)';
-                            e.currentTarget.style.color = link.isAmber ? '#ff9500' : 'var(--text-dark)';
-                          }}
-                        >
-                          {link.icon}
-                          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{link.label}</span>
-                        </button>
-                      ))}
-                    </div>
                   </div>
 
                   {/* Product Kind / Folding Type Selection Bar */}
@@ -4464,27 +4420,6 @@ export const Calculator: React.FC = () => {
                     </div>
 
                     <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                      <button
-                        type="button"
-                        onClick={() => setActiveInfoModal('instr')}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '6px',
-                          padding: '8px 14px',
-                          borderRadius: 'var(--radius-md)',
-                          border: '0.5px solid var(--border-light)',
-                          backgroundColor: 'var(--bg-system)',
-                          color: 'var(--text-dark)',
-                          fontSize: '12px',
-                          fontWeight: '600',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        <FileText size={14} style={{ color: 'var(--primary)' }} />
-                        <span>Інструкція</span>
-                      </button>
-
                       <a
                         href={
                           {
@@ -4504,27 +4439,6 @@ export const Calculator: React.FC = () => {
                         <Download size={14} />
                         <span>Шаблон штампу (PDF)</span>
                       </a>
-
-                      <button
-                        type="button"
-                        onClick={() => setActiveInfoModal('materials')}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '6px',
-                          padding: '8px 14px',
-                          borderRadius: 'var(--radius-md)',
-                          border: '0.5px solid var(--border-light)',
-                          backgroundColor: 'var(--bg-system)',
-                          color: 'var(--text-dark)',
-                          fontSize: '12px',
-                          fontWeight: '600',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        <Layers size={14} style={{ color: 'var(--primary)' }} />
-                        <span>Матеріали</span>
-                      </button>
                     </div>
                   </div>
 
@@ -4858,49 +4772,6 @@ export const Calculator: React.FC = () => {
                         <h4 style={{ fontSize: '15px', fontWeight: '800', color: 'var(--text-dark)', margin: 0 }}>Багатосторінкова продукція (Каталоги, Журнали)</h4>
                         <span style={{ fontSize: '12px', color: 'var(--text-medium)' }}>Гнучке налаштування обкладинки, блоку та вставки</span>
                       </div>
-                    </div>
-
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                      <button
-                        type="button"
-                        onClick={() => setActiveInfoModal('tech_pur')}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '6px',
-                          padding: '8px 14px',
-                          borderRadius: 'var(--radius-md)',
-                          border: '0.5px solid var(--border-light)',
-                          backgroundColor: 'var(--bg-system)',
-                          color: 'var(--text-dark)',
-                          fontSize: '12px',
-                          fontWeight: '600',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        <BookOpen size={14} style={{ color: 'var(--primary)' }} />
-                        <span>Технічні вимоги</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setActiveInfoModal('materials')}
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '6px',
-                          padding: '8px 14px',
-                          borderRadius: 'var(--radius-md)',
-                          border: '0.5px solid var(--border-light)',
-                          backgroundColor: 'var(--bg-system)',
-                          color: 'var(--text-dark)',
-                          fontSize: '12px',
-                          fontWeight: '600',
-                          cursor: 'pointer'
-                        }}
-                      >
-                        <Layers size={14} style={{ color: 'var(--primary)' }} />
-                        <span>Матеріали</span>
-                      </button>
                     </div>
                   </div>
 
@@ -5912,28 +5783,6 @@ export const Calculator: React.FC = () => {
                           <span className="text-xs text-slate-500">Цифровий оперативний друк від 1 примірника</span>
                         </div>
                       </div>
-
-                      {/* Quick Info Badges */}
-                      <div className="flex flex-wrap items-center gap-2">
-                        {[
-                          { label: 'Інструкція по оформленню', icon: <Info size={13} className="text-blue-500" /> },
-                          { label: 'Терміни друку', icon: <Clock size={13} className="text-amber-500" /> },
-                          { label: 'Матеріали', icon: <Layers size={13} className="text-indigo-500" /> },
-                          { label: 'Зразки матеріалів', icon: <Tag size={13} className="text-emerald-500" /> },
-                          { label: 'Ваш відгук', icon: <MessageSquare size={13} className="text-cyan-500" /> },
-                          { label: 'Знайшли помилку?', icon: <AlertTriangle size={13} className="text-rose-500" /> },
-                        ].map((b, idx) => (
-                          <button
-                            key={idx}
-                            type="button"
-                            onClick={() => setActiveInfoModal('modal_instr_digital')}
-                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200/80 text-[11px] font-semibold text-slate-700 transition-all"
-                          >
-                            {b.icon}
-                            <span>{b.label}</span>
-                          </button>
-                        ))}
-                      </div>
                     </div>
                   </div>
 
@@ -6540,28 +6389,6 @@ export const Calculator: React.FC = () => {
                           <span className="text-xs text-slate-500">Швидка цифрова висічка готових форм (підставки, кишенькові календарі, бирки)</span>
                         </div>
                       </div>
-
-                      {/* Quick Info Badges */}
-                      <div className="flex flex-wrap items-center gap-2">
-                        {[
-                          { label: 'Інструкція по оформленню', icon: <Info size={13} className="text-blue-500" /> },
-                          { label: 'Завантажити шаблон штампу', icon: <Download size={13} className="text-emerald-500" /> },
-                          { label: 'Терміни друку', icon: <Clock size={13} className="text-amber-500" /> },
-                          { label: 'Матеріали', icon: <Layers size={13} className="text-indigo-500" /> },
-                          { label: 'Зразки матеріалів', icon: <Tag size={13} className="text-cyan-500" /> },
-                          { label: 'Знайшли помилку?', icon: <AlertTriangle size={13} className="text-rose-500" /> },
-                        ].map((b, idx) => (
-                          <button
-                            key={idx}
-                            type="button"
-                            onClick={() => setActiveInfoModal('modal_instr_digital')}
-                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200/80 text-[11px] font-semibold text-slate-700 transition-all"
-                          >
-                            {b.icon}
-                            <span>{b.label}</span>
-                          </button>
-                        ))}
-                      </div>
                     </div>
                   </div>
 
@@ -6951,26 +6778,6 @@ export const Calculator: React.FC = () => {
                           <h3 className="text-base font-extrabold text-slate-900 m-0">Багатосторінкова</h3>
                           <span className="text-xs text-slate-500">Оперативний цифровий друк брошур, каталогів, журналів та презентацій</span>
                         </div>
-                      </div>
-
-                      {/* Quick Info Badges */}
-                      <div className="flex flex-wrap items-center gap-2">
-                        {[
-                          { label: 'Матеріали', icon: <Layers size={13} className="text-indigo-500" /> },
-                          { label: 'Терміни друку', icon: <Clock size={13} className="text-amber-500" /> },
-                          { label: 'Технічні вимоги', icon: <FileText size={13} className="text-blue-500" /> },
-                          { label: 'Інструкція по оформленню замовлення', icon: <Info size={13} className="text-emerald-500" /> },
-                        ].map((b, idx) => (
-                          <button
-                            key={idx}
-                            type="button"
-                            onClick={() => setActiveInfoModal('modal_instr_digital')}
-                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200/80 text-[11px] font-semibold text-slate-700 transition-all"
-                          >
-                            {b.icon}
-                            <span>{b.label}</span>
-                          </button>
-                        ))}
                       </div>
                     </div>
                   </div>
@@ -8657,27 +8464,6 @@ export const Calculator: React.FC = () => {
                           </span>
                         </div>
                       </div>
-
-                      {/* Quick Info Badges */}
-                      <div className="flex flex-wrap items-center gap-2">
-                        {[
-                          { label: 'Інструкція по оформленню', icon: <Info size={13} className="text-blue-500" /> },
-                          { label: 'Терміни виготовлення', icon: <Clock size={13} className="text-amber-500" /> },
-                          { label: 'Характеристики матеріалів', icon: <Layers size={13} className="text-indigo-500" /> },
-                          { label: 'Зразки матеріалів', icon: <Tag size={13} className="text-emerald-500" /> },
-                          { label: 'Знайшли помилку?', icon: <AlertTriangle size={13} className="text-rose-500" /> },
-                        ].map((b, idx) => (
-                          <button
-                            key={idx}
-                            type="button"
-                            onClick={() => setActiveInfoModal('modal_instr_digital')}
-                            className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-slate-50 hover:bg-slate-100 border border-slate-200/80 text-[11px] font-semibold text-slate-700 transition-all"
-                          >
-                            {b.icon}
-                            <span>{b.label}</span>
-                          </button>
-                        ))}
-                      </div>
                     </div>
                   </div>
 
@@ -9556,49 +9342,6 @@ export const Calculator: React.FC = () => {
                     </p>
                   </div>
                 </div>
-              </div>
-
-              {/* Action / Info Links Row */}
-              <div className="ios-card bg-white" style={{ padding: '12px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
-                {[
-                  { id: 'instr_roll', label: 'Інструкція по оформленню замовлення', icon: <FileText size={15} style={{ color: 'var(--primary)' }} /> },
-                  { id: 'terms', label: 'Терміни друку', icon: <Clock size={15} style={{ color: 'var(--primary)' }} /> },
-                  { id: 'materials', label: 'Матеріали', icon: <Layers size={15} style={{ color: 'var(--primary)' }} /> },
-                  { id: 'samples', label: 'Зразки матеріалів з друком', icon: <Tag size={15} style={{ color: 'var(--primary)' }} /> },
-                  { id: 'review', label: 'Ваш відгук', icon: <MessageSquare size={15} style={{ color: 'var(--primary)' }} /> },
-                  { id: 'bug', label: 'Знайшли помилку?', icon: <AlertTriangle size={15} style={{ color: '#ff9500' }} /> },
-                ].map(link => (
-                  <button
-                    key={link.id}
-                    type="button"
-                    onClick={() => setActiveInfoModal(link.id)}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '7px',
-                      padding: '8px 12px',
-                      borderRadius: 'var(--radius-md)',
-                      backgroundColor: 'var(--bg-system)',
-                      border: '0.5px solid var(--border-light)',
-                      color: 'var(--text-dark)',
-                      fontSize: '12px',
-                      fontWeight: '600',
-                      cursor: 'pointer',
-                      transition: 'all 0.15s ease'
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = 'rgba(0, 122, 255, 0.08)';
-                      e.currentTarget.style.color = 'var(--primary)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = 'var(--bg-system)';
-                      e.currentTarget.style.color = 'var(--text-dark)';
-                    }}
-                  >
-                    {link.icon}
-                    <span>{link.label}</span>
-                  </button>
-                ))}
               </div>
 
               {/* Core Parameters Form Card */}
@@ -10530,36 +10273,6 @@ export const Calculator: React.FC = () => {
                         ← Всі категорії
                       </button>
                     </div>
-                  </div>
-
-                  {/* 6 Info Links */}
-                  <div style={{
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
-                    gap: '8px',
-                    backgroundColor: '#FFFFFF',
-                    padding: '12px 16px',
-                    borderRadius: '8px',
-                    border: '0.5px solid var(--border-light)'
-                  }}>
-                    <a href="#instruction" onClick={(e) => { e.preventDefault(); setActiveInfoModal('instruction' as any); }} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#1E293B', fontWeight: '600', textDecoration: 'none' }}>
-                      <span style={{ color: '#C00000', fontSize: '15px' }}>📄</span> Інструкція по оформленню замовлення
-                    </a>
-                    <a href="#materials" onClick={(e) => { e.preventDefault(); setActiveInfoModal('materials' as any); }} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#1E293B', fontWeight: '600', textDecoration: 'none' }}>
-                      <span style={{ color: '#C00000', fontSize: '15px' }}>📦</span> Матеріали
-                    </a>
-                    <a href="#feedback" onClick={(e) => { e.preventDefault(); setActiveInfoModal('feedback' as any); }} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#1E293B', fontWeight: '600', textDecoration: 'none' }}>
-                      <span style={{ color: '#C00000', fontSize: '15px' }}>💬</span> Ваш відгук
-                    </a>
-                    <a href="#timing" onClick={(e) => { e.preventDefault(); setActiveInfoModal('timing' as any); }} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#1E293B', fontWeight: '600', textDecoration: 'none' }}>
-                      <span style={{ color: '#C00000', fontSize: '15px' }}>⏱</span> Терміни друку
-                    </a>
-                    <a href="#samples" onClick={(e) => { e.preventDefault(); setActiveInfoModal('samples' as any); }} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#1E293B', fontWeight: '600', textDecoration: 'none' }}>
-                      <span style={{ color: '#C00000', fontSize: '15px' }}>🎨</span> Зразки матеріалів з друком
-                    </a>
-                    <a href="#error" onClick={(e) => { e.preventDefault(); setActiveInfoModal('error_report' as any); }} style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12px', color: '#1E293B', fontWeight: '600', textDecoration: 'none' }}>
-                      <span style={{ color: '#C00000', fontSize: '15px' }}>⚠️</span> Знайшли помилку?
-                    </a>
                   </div>
                 </div>
 
