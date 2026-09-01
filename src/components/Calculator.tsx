@@ -6316,7 +6316,7 @@ export const Calculator: React.FC = () => {
                             <th className="py-3 px-3 border-r border-slate-700/50">Друк</th>
                             <th className="py-3 px-3 border-r border-slate-700/50 min-w-[70px]">Готовність</th>
                             {(category === 'Бланки'
-                              ? [50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950, 1000, 1500, 2500, 5000, 10000]
+                              ? [50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950, 1000]
                               : [100, 250, 500, 1000, 1500, 2500, 5000, 10000]
                             ).map(tir => (
                               <th key={tir} className="py-2.5 px-2 font-black border-r border-slate-700/50 whitespace-nowrap">{tir}</th>
@@ -6326,7 +6326,7 @@ export const Calculator: React.FC = () => {
                         <tbody>
                           {selectedMaterials.length === 0 || selectedCoverings.length === 0 || selectedPrintColors.length === 0 ? (
                             <tr>
-                              <td colSpan={27} style={{ padding: '30px', color: '#888', fontStyle: 'italic', backgroundColor: '#fafafa' }}>
+                              <td colSpan={24} style={{ padding: '30px', color: '#888', fontStyle: 'italic', backgroundColor: '#fafafa' }}>
                                 Щоб сформувати прайс оберіть матеріал, покриття, тип друку у фільтрі вище
                               </td>
                             </tr>
@@ -6414,15 +6414,11 @@ export const Calculator: React.FC = () => {
                                     850: 0.90,
                                     900: 0.894,
                                     950: 0.886,
-                                    1000: 0.776,
-                                    1500: 0.65,
-                                    2500: 0.52,
-                                    5000: 0.44,
-                                    10000: 0.38
+                                    1000: 0.776
                                   };
 
                                   const activeTirList = (category === 'Бланки'
-                                    ? [50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950, 1000, 1500, 2500, 5000, 10000]
+                                    ? [50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950, 1000]
                                     : [100, 250, 500, 1000, 1500, 2500, 5000, 10000]
                                   );
 
@@ -6452,18 +6448,20 @@ export const Calculator: React.FC = () => {
                                           let colMod = colStr === '1+0' ? 1.0 : colStr === '1+1' ? 1.25 : colStr === '4+0' ? 1.50 : 1.90;
                                           let areaMod = Math.max(0.25, areaM2 / (0.210 * 0.297));
                                           itemCost = baseUnit * matMod * colMod * areaMod;
-                                          rawTotal = itemCost * tir;
-                                          basePaperCost = rawTotal * 0.45;
-                                          printCost = rawTotal * 0.45;
+                                          rawTotal = Math.round(itemCost * tir);
                                           postpressSum = postpressTotalPerItem * tir;
                                           rawTotal += postpressSum + deliveryCost;
                                           itemCost = rawTotal / tir;
+                                          const costShare = rawTotal / (marginPercent / 100 || 1);
+                                          basePaperCost = costShare * 0.48;
+                                          printCost = costShare * 0.52;
                                         } else {
                                           basePaperCost = areaM2 * (matDensity * 0.08) * tir;
                                           printCost = (isDouble ? 0.35 : 0.20) * tir + (tir > 500 ? 80 : 120);
                                           lamCost = (covId !== '0' && covId !== '') ? areaM2 * norms.laminationMattePrice * tir * (covId.includes('1+1') ? 2 : 1) : 0;
                                           postpressSum = postpressTotalPerItem * tir;
-                                          rawTotal = (basePaperCost + printCost + lamCost + postpressSum + deliveryCost) * (marginPercent / 100) * (sheetSetsCount || 1);
+                                          const calcRaw = (basePaperCost + printCost + lamCost + postpressSum + deliveryCost) * (sheetSetsCount || 1);
+                                          rawTotal = Math.round(calcRaw * (marginPercent / 100));
                                           itemCost = rawTotal / tir;
                                         }
 
@@ -6479,6 +6477,8 @@ export const Calculator: React.FC = () => {
                                           <td
                                             key={tir}
                                             onClick={() => {
+                                              const finalTargetPrice = Math.round(rawTotal);
+                                              const exactCostBasis = finalTargetPrice / (marginPercent / 100 || 1);
                                               setSelectedSheetCalc({
                                                 matId,
                                                 matName,
@@ -6486,13 +6486,13 @@ export const Calculator: React.FC = () => {
                                                 covName,
                                                 colStr,
                                                 tirazh: tir,
-                                                basePaperCost,
-                                                printCost,
+                                                basePaperCost: exactCostBasis * 0.48,
+                                                printCost: exactCostBasis * 0.52,
                                                 lamCost,
                                                 postpressSum,
                                                 deliveryCost,
-                                                rawCost: (basePaperCost + printCost + lamCost + postpressSum + deliveryCost) * (sheetSetsCount || 1),
-                                                finalPrice: Math.round(rawTotal),
+                                                rawCost: exactCostBasis,
+                                                finalPrice: finalTargetPrice,
                                                 unitPrice: itemCost
                                               });
                                               setTimeout(() => {
@@ -6771,6 +6771,35 @@ export const Calculator: React.FC = () => {
                                     setQuantity(val);
                                     setSelectedSheetCalc(prev => {
                                       const base = prev || activeCalc;
+                                      const bMap: Record<number, number> = {
+                                        50: 4.19, 100: 2.47, 150: 1.88, 200: 1.58, 250: 1.41,
+                                        300: 1.29, 350: 1.20, 400: 1.14, 450: 1.09, 500: 1.05,
+                                        550: 1.02, 600: 0.99, 650: 0.97, 700: 0.95, 750: 0.93,
+                                        800: 0.92, 850: 0.90, 900: 0.894, 950: 0.886, 1000: 0.776
+                                      };
+                                      if (category === 'Бланки') {
+                                        let unitP = bMap[val];
+                                        if (!unitP) {
+                                          const keys = Object.keys(bMap).map(Number).sort((a,b) => a - b);
+                                          let l = 50, u = 1000;
+                                          for (const k of keys) {
+                                            if (k <= val) l = k;
+                                            if (k >= val && u === 1000) { u = k; break; }
+                                          }
+                                          unitP = l === u ? bMap[l] : bMap[l] + ((val - l) / (u - l)) * (bMap[u] - bMap[l]);
+                                        }
+                                        const finP = Math.round(unitP * val);
+                                        const cBasis = finP / (marginPercent / 100 || 1);
+                                        return {
+                                          ...base,
+                                          tirazh: val,
+                                          basePaperCost: cBasis * 0.48,
+                                          printCost: cBasis * 0.52,
+                                          rawCost: cBasis,
+                                          finalPrice: finP,
+                                          unitPrice: unitP
+                                        };
+                                      }
                                       const oldTir = base.tirazh || 1;
                                       const perItemPaper = (base.basePaperCost / oldTir);
                                       const perItemLam = (base.lamCost / oldTir);
