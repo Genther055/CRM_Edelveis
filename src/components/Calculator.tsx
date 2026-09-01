@@ -862,7 +862,7 @@ export const Calculator: React.FC = () => {
   const [digitalCncType, setDigitalCncType] = useState<'package' | 'folder' | 'wobbler' | 'custom_shape'>('custom_shape');
 
   // Digital Sheets Specific Detailed States (as shown in reference)
-  const [digitalSheetSets, setDigitalSheetSets] = useState<number>(1);
+  const digitalSheetSets = 1;
   const [digitalSheetWithDelivery, setDigitalSheetWithDelivery] = useState<boolean>(false);
   const [digitalSheetPerPiece, setDigitalSheetPerPiece] = useState<boolean>(false);
   const [digitalSheetCornerCurve, setDigitalSheetCornerCurve] = useState<string>('0');
@@ -886,7 +886,7 @@ export const Calculator: React.FC = () => {
   const [wideWidth, setWideWidth] = useState<string>('2000');
   const [wideHeight, setWideHeight] = useState<string>('1000');
   const [wideUnit, setWideUnit] = useState<'mm' | 'cm' | 'm'>('mm');
-  const [wideSets, setWideSets] = useState<number>(1);
+  const wideSets = 1;
   const [wideWithDelivery, setWideWithDelivery] = useState<boolean>(false);
   const [widePriceCostVar, setWidePriceCostVar] = useState<'per_tirazh' | 'per_sqm' | 'per_item'>('per_tirazh');
 
@@ -1036,7 +1036,7 @@ export const Calculator: React.FC = () => {
   const [postPerforation, setPostPerforation] = useState<string>('0');
   const [postPackingText, setPostPackingText] = useState<string>('');
 
-  const [sheetSetsCount, setSheetSetsCount] = useState<number>(1);
+  const sheetSetsCount = 1;
 
   // Filters for Sheet Calculator
   const [selectedMaterials, setSelectedMaterials] = useState<string[]>(['300']);
@@ -6066,37 +6066,7 @@ export const Calculator: React.FC = () => {
                         </div>
                       </div>
 
-                      {/* Sets Counter Bar */}
-                      <div className="ios-card bg-white p-4 rounded-2xl border border-slate-200/80 shadow-2xs flex items-center justify-between flex-wrap gap-4">
-                        <div className="flex items-center gap-3">
-                          <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">Комплектів макетів:</span>
-                          <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-lg border border-slate-200">
-                            <button
-                              type="button"
-                              onClick={() => setSheetSetsCount(prev => Math.max(1, prev - 1))}
-                              className="w-7 h-7 rounded-md bg-white border border-slate-200 text-slate-700 font-bold hover:bg-slate-50 flex items-center justify-center transition-colors"
-                            >
-                              -
-                            </button>
-                            <input
-                              type="number"
-                              value={sheetSetsCount}
-                              onChange={(e) => setSheetSetsCount(parseInt(e.target.value) || 1)}
-                              className="w-12 h-7 rounded-md border border-slate-200 bg-white text-center font-bold text-xs"
-                            />
-                            <button
-                              type="button"
-                              onClick={() => setSheetSetsCount(prev => prev + 1)}
-                              className="w-7 h-7 rounded-md bg-white border border-slate-200 text-slate-700 font-bold hover:bg-slate-50 flex items-center justify-center transition-colors"
-                            >
-                              +
-                            </button>
-                          </div>
-                        </div>
-                        <span className="text-xs text-slate-400 font-medium">
-                          (Кількість однакових замовлень)
-                        </span>
-                      </div>
+
                     </div>
 
                     {/* Right Column (50%): Післядрукарська обробка */}
@@ -8683,37 +8653,7 @@ export const Calculator: React.FC = () => {
                         </div>
                       </div>
 
-                      {/* Section: КОМПЛЕКТІВ МАКЕТІВ Bar */}
-                      <div className="ios-card bg-white p-4 rounded-2xl border border-slate-200/80 shadow-2xs flex items-center justify-between flex-wrap gap-4">
-                        <div className="flex items-center gap-3">
-                          <span className="text-xs font-extrabold uppercase text-slate-800">КОМПЛЕКТІВ МАКЕТІВ:</span>
-                          <div className="flex items-center gap-1">
-                            <button
-                              type="button"
-                              onClick={() => setDigitalSheetSets(Math.max(1, digitalSheetSets - 1))}
-                              className="w-7 h-7 rounded-md bg-white border border-slate-200 text-slate-700 font-bold hover:bg-slate-50 flex items-center justify-center transition-colors"
-                            >
-                              -
-                            </button>
-                            <input
-                              type="number"
-                              value={digitalSheetSets}
-                              onChange={(e) => setDigitalSheetSets(Math.max(1, parseInt(e.target.value) || 1))}
-                              className="w-12 h-7 text-center rounded-md border border-slate-200 font-bold text-xs"
-                            />
-                            <button
-                              type="button"
-                              onClick={() => setDigitalSheetSets(digitalSheetSets + 1)}
-                              className="w-7 h-7 rounded-md bg-white border border-slate-200 text-slate-700 font-bold hover:bg-slate-50 flex items-center justify-center transition-colors"
-                            >
-                              +
-                            </button>
-                          </div>
-                        </div>
-                        <span className="text-xs text-slate-400 font-medium">
-                          (Кількість однакових замовлень)
-                        </span>
-                      </div>
+
                     </div>
 
                     {/* Right Column (50%): Післядрукарська обробка */}
@@ -9526,37 +9466,7 @@ export const Calculator: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Section: КОМПЛЕКТІВ МАКЕТІВ Bar */}
-                  <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex items-center justify-between flex-wrap gap-4">
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs font-extrabold uppercase text-slate-800">КОМПЛЕКТІВ МАКЕТІВ:</span>
-                      <div className="flex items-center gap-1">
-                        <button
-                          type="button"
-                          onClick={() => setDigitalSheetSets(Math.max(1, digitalSheetSets - 1))}
-                          className="w-7 h-7 rounded-md bg-white border border-slate-200 text-slate-700 font-bold hover:bg-slate-50 flex items-center justify-center transition-colors"
-                        >
-                          -
-                        </button>
-                        <input
-                          type="number"
-                          value={digitalSheetSets}
-                          onChange={(e) => setDigitalSheetSets(Math.max(1, parseInt(e.target.value) || 1))}
-                          className="w-12 h-7 text-center rounded-md border border-slate-200 font-bold text-xs"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setDigitalSheetSets(digitalSheetSets + 1)}
-                          className="w-7 h-7 rounded-md bg-white border border-slate-200 text-slate-700 font-bold hover:bg-slate-50 flex items-center justify-center transition-colors"
-                        >
-                          +
-                        </button>
-                      </div>
-                    </div>
-                    <span className="text-xs text-slate-400 font-medium">
-                      (Кількість однакових замовлень з різними макетами)
-                    </span>
-                  </div>
+
 
                   {/* Section: Фільтр специфікацій та матеріалів (Exact CRM Offset Pill Buttons) */}
                   <div className="ios-card bg-white rounded-2xl border border-slate-200/80 shadow-2xs overflow-hidden">
@@ -11814,27 +11724,7 @@ export const Calculator: React.FC = () => {
                         </div>
                       </div>
 
-                      {/* Sets Counter */}
-                      <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/60 flex items-center justify-between">
-                        <span className="text-xs font-bold text-slate-700 uppercase">Комплектів макетів:</span>
-                        <div className="flex items-center gap-2">
-                          <button
-                            type="button"
-                            onClick={() => setWideSets(Math.max(1, wideSets - 1))}
-                            className="w-7 h-7 rounded-lg bg-white border border-slate-200 font-extrabold text-slate-700 flex items-center justify-center hover:bg-slate-100"
-                          >
-                            -
-                          </button>
-                          <span className="w-8 text-center text-xs font-black text-slate-900 font-mono">{wideSets}</span>
-                          <button
-                            type="button"
-                            onClick={() => setWideSets(wideSets + 1)}
-                            className="w-7 h-7 rounded-lg bg-white border border-slate-200 font-extrabold text-slate-700 flex items-center justify-center hover:bg-slate-100"
-                          >
-                            +
-                          </button>
-                        </div>
-                      </div>
+
                     </div>
 
                     {/* Right Column (50%): Післядрукарська обробка та фурнітура */}
