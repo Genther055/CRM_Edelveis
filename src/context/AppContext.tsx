@@ -20,7 +20,7 @@ interface AppContextType {
   logout: () => void;
   addClient: (client: Omit<Client, 'id'>) => void;
   updateClient: (client: Client) => void;
-  addOrder: (order: Omit<Order, 'id' | 'createdAt' | 'createdBy' | 'status'>) => void;
+  addOrder: (order: Omit<Order, 'id' | 'createdAt' | 'createdBy' | 'status'> & { id?: string }) => void;
   updateOrder: (order: Order) => void;
   updateOrderStatus: (orderId: string, status: Order['status']) => void;
   updateOrderPayment: (orderId: string, paymentStatus: Order['paymentStatus'], prepayment: number) => void;
@@ -664,8 +664,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
-  const addOrder = (orderData: Omit<Order, 'id' | 'createdAt' | 'createdBy' | 'status'>) => {
-    const orderId = String(orders.length + 1);
+  const addOrder = (orderData: Omit<Order, 'id' | 'createdAt' | 'createdBy' | 'status'> & { id?: string }) => {
+    const orderId = orderData.id || String(orders.length + 1);
     const newOrder: Order = {
       ...orderData,
       id: orderId,

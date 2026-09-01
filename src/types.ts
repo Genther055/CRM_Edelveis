@@ -110,6 +110,16 @@ export interface Order {
   createdAt: string;
   createdBy: string;
   notes?: string; // Додатковий опис специфікації для виробництва
+  paperName?: string; // Назва матеріалу (напр. 'Крейдований 130г/м²')
+  sheetSize?: string; // Розмір друкарського листа (напр. '310 × 440 мм')
+  turnTypeLabel?: string; // Оборот спуску (напр. 'Сам на себе (с/с)')
+  priladkaSheets?: number; // Листи на приладку
+  techWasteSheets?: number; // Технічні відходи
+  totalGrossSheets?: number; // Фактично в друк
+  platesCount?: number; // Кількість форм CTP
+  postpressOps?: Array<{ name: string; qty: string; time?: string; worker?: string }>; // Післядрукарські операції для цеху
+  packingInfo?: string; // Інформація про фасування та пакування
+  deadline?: string; // Термін здачі
   ttnNumber?: string;
   ttnStatus?: 'created' | 'in_transit' | 'arrived' | 'received' | 'refused';
   customFieldValues?: Record<string, string | number>; // Значення користувацьких полів

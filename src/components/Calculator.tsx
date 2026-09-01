@@ -6864,30 +6864,96 @@ export const Calculator: React.FC = () => {
                               <button
                                 type="button"
                                 onClick={() => {
+                                  const pSizeOrd = parseInt(postPackingText.replace(/\D/g, '')) || 0;
+                                  const pCountOrd = pSizeOrd > 0 ? Math.ceil(activeCalc.tirazh / pSizeOrd) : 0;
+                                  const packingInfoStr = postPackingText.trim() 
+                                    ? `${postPackingText.trim()}${pCountOrd > 0 ? ` (${pCountOrd} пачок по ${pSizeOrd} шт)` : ''}`
+                                    : 'Стандартна упаковка в папір/стрейч';
+
+                                  const itemW = parseFloat(sheetCustomWidth) || 210;
+                                  const itemH = parseFloat(sheetCustomHeight) || 297;
+                                  const sheetW = 450;
+                                  const sheetH = 320;
+                                  const fit1 = Math.floor(sheetW / itemW) * Math.floor(sheetH / itemH);
+                                  const fit2 = Math.floor(sheetW / itemH) * Math.floor(sheetH / itemW);
+                                  const itemsPerSheetCalc = Math.max(1, fit1, fit2);
+
+                                  const physSheets = Math.ceil(activeCalc.tirazh / itemsPerSheetCalc);
+                                  const priladka = turnType === 'sam_na_sebe' ? 30 : turnType === 'chuzhyi_oborut' ? 50 : 20;
+                                  const techWaste = Math.max(10, Math.ceil(physSheets * 0.04));
+                                  const grossSheets = physSheets + priladka + techWaste;
+
+                                  const plates = activeCalc.colStr === '4+4' 
+                                    ? (turnType === 'sam_na_sebe' ? 4 : 8) 
+                                    : activeCalc.colStr === '4+0' ? 4 
+                                    : activeCalc.colStr === '1+1' ? (turnType === 'sam_na_sebe' ? 1 : 2) : 1;
+
+                                  const postpressList: Array<{ name: string; qty: string }> = [
+                                    { name: `Порізка в готовий розмір ${sheetCustomWidth}×${sheetCustomHeight} мм`, qty: `${activeCalc.tirazh} шт` }
+                                  ];
+                                  if (activeCalc.covId && activeCalc.covId !== '0') {
+                                    postpressList.push({ name: `Ламінування: ${activeCalc.covName}`, qty: `${physSheets} арк.` });
+                                  }
+                                  if (postCorners !== '0') {
+                                    postpressList.push({ name: `Скруглення кутів (${postCorners} кути)`, qty: `${activeCalc.tirazh} шт` });
+                                  }
+                                  if (postLuvers !== '0') {
+                                    postpressList.push({ name: `Встановлення люверсів (${postLuversCount} шт)`, qty: `${activeCalc.tirazh * postLuversCount} шт` });
+                                  }
+                                  if (postFolding !== '0') {
+                                    postpressList.push({ name: `Фальцювання (${postFolding})`, qty: `${activeCalc.tirazh} шт` });
+                                  }
+                                  if (postCreasing !== '0') {
+                                    postpressList.push({ name: `Біговка (${postCreasing} біги)`, qty: `${activeCalc.tirazh * parseInt(postCreasing)} бігів` });
+                                  }
+                                  if (postDrilling !== '0') {
+                                    postpressList.push({ name: `Свердління отворів (Ø ${postDrillingDia} мм)`, qty: `${activeCalc.tirazh * parseInt(postDrilling)} отв.` });
+                                  }
+                                  if (postGluing !== '0') {
+                                    postpressList.push({ name: `Проклейка в блок (по ${postGluing} листів)`, qty: `${Math.ceil(activeCalc.tirazh / parseInt(postGluing))} блоків` });
+                                  }
+                                  if (postPersonalization !== '0') {
+                                    postpressList.push({ name: `Персоналізація (${postPersonalization === '1' ? 'Нумерація / Штрихкод' : 'Змінні дані'})`, qty: `${activeCalc.tirazh} шт` });
+                                  }
+                                  if (postPackingText.trim()) {
+                                    postpressList.push({ name: `Фасування та пакування (${postPackingText.trim()})`, qty: pCountOrd > 0 ? `${pCountOrd} пачок` : '1 тираж' });
+                                  }
+
                                   addOrder({
+                                    id: orderNumber.toString(),
                                     name: name || fullComposedName,
                                     clientId: isNewClientMode ? (customClientName || 'Новий клієнт') : selectedClientId,
                                     category: category === 'Бланки' ? subCategory : (category as string),
                                     quantity: activeCalc.tirazh,
-                                    packingCount: 1,
+                                    packingCount: pSizeOrd > 0 ? pSizeOrd : 100,
                                     paperType: activeCalc.matId === '80' ? 'offset' : 'coated',
+                                    paperName: activeCalc.matName,
+                                    sheetSize: `${sheetW} × ${sheetH} мм (SRA3+)`,
+                                    turnTypeLabel: turnType === 'sam_na_sebe' ? 'Сам на себе (с/с)' : turnType === 'chuzhyi_oborut' ? 'Чужий оборот (ч/о)' : 'Без обороту',
                                     colors: activeCalc.colStr,
                                     isSamNaSebe: turnType === 'sam_na_sebe',
                                     designCost: designCost,
                                     margin: marginPercent,
-                                    machine: 'Офсетна машина',
-                                    format: `${sheetCustomWidth}×${sheetCustomHeight}`,
-                                    physicalSheets: Math.ceil(activeCalc.tirazh / 2),
-                                    itemsPerSheet: 2,
+                                    machine: 'Офсетна машина Heidelberg PM 52-4',
+                                    format: `${sheetCustomWidth}×${sheetCustomHeight} ${sheetUnit}`,
+                                    physicalSheets: physSheets,
+                                    itemsPerSheet: itemsPerSheetCalc,
+                                    priladkaSheets: priladka,
+                                    techWasteSheets: techWaste,
+                                    totalGrossSheets: grossSheets,
+                                    platesCount: plates,
+                                    postpressOps: postpressList,
+                                    packingInfo: packingInfoStr,
+                                    deadline: '1-2 роб. дні',
                                     subtotal: activeCalc.rawCost,
                                     marginAmount: liveMarginAmount,
                                     finalPrice: liveFinalPrice,
                                     unitPrice: liveUnitPrice,
                                     paymentStatus: 'unpaid',
                                     prepayment: 0,
-                                    notes: `Специфікація: ${name || fullComposedName}, ${sheetCustomWidth}×${sheetCustomHeight} ${sheetUnit}, ${activeCalc.matName}, ${activeCalc.covName}, ${activeCalc.colStr}, ${activeCalc.tirazh} шт.`
+                                    notes: `Специфікація: ${name || fullComposedName}, ${sheetCustomWidth}×${sheetCustomHeight} ${sheetUnit}, ${activeCalc.matName}, ${activeCalc.covName}, ${activeCalc.colStr}, ${turnShortLabel}, ${activeCalc.tirazh} шт.`
                                   });
-                                  alert(`Замовлення № ${orderNumber} створено та передано у виробництво.`);
+                                  alert(`Замовлення № ${orderNumber} успішно сформовано з автоматичним розрахунком виробництва та передано в цех!`);
                                   setOrderNumber(Math.floor(10000 + Math.random() * 90000));
                                 }}
                                 className="py-2.5 px-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs shadow-md shadow-blue-500/25 transition-all text-center flex items-center justify-center gap-1.5"
@@ -9295,21 +9361,47 @@ export const Calculator: React.FC = () => {
                               <button
                                 type="button"
                                 onClick={() => {
+                                  const itemW = parseFloat(sheetCustomWidth) || 210;
+                                  const itemH = parseFloat(sheetCustomHeight) || 297;
+                                  const sheetW = 450;
+                                  const sheetH = 320;
+                                  const fit1 = Math.floor(sheetW / itemW) * Math.floor(sheetH / itemH);
+                                  const fit2 = Math.floor(sheetW / itemH) * Math.floor(sheetH / itemW);
+                                  const itemsPerSheetCalc = Math.max(1, fit1, fit2);
+                                  const physSheets = Math.ceil(digTir / itemsPerSheetCalc);
+                                  const priladka = 3;
+                                  const techWaste = Math.max(2, Math.ceil(physSheets * 0.02));
+
                                   addOrder({
+                                    id: orderNumber.toString(),
                                     name: name || fullComposedName,
                                     clientId: isNewClientMode ? (customClientName || 'Новий клієнт') : selectedClientId,
                                     category: 'Цифровий друк',
                                     quantity: digTir,
-                                    packingCount: 1,
+                                    packingCount: 100,
                                     paperType: 'coated',
+                                    paperName: digMatLabels[digMatId] || 'Крейдований 350 г/м²',
+                                    sheetSize: '320 × 450 мм (SRA3)',
+                                    turnTypeLabel: turnType === 'sam_na_sebe' ? 'Сам на себе (с/с)' : 'Без обороту',
                                     colors: digColId,
                                     isSamNaSebe: turnType === 'sam_na_sebe',
                                     designCost: designCost,
                                     margin: marginPercent,
-                                    machine: 'Цифрова машина Konica Minolta',
-                                    format: `${sheetCustomWidth}×${sheetCustomHeight}`,
-                                    physicalSheets: Math.ceil(digTir / 2),
-                                    itemsPerSheet: 2,
+                                    machine: 'Цифрова машина Konica Minolta AccurioPress C7090',
+                                    format: `${sheetCustomWidth}×${sheetCustomHeight} ${sheetUnit}`,
+                                    physicalSheets: physSheets,
+                                    itemsPerSheet: itemsPerSheetCalc,
+                                    priladkaSheets: priladka,
+                                    techWasteSheets: techWaste,
+                                    totalGrossSheets: physSheets + priladka + techWaste,
+                                    platesCount: 0,
+                                    postpressOps: [
+                                      { name: `Порізка в готовий розмір ${sheetCustomWidth}×${sheetCustomHeight} мм`, qty: `${digTir} шт` },
+                                      ...(digCovId !== '0' ? [{ name: `Ламінування: ${digCovLabels[digCovId] || 'Ламінація'}`, qty: `${physSheets} арк.` }] : []),
+                                      { name: 'Фасування та упаковка продукції', qty: 'Стандартна' }
+                                    ],
+                                    packingInfo: 'Стандартна упаковка в папір/стрейч',
+                                    deadline: 'Сьогодні / завтра',
                                     subtotal: digRawCost,
                                     marginAmount: digMarginAmount,
                                     finalPrice: digFinalPrice,
@@ -9318,7 +9410,7 @@ export const Calculator: React.FC = () => {
                                     prepayment: 0,
                                     notes: `Специфікація: ${name || fullComposedName}, ${sheetCustomWidth}×${sheetCustomHeight} ${sheetUnit}, ${digMatLabels[digMatId] || '350г'}, ${digCovLabels[digCovId] || 'БП'}, ${digColId}, ${digTir} шт.`
                                   });
-                                  alert(`Замовлення № ${orderNumber} створено та передано у виробництво.`);
+                                  alert(`Замовлення № ${orderNumber} успішно сформовано з автоматичним розрахунком виробництва та передано в цех!`);
                                   setOrderNumber(Math.floor(10000 + Math.random() * 90000));
                                 }}
                                 className="py-2.5 px-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs shadow-md shadow-blue-500/20 transition-all text-center"

@@ -516,117 +516,206 @@ export const Production: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Product Specification & Quantity Banner */}
-                <div style={{ display: 'grid', gridTemplateColumns: '2.5fr 1fr', gap: '10px', marginBottom: '16px' }}>
-                  <div style={{ backgroundColor: '#f8fafc', padding: '10px 14px', borderRadius: '6px', border: '1px solid #e2e8f0' }}>
-                    <span style={{ fontSize: '9px', fontWeight: '800', color: '#636366', textTransform: 'uppercase', display: 'block', marginBottom: '2px' }}>Продукція / Специфікація</span>
-                    <p style={{ fontSize: '13px', fontWeight: '800', margin: 0, color: '#1c1c1e' }}>{selectedOrderForPDF.name}</p>
+                {/* Шапка наряду-замовлення (Паспорт виробництва) */}
+                <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '12px', marginBottom: '14px', backgroundColor: '#f8fafc', padding: '12px 14px', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <div style={{ fontSize: '11px' }}>
+                      <span style={{ color: '#64748b' }}>Замовник: </span>
+                      <strong style={{ color: '#0f172a' }}>{clients.find(c => c.id === selectedOrderForPDF.clientId)?.name || 'Клієнт'}</strong>
+                    </div>
+                    <div style={{ fontSize: '11px' }}>
+                      <span style={{ color: '#64748b' }}>Продукція: </span>
+                      <strong style={{ color: '#0f172a' }}>{selectedOrderForPDF.name}</strong>
+                    </div>
+                    <div style={{ fontSize: '11px' }}>
+                      <span style={{ color: '#64748b' }}>Відповідальний менеджер: </span>
+                      <strong style={{ color: '#0f172a' }}>{selectedOrderForPDF.createdBy || 'Менеджер'}</strong>
+                    </div>
                   </div>
-                  <div style={{ backgroundColor: '#f8fafc', padding: '10px 14px', borderRadius: '6px', border: '1px solid #e2e8f0', textAlign: 'right' }}>
-                    <span style={{ fontSize: '9px', fontWeight: '800', color: '#636366', textTransform: 'uppercase', display: 'block', marginBottom: '2px' }}>Тираж замовлення</span>
-                    <p style={{ fontSize: '14px', fontWeight: '900', margin: 0, color: '#007aff' }}>{selectedOrderForPDF.quantity.toLocaleString()} шт.</p>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', textAlign: 'right' }}>
+                    <div style={{ fontSize: '11px' }}>
+                      <span style={{ color: '#64748b' }}>Тираж: </span>
+                      <strong style={{ color: '#2563eb', fontSize: '13px' }}>{selectedOrderForPDF.quantity.toLocaleString()} шт.</strong>
+                    </div>
+                    <div style={{ fontSize: '11px' }}>
+                      <span style={{ color: '#64748b' }}>Дата прийому: </span>
+                      <strong style={{ color: '#0f172a' }}>{selectedOrderForPDF.createdAt}</strong>
+                    </div>
+                    <div style={{ fontSize: '11px' }}>
+                      <span style={{ color: '#64748b' }}>Здача (Дедлайн): </span>
+                      <strong style={{ color: '#d97706' }}>{selectedOrderForPDF.deadline || '1-2 роб. дні'}</strong>
+                    </div>
                   </div>
                 </div>
 
-                {/* 1. Матеріали та сировина */}
-                <div style={{ marginBottom: '16px' }}>
-                  <h5 style={{ fontSize: '11px', fontWeight: '800', borderBottom: '1px solid #e2e8f0', paddingBottom: '4px', marginBottom: '8px', color: '#007aff', textTransform: 'uppercase', margin: 0 }}>
-                    1. МАТЕРІАЛИ ТА СИРОВИНА
+                {/* 1. Блок «МАТЕРІАЛИ» */}
+                <div style={{ marginBottom: '14px' }}>
+                  <h5 style={{ fontSize: '10px', fontWeight: '800', borderBottom: '1px solid #cbd5e1', paddingBottom: '3px', marginBottom: '6px', color: '#1e293b', textTransform: 'uppercase', margin: 0 }}>
+                    1. МАТЕРІАЛИ ТА ПАПІР ЗІ СКЛАДУ
                   </h5>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 1fr', gap: '10px', backgroundColor: '#f8fafc', padding: '8px 12px', borderRadius: '6px', border: '1px solid #e2e8f0' }}>
-                    <div>
-                      <span style={{ color: '#636366', display: 'block', fontSize: '10px' }}>Матеріал паперу:</span>
-                      <strong style={{ fontSize: '11px', color: '#1c1c1e' }}>
-                        {selectedOrderForPDF.paperType === 'offset' ? 'Офсетний 70г' : selectedOrderForPDF.paperType === 'gazetka' ? 'Газетний 45г' : 'Крейдований 130г'}
-                      </strong>
-                    </div>
-                    <div>
-                      <span style={{ color: '#636366', display: 'block', fontSize: '10px' }}>Розмір друкарського листа:</span>
-                      <strong style={{ fontSize: '11px', color: '#1c1c1e' }}>
-                        {selectedOrderForPDF.format === 'A1' ? 'A1 (594×841 мм)' : selectedOrderForPDF.format === 'A2' ? 'A2 (420×594 мм)' : 'A3 (297×420 мм)'}
-                      </strong>
-                    </div>
-                    <div>
-                      <span style={{ color: '#636366', display: 'block', fontSize: '10px' }}>Обсяг матеріалу:</span>
-                      <strong style={{ fontSize: '11px', color: '#1c1c1e' }}>
-                        {selectedOrderForPDF.physicalSheets} арк. (+{Math.ceil(selectedOrderForPDF.physicalSheets * 0.05)} тех. відх.)
-                      </strong>
-                    </div>
-                  </div>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '10px', border: '1px solid #cbd5e1' }}>
+                    <thead>
+                      <tr style={{ backgroundColor: '#f1f5f9', borderBottom: '1px solid #cbd5e1', textAlign: 'left' }}>
+                        <th style={{ padding: '5px 8px' }}>Матеріал / Папір</th>
+                        <th style={{ padding: '5px 8px' }}>Формат сировини</th>
+                        <th style={{ padding: '5px 8px', textAlign: 'center' }}>Чистий наклад</th>
+                        <th style={{ padding: '5px 8px', textAlign: 'center' }}>Приладка</th>
+                        <th style={{ padding: '5px 8px', textAlign: 'center' }}>Тех. відходи</th>
+                        <th style={{ padding: '5px 8px', textAlign: 'right' }}>Фактично зі складу</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr style={{ backgroundColor: '#ffffff' }}>
+                        <td style={{ padding: '6px 8px', fontWeight: '700', color: '#0f172a' }}>{selectedOrderForPDF.paperName || (selectedOrderForPDF.paperType === 'offset' ? 'Офсетний 70г' : 'Крейдований 130г')}</td>
+                        <td style={{ padding: '6px 8px', color: '#334155' }}>{selectedOrderForPDF.sheetSize || selectedOrderForPDF.format || 'SRA3 (320×450 мм)'}</td>
+                        <td style={{ padding: '6px 8px', textAlign: 'center', fontFamily: 'monospace', fontWeight: '700' }}>{selectedOrderForPDF.physicalSheets} арк.</td>
+                        <td style={{ padding: '6px 8px', textAlign: 'center', fontFamily: 'monospace', color: '#64748b' }}>{selectedOrderForPDF.priladkaSheets || (selectedOrderForPDF.isSamNaSebe ? 30 : 20)} арк.</td>
+                        <td style={{ padding: '6px 8px', textAlign: 'center', fontFamily: 'monospace', color: '#64748b' }}>{selectedOrderForPDF.techWasteSheets || Math.ceil(selectedOrderForPDF.physicalSheets * 0.04)} арк.</td>
+                        <td style={{ padding: '6px 8px', textAlign: 'right', fontFamily: 'monospace', fontWeight: '900', color: '#2563eb' }}>
+                          {selectedOrderForPDF.totalGrossSheets || (selectedOrderForPDF.physicalSheets + (selectedOrderForPDF.priladkaSheets || 20) + (selectedOrderForPDF.techWasteSheets || 4))} арк.
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
 
-                {/* 2. Процес друку */}
-                <div style={{ marginBottom: '16px' }}>
-                  <h5 style={{ fontSize: '11px', fontWeight: '800', borderBottom: '1px solid #e2e8f0', paddingBottom: '4px', marginBottom: '8px', color: '#007aff', textTransform: 'uppercase', margin: 0 }}>
-                    2. ПРОЦЕС ДРУКУ (ДРУКАРСЬКА МАШИНА & ПАРАМЕТРИ)
+                {/* 2. Блок «ДРУК» (ПЕЧАТЬ) */}
+                <div style={{ marginBottom: '14px' }}>
+                  <h5 style={{ fontSize: '10px', fontWeight: '800', borderBottom: '1px solid #cbd5e1', paddingBottom: '3px', marginBottom: '6px', color: '#1e293b', textTransform: 'uppercase', margin: 0 }}>
+                    2. ДРУК (ДРУКАРСЬКА МАШИНА ТА ПАРАМЕТРИ)
                   </h5>
-                  <div style={{ backgroundColor: '#f8fafc', borderRadius: '6px', border: '1px solid #e2e8f0', overflow: 'hidden' }}>
-                    <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px' }}>
-                      <tbody>
-                        <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
-                          <td style={{ padding: '6px 12px', color: '#636366', width: '35%' }}>Друкарська машина:</td>
-                          <td style={{ padding: '6px 12px', fontWeight: '800', color: '#1c1c1e', width: '25%' }}>{selectedOrderForPDF.machine}</td>
-                          <td style={{ padding: '6px 12px', color: '#636366', width: '25%' }}>Красочність (кольоровість):</td>
-                          <td style={{ padding: '6px 12px', fontWeight: '800', color: '#1c1c1e', width: '15%' }}>{selectedOrderForPDF.colors}</td>
-                        </tr>
-                        <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
-                          <td style={{ padding: '6px 12px', color: '#636366' }}>Однотипних листів (на арк):</td>
-                          <td style={{ padding: '6px 12px', fontWeight: '800', color: '#1c1c1e' }}>{selectedOrderForPDF.itemsPerSheet} шт./арк</td>
-                          <td style={{ padding: '6px 12px', color: '#636366' }}>Спуск макету / оборот:</td>
-                          <td style={{ padding: '6px 12px', fontWeight: '800', color: '#1c1c1e' }}>
-                            {selectedOrderForPDF.isSamNaSebe ? 'Сам на себе (с/с)' : 'Без обороту'}
-                          </td>
-                        </tr>
-                        <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
-                          <td style={{ padding: '6px 12px', color: '#636366' }}>Кількість друкованих листів:</td>
-                          <td style={{ padding: '6px 12px', fontWeight: '800', color: '#1c1c1e' }}>{selectedOrderForPDF.physicalSheets} арк</td>
-                          <td style={{ padding: '6px 12px', color: '#636366' }}>Фактичні прогони (відбитки):</td>
-                          <td style={{ padding: '6px 12px', fontWeight: '800', color: '#1c1c1e' }}>{selectedOrderForPDF.physicalSheets} прогонів</td>
-                        </tr>
-                        <tr>
-                          <td style={{ padding: '6px 12px', color: '#636366' }}>Приладка / Форми:</td>
-                          <td style={{ padding: '6px 12px', fontWeight: '800', color: '#1c1c1e' }}>1 компл. форм</td>
-                          <td style={{ padding: '6px 12px', color: '#636366' }}>Технічні відходи (приладка):</td>
-                          <td style={{ padding: '6px 12px', fontWeight: '800', color: '#1c1c1e' }}>+{Math.ceil(selectedOrderForPDF.physicalSheets * 0.05)} арк. (5%)</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '10px', border: '1px solid #cbd5e1' }}>
+                    <thead>
+                      <tr style={{ backgroundColor: '#f1f5f9', borderBottom: '1px solid #cbd5e1', textAlign: 'left' }}>
+                        <th style={{ padding: '5px 6px' }}>Обладнання</th>
+                        <th style={{ padding: '5px 6px' }}>Папір</th>
+                        <th style={{ padding: '5px 6px' }}>Розмір, мм</th>
+                        <th style={{ padding: '5px 6px' }}>Красочність</th>
+                        <th style={{ padding: '5px 6px', textAlign: 'center' }}>Шт/арк</th>
+                        <th style={{ padding: '5px 6px', textAlign: 'center' }}>Друк. лист.</th>
+                        <th style={{ padding: '5px 6px', textAlign: 'center' }}>Приладка</th>
+                        <th style={{ padding: '5px 6px', textAlign: 'center' }}>Тех. відходи</th>
+                        <th style={{ padding: '5px 6px', textAlign: 'center' }}>В друк</th>
+                        <th style={{ padding: '5px 6px', textAlign: 'center' }}>Оборот</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr style={{ backgroundColor: '#ffffff' }}>
+                        <td style={{ padding: '6px 6px', fontWeight: '700', color: '#0f172a' }}>{selectedOrderForPDF.machine}</td>
+                        <td style={{ padding: '6px 6px', color: '#334155' }}>{selectedOrderForPDF.paperName || '130 г/м²'}</td>
+                        <td style={{ padding: '6px 6px', color: '#334155' }}>{selectedOrderForPDF.sheetSize || selectedOrderForPDF.format}</td>
+                        <td style={{ padding: '6px 6px', fontWeight: '800', color: '#c2410c' }}>{selectedOrderForPDF.colors}</td>
+                        <td style={{ padding: '6px 6px', textAlign: 'center', fontWeight: '700' }}>{selectedOrderForPDF.itemsPerSheet}</td>
+                        <td style={{ padding: '6px 6px', textAlign: 'center', fontFamily: 'monospace' }}>{selectedOrderForPDF.physicalSheets}</td>
+                        <td style={{ padding: '6px 6px', textAlign: 'center', fontFamily: 'monospace', color: '#64748b' }}>{selectedOrderForPDF.priladkaSheets || (selectedOrderForPDF.isSamNaSebe ? 30 : 20)}</td>
+                        <td style={{ padding: '6px 6px', textAlign: 'center', fontFamily: 'monospace', color: '#64748b' }}>{selectedOrderForPDF.techWasteSheets || Math.ceil(selectedOrderForPDF.physicalSheets * 0.04)}</td>
+                        <td style={{ padding: '6px 6px', textAlign: 'center', fontFamily: 'monospace', fontWeight: '800', color: '#2563eb' }}>
+                          {selectedOrderForPDF.totalGrossSheets || (selectedOrderForPDF.physicalSheets + (selectedOrderForPDF.priladkaSheets || 20) + (selectedOrderForPDF.techWasteSheets || 4))}
+                        </td>
+                        <td style={{ padding: '6px 6px', textAlign: 'center', fontWeight: '700', color: '#0f172a' }}>
+                          {selectedOrderForPDF.turnTypeLabel || (selectedOrderForPDF.isSamNaSebe ? 'с/с' : 'б/о')}
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
 
-                {/* 3. Післядрукарська обробка */}
-                <div style={{ marginBottom: '16px' }}>
-                  <h5 style={{ fontSize: '11px', fontWeight: '800', borderBottom: '1px solid #e2e8f0', paddingBottom: '4px', marginBottom: '8px', color: '#007aff', textTransform: 'uppercase', margin: 0 }}>
-                    3. ПІСЛЯДРУКАРСЬКА ОБРОБКА (ПІСЛЯДРУК)
+                {/* 3. Блок «ДОДРУКАРСЬКИЙ ПРОЦЕС» */}
+                <div style={{ marginBottom: '14px' }}>
+                  <h5 style={{ fontSize: '10px', fontWeight: '800', borderBottom: '1px solid #cbd5e1', paddingBottom: '3px', marginBottom: '6px', color: '#1e293b', textTransform: 'uppercase', margin: 0 }}>
+                    3. ДОДРУКАРСЬКИЙ ПРОЦЕС (CTP ФОРМИ ТА СПУСК СМУГ)
                   </h5>
-                  <div style={{ backgroundColor: '#f8fafc', padding: '8px 12px', borderRadius: '6px', border: '1px solid #e2e8f0', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                    <div>
-                      <span style={{ color: '#636366', display: 'block', fontSize: '10px' }}>Порізка тиражу:</span>
-                      <strong style={{ fontSize: '11px', color: '#1c1c1e' }}>Формат {selectedOrderForPDF.format}</strong>
-                    </div>
-                    <div>
-                      <span style={{ color: '#636366', display: 'block', fontSize: '10px' }}>Пакування виробів:</span>
-                      <strong style={{ fontSize: '11px', color: '#1c1c1e' }}>по {selectedOrderForPDF.packingCount} шт/пачка</strong>
-                    </div>
-                    {selectedOrderForPDF.notes && (
-                      <div style={{ gridColumn: 'span 2' }}>
-                        <span style={{ color: '#636366', display: 'block', fontSize: '10px' }}>Технічні примітки / Оздоблення:</span>
-                        <strong style={{ fontSize: '11px', color: '#007aff' }}>{selectedOrderForPDF.notes}</strong>
-                      </div>
-                    )}
-                  </div>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '10px', border: '1px solid #cbd5e1' }}>
+                    <thead>
+                      <tr style={{ backgroundColor: '#f1f5f9', borderBottom: '1px solid #cbd5e1', textAlign: 'left' }}>
+                        <th style={{ padding: '5px 8px', width: '8%' }}>№ п/п</th>
+                        <th style={{ padding: '5px 8px', width: '60%' }}>Технологічна операція</th>
+                        <th style={{ padding: '5px 8px', textAlign: 'center', width: '20%' }}>Кількість</th>
+                        <th style={{ padding: '5px 8px', textAlign: 'center', width: '12%' }}>Статус</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
+                        <td style={{ padding: '5px 8px', color: '#64748b' }}>1</td>
+                        <td style={{ padding: '5px 8px', fontWeight: '600' }}>Перевірка макету, калібрування та спуск смуг ({selectedOrderForPDF.format})</td>
+                        <td style={{ padding: '5px 8px', textAlign: 'center', fontFamily: 'monospace' }}>1 спуск</td>
+                        <td style={{ padding: '5px 8px', textAlign: 'center', color: '#16a34a', fontWeight: '700' }}>Готово</td>
+                      </tr>
+                      <tr>
+                        <td style={{ padding: '5px 8px', color: '#64748b' }}>2</td>
+                        <td style={{ padding: '5px 8px', fontWeight: '600' }}>Виведення офсетних CTP форм / термопластин</td>
+                        <td style={{ padding: '5px 8px', textAlign: 'center', fontFamily: 'monospace', fontWeight: '700' }}>
+                          {selectedOrderForPDF.platesCount || (selectedOrderForPDF.colors === '4+4' ? (selectedOrderForPDF.isSamNaSebe ? 4 : 8) : selectedOrderForPDF.colors === '4+0' ? 4 : 2)} пластин
+                        </td>
+                        <td style={{ padding: '5px 8px', textAlign: 'center', color: '#2563eb', fontWeight: '700' }}>До друку</td>
+                      </tr>
+                    </tbody>
+                  </table>
                 </div>
 
-                {/* 4. Фінанси та Підписи */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '2px dashed #e2e8f0', paddingTop: '14px', marginTop: '14px' }}>
-                  <div>
-                    <span style={{ fontSize: '11px', color: '#636366', display: 'block' }}>Автор наряду: <strong style={{ color: '#1c1c1e' }}>{selectedOrderForPDF.createdBy}</strong></span>
-                    <span style={{ fontSize: '11px', color: '#636366', marginTop: '4px', display: 'block' }}>Підпис майстра цеху: ___________________</span>
+                {/* 4. Блок «ПІСЛЯДРУКАРСЬКИЙ ПРОЦЕС ТА ФАСУВАННЯ» */}
+                <div style={{ marginBottom: '14px' }}>
+                  <h5 style={{ fontSize: '10px', fontWeight: '800', borderBottom: '1px solid #cbd5e1', paddingBottom: '3px', marginBottom: '6px', color: '#1e293b', textTransform: 'uppercase', margin: 0 }}>
+                    4. ПІСЛЯДРУКАРСЬКИЙ ПРОЦЕС ТА УПАКОВКА
+                  </h5>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '10px', border: '1px solid #cbd5e1' }}>
+                    <thead>
+                      <tr style={{ backgroundColor: '#f1f5f9', borderBottom: '1px solid #cbd5e1', textAlign: 'left' }}>
+                        <th style={{ padding: '5px 8px', width: '6%' }}>№</th>
+                        <th style={{ padding: '5px 8px', width: '44%' }}>Операція післядруку / фасування</th>
+                        <th style={{ padding: '5px 8px', textAlign: 'center', width: '22%' }}>Обсяг робіт</th>
+                        <th style={{ padding: '5px 8px', textAlign: 'center', width: '16%' }}>Прізвище майстра</th>
+                        <th style={{ padding: '5px 8px', textAlign: 'center', width: '12%' }}>Час виконання</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {selectedOrderForPDF.postpressOps && selectedOrderForPDF.postpressOps.length > 0 ? (
+                        selectedOrderForPDF.postpressOps.map((op, opIdx) => (
+                          <tr key={opIdx} style={{ borderBottom: '1px solid #e2e8f0' }}>
+                            <td style={{ padding: '5px 8px', color: '#64748b' }}>{opIdx + 1}</td>
+                            <td style={{ padding: '5px 8px', fontWeight: '600', color: '#0f172a' }}>{op.name}</td>
+                            <td style={{ padding: '5px 8px', textAlign: 'center', fontFamily: 'monospace', fontWeight: '700' }}>{op.qty}</td>
+                            <td style={{ padding: '5px 8px', textAlign: 'center', color: '#94a3b8' }}>____________</td>
+                            <td style={{ padding: '5px 8px', textAlign: 'center', color: '#94a3b8' }}>__:__</td>
+                          </tr>
+                        ))
+                      ) : (
+                        <>
+                          <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
+                            <td style={{ padding: '5px 8px', color: '#64748b' }}>1</td>
+                            <td style={{ padding: '5px 8px', fontWeight: '600', color: '#0f172a' }}>Порізка тиражу в готовий розмір ({selectedOrderForPDF.format})</td>
+                            <td style={{ padding: '5px 8px', textAlign: 'center', fontFamily: 'monospace', fontWeight: '700' }}>{selectedOrderForPDF.quantity.toLocaleString()} шт</td>
+                            <td style={{ padding: '5px 8px', textAlign: 'center', color: '#94a3b8' }}>____________</td>
+                            <td style={{ padding: '5px 8px', textAlign: 'center', color: '#94a3b8' }}>__:__</td>
+                          </tr>
+                          <tr style={{ borderBottom: '1px solid #e2e8f0' }}>
+                            <td style={{ padding: '5px 8px', color: '#64748b' }}>2</td>
+                            <td style={{ padding: '5px 8px', fontWeight: '600', color: '#0f172a' }}>Фасування та пакування продукції</td>
+                            <td style={{ padding: '5px 8px', textAlign: 'center', fontFamily: 'monospace', fontWeight: '700' }}>{selectedOrderForPDF.packingInfo || `по ${selectedOrderForPDF.packingCount || 100} шт`}</td>
+                            <td style={{ padding: '5px 8px', textAlign: 'center', color: '#94a3b8' }}>____________</td>
+                            <td style={{ padding: '5px 8px', textAlign: 'center', color: '#94a3b8' }}>__:__</td>
+                          </tr>
+                        </>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+
+                {/* 5. Фінансовий блок та Відмітки цеху */}
+                <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '14px', borderTop: '2px dashed #cbd5e1', paddingTop: '12px', marginTop: '12px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', fontSize: '10px', color: '#475569' }}>
+                    <div>Менеджер: <strong style={{ color: '#0f172a' }}>{selectedOrderForPDF.createdBy || 'Менеджер'}</strong> (підпис: ______________)</div>
+                    <div>Друкар (оператор): __________________ (підпис: ______________)</div>
+                    <div>Майстер післядруку: ________________ (підпис: ______________)</div>
+                    <div>Контролер якості (ВТК): ______________ (підпис: ______________)</div>
                   </div>
-                  <div style={{ textAlign: 'right' }}>
-                    <span style={{ fontSize: '11px', color: '#636366', display: 'block' }}>Ціна за 1 шт: <strong style={{ color: '#1c1c1e' }}>{(selectedOrderForPDF.unitPrice || 0).toFixed(2)} грн</strong></span>
-                    <span style={{ fontSize: '12px', color: '#1c1c1e', fontWeight: '700' }}>Сума прорахунку: </span>
-                    <strong style={{ fontSize: '18px', color: '#007aff' }}>{selectedOrderForPDF.finalPrice.toLocaleString()} грн</strong>
+                  <div style={{ textAlign: 'right', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                    <span style={{ fontSize: '10px', color: '#64748b' }}>Собівартість виробництва: <strong style={{ color: '#0f172a', fontFamily: 'monospace' }}>{(selectedOrderForPDF.subtotal || 0).toFixed(2)} ₴</strong></span>
+                    <span style={{ fontSize: '10px', color: '#64748b' }}>Ціна за 1 шт для клієнта: <strong style={{ color: '#0f172a', fontFamily: 'monospace' }}>{(selectedOrderForPDF.unitPrice || 0).toFixed(2)} ₴ / шт</strong></span>
+                    <div style={{ marginTop: '4px' }}>
+                      <span style={{ fontSize: '11px', fontWeight: '800', color: '#0f172a' }}>Сума замовлення: </span>
+                      <strong style={{ fontSize: '16px', color: '#2563eb', fontFamily: 'monospace' }}>{selectedOrderForPDF.finalPrice.toLocaleString()} ₴</strong>
+                    </div>
                   </div>
                 </div>
               </div>
