@@ -904,7 +904,6 @@ export const Calculator: React.FC = () => {
   // Multi-selection Filter States for Wide Format
   const [wideSelectedMaterials, setWideSelectedMaterials] = useState<string[]>(['frontlit_440']);
   const [wideSelectedResolutions, setWideSelectedResolutions] = useState<string[]>(['1440']);
-  const [wideSelectedFinishes, setWideSelectedFinishes] = useState<string[]>(['luvers_hemming']);
 
   // Notepad (Блокноти) State Hooks
   const [notebookPrintMethod, setNotebookPrintMethod] = useState<'digital' | 'offset'>('digital');
@@ -11230,25 +11229,23 @@ export const Calculator: React.FC = () => {
               {/* SPECIFIC CALCULATOR VIEW (FOR ALL 10 WIDE FORMAT SUB-TABS) */}
               {wideSubTab !== 'overview' && (
                 <div className="flex flex-col gap-5">
-                  {/* Title & Info Bar */}
-                  <div className="ios-card bg-white p-4">
-                    <div className="flex flex-wrap items-center justify-between gap-3">
-                      <div className="flex items-center gap-3">
-                        <div style={{ width: '42px', height: '42px', borderRadius: '12px', backgroundColor: 'rgba(0, 122, 255, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)' }}>
-                          {wideSubTab === 'banner' && <Layout size={22} />}
-                          {wideSubTab === 'film' && <Tag size={22} />}
-                          {wideSubTab === 'paper' && <Image size={22} />}
-                          {wideSubTab === 'custom' && <Settings size={22} />}
-                          {wideSubTab === 'pvc' && <Layers size={22} />}
-                          {wideSubTab === 'foam_board' && <FileText size={22} />}
-                          {wideSubTab === 'composite' && <ShieldCheck size={22} />}
-                          {wideSubTab === 'acrylic' && <Sparkles size={22} />}
-                          {wideSubTab === 'canvas' && <Image size={22} />}
-                          {wideSubTab === 'stands' && <FolderOpen size={22} />}
-                        </div>
-                        <div>
-                          <h3 className="text-base font-extrabold text-slate-900 m-0">
-                            {wideSubTab === 'banner' && 'Банер'}
+                  {/* Clean Sub-header Bar matching standard */}
+                  <div className="ios-card bg-white" style={{ padding: '14px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                      <button
+                        type="button"
+                        onClick={() => setWideSubTab('overview')}
+                        className="px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold transition-all flex items-center gap-1.5 shadow-2xs"
+                      >
+                        <ArrowLeft size={14} />
+                        <span>Назад</span>
+                      </button>
+                      <div className="flex flex-col">
+                        <div className="flex items-center gap-1.5 text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">
+                          <span>Широкоформатний друк</span>
+                          <span>/</span>
+                          <span className="text-blue-600">
+                            {wideSubTab === 'banner' && 'Банери'}
                             {wideSubTab === 'film' && 'Плівка'}
                             {wideSubTab === 'paper' && 'Папір'}
                             {wideSubTab === 'custom' && 'Індивідуальне замовлення'}
@@ -11258,32 +11255,55 @@ export const Calculator: React.FC = () => {
                             {wideSubTab === 'acrylic' && 'Акрил (Оргскло)'}
                             {wideSubTab === 'canvas' && 'Полотна (Canvas)'}
                             {wideSubTab === 'stands' && 'Мобільні стенди'}
-                          </h3>
-                          <span className="text-xs text-slate-500">
-                            {wideSubTab === 'banner' && 'Банерні вивіски, розтяжки, тенти, брандмауери, вітростійка сітка'}
-                            {wideSubTab === 'film' && 'Наліпки, плівка для обклеювання вітрин, вивісок, авто, підлогова графіка'}
-                            {wideSubTab === 'paper' && 'Афіші, плакати, постери, сітілайти, бігборди, крейдовані постери'}
-                            {wideSubTab === 'custom' && 'Замовити прорахунок комплексного або нестандартного замовлення'}
-                            {wideSubTab === 'pvc' && 'Таблички, вказівники, вивіски, букви, планшети, ростові фігури'}
-                            {wideSubTab === 'foam_board' && 'Легкі виставкові стенди, планшети для презентацій, ростові фігури'}
-                            {wideSubTab === 'composite' && 'Фасадні касети, рекламні вивіски високої міцності, таблички'}
-                            {wideSubTab === 'acrylic' && 'Номерки, бірки, настінні панелі, фотографії на склі, годинники'}
-                            {wideSubTab === 'canvas' && 'Картини на полотні з галерейною натяжкою на підрамник'}
-                            {wideSubTab === 'stands' && 'X-banner, L-banner, Roll-up, Прес-вол з конструкцією та полотном'}
                           </span>
                         </div>
+                        <span className="text-xs font-black text-slate-800">
+                          {wideSubTab === 'banner' && 'Банери (Frontlit, Cast, Сітка)'}
+                          {wideSubTab === 'film' && 'Плівка самоклеюча (ORACAL, Ritrama)'}
+                          {wideSubTab === 'paper' && 'Папір (Citylight, Blueback)'}
+                          {wideSubTab === 'custom' && 'Індивідуальний прорахунок'}
+                          {wideSubTab === 'pvc' && 'Пластик ПВХ'}
+                          {wideSubTab === 'foam_board' && 'Пінокартон'}
+                          {wideSubTab === 'composite' && 'Алюмінієвий композит'}
+                          {wideSubTab === 'acrylic' && 'Акрил (Оргскло)'}
+                          {wideSubTab === 'canvas' && 'Картини на полотні'}
+                          {wideSubTab === 'stands' && 'Мобільні стенди (Roll-Up, X-banner)'}
+                        </span>
                       </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const el = document.getElementById('detailed-wide-calculation');
+                          if (el) el.scrollIntoView({ behavior: 'smooth' });
+                        }}
+                        className="px-3 py-1.5 rounded-xl border border-blue-200 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold transition-all flex items-center gap-1.5"
+                      >
+                        <Settings size={14} />
+                        <span>Кошторис</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setWideSubTab('overview')}
+                        className="w-8 h-8 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-500 hover:text-slate-900 flex items-center justify-center text-xs font-bold transition-all"
+                        title="Закрити сторінку"
+                      >
+                        ✕
+                      </button>
                     </div>
                   </div>
 
-                  {/* Section: Розмір & Візуалізація виробу */}
-                  <div className="ios-card bg-white p-5">
-                    <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
-                      <div className="md:col-span-6 flex flex-col gap-4">
-                        <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800 m-0 flex items-center gap-2">
-                          <span className="w-2 h-2 rounded-full bg-blue-600"></span>
-                          Розмір та параметри
-                        </h4>
+                  {/* Row 1 (50% / 50%): Left = РОЗМІР, Right = ВІЗУАЛІЗАЦІЯ & ПРОПОРЦІЯ */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-stretch">
+                    {/* Left: РОЗМІР */}
+                    <div className="ios-card bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-4">
+                      <div className="flex flex-col gap-3">
+                        <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                          <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wider">РОЗМІР:</span>
+                          <span className="text-[11px] font-bold text-slate-400">Стандарт або індивідуал</span>
+                        </div>
 
                         <div>
                           <label className="text-[11px] font-bold text-slate-600 block mb-1.5">Оберіть стандартний розмір:</label>
@@ -11295,7 +11315,7 @@ export const Calculator: React.FC = () => {
                                 setWideHeight(h);
                               }
                             }}
-                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 focus:bg-white focus:border-blue-600 focus:outline-none transition-all shadow-sm"
+                            className="w-full bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-xs font-bold text-slate-800 focus:bg-white focus:border-blue-600 focus:outline-none transition-all shadow-2xs"
                           >
                             {wideSubTab === 'banner' && (
                               <>
@@ -11353,33 +11373,27 @@ export const Calculator: React.FC = () => {
                         </div>
 
                         <div>
-                          <label className="text-[11px] font-bold text-slate-600 block mb-1.5">Введіть свій індивідуальний розмір:</label>
+                          <label className="text-[11px] font-bold text-slate-600 block mb-1.5">Введіть свій розмір:</label>
                           <div className="flex items-center gap-2">
-                            <div className="relative flex-1">
-                              <input
-                                type="number"
-                                value={wideWidth}
-                                onChange={(e) => setWideWidth(e.target.value)}
-                                className="w-full pl-3 pr-8 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs font-bold text-slate-900 focus:bg-white focus:border-blue-600 focus:outline-none"
-                                placeholder="Ширина"
-                              />
-                              <span className="absolute right-2.5 top-2 text-[10px] font-bold text-slate-400">Ш</span>
-                            </div>
+                            <input
+                              type="number"
+                              value={wideWidth}
+                              onChange={(e) => setWideWidth(e.target.value)}
+                              className="w-28 px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs font-bold text-slate-900 text-center focus:bg-white focus:border-blue-600 focus:outline-none"
+                              placeholder="Ширина"
+                            />
                             <span className="text-slate-400 font-bold">×</span>
-                            <div className="relative flex-1">
-                              <input
-                                type="number"
-                                value={wideHeight}
-                                onChange={(e) => setWideHeight(e.target.value)}
-                                className="w-full pl-3 pr-8 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs font-bold text-slate-900 focus:bg-white focus:border-blue-600 focus:outline-none"
-                                placeholder="Висота"
-                              />
-                              <span className="absolute right-2.5 top-2 text-[10px] font-bold text-slate-400">В</span>
-                            </div>
+                            <input
+                              type="number"
+                              value={wideHeight}
+                              onChange={(e) => setWideHeight(e.target.value)}
+                              className="w-28 px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs font-bold text-slate-900 text-center focus:bg-white focus:border-blue-600 focus:outline-none"
+                              placeholder="Висота"
+                            />
                             <select
                               value={wideUnit}
                               onChange={(e) => setWideUnit(e.target.value as any)}
-                              className="w-16 bg-slate-50 border border-slate-200 rounded-xl px-2 py-2 text-xs font-bold text-slate-800"
+                              className="w-20 bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-2 text-xs font-bold text-slate-800 focus:bg-white focus:border-blue-600"
                             >
                               <option value="mm">мм</option>
                               <option value="cm">см</option>
@@ -11387,35 +11401,45 @@ export const Calculator: React.FC = () => {
                             </select>
                           </div>
                         </div>
-
-                        {/* Calculated Area & Perimeter Metric */}
-                        <div className="flex items-center gap-4 text-xs font-bold text-slate-700 bg-slate-50 p-2.5 rounded-xl border border-slate-100">
-                          <div>
-                            <span className="text-slate-400 block text-[10px] uppercase">Площа (1 шт):</span>
-                            <span className="text-blue-700 font-extrabold text-sm">
-                              {((Number(wideWidth || 0) * Number(wideHeight || 0)) / (wideUnit === 'mm' ? 1000000 : wideUnit === 'cm' ? 10000 : 1)).toFixed(2)} м²
-                            </span>
-                          </div>
-                          <div className="h-6 w-px bg-slate-200"></div>
-                          <div>
-                            <span className="text-slate-400 block text-[10px] uppercase">Периметр:</span>
-                            <span className="text-slate-800 font-extrabold text-sm">
-                              {((2 * (Number(wideWidth || 0) + Number(wideHeight || 0))) / (wideUnit === 'mm' ? 1000 : wideUnit === 'cm' ? 100 : 1)).toFixed(2)} м.п.
-                            </span>
-                          </div>
-                        </div>
                       </div>
 
-                      {/* Right: Blueprint Visual Preview */}
-                      <div className="md:col-span-6 flex flex-col items-center justify-center p-6 bg-gradient-to-b from-slate-50 to-slate-100/60 rounded-2xl border border-slate-200/80 min-h-[190px]">
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-3">Вид та пропорція макету</span>
+                      {/* Calculated Area & Perimeter Metric */}
+                      <div className="flex items-center justify-between text-xs font-bold text-slate-700 bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
+                        <div>
+                          <span className="text-slate-400 block text-[10px] uppercase">Площа (1 шт):</span>
+                          <span className="text-blue-700 font-extrabold text-xs">
+                            {((Number(wideWidth || 0) * Number(wideHeight || 0)) / (wideUnit === 'mm' ? 1000000 : wideUnit === 'cm' ? 10000 : 1)).toFixed(2)} м²
+                          </span>
+                        </div>
+                        <div className="h-6 w-px bg-slate-200"></div>
+                        <div>
+                          <span className="text-slate-400 block text-[10px] uppercase">Периметр:</span>
+                          <span className="text-slate-800 font-extrabold text-xs">
+                            {((2 * (Number(wideWidth || 0) + Number(wideHeight || 0))) / (wideUnit === 'mm' ? 1000 : wideUnit === 'cm' ? 100 : 1)).toFixed(2)} м.п.
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Right: ВІЗУАЛІЗАЦІЯ & ПРОПОРЦІЯ */}
+                    <div className="ios-card bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col items-center justify-between text-center min-h-[220px]">
+                      <div className="w-full flex items-center justify-between pb-2 border-b border-slate-100">
+                        <span className="text-[11px] font-extrabold text-slate-700 uppercase tracking-wider">
+                          ВІЗУАЛІЗАЦІЯ & ПРОПОРЦІЯ МАКЕТУ
+                        </span>
+                        <span className="text-[10px] font-bold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">
+                          Масштаб виробу
+                        </span>
+                      </div>
+
+                      <div className="flex-1 flex items-center justify-center my-3 w-full">
                         <div
                           style={{
-                            width: `${Math.min(220, Math.max(90, (Number(wideWidth || 2000) / Number(wideHeight || 1000)) * 110))}px`,
-                            height: '110px',
+                            width: `${Math.min(220, Math.max(90, (Number(wideWidth || 2000) / Math.max(1, Number(wideHeight || 1000))) * 100))}px`,
+                            height: '95px',
                             backgroundColor: '#ffffff',
                             border: '2px solid var(--primary)',
-                            borderRadius: '8px',
+                            borderRadius: '10px',
                             boxShadow: '0 8px 20px rgba(0, 122, 255, 0.12)',
                             display: 'flex',
                             flexDirection: 'column',
@@ -11425,468 +11449,415 @@ export const Calculator: React.FC = () => {
                             transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
                           }}
                         >
-                          <span className="text-xs font-extrabold text-blue-700">
+                          <span className="text-xs font-black text-blue-700 font-mono">
                             {wideWidth} × {wideHeight} {wideUnit}
                           </span>
-                          <span className="text-[10px] font-bold text-slate-400 mt-1">
+                          <span className="text-[10px] font-bold text-slate-500 mt-1">
                             {((Number(wideWidth || 0) * Number(wideHeight || 0)) / (wideUnit === 'mm' ? 1000000 : wideUnit === 'cm' ? 10000 : 1)).toFixed(2)} м²
                           </span>
                         </div>
                       </div>
+
+                      <div className="w-full text-[11px] text-slate-500 font-semibold bg-slate-50 py-1.5 px-3 rounded-lg border border-slate-200/60">
+                        Габарит під монтаж: <strong className="text-slate-800">{wideWidth} × {wideHeight} {wideUnit}</strong>
+                      </div>
                     </div>
                   </div>
 
-                  {/* Side-by-Side 2 Columns (50% / 50%): Left = Materials Filter & Sets, Right = Postpress & Hardware */}
+                  {/* Row 2 (50% / 50%): Left = МАТЕРІАЛИ ТА ЯКІСТЬ ДРУКУ, Right = ПІСЛЯДРУКАРСЬКА ОБРОБКА ТА ФУРНІТУРА */}
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-stretch">
-                    {/* Left Column (50%): Післядрукарська обробка та фурнітура */}
-                    <div className="ios-card bg-white overflow-hidden flex flex-col h-full">
-                      <div className="w-full px-5 py-3.5 flex items-center justify-between bg-slate-50/90 border-b border-slate-200">
-                        <div className="flex items-center gap-2">
-                          <SlidersHorizontal size={16} className="text-blue-600" />
-                          <span className="text-xs font-extrabold uppercase tracking-wider text-slate-800">
-                            Післядрукарська обробка та фурнітура (Нормативи)
+                    {/* Left Column (50%): Фільтр матеріалів та параметрів */}
+                    <div className="ios-card bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-4">
+                      <div className="flex flex-col gap-3">
+                        <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                          <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wider">
+                            МАТЕРІАЛИ ТА СПЕЦИФІКАЦІЯ:
                           </span>
-                          {(wideLuvers !== 'none' || wideHemming !== 'none' || widePocket !== '0' || wideLamination !== '0' || widePlotterCut !== '0' || wideMilling !== '0' || wideHolders !== '0' || wideTape3M !== '0' || wideStretcher !== 'none') && (
-                            <span className="ios-badge-blue text-[10px] px-2 py-0.5 rounded-full font-bold">Опції активні</span>
-                          )}
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setWideLuvers('none');
-                            setWideHemming('none');
-                            setWidePocket('0');
-                            setWideLamination('0');
-                            setWidePlotterCut('0');
-                            setWideMountFilm('0');
-                            setWideMilling('0');
-                            setWideHolders('0');
-                            setWideTape3M('0');
-                            setWideStretcher('none');
-                            setWideArtGel('0');
-                          }}
-                          className="px-2.5 py-1 rounded-md bg-white border border-slate-200 text-slate-600 hover:text-red-600 text-[11px] font-semibold transition-colors shadow-2xs"
-                        >
-                          Очистити
-                        </button>
-                      </div>
-
-                      <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-3 bg-white flex-1">
-                        {/* Option 1: Люверси (Banners / Canvas) */}
-                        {(wideSubTab === 'banner' || wideSubTab === 'custom') && (
-                          <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
-                            <label className="text-[11px] font-bold text-slate-600 block mb-1">Встановлення люверсів:</label>
-                            <select
-                            value={wideLuvers}
-                            onChange={(e) => setWideLuvers(e.target.value)}
-                              className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800"
-                            >
-                              <option value="none">Без люверсів</option>
-                              <option value="30cm">Люверси кожні 30 см (по периметру)</option>
-                              <option value="50cm">Люверси кожні 50 см (стандарт)</option>
-                              <option value="corners">Тільки по 4 кутах</option>
-                            </select>
-                          </div>
-                        )}
-
-                        {/* Option 2: Підгин / Проклейка краю */}
-                        {(wideSubTab === 'banner' || wideSubTab === 'custom') && (
-                          <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
-                            <label className="text-[11px] font-bold text-slate-600 block mb-1">Підгин (проварка краю):</label>
-                            <select
-                              value={wideHemming}
-                              onChange={(e) => setWideHemming(e.target.value)}
-                              className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800"
-                            >
-                              <option value="perimeter">Проварка по периметру</option>
-                              <option value="top_bottom">Тільки верх і низ</option>
-                              <option value="none">Без проварки (чистий різ)</option>
-                            </select>
-                          </div>
-                        )}
-
-                        {/* Option 3: Кишені під трубу */}
-                        {(wideSubTab === 'banner' || wideSubTab === 'stands' || wideSubTab === 'custom') && (
-                          <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
-                            <label className="text-[11px] font-bold text-slate-600 block mb-1">Кишені під трубу/обтяжувач:</label>
-                            <select
-                              value={widePocket}
-                              onChange={(e) => setWidePocket(e.target.value)}
-                              className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800"
-                            >
-                              <option value="0">Ні</option>
-                              <option value="top_bottom">Верх + Низ (Ø 50 мм)</option>
-                              <option value="top">Тільки верх (Ø 50 мм)</option>
-                            </select>
-                          </div>
-                        )}
-
-                        {/* Option 4: Ламінація (Film / Paper) */}
-                        {(wideSubTab === 'film' || wideSubTab === 'paper' || wideSubTab === 'custom') && (
-                          <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
-                            <label className="text-[11px] font-bold text-slate-600 block mb-1">Захисна ламінація:</label>
-                            <select
-                              value={wideLamination}
-                              onChange={(e) => setWideLamination(e.target.value)}
-                              className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800"
-                            >
-                              <option value="0">Без ламінації</option>
-                              <option value="gloss">Глянцева 1+0</option>
-                              <option value="matte">Матова 1+0</option>
-                              <option value="floor">Підлогова протиковзка (FloorProtect)</option>
-                              <option value="antigraffiti">Антиграфіті захисна</option>
-                            </select>
-                          </div>
-                        )}
-
-                        {/* Option 5: Плоттерна порізка (Film) */}
-                        {(wideSubTab === 'film' || wideSubTab === 'custom') && (
-                          <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
-                            <label className="text-[11px] font-bold text-slate-600 block mb-1">Плоттерна порізка:</label>
-                            <select
-                              value={widePlotterCut}
-                              onChange={(e) => setWidePlotterCut(e.target.value)}
-                              className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800"
-                            >
-                              <option value="0">Без порізки</option>
-                              <option value="kiss_cut">Присічка до підкладки (Kiss-Cut)</option>
-                              <option value="through_cut">Наскрізна порізка контуру</option>
-                            </select>
-                          </div>
-                        )}
-
-                        {/* Option 6: Монтажна плівка (Film) */}
-                        {(wideSubTab === 'film' || wideSubTab === 'custom') && (
-                          <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
-                            <label className="text-[11px] font-bold text-slate-600 block mb-1">Вибірка + Монтажка:</label>
-                            <select
-                              value={wideMountFilm}
-                              onChange={(e) => setWideMountFilm(e.target.value)}
-                              className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800"
-                            >
-                              <option value="0">Ні</option>
-                              <option value="mount">Вибірка облою + Монтажна плівка</option>
-                            </select>
-                          </div>
-                        )}
-
-                        {/* Option 7: Фрезерна різка (PVC / Composite / Acrylic / Foam) */}
-                        {(wideSubTab === 'pvc' || wideSubTab === 'composite' || wideSubTab === 'acrylic' || wideSubTab === 'foam_board') && (
-                          <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
-                            <label className="text-[11px] font-bold text-slate-600 block mb-1">Фрезерна різка на ЧПУ:</label>
-                            <select
-                              value={wideMilling}
-                              onChange={(e) => setWideMilling(e.target.value)}
-                              className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800"
-                            >
-                              <option value="0">Прямий різ у розмір</option>
-                              <option value="vector">Фігурна фрезеровка по контуру</option>
-                            </select>
-                          </div>
-                        )}
-
-                        {/* Option 8: Дистанційні тримачі (PVC / Acrylic / Composite) */}
-                        {(wideSubTab === 'pvc' || wideSubTab === 'composite' || wideSubTab === 'acrylic') && (
-                          <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
-                            <label className="text-[11px] font-bold text-slate-600 block mb-1">Дистанційні кріплення:</label>
-                            <select
-                              value={wideHolders}
-                              onChange={(e) => setWideHolders(e.target.value)}
-                              className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800"
-                            >
-                              <option value="0">Ні</option>
-                              <option value="chrome_4">Хромовані металеві (4 шт)</option>
-                              <option value="gold_4">Золоті металеві (4 шт)</option>
-                              <option value="black_4">Чорні матові (4 шт)</option>
-                            </select>
-                          </div>
-                        )}
-
-                        {/* Option 9: Монтажний скотч 3M (PVC / Acrylic / Composite) */}
-                        {(wideSubTab === 'pvc' || wideSubTab === 'composite' || wideSubTab === 'acrylic' || wideSubTab === 'foam_board') && (
-                          <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
-                            <label className="text-[11px] font-bold text-slate-600 block mb-1">Монтажний скотч 3M:</label>
-                            <select
-                              value={wideTape3M}
-                              onChange={(e) => setWideTape3M(e.target.value)}
-                              className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800"
-                            >
-                              <option value="0">Ні</option>
-                              <option value="tape_vhb">Стрічки 3M VHB по периметру</option>
-                            </select>
-                          </div>
-                        )}
-
-                        {/* Option 10: Натяжка на підрамник (Canvas) */}
-                        {wideSubTab === 'canvas' && (
-                          <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
-                            <label className="text-[11px] font-bold text-slate-600 block mb-1">Натяжка на підрамник:</label>
-                            <select
-                              value={wideStretcher}
-                              onChange={(e) => setWideStretcher(e.target.value)}
-                              className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800"
-                            >
-                              <option value="gallery">Галерейна натяжка (друк на торцях)</option>
-                              <option value="standard">Стандартна натяжка (під багет)</option>
-                              <option value="none">Без натяжки (полотно в рулоні)</option>
-                            </select>
-                          </div>
-                        )}
-
-                        {/* Option 11: Арт-гель / Текстурний лак (Canvas) */}
-                        {wideSubTab === 'canvas' && (
-                          <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
-                            <label className="text-[11px] font-bold text-slate-600 block mb-1">Покриття арт-гелем:</label>
-                            <select
-                              value={wideArtGel}
-                              onChange={(e) => setWideArtGel(e.target.value)}
-                              className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800"
-                            >
-                              <option value="0">Ні</option>
-                              <option value="art_varnish">Акриловий художній лак 1+0</option>
-                              <option value="gel_brush">Текстурний арт-гель (імітація мазків)</option>
-                            </select>
-                          </div>
-                        )}
-
-                        {/* Option 12: Модель мобільного стенду (Stands) */}
-                        {wideSubTab === 'stands' && (
-                          <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
-                            <label className="text-[11px] font-bold text-slate-600 block mb-1">Конструкція стенду:</label>
-                            <select
-                              value={wideStandModel}
-                              onChange={(e) => setWideStandModel(e.target.value)}
-                              className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800"
-                            >
-                              <option value="rollup_80x200">Roll-Up 80 × 200 см (Касета + чохол)</option>
-                              <option value="rollup_100x200">Roll-Up 100 × 200 см (Касета + чохол)</option>
-                              <option value="rollup_120x200">Roll-Up 120 × 200 см (Касета + чохол)</option>
-                              <option value="spider_60x160">X-banner Павук 60 × 160 см</option>
-                              <option value="spider_80x180">X-banner Павук 80 × 180 см</option>
-                              <option value="presswall_3x2">Прес-вол 3 × 2 м (Хромована труба)</option>
-                            </select>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-
-                    {/* Right Column (50%): Filter & Sets Counter */}
-                    <div className="flex flex-col gap-4">
-                      {/* Section: Фільтр специфікацій та матеріалів (Pill Buttons) */}
-                      <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden flex-1">
-                        <div className="px-5 py-3.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
-                          <h4 className="text-sm font-bold text-slate-900 m-0">
-                            Фільтр специфікацій та матеріалів
-                          </h4>
-                          <span className="text-xs text-slate-500 font-medium">Параметри матриці</span>
+                          <span className="text-[11px] font-bold text-slate-400">Фільтр матриці</span>
                         </div>
 
-                    <div className="flex flex-col divide-y divide-slate-100">
-                      {/* Row 1: Material Options */}
-                      <div className="flex flex-col md:flex-row">
-                        <div className="w-full md:w-36 bg-slate-50/70 p-3.5 border-b md:border-b-0 md:border-r border-slate-100 text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center">
-                          МАТЕРІАЛ:
+                        {/* Material Pills */}
+                        <div className="flex flex-col gap-1.5">
+                          <label className="text-[11px] font-bold text-slate-600 uppercase">МАТЕРІАЛ:</label>
+                          <div className="flex gap-1.5 flex-wrap items-center">
+                            {(wideSubTab === 'banner'
+                              ? [
+                                  { id: 'frontlit_440', label: 'Frontlit 440 ламінований' },
+                                  { id: 'frontlit_510', label: 'Frontlit 510 литий (міцний)' },
+                                  { id: 'blockout_510', label: 'Blockout 510 двосторонній' },
+                                  { id: 'mesh_banner', label: 'Банерна сітка Mesh' },
+                                  { id: 'backlit_510', label: 'Backlit 510 для лайтбоксів' }
+                                ]
+                              : wideSubTab === 'film'
+                              ? [
+                                  { id: 'oracal_matte', label: 'ORAJET матова біла' },
+                                  { id: 'oracal_gloss', label: 'ORAJET глянцева біла' },
+                                  { id: 'oracal_clear', label: 'ORAJET прозора' },
+                                  { id: 'ritrama_matte', label: 'Ritrama перманентна' },
+                                  { id: 'one_way_vision', label: 'One Way Vision' },
+                                  { id: 'translucent', label: 'Транслюцентна' },
+                                  { id: 'car_cast', label: 'Автомобільна лита' }
+                                ]
+                              : wideSubTab === 'paper'
+                              ? [
+                                  { id: 'citylight_150', label: 'Citylight 150г' },
+                                  { id: 'blueback_115', label: 'Blueback 115г (бігборди)' },
+                                  { id: 'photo_satin_200', label: 'Фотопапір Satin 200г' },
+                                  { id: 'photo_gloss_220', label: 'Фотопапір Gloss 220г' }
+                                ]
+                              : wideSubTab === 'pvc'
+                              ? [
+                                  { id: 'pvc_3mm', label: 'ПВХ 3 мм' },
+                                  { id: 'pvc_4mm', label: 'ПВХ 4 мм' },
+                                  { id: 'pvc_5mm', label: 'ПВХ 5 мм' },
+                                  { id: 'pvc_8mm', label: 'ПВХ 8 мм' },
+                                  { id: 'pvc_10mm', label: 'ПВХ 10 мм' }
+                                ]
+                              : wideSubTab === 'foam_board'
+                              ? [
+                                  { id: 'foam_5mm', label: 'Пінокартон 5 мм білий' },
+                                  { id: 'foam_10mm', label: 'Пінокартон 10 мм білий' },
+                                  { id: 'foam_black_5mm', label: 'Пінокартон 5 мм чорний' }
+                                ]
+                              : wideSubTab === 'composite'
+                              ? [
+                                  { id: 'comp_white_3mm', label: 'Композит білий 3 мм' },
+                                  { id: 'comp_silver_3mm', label: 'Композит срібло 3 мм' },
+                                  { id: 'comp_black_3mm', label: 'Композит чорний 3 мм' },
+                                  { id: 'comp_gold_3mm', label: 'Композит золото 3 мм' }
+                                ]
+                              : wideSubTab === 'acrylic'
+                              ? [
+                                  { id: 'acryl_clear_3mm', label: 'Акрил прозорий 3 мм' },
+                                  { id: 'acryl_clear_5mm', label: 'Акрил прозорий 5 мм' },
+                                  { id: 'acryl_milky_3mm', label: 'Акрил молочний 3 мм' },
+                                  { id: 'acryl_black_3mm', label: 'Акрил чорний 3 мм' }
+                                ]
+                              : wideSubTab === 'canvas'
+                              ? [
+                                  { id: 'canvas_cotton_380', label: 'Бавовняне 380г' },
+                                  { id: 'canvas_synthetic_280', label: 'Синтетичне 280г' },
+                                  { id: 'canvas_gloss_350', label: 'Глянцеве 350г' }
+                                ]
+                              : wideSubTab === 'stands'
+                              ? [
+                                  { id: 'stand_banner_440', label: 'Стенд + Frontlit 440г' },
+                                  { id: 'stand_banner_510', label: 'Стенд + Blockout 510г' },
+                                  { id: 'stand_pp_film', label: 'Стенд + PP Film (без загину)' }
+                                ]
+                              : [
+                                  { id: 'frontlit_440', label: 'Банер 440г' },
+                                  { id: 'oracal_matte', label: 'Плівка Oracal' },
+                                  { id: 'pvc_3mm', label: 'ПВХ 3мм' }
+                                ]
+                            ).map(mat => {
+                              const isSelected = wideSelectedMaterials.includes(mat.id);
+                              return (
+                                <button
+                                  key={mat.id}
+                                  type="button"
+                                  onClick={() => {
+                                    setWideSelectedMaterials(prev =>
+                                      isSelected ? (prev.length > 1 ? prev.filter(x => x !== mat.id) : prev) : [...prev, mat.id]
+                                    );
+                                  }}
+                                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all text-center ${
+                                    isSelected
+                                      ? 'bg-blue-600 text-white shadow-2xs'
+                                      : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200/80'
+                                  }`}
+                                >
+                                  {mat.label}
+                                </button>
+                              );
+                            })}
+                          </div>
                         </div>
-                        <div className="flex-1 p-3.5 flex gap-1.5 flex-wrap items-center">
-                          {(wideSubTab === 'banner'
-                            ? [
-                                { id: 'frontlit_440', label: 'Frontlit 440 ламінований' },
-                                { id: 'frontlit_510', label: 'Frontlit 510 литий (міцний)' },
-                                { id: 'blockout_510', label: 'Blockout 510 двосторонній' },
-                                { id: 'mesh_banner', label: 'Банерна сітка Mesh (вітростійка)' },
-                                { id: 'backlit_510', label: 'Backlit 510 для лайтбоксів' }
-                              ]
-                            : wideSubTab === 'film'
-                            ? [
-                                { id: 'oracal_matte', label: 'ORAJET матова біла' },
-                                { id: 'oracal_gloss', label: 'ORAJET глянцева біла' },
-                                { id: 'oracal_clear', label: 'ORAJET прозора' },
-                                { id: 'ritrama_matte', label: 'Ritrama перманентна' },
-                                { id: 'one_way_vision', label: 'One Way Vision перфорована' },
-                                { id: 'translucent', label: 'Світлорозсіювальна транслюцентна' },
-                                { id: 'car_cast', label: 'Автомобільна лита (Car Wrap)' }
-                              ]
-                            : wideSubTab === 'paper'
-                            ? [
-                                { id: 'citylight_150', label: 'Папір Citylight 150г' },
-                                { id: 'blueback_115', label: 'Папір Blueback 115г (бігборди)' },
-                                { id: 'photo_satin_200', label: 'Фотопапір Satin 200г' },
-                                { id: 'photo_gloss_220', label: 'Фотопапір Gloss 220г' }
-                              ]
-                            : wideSubTab === 'pvc'
-                            ? [
-                                { id: 'pvc_3mm', label: 'ПВХ пластик 3 мм' },
-                                { id: 'pvc_4mm', label: 'ПВХ пластик 4 мм' },
-                                { id: 'pvc_5mm', label: 'ПВХ пластик 5 мм' },
-                                { id: 'pvc_8mm', label: 'ПВХ пластик 8 мм' },
-                                { id: 'pvc_10mm', label: 'ПВХ пластик 10 мм' }
-                              ]
-                            : wideSubTab === 'foam_board'
-                            ? [
-                                { id: 'foam_5mm', label: 'Пінокартон білий 5 мм' },
-                                { id: 'foam_10mm', label: 'Пінокартон білий 10 мм' },
-                                { id: 'foam_black_5mm', label: 'Пінокартон чорний 5 мм' }
-                              ]
-                            : wideSubTab === 'composite'
-                            ? [
-                                { id: 'comp_white_3mm', label: 'Композит білий 3 мм' },
-                                { id: 'comp_silver_3mm', label: 'Композит срібло браш 3 мм' },
-                                { id: 'comp_black_3mm', label: 'Композит чорний глянець 3 мм' },
-                                { id: 'comp_gold_3mm', label: 'Композит золото браш 3 мм' }
-                              ]
-                            : wideSubTab === 'acrylic'
-                            ? [
-                                { id: 'acryl_clear_3mm', label: 'Акрил прозорий 3 мм' },
-                                { id: 'acryl_clear_5mm', label: 'Акрил прозорий 5 мм' },
-                                { id: 'acryl_milky_3mm', label: 'Акрил молочний 3 мм' },
-                                { id: 'acryl_black_3mm', label: 'Акрил чорний глянець 3 мм' }
-                              ]
-                            : wideSubTab === 'canvas'
-                            ? [
-                                { id: 'canvas_cotton_380', label: 'Натуральне бавовняне полотно 380г' },
-                                { id: 'canvas_synthetic_280', label: 'Синтетичне полотно 280г' },
-                                { id: 'canvas_gloss_350', label: 'Глянцеве фотополотно 350г' }
-                              ]
-                            : wideSubTab === 'stands'
-                            ? [
-                                { id: 'stand_banner_440', label: 'Полотно Frontlit 440г' },
-                                { id: 'stand_banner_510', label: 'Полотно Литий Blockout 510г' },
-                                { id: 'stand_pp_film', label: 'Полотно PP Film без загину краю' }
-                              ]
-                            : [
-                                { id: 'frontlit_440', label: 'Банер Frontlit 440' },
-                                { id: 'oracal_matte', label: 'Плівка самоклейка' },
-                                { id: 'pvc_3mm', label: 'Пластик ПВХ 3 мм' }
-                              ]
-                          ).map(mat => {
-                            const isSel = wideSelectedMaterials.includes(mat.id);
-                            return (
-                              <button
-                                key={mat.id}
-                                type="button"
-                                onClick={() => {
-                                  setWideSelectedMaterials(prev => 
-                                    prev.includes(mat.id) ? prev.filter(x => x !== mat.id) : [...prev, mat.id]
-                                  );
-                                }}
-                                className={`px-2.5 py-1 text-xs font-semibold rounded-lg border transition-all ${
-                                  isSel
-                                    ? 'bg-blue-600 text-white border-blue-600 shadow-sm font-bold'
-                                    : 'bg-slate-100 hover:bg-slate-200/80 text-slate-700 border-slate-200/60'
-                                }`}
-                              >
-                                {mat.label}
-                              </button>
-                            );
-                          })}
+
+                        {/* Resolution / Print Quality Pills */}
+                        <div className="flex flex-col gap-1.5 pt-1">
+                          <label className="text-[11px] font-bold text-slate-600 uppercase">ЯКІСТЬ ДРУКУ:</label>
+                          <div className="flex gap-1.5 flex-wrap items-center">
+                            {[
+                              { id: '720', label: '720 dpi (Стандарт)' },
+                              { id: '1440', label: '1440 dpi (Фотоякість)' },
+                              { id: 'uv_1200', label: 'УФ-друк 1200 dpi' },
+                              { id: 'uv_white', label: 'УФ-друк + Білий колір' }
+                            ].map(res => {
+                              const isSelected = wideSelectedResolutions.includes(res.id);
+                              return (
+                                <button
+                                  key={res.id}
+                                  type="button"
+                                  onClick={() => {
+                                    setWideSelectedResolutions(prev =>
+                                      isSelected ? (prev.length > 1 ? prev.filter(x => x !== res.id) : prev) : [...prev, res.id]
+                                    );
+                                  }}
+                                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all text-center ${
+                                    isSelected
+                                      ? 'bg-blue-600 text-white shadow-2xs'
+                                      : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200/80'
+                                  }`}
+                                >
+                                  {res.label}
+                                </button>
+                              );
+                            })}
+                          </div>
                         </div>
                       </div>
 
-                      {/* Row 2: Resolution & Print Quality */}
-                      <div className="flex flex-col md:flex-row">
-                        <div className="w-full md:w-36 bg-slate-50/70 p-3.5 border-b md:border-b-0 md:border-r border-slate-100 text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center">
-                          РОЗДІЛЬНІСТЬ:
-                        </div>
-                        <div className="flex-1 p-3.5 flex gap-1.5 flex-wrap items-center">
-                          {[
-                            { id: '720', label: '720 dpi — Зовнішній друк (вулиця)' },
-                            { id: '1440', label: '1440 dpi — Інтер\'єрний фотоякість' },
-                            { id: 'uv_cmyk', label: 'УФ-друк CMYK (стійкий)' },
-                            { id: 'uv_white', label: 'УФ CMYK + White (білий шар)' },
-                          ].map(res => {
-                            const isSel = wideSelectedResolutions.includes(res.id);
-                            return (
-                              <button
-                                key={res.id}
-                                type="button"
-                                onClick={() => {
-                                  setWideSelectedResolutions(prev => 
-                                    prev.includes(res.id) ? prev.filter(x => x !== res.id) : [...prev, res.id]
-                                  );
-                                }}
-                                className={`px-2.5 py-1 text-xs font-semibold rounded-lg border transition-all ${
-                                  isSel
-                                    ? 'bg-blue-600 text-white border-blue-600 shadow-sm font-bold'
-                                    : 'bg-slate-100 hover:bg-slate-200/80 text-slate-700 border-slate-200/60'
-                                }`}
-                              >
-                                {res.label}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-
-                      {/* Row 3: Finishing / Processing */}
-                      <div className="flex flex-col md:flex-row">
-                        <div className="w-full md:w-36 bg-slate-50/70 p-3.5 border-b md:border-b-0 md:border-r border-slate-100 text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center">
-                          ОБРОБКА:
-                        </div>
-                        <div className="flex-1 p-3.5 flex gap-1.5 flex-wrap items-center">
-                          {[
-                            { id: 'clean_cut', label: 'Чистий різ у розмір' },
-                            { id: 'luvers_hemming', label: 'Люверси + проклейка' },
-                            { id: 'laminated', label: 'З ламінацією' },
-                            { id: 'milled', label: 'Фрезеровка по контуру' },
-                          ].map(fin => {
-                            const isSel = wideSelectedFinishes.includes(fin.id);
-                            return (
-                              <button
-                                key={fin.id}
-                                type="button"
-                                onClick={() => {
-                                  setWideSelectedFinishes(prev => 
-                                    prev.includes(fin.id) ? prev.filter(x => x !== fin.id) : [...prev, fin.id]
-                                  );
-                                }}
-                                className={`px-2.5 py-1 text-xs font-semibold rounded-lg border transition-all ${
-                                  isSel
-                                    ? 'bg-blue-600 text-white border-blue-600 shadow-sm font-bold'
-                                    : 'bg-slate-100 hover:bg-slate-200/80 text-slate-700 border-slate-200/60'
-                                }`}
-                              >
-                                {fin.label}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Section: КОМПЛЕКТІВ МАКЕТІВ Bar */}
-                    <div className="bg-white border border-slate-200 rounded-xl p-3.5 shadow-sm flex items-center justify-between flex-wrap gap-4">
-                      <div className="flex items-center gap-3">
-                        <span className="text-xs font-extrabold uppercase text-slate-800">КОМПЛЕКТІВ МАКЕТІВ:</span>
-                        <div className="flex items-center gap-1">
+                      {/* Sets Counter */}
+                      <div className="p-3 bg-slate-50 rounded-xl border border-slate-200/60 flex items-center justify-between">
+                        <span className="text-xs font-bold text-slate-700 uppercase">Комплектів макетів:</span>
+                        <div className="flex items-center gap-2">
                           <button
                             type="button"
                             onClick={() => setWideSets(Math.max(1, wideSets - 1))}
-                            className="w-7 h-7 rounded-md bg-white border border-slate-200 text-slate-700 font-bold hover:bg-slate-50 flex items-center justify-center transition-colors"
+                            className="w-7 h-7 rounded-lg bg-white border border-slate-200 font-extrabold text-slate-700 flex items-center justify-center hover:bg-slate-100"
                           >
                             -
                           </button>
-                          <input
-                            type="number"
-                            value={wideSets}
-                            onChange={(e) => setWideSets(Math.max(1, parseInt(e.target.value) || 1))}
-                            className="w-12 h-7 text-center rounded-md border border-slate-200 font-bold text-xs"
-                          />
+                          <span className="w-8 text-center text-xs font-black text-slate-900 font-mono">{wideSets}</span>
                           <button
                             type="button"
                             onClick={() => setWideSets(wideSets + 1)}
-                            className="w-7 h-7 rounded-md bg-white border border-slate-200 text-slate-700 font-bold hover:bg-slate-50 flex items-center justify-center transition-colors"
+                            className="w-7 h-7 rounded-lg bg-white border border-slate-200 font-extrabold text-slate-700 flex items-center justify-center hover:bg-slate-100"
                           >
                             +
                           </button>
                         </div>
                       </div>
-                      <span className="text-xs text-slate-400 font-medium">
-                        (Кількість однакових замовлень)
-                      </span>
+                    </div>
+
+                    {/* Right Column (50%): Післядрукарська обробка та фурнітура */}
+                    <div className="ios-card bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-4">
+                      <div className="flex flex-col gap-3">
+                        <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                          <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wider">
+                            ПІСЛЯДРУКАРСЬКА ОБРОБКА & ФУРНІТУРА:
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setWideLuvers('none');
+                              setWideHemming('none');
+                              setWidePocket('0');
+                              setWideLamination('0');
+                              setWidePlotterCut('0');
+                              setWideMountFilm('0');
+                              setWideMilling('0');
+                              setWideHolders('0');
+                              setWideTape3M('0');
+                              setWideStretcher('none');
+                              setWideArtGel('0');
+                            }}
+                            className="px-2.5 py-1 rounded-lg bg-slate-50 border border-slate-200 text-slate-600 hover:text-red-600 text-[11px] font-semibold transition-colors shadow-2xs"
+                          >
+                            Очистити
+                          </button>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                          {/* Option 1: Люверси (Banners / Canvas) */}
+                          {(wideSubTab === 'banner' || wideSubTab === 'custom') && (
+                            <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
+                              <label className="text-[11px] font-bold text-slate-600 block mb-1">Люверси:</label>
+                              <select
+                                value={wideLuvers}
+                                onChange={(e) => setWideLuvers(e.target.value)}
+                                className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800"
+                              >
+                                <option value="none">Без люверсів</option>
+                                <option value="30cm">Кожні 30 см (по периметру)</option>
+                                <option value="50cm">Кожні 50 см (стандарт)</option>
+                                <option value="corners">Тільки по 4 кутах</option>
+                              </select>
+                            </div>
+                          )}
+
+                          {/* Option 2: Підгин / Проклейка краю */}
+                          {(wideSubTab === 'banner' || wideSubTab === 'custom') && (
+                            <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
+                              <label className="text-[11px] font-bold text-slate-600 block mb-1">Проварка краю:</label>
+                              <select
+                                value={wideHemming}
+                                onChange={(e) => setWideHemming(e.target.value)}
+                                className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800"
+                              >
+                                <option value="perimeter">По периметру</option>
+                                <option value="top_bottom">Верх і низ</option>
+                                <option value="none">Без проварки (чистий різ)</option>
+                              </select>
+                            </div>
+                          )}
+
+                          {/* Option 3: Кишені під трубу */}
+                          {(wideSubTab === 'banner' || wideSubTab === 'stands' || wideSubTab === 'custom') && (
+                            <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
+                              <label className="text-[11px] font-bold text-slate-600 block mb-1">Кишені під трубу:</label>
+                              <select
+                                value={widePocket}
+                                onChange={(e) => setWidePocket(e.target.value)}
+                                className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800"
+                              >
+                                <option value="0">Ні</option>
+                                <option value="top_bottom">Верх + Низ (Ø 50 мм)</option>
+                                <option value="top">Тільки верх (Ø 50 мм)</option>
+                              </select>
+                            </div>
+                          )}
+
+                          {/* Option 4: Ламінація (Film / Paper) */}
+                          {(wideSubTab === 'film' || wideSubTab === 'paper' || wideSubTab === 'custom') && (
+                            <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
+                              <label className="text-[11px] font-bold text-slate-600 block mb-1">Захисна ламінація:</label>
+                              <select
+                                value={wideLamination}
+                                onChange={(e) => setWideLamination(e.target.value)}
+                                className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800"
+                              >
+                                <option value="0">Без ламінації</option>
+                                <option value="gloss">Глянцева 1+0</option>
+                                <option value="matte">Матова 1+0</option>
+                                <option value="floor">Підлогова (FloorProtect)</option>
+                              </select>
+                            </div>
+                          )}
+
+                          {/* Option 5: Плоттерна порізка (Film) */}
+                          {(wideSubTab === 'film' || wideSubTab === 'custom') && (
+                            <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
+                              <label className="text-[11px] font-bold text-slate-600 block mb-1">Плоттерна порізка:</label>
+                              <select
+                                value={widePlotterCut}
+                                onChange={(e) => setWidePlotterCut(e.target.value)}
+                                className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800"
+                              >
+                                <option value="0">Ні (прямий різ)</option>
+                                <option value="simple">Простий контур (коло, квадрат)</option>
+                                <option value="complex">Складний контур (фігурна)</option>
+                              </select>
+                            </div>
+                          )}
+
+                          {/* Option 6: Натяжка на підрамник (Canvas) */}
+                          {wideSubTab === 'canvas' && (
+                            <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
+                              <label className="text-[11px] font-bold text-slate-600 block mb-1">Натяжка на підрамник:</label>
+                              <select
+                                value={wideStretcher}
+                                onChange={(e) => setWideStretcher(e.target.value)}
+                                className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800"
+                              >
+                                <option value="gallery">Галерейна натяжка</option>
+                                <option value="standard">Стандартна натяжка</option>
+                                <option value="none">Без натяжки (рулон)</option>
+                              </select>
+                            </div>
+                          )}
+
+                          {/* Option 7: Модель мобільного стенду (Stands) */}
+                          {wideSubTab === 'stands' && (
+                            <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
+                              <label className="text-[11px] font-bold text-slate-600 block mb-1">Конструкція стенду:</label>
+                              <select
+                                value={wideStandModel}
+                                onChange={(e) => setWideStandModel(e.target.value)}
+                                className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800"
+                              >
+                                <option value="rollup_80x200">Roll-Up 80 × 200 см</option>
+                                <option value="rollup_100x200">Roll-Up 100 × 200 см</option>
+                                <option value="rollup_120x200">Roll-Up 120 × 200 см</option>
+                                <option value="spider_60x160">X-banner Павук 60 × 160 см</option>
+                                <option value="spider_80x180">X-banner Павук 80 × 180 см</option>
+                              </select>
+                            </div>
+                          )}
+                          {/* Option 8: Монтаж на пластик / основу (Film / Paper) */}
+                          {(wideSubTab === 'film' || wideSubTab === 'paper' || wideSubTab === 'custom') && (
+                            <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
+                              <label className="text-[11px] font-bold text-slate-600 block mb-1">Монтаж на основу:</label>
+                              <select
+                                value={wideMountFilm}
+                                onChange={(e) => setWideMountFilm(e.target.value)}
+                                className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800"
+                              >
+                                <option value="0">Без накочування</option>
+                                <option value="pvc3">Накатка на ПВХ 3 мм</option>
+                                <option value="pvc5">Накатка на ПВХ 5 мм</option>
+                                <option value="foam">Накатка на пінокартон</option>
+                              </select>
+                            </div>
+                          )}
+
+                          {/* Option 9: Фрезерування / Фігурна різка (PVC / Acrylic / Composite) */}
+                          {(wideSubTab === 'pvc' || wideSubTab === 'composite' || wideSubTab === 'acrylic' || wideSubTab === 'foam_board') && (
+                            <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
+                              <label className="text-[11px] font-bold text-slate-600 block mb-1">Фрезерування ЧПУ:</label>
+                              <select
+                                value={wideMilling}
+                                onChange={(e) => setWideMilling(e.target.value)}
+                                className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800"
+                              >
+                                <option value="0">Прямокутний різ</option>
+                                <option value="contour">Контурна фрезеровка форми</option>
+                                <option value="chamfer">Зняття фаски 45°</option>
+                              </select>
+                            </div>
+                          )}
+
+                          {/* Option 10: Дистанційні тримачі (PVC / Acrylic / Composite) */}
+                          {(wideSubTab === 'pvc' || wideSubTab === 'composite' || wideSubTab === 'acrylic') && (
+                            <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
+                              <label className="text-[11px] font-bold text-slate-600 block mb-1">Дистанційні тримачі:</label>
+                              <select
+                                value={wideHolders}
+                                onChange={(e) => setWideHolders(e.target.value)}
+                                className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800"
+                              >
+                                <option value="0">Ні</option>
+                                <option value="chrome_4">Хромовані металеві (4 шт)</option>
+                                <option value="black_4">Чорні матові (4 шт)</option>
+                              </select>
+                            </div>
+                          )}
+
+                          {/* Option 11: Монтажний скотч 3M (PVC / Acrylic / Composite) */}
+                          {(wideSubTab === 'pvc' || wideSubTab === 'composite' || wideSubTab === 'acrylic' || wideSubTab === 'foam_board') && (
+                            <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
+                              <label className="text-[11px] font-bold text-slate-600 block mb-1">Монтажний скотч 3M:</label>
+                              <select
+                                value={wideTape3M}
+                                onChange={(e) => setWideTape3M(e.target.value)}
+                                className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800"
+                              >
+                                <option value="0">Ні</option>
+                                <option value="tape_vhb">Стрічки 3M VHB по периметру</option>
+                              </select>
+                            </div>
+                          )}
+
+                          {/* Option 12: Арт-гель / Текстурний лак (Canvas) */}
+                          {wideSubTab === 'canvas' && (
+                            <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
+                              <label className="text-[11px] font-bold text-slate-600 block mb-1">Покриття арт-гелем:</label>
+                              <select
+                                value={wideArtGel}
+                                onChange={(e) => setWideArtGel(e.target.value)}
+                                className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800"
+                              >
+                                <option value="0">Ні</option>
+                                <option value="art_varnish">Акриловий художній лак 1+0</option>
+                                <option value="gel_brush">Текстурний арт-гель (імітація мазків)</option>
+                              </select>
+                            </div>
+                          )}
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
 
                   {/* Price Calculation Matrix Table (Matching Exact Offset & Digital Design) */}
                   <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
@@ -12079,6 +12050,382 @@ export const Calculator: React.FC = () => {
                       </table>
                     </div>
                   </div>
+
+                  {/* Extended Order & 1C Calculation Card for Wide Format */}
+                  {(() => {
+                    const areaM2 = Math.max(0.1, (Number(wideWidth || 2000) * Number(wideHeight || 1000)) / (wideUnit === 'mm' ? 1000000 : wideUnit === 'cm' ? 10000 : 1));
+                    const perimeterM = (2 * (Number(wideWidth || 2000) + Number(wideHeight || 1000))) / (wideUnit === 'mm' ? 1000 : wideUnit === 'cm' ? 100 : 1);
+                    const wideTir = selectedSheetCalc?.tirazh || 1;
+
+                    const matRates: Record<string, { label: string; sqmPrice: number }> = {
+                      frontlit_440: { label: 'Банер Frontlit 440 ламінований', sqmPrice: 220 },
+                      frontlit_510: { label: 'Банер Frontlit 510 литий міцний', sqmPrice: 290 },
+                      blockout_510: { label: 'Банер Blockout 510 двосторонній', sqmPrice: 380 },
+                      mesh_banner: { label: 'Банерна сітка Mesh вітростійка', sqmPrice: 260 },
+                      backlit_510: { label: 'Банер Backlit 510 для лайтбоксів', sqmPrice: 340 },
+                      oracal_matte: { label: 'Плівка ORAJET матова біла', sqmPrice: 240 },
+                      oracal_gloss: { label: 'Плівка ORAJET глянцева біла', sqmPrice: 240 },
+                      oracal_clear: { label: 'Плівка ORAJET прозора', sqmPrice: 250 },
+                      ritrama_matte: { label: 'Плівка Ritrama перманентна', sqmPrice: 260 },
+                      one_way_vision: { label: 'Плівка One Way Vision перфорована', sqmPrice: 420 },
+                      translucent: { label: 'Плівка транслюцентна світлорозсіювальна', sqmPrice: 380 },
+                      car_cast: { label: 'Плівка автомобільна лита (Car Wrap)', sqmPrice: 650 },
+                      citylight_150: { label: 'Папір Citylight 150г', sqmPrice: 160 },
+                      blueback_115: { label: 'Папір Blueback 115г', sqmPrice: 120 },
+                      photo_satin_200: { label: 'Фотопапір Satin 200г', sqmPrice: 310 },
+                      photo_gloss_220: { label: 'Фотопапір Gloss 220г', sqmPrice: 330 },
+                      pvc_3mm: { label: 'ПВХ пластик 3 мм + друк', sqmPrice: 680 },
+                      pvc_4mm: { label: 'ПВХ пластик 4 мм + друк', sqmPrice: 790 },
+                      pvc_5mm: { label: 'ПВХ пластик 5 мм + друк', sqmPrice: 890 },
+                      foam_5mm: { label: 'Пінокартон білий 5 мм', sqmPrice: 620 },
+                      comp_white_3mm: { label: 'Композит білий 3 мм', sqmPrice: 1350 },
+                      acryl_clear_3mm: { label: 'Акрил прозорий 3 мм', sqmPrice: 1650 },
+                      canvas_cotton_380: { label: 'Бавовняне полотно 380г', sqmPrice: 580 },
+                      stand_banner_440: { label: 'Стенд + Frontlit 440г', sqmPrice: 750 },
+                    };
+
+                    const wideMatId = wideSelectedMaterials[0] || 'frontlit_440';
+                    const wideResId = wideSelectedResolutions[0] || '720';
+                    const matInfo = matRates[wideMatId] || { label: wideMatId, sqmPrice: 250 };
+
+                    const resMultiplier = wideResId === '1440' ? 1.25 : wideResId.includes('white') ? 1.55 : wideResId.includes('uv') ? 1.35 : 1.0;
+                    const luversCostPerM = wideLuvers === '30cm' ? 45 : wideLuvers === '50cm' ? 30 : wideLuvers === 'corners' ? 15 : 0;
+                    const hemmingCostPerM = wideHemming !== 'none' ? 25 : 0;
+                    const lamCostPerSqm = wideLamination !== '0' ? 95 : 0;
+                    const stretcherCost = wideStretcher === 'gallery' ? 180 : wideStretcher === 'standard' ? 130 : 0;
+                    const postPressPerUnit = (perimeterM * (luversCostPerM + hemmingCostPerM)) + (areaM2 * lamCostPerSqm) + stretcherCost;
+
+                    const widePaperCost = Math.round(wideTir * areaM2 * (matInfo.sqmPrice * 0.65));
+                    const widePrintCost = Math.round(wideTir * areaM2 * (matInfo.sqmPrice * 0.35 * resMultiplier));
+                    const widePostSum = Math.round(wideTir * postPressPerUnit);
+                    const wideDelivery = wideWithDelivery ? 120 : 0;
+                    const wideRawCost = widePaperCost + widePrintCost + widePostSum + wideDelivery + 50;
+
+                    const wideFinalPrice = Math.round(wideRawCost * (1 + marginPercent / 100));
+                    const wideMarginAmount = Math.max(0, wideFinalPrice - wideRawCost);
+                    const wideUnitPrice = wideFinalPrice / wideTir;
+
+                    const effectiveClient = isNewClientMode && customClientName.trim()
+                      ? customClientName.trim()
+                      : (activeClient?.name || 'Замовник');
+                    const fullComposedName = `№ ${orderNumber} - Широкоформатний друк ${wideWidth}×${wideHeight} ${wideUnit} — ${effectiveClient} (${matInfo.label}, ${wideResId} dpi, ${wideTir} шт.)`;
+
+                    return (
+                      <div id="detailed-wide-calculation" className="ios-card bg-white" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px', border: '1px solid #bfdbfe', boxShadow: '0 10px 25px -5px rgba(59, 130, 246, 0.1)' }}>
+                        {/* Section Header */}
+                        <div className="flex items-center justify-between flex-wrap gap-3 pb-3 border-b border-slate-100">
+                          <div className="flex items-center gap-3">
+                            <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center text-sm font-bold shadow-sm">
+                              <FileText size={18} />
+                            </div>
+                            <div>
+                              <h4 className="text-base font-black text-slate-900 m-0">
+                                Оформлення та кошторис: Широкоформатний друк
+                              </h4>
+                              <span className="text-xs text-slate-500 font-medium">
+                                Параметри розрахунку, розцінки 1С та формування документів
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-bold px-3 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+                              {wideTir} шт ({areaM2.toFixed(2)} м²)
+                            </span>
+                            <span className="text-xs font-bold px-3 py-1 rounded-full bg-slate-100 text-slate-700">
+                              {wideResId} dpi
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Top 3-Field Strip: [ № ] [ ЗАМОВНИК ] [ ПРОДУКЦІЯ (авто) ] */}
+                        <div className="grid grid-cols-1 md:grid-cols-12 gap-3 p-4 rounded-xl bg-slate-50 border border-slate-200">
+                          {/* 1. Номер замовлення */}
+                          <div className="md:col-span-3 flex flex-col gap-1">
+                            <label className="text-[11px] font-extrabold text-slate-700 uppercase">№ Замовлення:</label>
+                            <div className="flex items-center gap-1.5">
+                              <input
+                                type="text"
+                                value={`№ ${orderNumber}`}
+                                onChange={(e) => {
+                                  const n = parseInt(e.target.value.replace(/\D/g, ''));
+                                  if (n) setOrderNumber(n);
+                                }}
+                                className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-black text-blue-700"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => setOrderNumber(Math.floor(10000 + Math.random() * 90000))}
+                                className="px-2 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 text-slate-600 text-xs font-bold transition-colors"
+                                title="Згенерувати новий номер"
+                              >
+                                <RotateCcw size={13} />
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* 2. Замовник */}
+                          <div className="md:col-span-4 flex flex-col gap-1">
+                            <div className="flex items-center justify-between">
+                              <label className="text-[11px] font-extrabold text-slate-700 uppercase">Замовник:</label>
+                              <button
+                                type="button"
+                                onClick={() => setIsNewClientMode(!isNewClientMode)}
+                                className="text-[10px] font-bold text-blue-600 hover:text-blue-800 underline"
+                              >
+                                {isNewClientMode ? 'Вибрати з бази' : '+ Вписати нового'}
+                              </button>
+                            </div>
+
+                            {isNewClientMode ? (
+                              <input
+                                type="text"
+                                placeholder="Введіть назву клієнта"
+                                value={customClientName}
+                                onChange={(e) => setCustomClientName(e.target.value)}
+                                className="w-full px-3 py-1.5 rounded-lg border border-blue-400 bg-white text-xs font-bold text-slate-900 focus:outline-none"
+                                autoFocus
+                              />
+                            ) : (
+                              <select
+                                value={selectedClientId}
+                                onChange={(e) => setSelectedClientId(e.target.value)}
+                                className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-bold text-slate-800 focus:outline-none"
+                              >
+                                <option value="">-- Оберіть замовника з бази --</option>
+                                {clients.map(c => (
+                                  <option key={c.id} value={c.id}>{c.name}</option>
+                                ))}
+                              </select>
+                            )}
+                          </div>
+
+                          {/* 3. Продукція (авто) */}
+                          <div className="md:col-span-5 flex flex-col gap-1">
+                            <div className="flex items-center justify-between">
+                              <label className="text-[11px] font-extrabold text-slate-700 uppercase">Продукція:</label>
+                              <span className="text-[9px] font-bold text-blue-700 bg-blue-100 px-1.5 py-0.2 rounded">авто</span>
+                            </div>
+                            <input
+                              type="text"
+                              value={name || fullComposedName}
+                              onChange={(e) => setName(e.target.value)}
+                              className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold text-slate-800"
+                            />
+                          </div>
+                        </div>
+
+                        {/* 2-Column Main Section: Left = НАКЛАД ТА НАЦІНКА | Right = РОЗРАХУНОК + Горизонтальні кнопки */}
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-stretch">
+                          {/* 1. Left Column (50%): Параметри тиражу та націнка */}
+                          <div className="ios-card bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-4">
+                            <div className="flex flex-col gap-4">
+                              <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                                <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wider">ПАРАМЕТРИ ТИРАЖУ:</span>
+                                <span className="text-[11px] font-bold text-slate-400">Широкий формат</span>
+                              </div>
+
+                              {/* Tirazh Input */}
+                              <div className="flex flex-col gap-1.5">
+                                <label className="text-xs font-extrabold text-slate-700 uppercase">НАКЛАД (ШТ):</label>
+                                <input
+                                  type="number"
+                                  value={wideTir}
+                                  onChange={(e) => {
+                                    const val = parseInt(e.target.value) || 1;
+                                    setSelectedSheetCalc(prev => prev ? { ...prev, tirazh: val } : {
+                                      matId: wideMatId,
+                                      covId: '0',
+                                      colStr: wideResId,
+                                      tirazh: val,
+                                      matName: matInfo.label,
+                                      covName: 'БП',
+                                      rawCost: wideRawCost,
+                                      basePaperCost: widePaperCost,
+                                      printCost: widePrintCost,
+                                      lamCost: 0,
+                                      postpressSum: widePostSum,
+                                      deliveryCost: wideDelivery,
+                                      finalPrice: wideFinalPrice,
+                                      unitPrice: wideUnitPrice
+                                    });
+                                  }}
+                                  className="w-full px-3.5 py-2 rounded-xl border border-slate-200 bg-slate-50 font-bold text-xs text-slate-900 focus:bg-white focus:border-blue-600 focus:outline-none font-mono"
+                                />
+                              </div>
+
+                              {/* Margin slider & presets */}
+                              <div className="flex flex-col gap-2">
+                                <div className="flex items-center justify-between text-xs">
+                                  <label className="text-xs font-extrabold text-slate-700 uppercase">НАЦІНКА (МАРЖА):</label>
+                                  <span className="font-extrabold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-lg border border-blue-200">{marginPercent}%</span>
+                                </div>
+                                <input
+                                  type="range"
+                                  min="0"
+                                  max="300"
+                                  step="5"
+                                  value={marginPercent}
+                                  onChange={(e) => setMarginPercent(Number(e.target.value) || 0)}
+                                  className="w-full cursor-pointer accent-blue-600 h-2 bg-slate-200 rounded-lg"
+                                />
+                                <div className="grid grid-cols-5 gap-1.5 p-1 bg-slate-100 rounded-xl border border-slate-200/60">
+                                  {[20, 35, 50, 100, 150].map(m => (
+                                    <button
+                                      key={m}
+                                      type="button"
+                                      onClick={() => setMarginPercent(m)}
+                                      className={`py-1.5 text-xs font-bold rounded-lg transition-all ${
+                                        marginPercent === m
+                                          ? 'bg-blue-600 text-white shadow-2xs'
+                                          : 'text-slate-600 hover:bg-white'
+                                      }`}
+                                    >
+                                      {m}%
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* 2. Right Column (50%): РОЗРАХУНОК + ГОРИЗОНТАЛЬНІ КНОПКИ СПРАВА */}
+                          <div className="ios-card bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-4">
+                            <div className="flex flex-col gap-3">
+                              <div className="flex justify-between items-center pb-2 border-b border-slate-100">
+                                <span className="text-xs font-black text-slate-800 uppercase tracking-wide">
+                                  РОЗРАХУНОК (СОБІВАРТІСТЬ & НОРМИ 1С):
+                                </span>
+                                <strong className="text-sm font-black text-slate-900 font-mono">
+                                  {wideRawCost.toFixed(2)} ₴
+                                </strong>
+                              </div>
+
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                                <div className="flex justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/60">
+                                  <span className="text-slate-600 font-medium">Основа / Матеріал:</span>
+                                  <strong className="font-mono text-slate-900">{widePaperCost.toFixed(2)} ₴</strong>
+                                </div>
+                                <div className="flex justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/60">
+                                  <span className="text-slate-600 font-medium">Широкоформатний друк:</span>
+                                  <strong className="font-mono text-slate-900">{widePrintCost.toFixed(2)} ₴</strong>
+                                </div>
+                                <div className="flex justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/60">
+                                  <span className="text-slate-600 font-medium">Фурнітура / Обробка:</span>
+                                  <strong className="font-mono text-slate-900">{widePostSum.toFixed(2)} ₴</strong>
+                                </div>
+                                {wideDelivery > 0 && (
+                                  <div className="flex justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/60">
+                                    <span className="text-slate-600 font-medium">Доставка:</span>
+                                    <strong className="font-mono text-slate-900">{wideDelivery.toFixed(2)} ₴</strong>
+                                  </div>
+                                )}
+                              </div>
+
+                              <div className="flex justify-between text-[11px] font-semibold text-slate-500 px-1">
+                                <span>Собівартість 1 м²:</span>
+                                <strong className="font-mono text-slate-800">
+                                  {(wideRawCost / (wideTir * areaM2)).toFixed(2)} ₴ / м²
+                                </strong>
+                              </div>
+
+                              {/* Total Final Price Box */}
+                              <div className="p-3.5 rounded-xl bg-gradient-to-br from-blue-50/90 via-indigo-50/50 to-white border border-blue-200/80">
+                                <div className="flex justify-between items-baseline">
+                                  <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wide">РАЗОМ ДО СПЛАТИ:</span>
+                                  <span className="text-xs font-bold text-emerald-600 font-mono">
+                                    +{wideMarginAmount.toFixed(2)} ₴ маржа
+                                  </span>
+                                </div>
+                                <p className="text-2xl font-black text-blue-600 my-0.5 font-mono tracking-tight">
+                                  {wideFinalPrice} <span className="text-sm font-bold text-slate-600">₴</span>
+                                </p>
+                                <div className="flex justify-between items-center text-xs pt-1.5 border-t border-blue-200/60 font-semibold text-blue-900">
+                                  <span>Ціна за 1 шт:</span>
+                                  <strong className="font-mono font-bold">{wideUnitPrice.toFixed(2)} ₴ / шт</strong>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Horizontal Action Buttons Right: [ ШАБЛОН ] [ PDF ] [ КП ] [ ВИРОБНИЦТВО ] */}
+                            <div className="grid grid-cols-4 gap-2 pt-1 border-t border-slate-100">
+                              <button
+                                type="button"
+                                onClick={() => setShowTemplateModal(true)}
+                                className="py-2.5 px-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-2xs transition-colors text-center"
+                              >
+                                Шаблон
+                              </button>
+                              
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setName(fullComposedName);
+                                  setShowInvoice(true);
+                                }}
+                                className="py-2.5 px-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-2xs transition-colors text-center"
+                              >
+                                ПДФ
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const text = `Комерційна пропозиція № ${orderNumber}
+Замовник: ${effectiveClient}
+Продукція: Широкоформатний друк
+Розмір: ${wideWidth} × ${wideHeight} ${wideUnit} (${areaM2.toFixed(2)} м²)
+Матеріал: ${matInfo.label}
+Якість: ${wideResId} dpi
+Тираж: ${wideTir} шт
+Вартість замовлення: ${wideFinalPrice} грн (${wideUnitPrice.toFixed(2)} грн/шт)
+Друкарня "Едельвейс і К"`;
+                                  navigator.clipboard.writeText(text);
+                                  alert('Комерційну пропозицію (КП) скопійовано в буфер обміну.');
+                                }}
+                                className="py-2.5 px-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-2xs transition-colors text-center"
+                              >
+                                КП
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  addOrder({
+                                    name: name || fullComposedName,
+                                    clientId: isNewClientMode ? (customClientName || 'Новий клієнт') : selectedClientId,
+                                    category: 'Широкоформатний друк',
+                                    quantity: wideTir,
+                                    packingCount: 1,
+                                    paperType: 'coated',
+                                    colors: `${wideResId} dpi`,
+                                    isSamNaSebe: false,
+                                    designCost: designCost,
+                                    margin: marginPercent,
+                                    machine: 'Широкоформатний плотер Flora',
+                                    format: `${wideWidth}×${wideHeight}`,
+                                    physicalSheets: wideTir,
+                                    itemsPerSheet: 1,
+                                    subtotal: wideRawCost,
+                                    marginAmount: wideMarginAmount,
+                                    finalPrice: wideFinalPrice,
+                                    unitPrice: wideUnitPrice,
+                                    paymentStatus: 'unpaid',
+                                    prepayment: 0,
+                                    notes: `Специфікація: ${name || fullComposedName}, ${wideWidth}×${wideHeight} ${wideUnit}, ${matInfo.label}, ${wideResId} dpi, ${wideTir} шт.`
+                                  });
+                                  alert(`Замовлення № ${orderNumber} створено та передано у виробництво.`);
+                                  setOrderNumber(Math.floor(10000 + Math.random() * 90000));
+                                }}
+                                className="py-2.5 px-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs shadow-md shadow-blue-500/20 transition-all text-center"
+                              >
+                                Виробництво
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
               )}
             </div>
@@ -12689,7 +13036,7 @@ export const Calculator: React.FC = () => {
                   </table>
                 </div>
 
-                {/* Bottom Technical Bar */}
+{/* Extended Order & 1C Calculation Card for Roll Printing */}
                 {(() => {
                   const w = parseFloat(rollWidth) || 25;
                   const h = parseFloat(rollHeight) || 25;
@@ -12700,73 +13047,338 @@ export const Calculator: React.FC = () => {
                   const colorAdd = rollColor === '14' ? 85 : rollColor === '8' ? 55 : 40;
                   const coatAdd = rollCoating === '190' ? 25 : rollCoating === '191' ? 30 : 0;
                   const baseRate = rollMaterial === '215' ? 165 : rollMaterial === '211' ? 150 : rollMaterial === '214' ? 135 : rollMaterial === '213' ? 110 : rollMaterial === '212' ? 95 : rollMaterial === '210' ? 85 : 65;
-                  const calculatedTotal = Math.round(sqMeters * (baseRate + colorAdd + coatAdd) + 380 + (includeDelivery ? 75 : 0));
+                  
+                  const rollPaperCost = Math.round(sqMeters * baseRate);
+                  const rollPrintCost = Math.round(sqMeters * colorAdd);
+                  const rollLamCost = Math.round(sqMeters * coatAdd);
+                  const rollPostSum = 250;
+                  const rollDelivery = includeDelivery ? 90 : 0;
+                  const rollRawCost = rollPaperCost + rollPrintCost + rollLamCost + rollPostSum + rollDelivery + 50;
+
+                  const rollFinalPrice = Math.round(rollRawCost * (1 + marginPercent / 100));
+                  const rollMarginAmount = Math.max(0, rollFinalPrice - rollRawCost);
+                  const rollUnitPrice = rollFinalPrice / rollQuantity;
+
+                  const matLabels: Record<string, string> = {
+                    '209': 'Етикеточний папір Raflatac',
+                    '210': 'Етикеточний папір Крафт',
+                    '212': 'Поліпропілен білий (PP)',
+                    '213': 'Поліпропілен прозорий',
+                    '214': 'Поліпропілен срібло',
+                    '211': 'Папір винний Antique White',
+                    '215': 'Папір винний Martel',
+                  };
+
+                  const effectiveClient = isNewClientMode && customClientName.trim()
+                    ? customClientName.trim()
+                    : (activeClient?.name || 'Замовник');
+                  const fullComposedName = `№ ${orderNumber} - Рулонна етикетка ${rollWidth}×${rollHeight} мм — ${effectiveClient} (${matLabels[rollMaterial] || 'Raflatac'}, ${rollQuantity} шт.)`;
 
                   return (
-                    <div style={{
-                      backgroundColor: 'var(--bg-system)',
-                      borderTop: '0.5px solid var(--border-light)',
-                      padding: '16px 20px',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      flexWrap: 'wrap',
-                      gap: '14px'
-                    }}>
-                      <div className="flex items-center gap-6 flex-wrap text-xs">
-                        <div>
-                          <span className="text-slate-500 block text-[11px]">Метраж намотки:</span>
-                          <strong className="text-slate-800 text-sm">{linearMeters} м.п.</strong>
+                    <div id="detailed-roll-calculation" className="ios-card bg-white" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px', border: '1px solid #bfdbfe', boxShadow: '0 10px 25px -5px rgba(59, 130, 246, 0.1)', marginTop: '20px' }}>
+                      {/* Section Header */}
+                      <div className="flex items-center justify-between flex-wrap gap-3 pb-3 border-b border-slate-100">
+                        <div className="flex items-center gap-3">
+                          <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center text-sm font-bold shadow-sm">
+                            <FileText size={18} />
+                          </div>
+                          <div>
+                            <h4 className="text-base font-black text-slate-900 m-0">
+                              Оформлення та кошторис: Рулонний друк
+                            </h4>
+                            <span className="text-xs text-slate-500 font-medium">
+                              Технічні параметри намотки, розцінки 1С та формування документів
+                            </span>
+                          </div>
                         </div>
-                        <div>
-                          <span className="text-slate-500 block text-[11px]">Площа друку:</span>
-                          <strong className="text-slate-800 text-sm">{sqMeters} м²</strong>
-                        </div>
-                        <div>
-                          <span className="text-slate-500 block text-[11px]">Кількість рулонів:</span>
-                          <strong className="text-blue-600 text-sm">{approxRolls} шт (~100м/рулон)</strong>
-                        </div>
-                        <div>
-                          <span className="text-slate-500 block text-[11px]">Втулка:</span>
-                          <strong className="text-slate-800 text-sm">{rollCore} мм (орієнт. №{rollOrientation})</strong>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold px-3 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+                            {rollQuantity} шт ({linearMeters} м.п.)
+                          </span>
+                          <span className="text-xs font-bold px-3 py-1 rounded-full bg-slate-100 text-slate-700">
+                            Втулка {rollCore} мм (№{rollOrientation})
+                          </span>
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-4">
-                        <div className="text-right">
-                          <span className="text-slate-500 block text-[11px]">Сума до оплати:</span>
-                          <span style={{ fontSize: '18px', fontWeight: '900', color: 'var(--primary)' }}>
-                            {calculatedTotal} грн
-                          </span>
+                      {/* Top 3-Field Strip: [ № ] [ ЗАМОВНИК ] [ ПРОДУКЦІЯ (авто) ] */}
+                      <div className="grid grid-cols-1 md:grid-cols-12 gap-3 p-4 rounded-xl bg-slate-50 border border-slate-200">
+                        {/* 1. Номер замовлення */}
+                        <div className="md:col-span-3 flex flex-col gap-1">
+                          <label className="text-[11px] font-extrabold text-slate-700 uppercase">№ Замовлення:</label>
+                          <div className="flex items-center gap-1.5">
+                            <input
+                              type="text"
+                              value={`№ ${orderNumber}`}
+                              onChange={(e) => {
+                                const n = parseInt(e.target.value.replace(/\D/g, ''));
+                                if (n) setOrderNumber(n);
+                              }}
+                              className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-black text-blue-700"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setOrderNumber(Math.floor(10000 + Math.random() * 90000))}
+                              className="px-2 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 text-slate-600 text-xs font-bold transition-colors"
+                              title="Згенерувати новий номер"
+                            >
+                              <RotateCcw size={13} />
+                            </button>
+                          </div>
                         </div>
 
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setQuantity(rollQuantity);
-                            setCategory('Етикетки');
-                            setStep('editor');
-                          }}
-                          style={{
-                            padding: '10px 20px',
-                            borderRadius: '12px',
-                            backgroundColor: 'var(--primary)',
-                            color: '#ffffff',
-                            fontSize: '13px',
-                            fontWeight: '800',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '6px',
-                            boxShadow: '0 4px 14px rgba(0, 122, 255, 0.25)',
-                            transition: 'all 0.15s ease'
-                          }}
-                          onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-1px)'; }}
-                          onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; }}
-                        >
-                          <span>Оформити замовлення</span>
-                          <ChevronRight size={16} />
-                        </button>
+                        {/* 2. Замовник */}
+                        <div className="md:col-span-4 flex flex-col gap-1">
+                          <div className="flex items-center justify-between">
+                            <label className="text-[11px] font-extrabold text-slate-700 uppercase">Замовник:</label>
+                            <button
+                              type="button"
+                              onClick={() => setIsNewClientMode(!isNewClientMode)}
+                              className="text-[10px] font-bold text-blue-600 hover:text-blue-800 underline"
+                            >
+                              {isNewClientMode ? 'Вибрати з бази' : '+ Вписати нового'}
+                            </button>
+                          </div>
+
+                          {isNewClientMode ? (
+                            <input
+                              type="text"
+                              placeholder="Введіть назву клієнта"
+                              value={customClientName}
+                              onChange={(e) => setCustomClientName(e.target.value)}
+                              className="w-full px-3 py-1.5 rounded-lg border border-blue-400 bg-white text-xs font-bold text-slate-900 focus:outline-none"
+                              autoFocus
+                            />
+                          ) : (
+                            <select
+                              value={selectedClientId}
+                              onChange={(e) => setSelectedClientId(e.target.value)}
+                              className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-bold text-slate-800 focus:outline-none"
+                            >
+                              <option value="">-- Оберіть замовника з бази --</option>
+                              {clients.map(c => (
+                                <option key={c.id} value={c.id}>{c.name}</option>
+                              ))}
+                            </select>
+                          )}
+                        </div>
+
+                        {/* 3. Продукція (авто) */}
+                        <div className="md:col-span-5 flex flex-col gap-1">
+                          <div className="flex items-center justify-between">
+                            <label className="text-[11px] font-extrabold text-slate-700 uppercase">Продукція:</label>
+                            <span className="text-[9px] font-bold text-blue-700 bg-blue-100 px-1.5 py-0.2 rounded">авто</span>
+                          </div>
+                          <input
+                            type="text"
+                            value={name || fullComposedName}
+                            onChange={(e) => setName(e.target.value)}
+                            className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold text-slate-800"
+                          />
+                        </div>
+                      </div>
+
+                      {/* 2-Column Main Section: Left = ТЕХНІЧНІ ДАНІ НАМОТКИ ТА НАЦІНКА | Right = РОЗРАХУНОК + Горизонтальні кнопки */}
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-stretch">
+                        {/* 1. Left Column (50%): Технічні параметри намотки та націнка */}
+                        <div className="ios-card bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-4">
+                          <div className="flex flex-col gap-3">
+                            <div className="flex items-center justify-between pb-2 border-b border-slate-100">
+                              <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wider">ПАРАМЕТРИ НАМОТКИ В РУЛОНИ:</span>
+                              <span className="text-[11px] font-bold text-slate-400">Флексодрук</span>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-2 text-xs">
+                              <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/60 flex flex-col">
+                                <span className="text-slate-500 text-[10px] uppercase font-bold">Метраж намотки:</span>
+                                <strong className="text-slate-900 text-sm font-mono">{linearMeters} м.п.</strong>
+                              </div>
+                              <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/60 flex flex-col">
+                                <span className="text-slate-500 text-[10px] uppercase font-bold">Площа друку:</span>
+                                <strong className="text-slate-900 text-sm font-mono">{sqMeters} м²</strong>
+                              </div>
+                              <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/60 flex flex-col">
+                                <span className="text-slate-500 text-[10px] uppercase font-bold">Кількість рулонів:</span>
+                                <strong className="text-blue-600 text-sm font-mono">{approxRolls} шт (~100м)</strong>
+                              </div>
+                              <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200/60 flex flex-col">
+                                <span className="text-slate-500 text-[10px] uppercase font-bold">Втулка та вихід:</span>
+                                <strong className="text-slate-900 text-sm font-mono">Ø{rollCore}мм (№{rollOrientation})</strong>
+                              </div>
+                            </div>
+
+                            {/* Margin slider & presets */}
+                            <div className="flex flex-col gap-2 pt-1">
+                              <div className="flex items-center justify-between text-xs">
+                                <label className="text-xs font-extrabold text-slate-700 uppercase">НАЦІНКА (МАРЖА):</label>
+                                <span className="font-extrabold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-lg border border-blue-200">{marginPercent}%</span>
+                              </div>
+                              <input
+                                type="range"
+                                min="0"
+                                max="300"
+                                step="5"
+                                value={marginPercent}
+                                onChange={(e) => setMarginPercent(Number(e.target.value) || 0)}
+                                className="w-full cursor-pointer accent-blue-600 h-2 bg-slate-200 rounded-lg"
+                              />
+                              <div className="grid grid-cols-5 gap-1.5 p-1 bg-slate-100 rounded-xl border border-slate-200/60">
+                                {[20, 35, 50, 100, 150].map(m => (
+                                  <button
+                                    key={m}
+                                    type="button"
+                                    onClick={() => setMarginPercent(m)}
+                                    className={`py-1.5 text-xs font-bold rounded-lg transition-all ${
+                                      marginPercent === m
+                                        ? 'bg-blue-600 text-white shadow-2xs'
+                                        : 'text-slate-600 hover:bg-white'
+                                    }`}
+                                  >
+                                    {m}%
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* 2. Right Column (50%): РОЗРАХУНОК + ГОРИЗОНТАЛЬНІ КНОПКИ СПРАВА */}
+                        <div className="ios-card bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-4">
+                          <div className="flex flex-col gap-3">
+                            <div className="flex justify-between items-center pb-2 border-b border-slate-100">
+                              <span className="text-xs font-black text-slate-800 uppercase tracking-wide">
+                                РОЗРАХУНОК (СОБІВАРТІСТЬ & НОРМИ 1С):
+                              </span>
+                              <strong className="text-sm font-black text-slate-900 font-mono">
+                                {rollRawCost.toFixed(2)} ₴
+                              </strong>
+                            </div>
+
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                              <div className="flex justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/60">
+                                <span className="text-slate-600 font-medium">Рулонний матеріал:</span>
+                                <strong className="font-mono text-slate-900">{rollPaperCost.toFixed(2)} ₴</strong>
+                              </div>
+                              <div className="flex justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/60">
+                                <span className="text-slate-600 font-medium">Флексодрук / Фарби:</span>
+                                <strong className="font-mono text-slate-900">{rollPrintCost.toFixed(2)} ₴</strong>
+                              </div>
+                              <div className="flex justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/60">
+                                <span className="text-slate-600 font-medium">Лак / Ламінація:</span>
+                                <strong className="font-mono text-slate-900">{rollLamCost.toFixed(2)} ₴</strong>
+                              </div>
+                              <div className="flex justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/60">
+                                <span className="text-slate-600 font-medium">Намотка та різка:</span>
+                                <strong className="font-mono text-slate-900">{rollPostSum.toFixed(2)} ₴</strong>
+                              </div>
+                              {rollDelivery > 0 && (
+                                <div className="flex justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/60 col-span-2">
+                                  <span className="text-slate-600 font-medium">Доставка:</span>
+                                  <strong className="font-mono text-slate-900">{rollDelivery.toFixed(2)} ₴</strong>
+                                </div>
+                              )}
+                            </div>
+
+                            <div className="flex justify-between text-[11px] font-semibold text-slate-500 px-1">
+                              <span>Собівартість 1000 шт:</span>
+                              <strong className="font-mono text-slate-800">
+                                {((rollRawCost / rollQuantity) * 1000).toFixed(2)} ₴ / тис.шт
+                              </strong>
+                            </div>
+
+                            {/* Total Final Price Box */}
+                            <div className="p-3.5 rounded-xl bg-gradient-to-br from-blue-50/90 via-indigo-50/50 to-white border border-blue-200/80">
+                              <div className="flex justify-between items-baseline">
+                                <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wide">РАЗОМ ДО СПЛАТИ:</span>
+                                <span className="text-xs font-bold text-emerald-600 font-mono">
+                                  +{rollMarginAmount.toFixed(2)} ₴ маржа
+                                </span>
+                              </div>
+                              <p className="text-2xl font-black text-blue-600 my-0.5 font-mono tracking-tight">
+                                {rollFinalPrice} <span className="text-sm font-bold text-slate-600">₴</span>
+                              </p>
+                              <div className="flex justify-between items-center text-xs pt-1.5 border-t border-blue-200/60 font-semibold text-blue-900">
+                                <span>Ціна за 1 шт:</span>
+                                <strong className="font-mono font-bold">{rollUnitPrice.toFixed(4)} ₴ / шт</strong>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Horizontal Action Buttons Right: [ ШАБЛОН ] [ PDF ] [ КП ] [ ВИРОБНИЦТВО ] */}
+                          <div className="grid grid-cols-4 gap-2 pt-1 border-t border-slate-100">
+                            <button
+                              type="button"
+                              onClick={() => setShowTemplateModal(true)}
+                              className="py-2.5 px-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-2xs transition-colors text-center"
+                            >
+                              Шаблон
+                            </button>
+                            
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setName(fullComposedName);
+                                setShowInvoice(true);
+                              }}
+                              className="py-2.5 px-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-2xs transition-colors text-center"
+                            >
+                              ПДФ
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const text = `Комерційна пропозиція № ${orderNumber}
+Замовник: ${effectiveClient}
+Продукція: Рулонна етикетка
+Розмір: ${rollWidth} × ${rollHeight} мм
+Матеріал: ${matLabels[rollMaterial] || 'Raflatac'}
+Тираж: ${rollQuantity} шт (${approxRolls} рул.)
+Вартість замовлення: ${rollFinalPrice} грн (${rollUnitPrice.toFixed(4)} грн/шт)
+Друкарня "Едельвейс і К"`;
+                                navigator.clipboard.writeText(text);
+                                alert('Комерційну пропозицію (КП) скопійовано в буфер обміну.');
+                              }}
+                              className="py-2.5 px-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-2xs transition-colors text-center"
+                            >
+                              КП
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => {
+                                addOrder({
+                                  name: name || fullComposedName,
+                                  clientId: isNewClientMode ? (customClientName || 'Новий клієнт') : selectedClientId,
+                                  category: 'Рулонний друк',
+                                  quantity: rollQuantity,
+                                  packingCount: approxRolls,
+                                  paperType: 'coated',
+                                  colors: 'Флексодрук',
+                                  isSamNaSebe: false,
+                                  designCost: designCost,
+                                  margin: marginPercent,
+                                  machine: 'Флексографічна машина',
+                                  format: `${rollWidth}×${rollHeight}`,
+                                  physicalSheets: approxRolls,
+                                  itemsPerSheet: 1,
+                                  subtotal: rollRawCost,
+                                  marginAmount: rollMarginAmount,
+                                  finalPrice: rollFinalPrice,
+                                  unitPrice: rollUnitPrice,
+                                  paymentStatus: 'unpaid',
+                                  prepayment: 0,
+                                  notes: `Специфікація: ${name || fullComposedName}, ${rollWidth}×${rollHeight} мм, ${matLabels[rollMaterial] || 'Raflatac'}, втулка Ø${rollCore}мм, орієнтація №${rollOrientation}, ${rollQuantity} шт.`
+                                });
+                                alert(`Замовлення № ${orderNumber} створено та передано у виробництво.`);
+                                setOrderNumber(Math.floor(10000 + Math.random() * 90000));
+                              }}
+                              className="py-2.5 px-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs shadow-md shadow-blue-500/20 transition-all text-center"
+                            >
+                              Виробництво
+                            </button>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   );
