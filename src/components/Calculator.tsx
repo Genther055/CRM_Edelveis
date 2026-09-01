@@ -4549,56 +4549,58 @@ export const Calculator: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Postpress Options Section (Always Open, 2 Columns) */}
-                  <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-                    <div className="px-5 py-3.5 bg-slate-50/90 flex items-center justify-between border-b border-slate-200">
-                      <div className="flex items-center gap-2.5">
-                        <SlidersHorizontal size={18} className="text-blue-600" />
-                        <h4 className="text-sm font-bold text-slate-900 m-0">Післядрукарська обробка (Нормативи)</h4>
+                  {/* Side-by-Side 2 Columns (50% / 50%): Left = Postpress, Right = Materials Filter & Sets */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-stretch">
+                    {/* Left Column (50%): Післядрукарська обробка */}
+                    <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden flex flex-col h-full">
+                      <div className="px-5 py-3.5 bg-slate-50/90 flex items-center justify-between border-b border-slate-200">
+                        <div className="flex items-center gap-2.5">
+                          <SlidersHorizontal size={18} className="text-blue-600" />
+                          <h4 className="text-sm font-bold text-slate-900 m-0">Післядрукарська обробка (Нормативи)</h4>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setPostPersonalization('0'); setPostLuvers('0'); setPostLuversCount(1);
+                            setPostCorners('0'); setPostGluing('0'); setPostDrilling('0');
+                            setPostFolding('0'); setPostCreasing('0'); setPostPerforation('0');
+                            setPostPackingText('');
+                          }}
+                          className="text-xs font-semibold px-2.5 py-1 rounded-md bg-white border border-slate-200 text-slate-600 hover:text-red-600 hover:border-red-200 transition-colors shadow-2xs"
+                        >
+                          Очистити
+                        </button>
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setPostPersonalization('0'); setPostLuvers('0'); setPostLuversCount(1);
-                          setPostCorners('0'); setPostGluing('0'); setPostDrilling('0');
-                          setPostFolding('0'); setPostCreasing('0'); setPostPerforation('0');
-                          setPostPackingText('');
-                        }}
-                        className="text-xs font-semibold px-2.5 py-1 rounded-md bg-white border border-slate-200 text-slate-600 hover:text-red-600 hover:border-red-200 transition-colors shadow-2xs"
-                      >
-                        Очистити
-                      </button>
-                    </div>
 
-                    <div className="p-5 grid grid-cols-1 md:grid-cols-2 gap-4 bg-white">
-                      {/* 1. Персоналізація */}
+                      <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-3 bg-white flex-1">
+                        {/* 1. Персоналізація */}
                         <div>
-                          <label className="text-xs font-bold text-slate-700 block mb-1">Персоналізація</label>
-                          <select value={postPersonalization} onChange={(e) => setPostPersonalization(e.target.value)} className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold">
+                          <label className="text-[11px] font-bold text-slate-700 block mb-1">Персоналізація</label>
+                          <select value={postPersonalization} onChange={(e) => setPostPersonalization(e.target.value)} className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold">
                             <option value="0">Ні</option>
-                            <option value="1">Є — нумерація, змінні дані</option>
+                            <option value="1">Є — змінні дані</option>
                           </select>
                         </div>
 
                         {/* 2. Люверс */}
                         <div>
-                          <label className="text-xs font-bold text-slate-700 block mb-1">Люверс</label>
-                          <div className="flex gap-2">
-                            <select value={postLuvers} onChange={(e) => setPostLuvers(e.target.value)} className="flex-1 px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold">
+                          <label className="text-[11px] font-bold text-slate-700 block mb-1">Люверс</label>
+                          <div className="flex gap-1.5">
+                            <select value={postLuvers} onChange={(e) => setPostLuvers(e.target.value)} className="flex-1 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold">
                               <option value="0">Ні</option>
                               <option value="93">Золотий</option>
                               <option value="92">Срібний</option>
                             </select>
                             {postLuvers !== '0' && (
-                              <input type="number" value={postLuversCount} onChange={(e) => setPostLuversCount(parseInt(e.target.value) || 1)} min={1} className="w-16 px-2 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-center" />
+                              <input type="number" value={postLuversCount} onChange={(e) => setPostLuversCount(parseInt(e.target.value) || 1)} min={1} className="w-14 px-1.5 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-center" />
                             )}
                           </div>
                         </div>
 
                         {/* 3. Закруглення кутів */}
                         <div>
-                          <label className="text-xs font-bold text-slate-700 block mb-1">Закруглення кутів (0.035 ₴/шт)</label>
-                          <select value={postCorners} onChange={(e) => setPostCorners(e.target.value)} className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold">
+                          <label className="text-[11px] font-bold text-slate-700 block mb-1">Закруглення кутів</label>
+                          <select value={postCorners} onChange={(e) => setPostCorners(e.target.value)} className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold">
                             <option value="0">Ні</option>
                             <option value="4">4 кути</option>
                             <option value="1">1 кут</option>
@@ -4609,17 +4611,16 @@ export const Calculator: React.FC = () => {
 
                         {/* 4. Проклейка в блок */}
                         <div>
-                          <label className="text-xs font-bold text-slate-700 block mb-1">Проклейка в блок</label>
-                          <div className="flex gap-2">
-                            <select value={postGluing} onChange={(e) => setPostGluing(e.target.value)} className="flex-1 px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold">
+                          <label className="text-[11px] font-bold text-slate-700 block mb-1">Проклейка в блок</label>
+                          <div className="flex gap-1.5">
+                            <select value={postGluing} onChange={(e) => setPostGluing(e.target.value)} className="flex-1 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold">
                               <option value="0">Ні</option>
                               <option value="25">25 листів</option>
                               <option value="50">50 листів</option>
                               <option value="100">100 листів</option>
-                              <option value="250">250 листів</option>
                             </select>
                             {postGluing !== '0' && (
-                              <select value={postGluingSide} onChange={(e) => setPostGluingSide(e.target.value)} className="w-28 px-2 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold">
+                              <select value={postGluingSide} onChange={(e) => setPostGluingSide(e.target.value)} className="w-24 px-1.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold">
                                 <option value="1">По короткій</option>
                                 <option value="2">По довгій</option>
                               </select>
@@ -4629,9 +4630,9 @@ export const Calculator: React.FC = () => {
 
                         {/* 5. Свердління */}
                         <div>
-                          <label className="text-xs font-bold text-slate-700 block mb-1">Свердління</label>
-                          <div className="flex gap-2">
-                            <select value={postDrilling} onChange={(e) => setPostDrilling(e.target.value)} className="flex-1 px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold">
+                          <label className="text-[11px] font-bold text-slate-700 block mb-1">Свердління</label>
+                          <div className="flex gap-1.5">
+                            <select value={postDrilling} onChange={(e) => setPostDrilling(e.target.value)} className="flex-1 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold">
                               <option value="0">Ні</option>
                               <option value="1">1 отвір</option>
                               <option value="2">2 отвори</option>
@@ -4639,11 +4640,10 @@ export const Calculator: React.FC = () => {
                               <option value="4">4 отвори</option>
                             </select>
                             {postDrilling !== '0' && (
-                              <select value={postDrillingDia} onChange={(e) => setPostDrillingDia(e.target.value)} className="w-24 px-2 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold">
+                              <select value={postDrillingDia} onChange={(e) => setPostDrillingDia(e.target.value)} className="w-20 px-1.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold">
                                 <option value="3">Ø 3 мм</option>
                                 <option value="4">Ø 4 мм</option>
                                 <option value="5">Ø 5 мм</option>
-                                <option value="6">Ø 6 мм</option>
                               </select>
                             )}
                           </div>
@@ -4651,22 +4651,19 @@ export const Calculator: React.FC = () => {
 
                         {/* 6. Згинання (Фальцовка) */}
                         <div>
-                          <label className="text-xs font-bold text-slate-700 block mb-1">Згинання / Фальцовка (0.122 ₴/згин)</label>
-                          <div className="flex gap-2">
-                            <select value={postFolding} onChange={(e) => setPostFolding(e.target.value)} className="flex-1 px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold">
+                          <label className="text-[11px] font-bold text-slate-700 block mb-1">Згинання / Фальцовка</label>
+                          <div className="flex gap-1.5">
+                            <select value={postFolding} onChange={(e) => setPostFolding(e.target.value)} className="flex-1 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold">
                               <option value="0">Ні</option>
-                              <option value="1">1 Згинання — навпіл</option>
-                              <option value="121">1 Згинання — асиметричне</option>
-                              <option value="21">2 Згинання — намотка</option>
-                              <option value="22">2 Згинання — гармошка</option>
-                              <option value="23">2 Згинання — вікно</option>
-                              <option value="34">2 Згинання — комбіноване</option>
-                              <option value="31">3 Згинання — намотка</option>
-                              <option value="32">3 Згинання — гармошка</option>
-                              <option value="33">3 Згинання — вікно</option>
-                              <option value="41">4 Згинання — намотка</option>
-                              <option value="42">4 Згинання — гармошка</option>
-                              <option value="52">5 Згинання — гармошка</option>
+                              <option value="1">1 Згинання (навпіл)</option>
+                              <option value="121">1 Згинання (асиметрія)</option>
+                              <option value="21">2 Згинання (намотка)</option>
+                              <option value="22">2 Згинання (гармошка)</option>
+                              <option value="23">2 Згинання (вікно)</option>
+                              <option value="31">3 Згинання (намотка)</option>
+                              <option value="32">3 Згинання (гармошка)</option>
+                              <option value="41">4 Згинання</option>
+                              <option value="52">5 Згинань</option>
                             </select>
                             {postFolding === '121' && (
                               <input
@@ -4674,7 +4671,7 @@ export const Calculator: React.FC = () => {
                                 value={postFoldingOffset}
                                 onChange={(e) => setPostFoldingOffset(e.target.value)}
                                 placeholder="мм"
-                                className="w-16 px-2 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-center"
+                                className="w-14 px-1.5 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-center"
                               />
                             )}
                           </div>
@@ -4682,10 +4679,10 @@ export const Calculator: React.FC = () => {
 
                         {/* 7. Біговка */}
                         <div>
-                          <label className="text-xs font-bold text-slate-700 block mb-1">Біговка (0.122 ₴/біг)</label>
-                          <select value={postCreasing} onChange={(e) => setPostCreasing(e.target.value)} className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold">
+                          <label className="text-[11px] font-bold text-slate-700 block mb-1">Біговка</label>
+                          <select value={postCreasing} onChange={(e) => setPostCreasing(e.target.value)} className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold">
                             <option value="0">Ні</option>
-                            {[1,2,3,4,5,6,7,8,9,10].map(n => (
+                            {[1,2,3,4,5,6].map(n => (
                               <option key={n} value={n.toString()}>{n} {n === 1 ? 'біг' : 'біги'}</option>
                             ))}
                           </select>
@@ -4693,193 +4690,187 @@ export const Calculator: React.FC = () => {
 
                         {/* 8. Перфорація */}
                         <div>
-                          <label className="text-xs font-bold text-slate-700 block mb-1">Перфорація</label>
-                          <select value={postPerforation} onChange={(e) => setPostPerforation(e.target.value)} className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold">
+                          <label className="text-[11px] font-bold text-slate-700 block mb-1">Перфорація</label>
+                          <select value={postPerforation} onChange={(e) => setPostPerforation(e.target.value)} className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold">
                             <option value="0">Ні</option>
-                            {[1,2,3,4,5,6,7,8,9,10].map(n => (
+                            {[1,2,3,4].map(n => (
                               <option key={n} value={n.toString()}>{n} {n === 1 ? 'прохід' : 'проходи'}</option>
                             ))}
                           </select>
                         </div>
 
-                        {/* 9. Розфасовка */}
-                        <div>
-                          <label className="text-xs font-bold text-slate-700 block mb-1">Розфасовка (упаковка)</label>
+                        {/* 9. Розфасовка (full span in left card) */}
+                        <div className="sm:col-span-2">
+                          <label className="text-[11px] font-bold text-slate-700 block mb-1">Розфасовка (упаковка)</label>
                           <input
                             type="text"
                             value={postPackingText}
                             onChange={(e) => setPostPackingText(e.target.value)}
                             placeholder="наприклад: по 100, 200 шт"
-                            className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold"
+                            className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold"
                           />
                         </div>
                       </div>
-                  </div>
-
-                  {/* Sets Counter Bar */}
-                  <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex items-center justify-between flex-wrap gap-4">
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">Комплектів макетів:</span>
-                      <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-lg border border-slate-200">
-                        <button
-                          type="button"
-                          onClick={() => setSheetSetsCount(prev => Math.max(1, prev - 1))}
-                          className="w-7 h-7 rounded-md bg-white border border-slate-200 text-slate-700 font-bold hover:bg-slate-50 flex items-center justify-center transition-colors"
-                        >
-                          -
-                        </button>
-                        <input
-                          type="number"
-                          value={sheetSetsCount}
-                          onChange={(e) => setSheetSetsCount(parseInt(e.target.value) || 1)}
-                          className="w-12 h-7 rounded-md border border-slate-200 bg-white text-center font-bold text-xs"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setSheetSetsCount(prev => prev + 1)}
-                          className="w-7 h-7 rounded-md bg-white border border-slate-200 text-slate-700 font-bold hover:bg-slate-50 flex items-center justify-center transition-colors"
-                        >
-                          +
-                        </button>
-                      </div>
-                    </div>
-                    <span className="text-xs text-slate-400 font-medium">
-                      (Кількість однакових замовлень з різними макетами)
-                    </span>
-                  </div>
-
-                  {/* Filter Options (Materials, Coating, Color Printing) */}
-                  <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-                    <div className="px-5 py-3.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
-                      <h4 className="text-sm font-bold text-slate-900 m-0">
-                        Фільтр специфікацій та матеріалів
-                      </h4>
-                      <span className="text-xs text-slate-500 font-medium">Оберіть параметри для формування матриці цін</span>
                     </div>
 
-                    <div className="flex flex-col divide-y divide-slate-100">
-                      {/* Row 1: Material Options */}
-                      <div className="flex flex-col md:flex-row">
-                        <div className="w-full md:w-36 bg-slate-50/70 p-3.5 border-b md:border-b-0 md:border-r border-slate-100 text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center">
-                          МАТЕРІАЛ:
+                    {/* Right Column (50%): Filter Options & Sets Counter */}
+                    <div className="flex flex-col gap-4">
+                      {/* Filter Options (Materials, Coating, Color Printing) */}
+                      <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden flex-1">
+                        <div className="px-5 py-3.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                          <h4 className="text-sm font-bold text-slate-900 m-0">
+                            Фільтр специфікацій та матеріалів
+                          </h4>
+                          <span className="text-xs text-slate-500 font-medium">Параметри матриці</span>
                         </div>
-                        <div className="flex-1 p-3.5 flex gap-1.5 flex-wrap items-center">
-                          {[
-                            { id: 'kraft_70', label: 'Крафт бурий 70' },
-                            { id: '80', label: 'Офсет 80' },
-                            { id: 'linen_300', label: 'Льон білий 300' },
-                            { id: 'tintoretto_crema', label: 'Tintoretto crema 300' },
-                            { id: 'tintoretto_gesso', label: 'Tintoretto gesso 300' },
-                            { id: 'stardream_opal', label: 'Stardream opal 285' },
-                            { id: 'stardream_diamond', label: 'Stardream diamond 285' },
-                            { id: 'stardream_topaz', label: 'Stardream topaz 285' },
-                            { id: '90', label: 'Крейда МАТ 90' },
-                            { id: '115', label: 'Крейда МАТ 115' },
-                            { id: '130', label: 'Крейда МАТ 130' },
-                            { id: '150', label: 'Крейда МАТ 150' },
-                            { id: '170', label: 'Крейда МАТ 170' },
-                            { id: '250', label: 'Крейда МАТ 250' },
-                            { id: '300', label: 'Крейда МАТ 300' },
-                            { id: '350', label: 'Крейда МАТ 350' },
-                            { id: '450', label: 'Крейда МАТ 450' }
-                          ].map(mat => {
-                            const isSel = selectedMaterials.includes(mat.id);
-                            return (
-                              <button
-                                key={mat.id}
-                                type="button"
-                                onClick={() => {
-                                  setSelectedMaterials(prev => 
-                                    prev.includes(mat.id) ? prev.filter(x => x !== mat.id) : [...prev, mat.id]
-                                  );
-                                }}
-                                className={`px-2.5 py-1 text-xs font-semibold rounded-lg border transition-all ${
-                                  isSel
-                                    ? 'bg-blue-600 text-white border-blue-600 shadow-sm font-bold'
-                                    : 'bg-slate-100 hover:bg-slate-200/80 text-slate-700 border-slate-200/60'
-                                }`}
-                              >
-                                {mat.label}
-                              </button>
-                            );
-                          })}
+
+                        <div className="flex flex-col divide-y divide-slate-100">
+                          {/* Row 1: Material Options */}
+                          <div className="p-3.5 flex flex-col gap-2">
+                            <span className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">МАТЕРІАЛ:</span>
+                            <div className="flex gap-1.5 flex-wrap items-center">
+                              {[
+                                { id: 'kraft_70', label: 'Крафт 70' },
+                                { id: '80', label: 'Офсет 80' },
+                                { id: 'linen_300', label: 'Льон 300' },
+                                { id: 'tintoretto_crema', label: 'Tintoretto 300' },
+                                { id: 'stardream_opal', label: 'Stardream 285' },
+                                { id: '90', label: 'Крейда МАТ 90' },
+                                { id: '115', label: 'Крейда МАТ 115' },
+                                { id: '130', label: 'Крейда МАТ 130' },
+                                { id: '150', label: 'Крейда МАТ 150' },
+                                { id: '170', label: 'Крейда МАТ 170' },
+                                { id: '250', label: 'Крейда МАТ 250' },
+                                { id: '300', label: 'Крейда МАТ 300' },
+                                { id: '350', label: 'Крейда МАТ 350' },
+                                { id: '450', label: 'Крейда МАТ 450' }
+                              ].map(mat => {
+                                const isSel = selectedMaterials.includes(mat.id);
+                                return (
+                                  <button
+                                    key={mat.id}
+                                    type="button"
+                                    onClick={() => {
+                                      setSelectedMaterials(prev => 
+                                        prev.includes(mat.id) ? prev.filter(x => x !== mat.id) : [...prev, mat.id]
+                                      );
+                                    }}
+                                    className={`px-2 py-1 text-[11px] font-semibold rounded-lg border transition-all ${
+                                      isSel
+                                        ? 'bg-blue-600 text-white border-blue-600 shadow-2xs font-bold'
+                                        : 'bg-slate-100 hover:bg-slate-200/80 text-slate-700 border-slate-200/60'
+                                    }`}
+                                  >
+                                    {mat.label}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+
+                          {/* Row 2: Coating Options */}
+                          <div className="p-3.5 flex flex-col gap-2">
+                            <span className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">ПОКРИТТЯ:</span>
+                            <div className="flex gap-1.5 flex-wrap items-center">
+                              {[
+                                { id: '0', label: 'БП' },
+                                { id: '7', label: 'ГЛ лам 1+0' },
+                                { id: '8', label: 'ГЛ лам 1+1' },
+                                { id: '9', label: 'МАТ лам 1+0' },
+                                { id: '10', label: 'МАТ лам 1+1' },
+                                { id: '30', label: 'SOFT лам 1+0' },
+                                { id: '31', label: 'SOFT лам 1+1' },
+                                { id: 'uv_10', label: 'УФ ЛАК 1+0' },
+                                { id: 'uv_11', label: 'УФ ЛАК 1+1' }
+                              ].map(cov => {
+                                const isSel = selectedCoverings.includes(cov.id);
+                                return (
+                                  <button
+                                    key={cov.id}
+                                    type="button"
+                                    onClick={() => {
+                                      setSelectedCoverings(prev => 
+                                        prev.includes(cov.id) ? prev.filter(x => x !== cov.id) : [...prev, cov.id]
+                                      );
+                                    }}
+                                    className={`px-2 py-1 text-[11px] font-semibold rounded-lg border transition-all ${
+                                      isSel
+                                        ? 'bg-blue-600 text-white border-blue-600 shadow-2xs font-bold'
+                                        : 'bg-slate-100 hover:bg-slate-200/80 text-slate-700 border-slate-200/60'
+                                    }`}
+                                  >
+                                    {cov.label}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+
+                          {/* Row 3: Color Printing Options */}
+                          <div className="p-3.5 flex flex-col gap-2">
+                            <span className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">ДРУК:</span>
+                            <div className="flex gap-1.5 flex-wrap items-center">
+                              {[
+                                { id: '4+0', label: 'Односторонній 4+0' },
+                                { id: '4+4', label: 'Двосторонній 4+4' },
+                                { id: '1+0', label: 'Одноколірний 1+0' },
+                                { id: '1+1', label: 'Одноколірний 1+1' }
+                              ].map(col => {
+                                const isSel = selectedPrintColors.includes(col.id);
+                                return (
+                                  <button
+                                    key={col.id}
+                                    type="button"
+                                    onClick={() => {
+                                      setSelectedPrintColors(prev => 
+                                        prev.includes(col.id) ? prev.filter(x => x !== col.id) : [...prev, col.id]
+                                      );
+                                    }}
+                                    className={`px-2.5 py-1 text-xs font-semibold rounded-lg border transition-all ${
+                                      isSel
+                                        ? 'bg-blue-600 text-white border-blue-600 shadow-2xs font-bold'
+                                        : 'bg-slate-100 hover:bg-slate-200/80 text-slate-700 border-slate-200/60'
+                                    }`}
+                                  >
+                                    {col.label}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
                         </div>
                       </div>
 
-                      {/* Row 2: Coating Options */}
-                      <div className="flex flex-col md:flex-row">
-                        <div className="w-full md:w-36 bg-slate-50/70 p-3.5 border-b md:border-b-0 md:border-r border-slate-100 text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center">
-                          ПОКРИТТЯ:
+                      {/* Sets Counter Bar */}
+                      <div className="bg-white border border-slate-200 rounded-xl p-3.5 shadow-sm flex items-center justify-between flex-wrap gap-4">
+                        <div className="flex items-center gap-3">
+                          <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">Комплектів макетів:</span>
+                          <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-lg border border-slate-200">
+                            <button
+                              type="button"
+                              onClick={() => setSheetSetsCount(prev => Math.max(1, prev - 1))}
+                              className="w-7 h-7 rounded-md bg-white border border-slate-200 text-slate-700 font-bold hover:bg-slate-50 flex items-center justify-center transition-colors"
+                            >
+                              -
+                            </button>
+                            <input
+                              type="number"
+                              value={sheetSetsCount}
+                              onChange={(e) => setSheetSetsCount(parseInt(e.target.value) || 1)}
+                              className="w-12 h-7 rounded-md border border-slate-200 bg-white text-center font-bold text-xs"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setSheetSetsCount(prev => prev + 1)}
+                              className="w-7 h-7 rounded-md bg-white border border-slate-200 text-slate-700 font-bold hover:bg-slate-50 flex items-center justify-center transition-colors"
+                            >
+                              +
+                            </button>
+                          </div>
                         </div>
-                        <div className="flex-1 p-3.5 flex gap-1.5 flex-wrap items-center">
-                          {[
-                            { id: '0', label: 'БП' },
-                            { id: '7', label: 'ГЛ лам 1+0' },
-                            { id: '8', label: 'ГЛ лам 1+1' },
-                            { id: '9', label: 'МАТ лам 1+0' },
-                            { id: '10', label: 'МАТ лам 1+1' },
-                            { id: '30', label: 'SOFT лам 1+0' },
-                            { id: '31', label: 'SOFT лам 1+1' },
-                            { id: 'uv_10', label: 'УФ ЛАК 1+0' },
-                            { id: 'uv_11', label: 'УФ ЛАК 1+1' },
-                            { id: 'gibrid_10', label: 'Гібрид 1+0' }
-                          ].map(cov => {
-                            const isSel = selectedCoverings.includes(cov.id);
-                            return (
-                              <button
-                                key={cov.id}
-                                type="button"
-                                onClick={() => {
-                                  setSelectedCoverings(prev => 
-                                    prev.includes(cov.id) ? prev.filter(x => x !== cov.id) : [...prev, cov.id]
-                                  );
-                                }}
-                                className={`px-2.5 py-1 text-xs font-semibold rounded-lg border transition-all ${
-                                  isSel
-                                    ? 'bg-blue-600 text-white border-blue-600 shadow-sm font-bold'
-                                    : 'bg-slate-100 hover:bg-slate-200/80 text-slate-700 border-slate-200/60'
-                                }`}
-                              >
-                                {cov.label}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-
-                      {/* Row 3: Color Printing Options */}
-                      <div className="flex flex-col md:flex-row">
-                        <div className="w-full md:w-36 bg-slate-50/70 p-3.5 border-b md:border-b-0 md:border-r border-slate-100 text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center">
-                          ДРУК:
-                        </div>
-                        <div className="flex-1 p-3.5 flex gap-1.5 flex-wrap items-center">
-                          {[
-                            { id: '4+0', label: 'Односторонній 4+0' },
-                            { id: '4+4', label: 'Двосторонній 4+4' },
-                            { id: '1+0', label: 'Одноколірний 1+0' },
-                            { id: '1+1', label: 'Одноколірний 1+1' }
-                          ].map(col => {
-                            const isSel = selectedPrintColors.includes(col.id);
-                            return (
-                              <button
-                                key={col.id}
-                                type="button"
-                                onClick={() => {
-                                  setSelectedPrintColors(prev => 
-                                    prev.includes(col.id) ? prev.filter(x => x !== col.id) : [...prev, col.id]
-                                  );
-                                }}
-                                className={`px-2.5 py-1 text-xs font-semibold rounded-lg border transition-all ${
-                                  isSel
-                                    ? 'bg-blue-600 text-white border-blue-600 shadow-sm font-bold'
-                                    : 'bg-slate-100 hover:bg-slate-200/80 text-slate-700 border-slate-200/60'
-                                }`}
-                              >
-                                {col.label}
-                              </button>
-                            );
-                          })}
-                        </div>
+                        <span className="text-xs text-slate-400 font-medium">
+                          (Кількість однакових замовлень)
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -7023,35 +7014,37 @@ export const Calculator: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Section: Післядрукарська обробка (Нормативи) */}
-                  <div className="ios-card bg-white overflow-hidden">
-                    <div className="w-full px-5 py-3.5 flex items-center justify-between bg-slate-50/90 border-b border-slate-200">
-                      <div className="flex items-center gap-2">
-                        <SlidersHorizontal size={16} className="text-blue-600" />
-                        <span className="text-xs font-extrabold uppercase tracking-wider text-slate-800">Післядрукарська обробка (Нормативи)</span>
-                        {(digitalSheetCornerCurve !== '0' || digitalSheetDrilling !== '0' || digitalSheetLuvers !== '0' || digitalSheetPersonalization !== '0' || digitalSheetFolding !== '0' || digitalSheetGluingBlock !== '0') && (
-                          <span className="ios-badge-blue text-[10px] px-2 py-0.5 rounded-full font-bold">Опції обрано</span>
-                        )}
+                  {/* Side-by-Side 2 Columns (50% / 50%): Left = Postpress, Right = Materials Filter & Sets */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-stretch">
+                    {/* Left Column (50%): Післядрукарська обробка */}
+                    <div className="ios-card bg-white overflow-hidden flex flex-col h-full">
+                      <div className="w-full px-5 py-3.5 flex items-center justify-between bg-slate-50/90 border-b border-slate-200">
+                        <div className="flex items-center gap-2">
+                          <SlidersHorizontal size={16} className="text-blue-600" />
+                          <span className="text-xs font-extrabold uppercase tracking-wider text-slate-800">Післядрукарська обробка (Нормативи)</span>
+                          {(digitalSheetCornerCurve !== '0' || digitalSheetDrilling !== '0' || digitalSheetLuvers !== '0' || digitalSheetPersonalization !== '0' || digitalSheetFolding !== '0' || digitalSheetGluingBlock !== '0') && (
+                            <span className="ios-badge-blue text-[10px] px-2 py-0.5 rounded-full font-bold">Опції обрано</span>
+                          )}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setDigitalSheetCornerCurve('0');
+                            setDigitalSheetDrilling('0');
+                            setDigitalSheetLuvers('0');
+                            setDigitalSheetPersonalization('0');
+                            setDigitalSheetFolding('0');
+                            setDigitalSheetGluingBlock('0');
+                          }}
+                          className="px-2.5 py-1 rounded-md bg-white border border-slate-200 text-slate-600 hover:text-red-600 text-[11px] font-semibold transition-colors shadow-2xs"
+                        >
+                          Очистити
+                        </button>
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setDigitalSheetCornerCurve('0');
-                          setDigitalSheetDrilling('0');
-                          setDigitalSheetLuvers('0');
-                          setDigitalSheetPersonalization('0');
-                          setDigitalSheetFolding('0');
-                          setDigitalSheetGluingBlock('0');
-                        }}
-                        className="px-2.5 py-1 rounded-md bg-white border border-slate-200 text-slate-600 hover:text-red-600 text-[11px] font-semibold transition-colors shadow-2xs"
-                      >
-                        Очистити
-                      </button>
-                    </div>
 
-                    <div className="p-5 grid grid-cols-1 md:grid-cols-2 gap-4 bg-white">
-                      <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
-                        <label className="text-[11px] font-bold text-slate-600 block mb-1">Заокруглення кутів:</label>
+                      <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-3 bg-white flex-1">
+                        <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
+                          <label className="text-[11px] font-bold text-slate-600 block mb-1">Заокруглення кутів:</label>
                           <select
                             value={digitalSheetCornerCurve}
                             onChange={(e) => setDigitalSheetCornerCurve(e.target.value)}
@@ -7133,177 +7126,171 @@ export const Calculator: React.FC = () => {
                           </select>
                         </div>
                       </div>
-                  </div>
-
-                  {/* Section: КОМПЛЕКТІВ МАКЕТІВ Bar */}
-                  <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex items-center justify-between flex-wrap gap-4">
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs font-extrabold uppercase text-slate-800">КОМПЛЕКТІВ МАКЕТІВ:</span>
-                      <div className="flex items-center gap-1">
-                        <button
-                          type="button"
-                          onClick={() => setDigitalSheetSets(Math.max(1, digitalSheetSets - 1))}
-                          className="w-7 h-7 rounded-md bg-white border border-slate-200 text-slate-700 font-bold hover:bg-slate-50 flex items-center justify-center transition-colors"
-                        >
-                          -
-                        </button>
-                        <input
-                          type="number"
-                          value={digitalSheetSets}
-                          onChange={(e) => setDigitalSheetSets(Math.max(1, parseInt(e.target.value) || 1))}
-                          className="w-12 h-7 text-center rounded-md border border-slate-200 font-bold text-xs"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setDigitalSheetSets(digitalSheetSets + 1)}
-                          className="w-7 h-7 rounded-md bg-white border border-slate-200 text-slate-700 font-bold hover:bg-slate-50 flex items-center justify-center transition-colors"
-                        >
-                          +
-                        </button>
-                      </div>
-                    </div>
-                    <span className="text-xs text-slate-400 font-medium">
-                      (Кількість однакових замовлень з різними макетами)
-                    </span>
-                  </div>
-
-                  {/* Section: Фільтр специфікацій та матеріалів (Exact CRM Offset Pill Buttons) */}
-                  <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-                    <div className="px-5 py-3.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
-                      <h4 className="text-sm font-bold text-slate-900 m-0">
-                        Фільтр специфікацій та матеріалів
-                      </h4>
-                      <span className="text-xs text-slate-500 font-medium">Оберіть параметри для формування матриці цін</span>
                     </div>
 
-                    <div className="flex flex-col divide-y divide-slate-100">
-                      {/* Row 1: Material Options */}
-                      <div className="flex flex-col md:flex-row">
-                        <div className="w-full md:w-36 bg-slate-50/70 p-3.5 border-b md:border-b-0 md:border-r border-slate-100 text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center">
-                          МАТЕРІАЛ:
+                    {/* Right Column (50%): Filter & Sets Counter */}
+                    <div className="flex flex-col gap-4">
+                      {/* Section: Фільтр специфікацій та матеріалів (Exact CRM Offset Pill Buttons) */}
+                      <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden flex-1">
+                        <div className="px-5 py-3.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                          <h4 className="text-sm font-bold text-slate-900 m-0">
+                            Фільтр специфікацій та матеріалів
+                          </h4>
+                          <span className="text-xs text-slate-500 font-medium">Параметри матриці</span>
                         </div>
-                        <div className="flex-1 p-3.5 flex gap-1.5 flex-wrap items-center">
-                          {[
-                            { id: 'kraft_70', label: 'Крафт бурий 70' },
-                            { id: '80', label: 'Офсет 80' },
-                            { id: 'linen_300', label: 'Льон білий 300' },
-                            { id: 'tintoretto_crema', label: 'Tintoretto crema 300' },
-                            { id: 'tintoretto_gesso', label: 'Tintoretto gesso 300' },
-                            { id: 'stardream_opal', label: 'Stardream opal 285' },
-                            { id: 'stardream_diamond', label: 'Stardream diamond 285' },
-                            { id: 'stardream_topaz', label: 'Stardream topaz 285' },
-                            { id: '90', label: 'Крейда МАТ 90' },
-                            { id: '115', label: 'Крейда МАТ 115' },
-                            { id: '130', label: 'Крейда МАТ 130' },
-                            { id: '150', label: 'Крейда МАТ 150' },
-                            { id: '170', label: 'Крейда МАТ 170' },
-                            { id: '250', label: 'Крейда МАТ 250' },
-                            { id: '300', label: 'Крейда МАТ 300' },
-                            { id: '350', label: 'Крейда МАТ 350' },
-                            { id: '450', label: 'Крейда МАТ 450' },
-                            { id: 'raflatac', label: 'Самоклейка Raflatac' }
-                          ].map(mat => {
-                            const isSel = digitalSelectedMaterials.includes(mat.id);
-                            return (
-                              <button
-                                key={mat.id}
-                                type="button"
-                                onClick={() => {
-                                  setDigitalSelectedMaterials(prev => 
-                                    prev.includes(mat.id) ? prev.filter(x => x !== mat.id) : [...prev, mat.id]
-                                  );
-                                }}
-                                className={`px-2.5 py-1 text-xs font-semibold rounded-lg border transition-all ${
-                                  isSel
-                                    ? 'bg-blue-600 text-white border-blue-600 shadow-sm font-bold'
-                                    : 'bg-slate-100 hover:bg-slate-200/80 text-slate-700 border-slate-200/60'
-                                }`}
-                              >
-                                {mat.label}
-                              </button>
-                            );
-                          })}
+
+                        <div className="flex flex-col divide-y divide-slate-100">
+                          {/* Row 1: Material Options */}
+                          <div className="p-3.5 flex flex-col gap-2">
+                            <span className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">МАТЕРІАЛ:</span>
+                            <div className="flex gap-1.5 flex-wrap items-center">
+                              {[
+                                { id: 'kraft_70', label: 'Крафт 70' },
+                                { id: '80', label: 'Офсет 80' },
+                                { id: 'linen_300', label: 'Льон 300' },
+                                { id: 'tintoretto_crema', label: 'Tintoretto 300' },
+                                { id: 'stardream_opal', label: 'Stardream 285' },
+                                { id: '90', label: 'Крейда МАТ 90' },
+                                { id: '115', label: 'Крейда МАТ 115' },
+                                { id: '130', label: 'Крейда МАТ 130' },
+                                { id: '150', label: 'Крейда МАТ 150' },
+                                { id: '170', label: 'Крейда МАТ 170' },
+                                { id: '250', label: 'Крейда МАТ 250' },
+                                { id: '300', label: 'Крейда МАТ 300' },
+                                { id: '350', label: 'Крейда МАТ 350' },
+                                { id: '450', label: 'Крейда МАТ 450' },
+                                { id: 'raflatac', label: 'Raflatac' }
+                              ].map(mat => {
+                                const isSel = digitalSelectedMaterials.includes(mat.id);
+                                return (
+                                  <button
+                                    key={mat.id}
+                                    type="button"
+                                    onClick={() => {
+                                      setDigitalSelectedMaterials(prev => 
+                                        prev.includes(mat.id) ? prev.filter(x => x !== mat.id) : [...prev, mat.id]
+                                      );
+                                    }}
+                                    className={`px-2 py-1 text-[11px] font-semibold rounded-lg border transition-all ${
+                                      isSel
+                                        ? 'bg-blue-600 text-white border-blue-600 shadow-2xs font-bold'
+                                        : 'bg-slate-100 hover:bg-slate-200/80 text-slate-700 border-slate-200/60'
+                                    }`}
+                                  >
+                                    {mat.label}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+
+                          {/* Row 2: Coating Options */}
+                          <div className="p-3.5 flex flex-col gap-2">
+                            <span className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">ПОКРИТТЯ:</span>
+                            <div className="flex gap-1.5 flex-wrap items-center">
+                              {[
+                                { id: '0', label: 'БП' },
+                                { id: '7', label: 'ГЛ лам 1+0' },
+                                { id: '8', label: 'ГЛ лам 1+1' },
+                                { id: '9', label: 'МАТ лам 1+0' },
+                                { id: '10', label: 'МАТ лам 1+1' },
+                                { id: '30', label: 'SOFT лам 1+0' },
+                                { id: '31', label: 'SOFT лам 1+1' },
+                                { id: 'uv_10', label: 'УФ ЛАК 1+0' },
+                                { id: 'uv_11', label: 'УФ ЛАК 1+1' }
+                              ].map(cov => {
+                                const isSel = digitalSelectedCoverings.includes(cov.id);
+                                return (
+                                  <button
+                                    key={cov.id}
+                                    type="button"
+                                    onClick={() => {
+                                      setDigitalSelectedCoverings(prev => 
+                                        prev.includes(cov.id) ? prev.filter(x => x !== cov.id) : [...prev, cov.id]
+                                      );
+                                    }}
+                                    className={`px-2 py-1 text-[11px] font-semibold rounded-lg border transition-all ${
+                                      isSel
+                                        ? 'bg-blue-600 text-white border-blue-600 shadow-2xs font-bold'
+                                        : 'bg-slate-100 hover:bg-slate-200/80 text-slate-700 border-slate-200/60'
+                                    }`}
+                                  >
+                                    {cov.label}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+
+                          {/* Row 3: Color Printing Options */}
+                          <div className="p-3.5 flex flex-col gap-2">
+                            <span className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">ДРУК:</span>
+                            <div className="flex gap-1.5 flex-wrap items-center">
+                              {[
+                                { id: '4+0', label: 'Односторонній 4+0' },
+                                { id: '4+4', label: 'Двосторонній 4+4' },
+                                { id: '1+0', label: 'Одноколірний 1+0' },
+                                { id: '1+1', label: 'Одноколірний 1+1' },
+                                { id: 'white_10', label: 'WHITE 1+0' },
+                                { id: 'white_11', label: 'WHITE 1+1' },
+                                { id: 'white_50', label: '5+0 WHITE+CMYK' },
+                                { id: 'white_55', label: '5+5 WHITE+CMYK' },
+                              ].map(col => {
+                                const isSel = digitalSelectedPrints.includes(col.id);
+                                return (
+                                  <button
+                                    key={col.id}
+                                    type="button"
+                                    onClick={() => {
+                                      setDigitalSelectedPrints(prev => 
+                                        prev.includes(col.id) ? prev.filter(x => x !== col.id) : [...prev, col.id]
+                                      );
+                                    }}
+                                    className={`px-2.5 py-1 text-xs font-semibold rounded-lg border transition-all ${
+                                      isSel
+                                        ? 'bg-blue-600 text-white border-blue-600 shadow-2xs font-bold'
+                                        : 'bg-slate-100 hover:bg-slate-200/80 text-slate-700 border-slate-200/60'
+                                    }`}
+                                  >
+                                    {col.label}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
                         </div>
                       </div>
 
-                      {/* Row 2: Coating Options */}
-                      <div className="flex flex-col md:flex-row">
-                        <div className="w-full md:w-36 bg-slate-50/70 p-3.5 border-b md:border-b-0 md:border-r border-slate-100 text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center">
-                          ПОКРИТТЯ:
+                      {/* Section: КОМПЛЕКТІВ МАКЕТІВ Bar */}
+                      <div className="bg-white border border-slate-200 rounded-xl p-3.5 shadow-sm flex items-center justify-between flex-wrap gap-4">
+                        <div className="flex items-center gap-3">
+                          <span className="text-xs font-extrabold uppercase text-slate-800">КОМПЛЕКТІВ МАКЕТІВ:</span>
+                          <div className="flex items-center gap-1">
+                            <button
+                              type="button"
+                              onClick={() => setDigitalSheetSets(Math.max(1, digitalSheetSets - 1))}
+                              className="w-7 h-7 rounded-md bg-white border border-slate-200 text-slate-700 font-bold hover:bg-slate-50 flex items-center justify-center transition-colors"
+                            >
+                              -
+                            </button>
+                            <input
+                              type="number"
+                              value={digitalSheetSets}
+                              onChange={(e) => setDigitalSheetSets(Math.max(1, parseInt(e.target.value) || 1))}
+                              className="w-12 h-7 text-center rounded-md border border-slate-200 font-bold text-xs"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setDigitalSheetSets(digitalSheetSets + 1)}
+                              className="w-7 h-7 rounded-md bg-white border border-slate-200 text-slate-700 font-bold hover:bg-slate-50 flex items-center justify-center transition-colors"
+                            >
+                              +
+                            </button>
+                          </div>
                         </div>
-                        <div className="flex-1 p-3.5 flex gap-1.5 flex-wrap items-center">
-                          {[
-                            { id: '0', label: 'БП' },
-                            { id: '7', label: 'ГЛ лам 1+0' },
-                            { id: '8', label: 'ГЛ лам 1+1' },
-                            { id: '9', label: 'МАТ лам 1+0' },
-                            { id: '10', label: 'МАТ лам 1+1' },
-                            { id: '30', label: 'SOFT лам 1+0' },
-                            { id: '31', label: 'SOFT лам 1+1' },
-                            { id: 'uv_10', label: 'УФ ЛАК 1+0' },
-                            { id: 'uv_11', label: 'УФ ЛАК 1+1' },
-                            { id: 'gibrid_10', label: 'Гібрид 1+0' }
-                          ].map(cov => {
-                            const isSel = digitalSelectedCoverings.includes(cov.id);
-                            return (
-                              <button
-                                key={cov.id}
-                                type="button"
-                                onClick={() => {
-                                  setDigitalSelectedCoverings(prev => 
-                                    prev.includes(cov.id) ? prev.filter(x => x !== cov.id) : [...prev, cov.id]
-                                  );
-                                }}
-                                className={`px-2.5 py-1 text-xs font-semibold rounded-lg border transition-all ${
-                                  isSel
-                                    ? 'bg-blue-600 text-white border-blue-600 shadow-sm font-bold'
-                                    : 'bg-slate-100 hover:bg-slate-200/80 text-slate-700 border-slate-200/60'
-                                }`}
-                              >
-                                {cov.label}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-
-                      {/* Row 3: Color Printing Options */}
-                      <div className="flex flex-col md:flex-row">
-                        <div className="w-full md:w-36 bg-slate-50/70 p-3.5 border-b md:border-b-0 md:border-r border-slate-100 text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center">
-                          ДРУК:
-                        </div>
-                        <div className="flex-1 p-3.5 flex gap-1.5 flex-wrap items-center">
-                          {[
-                            { id: '4+0', label: 'Односторонній 4+0' },
-                            { id: '4+4', label: 'Двосторонній 4+4' },
-                            { id: '1+0', label: 'Одноколірний 1+0' },
-                            { id: '1+1', label: 'Одноколірний 1+1' },
-                            { id: 'white_10', label: 'WHITE 1+0' },
-                            { id: 'white_11', label: 'WHITE 1+1' },
-                            { id: 'white_50', label: '5+0 WHITE+CMYK' },
-                            { id: 'white_55', label: '5+5 WHITE+CMYK' },
-                          ].map(col => {
-                            const isSel = digitalSelectedPrints.includes(col.id);
-                            return (
-                              <button
-                                key={col.id}
-                                type="button"
-                                onClick={() => {
-                                  setDigitalSelectedPrints(prev => 
-                                    prev.includes(col.id) ? prev.filter(x => x !== col.id) : [...prev, col.id]
-                                  );
-                                }}
-                                className={`px-2.5 py-1 text-xs font-semibold rounded-lg border transition-all ${
-                                  isSel
-                                    ? 'bg-blue-600 text-white border-blue-600 shadow-sm font-bold'
-                                    : 'bg-slate-100 hover:bg-slate-200/80 text-slate-700 border-slate-200/60'
-                                }`}
-                              >
-                                {col.label}
-                              </button>
-                            );
-                          })}
-                        </div>
+                        <span className="text-xs text-slate-400 font-medium">
+                          (Кількість однакових замовлень)
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -9775,45 +9762,47 @@ export const Calculator: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Section: Післядрукарська обробка (Нормативи) */}
-                  <div className="ios-card bg-white overflow-hidden">
-                    <div className="w-full px-5 py-3.5 flex items-center justify-between bg-slate-50/90 border-b border-slate-200">
-                      <div className="flex items-center gap-2">
-                        <SlidersHorizontal size={16} className="text-blue-600" />
-                        <span className="text-xs font-extrabold uppercase tracking-wider text-slate-800">
-                          Післядрукарська обробка та фурнітура (Нормативи)
-                        </span>
-                        {(wideLuvers !== 'none' || wideHemming !== 'none' || widePocket !== '0' || wideLamination !== '0' || widePlotterCut !== '0' || wideMilling !== '0' || wideHolders !== '0' || wideTape3M !== '0' || wideStretcher !== 'none') && (
-                          <span className="ios-badge-blue text-[10px] px-2 py-0.5 rounded-full font-bold">Опції активні</span>
-                        )}
+                  {/* Side-by-Side 2 Columns (50% / 50%): Left = Postpress & Hardware, Right = Materials Filter & Sets */}
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-stretch">
+                    {/* Left Column (50%): Післядрукарська обробка та фурнітура */}
+                    <div className="ios-card bg-white overflow-hidden flex flex-col h-full">
+                      <div className="w-full px-5 py-3.5 flex items-center justify-between bg-slate-50/90 border-b border-slate-200">
+                        <div className="flex items-center gap-2">
+                          <SlidersHorizontal size={16} className="text-blue-600" />
+                          <span className="text-xs font-extrabold uppercase tracking-wider text-slate-800">
+                            Післядрукарська обробка та фурнітура (Нормативи)
+                          </span>
+                          {(wideLuvers !== 'none' || wideHemming !== 'none' || widePocket !== '0' || wideLamination !== '0' || widePlotterCut !== '0' || wideMilling !== '0' || wideHolders !== '0' || wideTape3M !== '0' || wideStretcher !== 'none') && (
+                            <span className="ios-badge-blue text-[10px] px-2 py-0.5 rounded-full font-bold">Опції активні</span>
+                          )}
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setWideLuvers('none');
+                            setWideHemming('none');
+                            setWidePocket('0');
+                            setWideLamination('0');
+                            setWidePlotterCut('0');
+                            setWideMountFilm('0');
+                            setWideMilling('0');
+                            setWideHolders('0');
+                            setWideTape3M('0');
+                            setWideStretcher('none');
+                            setWideArtGel('0');
+                          }}
+                          className="px-2.5 py-1 rounded-md bg-white border border-slate-200 text-slate-600 hover:text-red-600 text-[11px] font-semibold transition-colors shadow-2xs"
+                        >
+                          Очистити
+                        </button>
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setWideLuvers('none');
-                          setWideHemming('none');
-                          setWidePocket('0');
-                          setWideLamination('0');
-                          setWidePlotterCut('0');
-                          setWideMountFilm('0');
-                          setWideMilling('0');
-                          setWideHolders('0');
-                          setWideTape3M('0');
-                          setWideStretcher('none');
-                          setWideArtGel('0');
-                        }}
-                        className="px-2.5 py-1 rounded-md bg-white border border-slate-200 text-slate-600 hover:text-red-600 text-[11px] font-semibold transition-colors shadow-2xs"
-                      >
-                        Очистити
-                      </button>
-                    </div>
 
-                    <div className="p-5 grid grid-cols-1 md:grid-cols-2 gap-4 bg-white">
-                      {/* Option 1: Люверси (Banners / Canvas) */}
-                      {(wideSubTab === 'banner' || wideSubTab === 'custom') && (
-                        <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
-                          <label className="text-[11px] font-bold text-slate-600 block mb-1">Встановлення люверсів:</label>
-                          <select
+                      <div className="p-4 grid grid-cols-1 sm:grid-cols-2 gap-3 bg-white flex-1">
+                        {/* Option 1: Люверси (Banners / Canvas) */}
+                        {(wideSubTab === 'banner' || wideSubTab === 'custom') && (
+                          <div className="bg-slate-50 p-2.5 rounded-xl border border-slate-200/60">
+                            <label className="text-[11px] font-bold text-slate-600 block mb-1">Встановлення люверсів:</label>
+                            <select
                             value={wideLuvers}
                             onChange={(e) => setWideLuvers(e.target.value)}
                               className="w-full bg-white border border-slate-200 rounded-lg px-2 py-1 text-xs font-bold text-slate-800"
@@ -10005,48 +9994,18 @@ export const Calculator: React.FC = () => {
                           </div>
                         )}
                       </div>
-                  </div>
-
-                  {/* Section: КОМПЛЕКТІВ МАКЕТІВ Bar */}
-                  <div className="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex items-center justify-between flex-wrap gap-4">
-                    <div className="flex items-center gap-3">
-                      <span className="text-xs font-extrabold uppercase text-slate-800">КОМПЛЕКТІВ МАКЕТІВ:</span>
-                      <div className="flex items-center gap-1">
-                        <button
-                          type="button"
-                          onClick={() => setWideSets(Math.max(1, wideSets - 1))}
-                          className="w-7 h-7 rounded-md bg-white border border-slate-200 text-slate-700 font-bold hover:bg-slate-50 flex items-center justify-center transition-colors"
-                        >
-                          -
-                        </button>
-                        <input
-                          type="number"
-                          value={wideSets}
-                          onChange={(e) => setWideSets(Math.max(1, parseInt(e.target.value) || 1))}
-                          className="w-12 h-7 text-center rounded-md border border-slate-200 font-bold text-xs"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setWideSets(wideSets + 1)}
-                          className="w-7 h-7 rounded-md bg-white border border-slate-200 text-slate-700 font-bold hover:bg-slate-50 flex items-center justify-center transition-colors"
-                        >
-                          +
-                        </button>
-                      </div>
                     </div>
-                    <span className="text-xs text-slate-400 font-medium">
-                      (Кількість однакових замовлень з різними макетами)
-                    </span>
-                  </div>
 
-                  {/* Section: Фільтр специфікацій та матеріалів (Pill Buttons) */}
-                  <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
-                    <div className="px-5 py-3.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
-                      <h4 className="text-sm font-bold text-slate-900 m-0">
-                        Фільтр специфікацій та матеріалів
-                      </h4>
-                      <span className="text-xs text-slate-500 font-medium">Оберіть параметри для формування матриці цін</span>
-                    </div>
+                    {/* Right Column (50%): Filter & Sets Counter */}
+                    <div className="flex flex-col gap-4">
+                      {/* Section: Фільтр специфікацій та матеріалів (Pill Buttons) */}
+                      <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden flex-1">
+                        <div className="px-5 py-3.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+                          <h4 className="text-sm font-bold text-slate-900 m-0">
+                            Фільтр специфікацій та матеріалів
+                          </h4>
+                          <span className="text-xs text-slate-500 font-medium">Параметри матриці</span>
+                        </div>
 
                     <div className="flex flex-col divide-y divide-slate-100">
                       {/* Row 1: Material Options */}
@@ -10220,6 +10179,40 @@ export const Calculator: React.FC = () => {
                       </div>
                     </div>
                   </div>
+
+                  {/* Section: КОМПЛЕКТІВ МАКЕТІВ Bar */}
+                    <div className="bg-white border border-slate-200 rounded-xl p-3.5 shadow-sm flex items-center justify-between flex-wrap gap-4">
+                      <div className="flex items-center gap-3">
+                        <span className="text-xs font-extrabold uppercase text-slate-800">КОМПЛЕКТІВ МАКЕТІВ:</span>
+                        <div className="flex items-center gap-1">
+                          <button
+                            type="button"
+                            onClick={() => setWideSets(Math.max(1, wideSets - 1))}
+                            className="w-7 h-7 rounded-md bg-white border border-slate-200 text-slate-700 font-bold hover:bg-slate-50 flex items-center justify-center transition-colors"
+                          >
+                            -
+                          </button>
+                          <input
+                            type="number"
+                            value={wideSets}
+                            onChange={(e) => setWideSets(Math.max(1, parseInt(e.target.value) || 1))}
+                            className="w-12 h-7 text-center rounded-md border border-slate-200 font-bold text-xs"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setWideSets(wideSets + 1)}
+                            className="w-7 h-7 rounded-md bg-white border border-slate-200 text-slate-700 font-bold hover:bg-slate-50 flex items-center justify-center transition-colors"
+                          >
+                            +
+                          </button>
+                        </div>
+                      </div>
+                      <span className="text-xs text-slate-400 font-medium">
+                        (Кількість однакових замовлень)
+                      </span>
+                    </div>
+                  </div>
+                </div>
 
                   {/* Price Calculation Matrix Table (Matching Exact Offset & Digital Design) */}
                   <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
