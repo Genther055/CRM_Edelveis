@@ -3266,7 +3266,7 @@ export const Calculator: React.FC = () => {
                 </button>
 
                 {[
-                  { key: 'products', label: 'Усі Продукти', count: 19 },
+                  { key: 'products', label: 'Усі Продукти', count: 18 },
                   { key: 'offset', label: 'Офсетний друк', badge: 'Авторозрахунок', count: 18 },
                   { key: 'digital', label: 'Цифровий друк', count: 11 },
                   { key: 'wide', label: 'Широкоформатний', count: 10 },
@@ -4251,7 +4251,6 @@ export const Calculator: React.FC = () => {
                 { title: 'Бланки та Листи', desc: 'Друк бланкової продукції на офсетному та самокопіювальному папері.', icon: <FileText size={30} style={{ color: 'var(--primary)' }} />, color: 'rgba(0, 122, 255, 0.1)', badgeClass: 'ios-badge-blue', badge: 'Бланки', cat: 'Бланки', metric: 'Офсет / самоклейка' },
                 { title: 'Візитки', desc: '90х50 мм або євро-формат, ламінація SoftTouch та скруглення кутів.', icon: <CreditCard size={30} style={{ color: '#5856d6' }} />, color: 'rgba(88, 86, 214, 0.1)', badgeClass: 'ios-badge-purple', badge: 'Візитки', cat: 'Візитки', metric: 'SoftTouch / Золото' },
                 { title: 'Буклети', desc: 'Рекламні буклети з 1, 2 або 3 фальцями (згинами).', icon: <BookOpen size={30} style={{ color: '#ff9500' }} />, color: 'rgba(255, 149, 0, 0.1)', badgeClass: 'ios-badge-orange', badge: 'Буклети', cat: 'Буклети', metric: '1-3 Фальці' },
-                { title: 'Дипломи випускні', desc: 'Святкові дипломи, почесні грамоти та сертифікати випускників.', icon: <Sparkles size={30} style={{ color: '#ffcc00' }} />, color: 'rgba(255, 204, 0, 0.15)', badgeClass: 'ios-badge-yellow', badge: 'Дипломи', cat: 'Дипломи випускні', metric: 'Сертифікати' },
                 { title: 'Календарики кишенькові', desc: 'Кишенькові календарики 70х100мм з двосторонньою ламінацією.', icon: <Calendar size={30} style={{ color: '#34c759' }} />, color: 'rgba(52, 199, 89, 0.1)', badgeClass: 'ios-badge-green', badge: 'Календарі', cat: 'Календарики кишенькові', metric: 'Ламінація 2+2' },
                 { title: 'Книги / Брошури', desc: 'Багатосторінкові книги на скобу, термоклей або м\'яку обкладинку.', icon: <BookOpen size={30} style={{ color: '#34c759' }} />, color: 'rgba(52, 199, 89, 0.1)', badgeClass: 'ios-badge-green', badge: 'Книги', cat: 'Книги', metric: 'Скоба / PUR клей' },
                 { title: 'Листівки', desc: 'Рекламні листівки А6, А5, А4 на крейдованому папері.', icon: <Image size={30} style={{ color: '#0ea5e9' }} />, color: 'rgba(14, 165, 233, 0.1)', badgeClass: 'ios-badge-blue', badge: 'Листівки', cat: 'Листівки', metric: 'А-формати' },
