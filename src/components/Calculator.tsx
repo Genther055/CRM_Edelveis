@@ -6465,7 +6465,10 @@ export const Calculator: React.FC = () => {
                                           itemCost = rawTotal / tir;
                                         }
 
-                                        const displayVal = priceCostVar === 'per_item' ? itemCost.toFixed(2) : Math.round(rawTotal).toString();
+                                        const isThreeDec = (itemCost * 100) % 1 !== 0;
+                                        const displayVal = priceCostVar === 'per_item'
+                                          ? (isThreeDec ? itemCost.toFixed(3) : itemCost.toFixed(2))
+                                          : Math.round(rawTotal).toString();
 
                                         const isSelectedCell = selectedSheetCalc && 
                                           selectedSheetCalc.matId === matId && 
@@ -6595,14 +6598,35 @@ export const Calculator: React.FC = () => {
                     const packCostPerItemAct = postPackingText.trim() ? (parsedPackSizeAct > 0 ? (4.5 / parsedPackSizeAct) : 0.045) : 0;
                     const postpressTotalPerItem = personalizationCost + luversCost + cornersCost + gluingCost + drillingCost + foldingCostPerItem + creasingCostPerItem + perforationCost + dieCutCostPerItem + packCostPerItemAct;
 
-                    const defPaperCost = hasMaterial ? areaM2 * (matDensity * 0.08) * tir : 0;
-                    const defPrintCost = hasMaterial ? (isDouble ? 0.35 : 0.20) * tir + (tir > 500 ? 80 : 120) : 0;
-                    const defLamCost = (hasMaterial && covId !== '0' && covId !== '') ? areaM2 * norms.laminationMattePrice * tir * (covId.includes('1+1') ? 2 : 1) : 0;
-                    const defPostCost = hasMaterial ? postpressTotalPerItem * tir : 0;
-                    const defDelivCost = (hasMaterial && includeDelivery) ? 80 : 0;
-                    const defRawCost = (defPaperCost + defPrintCost + defLamCost + defPostCost + defDelivCost) * (sheetSetsCount || 1);
-                    const defFinalPrice = hasMaterial ? Math.round(defRawCost * (marginPercent / 100)) : 0;
-                    const defUnitPrice = hasMaterial && tir > 0 ? defFinalPrice / tir : 0;
+                    let defPaperCost = 0;
+                    let defPrintCost = 0;
+                    let defLamCost = (hasMaterial && covId !== '0' && covId !== '') ? areaM2 * norms.laminationMattePrice * tir * (covId.includes('1+1') ? 2 : 1) : 0;
+                    let defPostCost = hasMaterial ? postpressTotalPerItem * tir : 0;
+                    let defDelivCost = (hasMaterial && includeDelivery) ? 80 : 0;
+                    let defRawCost = 0;
+                    let defFinalPrice = 0;
+                    let defUnitPrice = 0;
+
+                    if (category === 'Бланки') {
+                      const bMap: Record<number, number> = {
+                        50: 4.19, 100: 2.47, 150: 1.88, 200: 1.58, 250: 1.41,
+                        300: 1.29, 350: 1.20, 400: 1.14, 450: 1.09, 500: 1.05,
+                        550: 1.02, 600: 0.99, 650: 0.97, 700: 0.95, 750: 0.93,
+                        800: 0.92, 850: 0.90, 900: 0.894, 950: 0.886, 1000: 0.776
+                      };
+                      const unitP = bMap[tir] || 0.776;
+                      defUnitPrice = unitP;
+                      defRawCost = Math.round(unitP * tir);
+                      defPaperCost = defRawCost * 0.48;
+                      defPrintCost = defRawCost * 0.52;
+                      defFinalPrice = Math.round((defRawCost + defPostCost + defDelivCost) * (marginPercent / 100));
+                    } else {
+                      defPaperCost = hasMaterial ? areaM2 * (matDensity * 0.08) * tir : 0;
+                      defPrintCost = hasMaterial ? (isDouble ? 0.35 : 0.20) * tir + (tir > 500 ? 80 : 120) : 0;
+                      defRawCost = (defPaperCost + defPrintCost + defLamCost + defPostCost + defDelivCost) * (sheetSetsCount || 1);
+                      defFinalPrice = hasMaterial ? Math.round(defRawCost * (marginPercent / 100)) : 0;
+                      defUnitPrice = hasMaterial && tir > 0 ? defFinalPrice / tir : 0;
+                    }
 
                     const activeCalc = selectedSheetCalc || {
                       matId,
