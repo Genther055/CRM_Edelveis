@@ -5817,6 +5817,69 @@ export const Calculator: React.FC = () => {
                           </select>
                         </div>
                       </div>
+
+                      {/* Standard Format Pills to Fill Layout Space */}
+                      <div className="pt-2 border-t border-slate-100 flex flex-col gap-2">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[11px] font-extrabold text-slate-700 uppercase tracking-wider">
+                            {(category as string) === 'Буклети' ? 'Стандартні розміри буклетів:' : 'Стандартні формати:'}
+                          </span>
+                          <span className="text-[10px] font-bold text-slate-400">Швидкий вибір</span>
+                        </div>
+
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
+                          {((category as string) === 'Буклети'
+                            ? [
+                                { label: 'Євробуклет А4 (2 згини)', w: '297', h: '210', fold: '21', desc: 'У згині 100×210' },
+                                { label: 'Міні-буклет А5 (2 згини)', w: '210', h: '148', fold: '21', desc: 'У згині 70×148' },
+                                { label: 'Буклет А3 (2 згини)', w: '420', h: '297', fold: '21', desc: 'У згині 140×297' },
+                                { label: 'Книжка А4 в А5 (1 згин)', w: '297', h: '210', fold: '20', desc: 'У згині 148×210' },
+                                { label: 'Книжка А3 в А4 (1 згин)', w: '420', h: '297', fold: '20', desc: 'У згині 210×297' },
+                                { label: 'Книжка А5 в А6 (1 згин)', w: '210', h: '148', fold: '20', desc: 'У згині 105×148' },
+                                { label: 'Квадрат 200×200 (2 згини)', w: '600', h: '200', fold: '21', desc: 'У згині 200×200' },
+                                { label: 'Квадрат 150×150 (2 згини)', w: '450', h: '150', fold: '21', desc: 'У згині 150×150' },
+                                { label: 'Гармошка 3 згини (4 пол.)', w: '396', h: '210', fold: '23', desc: 'У згині 99×210' },
+                                { label: 'Віконце Gate-fold', w: '297', h: '210', fold: '22', desc: 'У згині 148×210' },
+                                { label: 'Мапа / План 4 згини', w: '420', h: '594', fold: '24', desc: 'Складна схема' },
+                              ]
+                            : [
+                                { label: 'А4 (210 × 297 мм)', w: '210', h: '297', fold: '', desc: 'Стандарт' },
+                                { label: 'А5 (148 × 210 мм)', w: '148', h: '210', fold: '', desc: 'Листівка' },
+                                { label: 'А6 (105 × 148 мм)', w: '105', h: '148', fold: '', desc: 'Флаєр А6' },
+                                { label: 'Єврофлаєр (99 × 210 мм)', w: '99', h: '210', fold: '', desc: 'DL формат' },
+                                { label: 'А3 (297 × 420 мм)', w: '297', h: '420', fold: '', desc: 'Плакат' },
+                                { label: 'Візитка (90 × 50 мм)', w: '90', h: '50', fold: '', desc: 'Стандарт' },
+                                { label: 'Євровізитка (85 × 55 мм)', w: '85', h: '55', fold: '', desc: 'Євро' },
+                                { label: 'Календарик (100 × 70 мм)', w: '100', h: '70', fold: '', desc: 'Кишеньковий' },
+                                { label: 'Квадрат (105 × 105 мм)', w: '105', h: '105', fold: '', desc: 'Кубик' },
+                              ]
+                          ).map((sz, idx) => {
+                            const isCurrent = sheetCustomWidth === sz.w && sheetCustomHeight === sz.h && (!sz.fold || postFolding === sz.fold);
+                            return (
+                              <button
+                                key={idx}
+                                type="button"
+                                onClick={() => {
+                                  setSheetCustomWidth(sz.w);
+                                  setSheetCustomHeight(sz.h);
+                                  setSheetSizePreset('custom');
+                                  if (sz.fold) {
+                                    setPostFolding(sz.fold);
+                                  }
+                                }}
+                                className={`px-2.5 py-1.5 rounded-xl text-left flex flex-col justify-center transition-all border ${
+                                  isCurrent
+                                    ? 'bg-blue-50 border-blue-400 text-blue-900 shadow-2xs'
+                                    : 'bg-slate-50/80 hover:bg-slate-100 border-slate-200/80 text-slate-700'
+                                }`}
+                              >
+                                <span className="text-[11px] font-extrabold truncate">{sz.label}</span>
+                                <span className="text-[9px] font-medium text-slate-400">{sz.desc}</span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
                     </div>
 
                     {/* Right: ВІЗУАЛ / РОЗГОРТКА */}
@@ -8333,11 +8396,74 @@ export const Calculator: React.FC = () => {
                             <select
                               value={sheetUnit}
                               onChange={(e) => setSheetUnit(e.target.value as any)}
-                              className="w-16 bg-slate-50 border border-slate-200 rounded-xl px-2 py-2 text-xs font-bold text-slate-800"
+                              className="w-20 bg-slate-50 border border-slate-200 rounded-xl px-2.5 py-2 text-xs font-bold text-slate-800"
                             >
                               <option value="mm">мм</option>
                               <option value="cm">см</option>
                             </select>
+                          </div>
+                        </div>
+
+                        {/* Standard Format Pills to Fill Layout Space */}
+                        <div className="pt-2 border-t border-slate-100 flex flex-col gap-2">
+                          <div className="flex items-center justify-between">
+                            <span className="text-[11px] font-extrabold text-slate-700 uppercase tracking-wider">
+                              {(category as string) === 'Буклети' ? 'Стандартні розміри буклетів:' : 'Стандартні формати:'}
+                            </span>
+                            <span className="text-[10px] font-bold text-slate-400">Швидкий вибір</span>
+                          </div>
+
+                          <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
+                            {((category as string) === 'Буклети'
+                              ? [
+                                  { label: 'Євробуклет А4 (2 згини)', w: '297', h: '210', fold: '21', desc: 'У згині 100×210' },
+                                  { label: 'Міні-буклет А5 (2 згини)', w: '210', h: '148', fold: '21', desc: 'У згині 70×148' },
+                                  { label: 'Буклет А3 (2 згини)', w: '420', h: '297', fold: '21', desc: 'У згині 140×297' },
+                                  { label: 'Книжка А4 в А5 (1 згин)', w: '297', h: '210', fold: '20', desc: 'У згині 148×210' },
+                                  { label: 'Книжка А3 в А4 (1 згин)', w: '420', h: '297', fold: '20', desc: 'У згині 210×297' },
+                                  { label: 'Книжка А5 в А6 (1 згин)', w: '210', h: '148', fold: '20', desc: 'У згині 105×148' },
+                                  { label: 'Квадрат 200×200 (2 згини)', w: '600', h: '200', fold: '21', desc: 'У згині 200×200' },
+                                  { label: 'Квадрат 150×150 (2 згини)', w: '450', h: '150', fold: '21', desc: 'У згині 150×150' },
+                                  { label: 'Гармошка 3 згини (4 пол.)', w: '396', h: '210', fold: '23', desc: 'У згині 99×210' },
+                                  { label: 'Віконце Gate-fold', w: '297', h: '210', fold: '22', desc: 'У згині 148×210' },
+                                  { label: 'Мапа / План 4 згини', w: '420', h: '594', fold: '24', desc: 'Складна схема' },
+                                ]
+                              : [
+                                  { label: 'А4 (210 × 297 мм)', w: '210', h: '297', fold: '', desc: 'Стандарт' },
+                                  { label: 'А5 (148 × 210 мм)', w: '148', h: '210', fold: '', desc: 'Листівка' },
+                                  { label: 'А6 (105 × 148 мм)', w: '105', h: '148', fold: '', desc: 'Флаєр А6' },
+                                  { label: 'Єврофлаєр (99 × 210 мм)', w: '99', h: '210', fold: '', desc: 'DL формат' },
+                                  { label: 'А3 (297 × 420 мм)', w: '297', h: '420', fold: '', desc: 'Плакат' },
+                                  { label: 'Візитка (90 × 50 мм)', w: '90', h: '50', fold: '', desc: 'Стандарт' },
+                                  { label: 'Євровізитка (85 × 55 мм)', w: '85', h: '55', fold: '', desc: 'Євро' },
+                                  { label: 'Календарик (100 × 70 мм)', w: '100', h: '70', fold: '', desc: 'Кишеньковий' },
+                                  { label: 'Квадрат (105 × 105 мм)', w: '105', h: '105', fold: '', desc: 'Кубик' },
+                                ]
+                            ).map((sz, idx) => {
+                              const isCurrent = sheetCustomWidth === sz.w && sheetCustomHeight === sz.h && (!sz.fold || postFolding === sz.fold);
+                              return (
+                                <button
+                                  key={idx}
+                                  type="button"
+                                  onClick={() => {
+                                    setSheetCustomWidth(sz.w);
+                                    setSheetCustomHeight(sz.h);
+                                    setSheetSizePreset('custom');
+                                    if (sz.fold) {
+                                      setPostFolding(sz.fold);
+                                    }
+                                  }}
+                                  className={`px-2.5 py-1.5 rounded-xl text-left flex flex-col justify-center transition-all border ${
+                                    isCurrent
+                                      ? 'bg-blue-50 border-blue-400 text-blue-900 shadow-2xs'
+                                      : 'bg-slate-50/80 hover:bg-slate-100 border-slate-200/80 text-slate-700'
+                                  }`}
+                                >
+                                  <span className="text-[11px] font-extrabold truncate">{sz.label}</span>
+                                  <span className="text-[9px] font-medium text-slate-400">{sz.desc}</span>
+                                </button>
+                              );
+                            })}
                           </div>
                         </div>
                       </div>
