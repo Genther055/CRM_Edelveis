@@ -1072,7 +1072,8 @@ export const Calculator: React.FC = () => {
   // Input states
   const [orderNumber, setOrderNumber] = useState<number>(() => Math.floor(10000 + Math.random() * 90000));
   const [subCategory, setSubCategory] = useState<'Бланки' | 'Листівки'>('Бланки');
-  const [name, setName] = useState('Бланки А4');
+  const [name, setName] = useState('');
+  const [customTitleMap, setCustomTitleMap] = useState<Record<string, string>>({});
   const [category, setCategory] = useState<
     | 'Візитки' 
     | 'Буклети' 
@@ -6651,8 +6652,11 @@ export const Calculator: React.FC = () => {
                             </div>
                             <input
                               type="text"
-                              value={name || fullComposedName}
-                              onChange={(e) => setName(e.target.value)}
+                              value={customTitleMap['digital'] ?? fullComposedName}
+                              onChange={(e) => {
+                                setCustomTitleMap(prev => ({ ...prev, digital: e.target.value }));
+                                setName(e.target.value);
+                              }}
                               className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold text-slate-800"
                             />
                           </div>
@@ -8966,11 +8970,13 @@ export const Calculator: React.FC = () => {
                                             key={tir}
                                             onClick={() => {
                                               setQuantity(tir);
-                                              setCategory('Листівки');
-                                              setStep('editor');
+                                              setDigitalSelectedMaterials([matId]);
+                                              setDigitalSelectedCoverings([covId]);
+                                              setDigitalSelectedPrints([colId]);
+                                              document.getElementById('detailed-dig-calculation')?.scrollIntoView({ behavior: 'smooth' });
                                             }}
                                             className="py-3 px-3 border-r border-slate-100 last:border-r-0 font-extrabold text-slate-900 hover:bg-blue-600 hover:text-white cursor-pointer transition-all text-sm"
-                                            title="Натисніть для замовлення"
+                                            title="Натисніть для вибору тиражу"
                                           >
                                             {displayCost} грн
                                           </td>
@@ -9136,8 +9142,11 @@ export const Calculator: React.FC = () => {
                             </div>
                             <input
                               type="text"
-                              value={name || fullComposedName}
-                              onChange={(e) => setName(e.target.value)}
+                              value={customTitleMap['digital'] ?? fullComposedName}
+                              onChange={(e) => {
+                                setCustomTitleMap(prev => ({ ...prev, digital: e.target.value }));
+                                setName(e.target.value);
+                              }}
                               className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold text-slate-800"
                             />
                           </div>
@@ -9788,11 +9797,13 @@ export const Calculator: React.FC = () => {
                                             key={tir}
                                             onClick={() => {
                                               setQuantity(tir);
-                                              setCategory('Листівки');
-                                              setStep('editor');
+                                              setDigitalSelectedMaterials([matId]);
+                                              setDigitalSelectedCoverings([covId]);
+                                              setDigitalSelectedPrints([colId]);
+                                              document.getElementById('detailed-dig-calculation')?.scrollIntoView({ behavior: 'smooth' });
                                             }}
                                             className="py-3 px-3 border-r border-slate-100 last:border-r-0 font-extrabold text-slate-900 hover:bg-blue-600 hover:text-white cursor-pointer transition-all text-sm"
-                                            title="Натисніть для замовлення"
+                                            title="Натисніть для вибору тиражу"
                                           >
                                             {displayCost} грн
                                           </td>
@@ -12225,12 +12236,29 @@ export const Calculator: React.FC = () => {
                                         <td
                                           key={tir}
                                           onClick={() => {
+                                            setWideSelectedMaterials([matId]);
+                                            setWideSelectedResolutions([resId]);
                                             setQuantity(tir);
-                                            setCategory(wideSubTab === 'film' ? 'Наклейки' : 'Плакати');
-                                            setStep('editor');
+                                            setSelectedSheetCalc({
+                                              matId: matId,
+                                              covId: '0',
+                                              colStr: `${resId} dpi`,
+                                              tirazh: tir,
+                                              matName: matInfo.label,
+                                              covName: 'БП',
+                                              rawCost: totalCost,
+                                              basePaperCost: Math.round(tir * areaM2 * (matInfo.sqmPrice * 0.65)),
+                                              printCost: Math.round(tir * areaM2 * (matInfo.sqmPrice * 0.35 * resMultiplier)),
+                                              lamCost: 0,
+                                              postpressSum: Math.round(tir * postPressPerUnit),
+                                              deliveryCost: deliveryFee,
+                                              finalPrice: Math.round(totalCost * (1 + marginPercent / 100)),
+                                              unitPrice: Math.round(totalCost * (1 + marginPercent / 100)) / (tir || 1)
+                                            });
+                                            document.getElementById('detailed-wide-calculation')?.scrollIntoView({ behavior: 'smooth' });
                                           }}
                                           className="py-3 px-3 border-r border-slate-100 last:border-r-0 font-extrabold text-slate-900 hover:bg-blue-600 hover:text-white cursor-pointer transition-all text-xs"
-                                          title="Натисніть для оформлення замовлення"
+                                          title="Натисніть для вибору тиражу"
                                         >
                                           {displayVal}
                                         </td>
@@ -12304,7 +12332,9 @@ export const Calculator: React.FC = () => {
                     const effectiveClient = isNewClientMode && customClientName.trim()
                       ? customClientName.trim()
                       : (activeClient?.name || 'Замовник');
-                    const fullComposedName = `№ ${orderNumber} - Широкоформатний друк ${wideWidth}×${wideHeight} ${wideUnit} — ${effectiveClient} (${matInfo.label}, ${wideResId} dpi, ${wideTir} шт.)`;
+                    const wideCatLabel = wideSubTab === 'banner' ? 'Банер' : wideSubTab === 'film' ? 'Плівка самоклеюча' : wideSubTab === 'paper' ? 'Папір широкоформатний' : (wideSubTab === 'pvc' || wideSubTab === 'foam_board' || wideSubTab === 'composite' || wideSubTab === 'acrylic') ? 'Прямий друк на пластику' : wideSubTab === 'canvas' ? 'Картина на полотні' : 'Мобільний стенд';
+                    const luversLabel = wideLuvers !== 'none' ? `Люверси: ${wideLuvers}, ` : '';
+                    const fullComposedName = `№ ${orderNumber} - ${wideCatLabel} (${matInfo.label}) — ${effectiveClient} (${wideWidth}×${wideHeight} ${wideUnit}, ${wideResId} dpi, ${luversLabel}${wideTir} шт.)`;
 
                     return (
                       <div id="detailed-wide-calculation" className="ios-card bg-white p-6 md:p-7 rounded-2xl border border-blue-200 shadow-lg shadow-blue-500/5 flex flex-col gap-6 md:gap-7">
@@ -12387,8 +12417,11 @@ export const Calculator: React.FC = () => {
                             </div>
                             <input
                               type="text"
-                              value={name || fullComposedName}
-                              onChange={(e) => setName(e.target.value)}
+                              value={customTitleMap['digital'] ?? fullComposedName}
+                              onChange={(e) => {
+                                setCustomTitleMap(prev => ({ ...prev, digital: e.target.value }));
+                                setName(e.target.value);
+                              }}
                               className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold text-slate-800"
                             />
                           </div>
@@ -13202,8 +13235,7 @@ export const Calculator: React.FC = () => {
                                     setRollMaterial(row.matId);
                                     setRollQuantity(tir);
                                     setQuantity(tir);
-                                    setCategory('Етикетки');
-                                    setStep('editor');
+                                    document.getElementById('detailed-roll-calculation')?.scrollIntoView({ behavior: 'smooth' });
                                   }}
                                   style={{ border: isCustomCol ? '1px solid rgba(0, 122, 255, 0.3)' : undefined }}
                                   className={`py-2.5 px-3 font-bold border-r border-slate-100 last:border-r-0 hover:bg-blue-600 hover:text-white cursor-pointer transition-all duration-150 ${
@@ -13340,8 +13372,11 @@ export const Calculator: React.FC = () => {
                           </div>
                           <input
                             type="text"
-                            value={name || fullComposedName}
-                            onChange={(e) => setName(e.target.value)}
+                            value={customTitleMap['roll_print'] ?? fullComposedName}
+                            onChange={(e) => {
+                              setCustomTitleMap(prev => ({ ...prev, roll_print: e.target.value }));
+                              setName(e.target.value);
+                            }}
                             className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold text-slate-800"
                           />
                         </div>
