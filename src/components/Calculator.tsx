@@ -38,7 +38,8 @@ import {
   FileSpreadsheet,
   Check,
   Search,
-  RotateCcw
+  RotateCcw,
+  ArrowLeftRight
 } from 'lucide-react';
 import html2pdf from 'html2pdf.js';
 
@@ -5786,7 +5787,19 @@ export const Calculator: React.FC = () => {
                             placeholder="Ширина"
                             className="w-24 px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold text-center"
                           />
-                          <span className="font-bold text-slate-400">×</span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const temp = sheetCustomWidth;
+                              setSheetCustomWidth(sheetCustomHeight);
+                              setSheetCustomHeight(temp);
+                              setSheetSizePreset('custom');
+                            }}
+                            className="w-7 h-7 rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300 border border-slate-200 flex items-center justify-center text-slate-500 font-bold transition-all shadow-2xs cursor-pointer active:scale-95 shrink-0"
+                            title="Поміняти ширину та висоту місцями (⇄)"
+                          >
+                            <ArrowLeftRight size={13} />
+                          </button>
                           <input
                             type="number"
                             value={sheetCustomHeight}
@@ -8416,7 +8429,18 @@ export const Calculator: React.FC = () => {
                               />
                               <span className="absolute right-2.5 top-2 text-[10px] font-bold text-slate-400">Ш</span>
                             </div>
-                            <span className="text-slate-400 font-bold">×</span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const temp = sheetCustomWidth;
+                                setSheetCustomWidth(sheetCustomHeight);
+                                setSheetCustomHeight(temp);
+                              }}
+                              className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300 border border-slate-200 flex items-center justify-center text-slate-500 font-bold transition-all shadow-2xs cursor-pointer active:scale-95 shrink-0"
+                              title="Поміняти ширину та висоту місцями (⇄)"
+                            >
+                              <ArrowLeftRight size={14} />
+                            </button>
                             <div className="relative flex-1">
                               <input
                                 type="number"
@@ -11518,7 +11542,18 @@ export const Calculator: React.FC = () => {
                               className="w-28 px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 text-xs font-bold text-slate-900 text-center focus:bg-white focus:border-blue-600 focus:outline-none"
                               placeholder="Ширина"
                             />
-                            <span className="text-slate-400 font-bold">×</span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const tempW = wideWidth;
+                                setWideWidth(wideHeight);
+                                setWideHeight(tempW);
+                              }}
+                              className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300 border border-slate-200 flex items-center justify-center text-slate-500 font-bold transition-all shadow-2xs cursor-pointer active:scale-95 shrink-0"
+                              title="Поміняти ширину та висоту місцями (⇄)"
+                            >
+                              <ArrowLeftRight size={14} />
+                            </button>
                             <input
                               type="number"
                               value={wideHeight}
