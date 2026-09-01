@@ -12604,34 +12604,14 @@ export const Calculator: React.FC = () => {
 
             {/* Right Side Summary panel (span 1 col) */}
             <div className="flex flex-col gap-5">
-              <div className="ios-card bg-white" style={{ padding: '22px', display: 'flex', flexDirection: 'column', gap: '15px', position: 'sticky', top: '24px' }}>
-                {/* 5-Step Progress & Process Header */}
+              <div className="ios-card bg-white" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px', position: 'sticky', top: '24px' }}>
                 <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <span style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-medium)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                      Калькуляція замовлення
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => setShowNorms(true)}
-                      className="text-[10.5px] font-bold px-2 py-0.5 rounded-md bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-200/60 transition-colors"
-                      title="Відкрити базу технологічних норм 1С"
-                    >
-                      ⚙️ Норми 1С
-                    </button>
-                  </div>
-
-                  {/* 5-Step Visual Mini-Tracker */}
-                  <div className="grid grid-cols-5 gap-1 p-1 rounded-lg bg-slate-100 text-center text-[9px] font-bold text-slate-500">
-                    <span className="py-1 px-0.5 rounded bg-white text-blue-700 shadow-2xs truncate">1. Параметри</span>
-                    <span className="py-1 px-0.5 rounded bg-white text-blue-700 shadow-2xs truncate">2. Норми</span>
-                    <span className="py-1 px-0.5 rounded bg-white text-blue-700 shadow-2xs truncate">3. Витрати</span>
-                    <span className="py-1 px-0.5 rounded bg-white text-blue-700 shadow-2xs truncate">4. Собіварт.</span>
-                    <span className="py-1 px-0.5 rounded bg-blue-600 text-white shadow-xs truncate">5. Ціна</span>
-                  </div>
+                  <span style={{ fontSize: '12px', fontWeight: '800', color: 'var(--text-medium)', textTransform: 'uppercase', letterSpacing: '0.5px', display: 'block' }}>
+                    Підсумки розрахунку
+                  </span>
                 </div>
 
-                {/* Step 5 Highlight: Final Price to Client */}
+                {/* Final Price to Client */}
                 <div className="p-3.5 rounded-xl bg-gradient-to-br from-blue-50/70 to-indigo-50/50 border border-blue-200/80">
                   <div className="flex justify-between items-baseline">
                     <span className="text-xs font-bold text-slate-600">Ціна для клієнта:</span>
@@ -12644,11 +12624,11 @@ export const Calculator: React.FC = () => {
                   </p>
                 </div>
 
-                {/* Step 3 & 4: Cost Structure Breakdown */}
+                {/* Cost Structure Breakdown */}
                 <div className="flex flex-col gap-2 p-3 rounded-xl bg-slate-50 border border-slate-200/80 text-xs">
                   <div className="flex justify-between items-center pb-1.5 border-b border-slate-200">
                     <span className="font-bold text-slate-700 uppercase text-[10px] tracking-wider">
-                      4. Собівартість виробництва:
+                      Собівартість виробництва:
                     </span>
                     <strong className="font-extrabold text-slate-900 font-mono">
                       {calculatedOps.subtotal.toFixed(2)} ₴
@@ -12718,7 +12698,7 @@ export const Calculator: React.FC = () => {
                 {/* Margin manual percentage selector with Range Slider */}
                 <div>
                   <div className="flex justify-between items-center mb-1.5">
-                    <label className="text-xs font-semibold text-slate-600">5. Націнка (Маржа друкарні):</label>
+                    <label className="text-xs font-semibold text-slate-600">Націнка (Маржа друкарні):</label>
                     <div className="flex items-center gap-1">
                       <span className="text-xs font-bold text-emerald-600 font-mono">+{calculatedOps.marginAmount.toFixed(2)} ₴</span>
                       <span className="text-xs font-extrabold text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded">({marginPercent}%)</span>
