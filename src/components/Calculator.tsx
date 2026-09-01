@@ -4926,54 +4926,50 @@ export const Calculator: React.FC = () => {
               {/* DETAILED SHEET CALCULATOR (Офсетний друк / Листова) */}
               {offsetSubTab === 'sheets' && (
                 <div className="flex flex-col gap-6">
-                  {/* Top Product Header & Quick Links Bar - Cupertino iOS Card */}
-                  <div className="ios-card bg-white" style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', borderBottom: '0.5px solid var(--border-light)', paddingBottom: '14px', flexWrap: 'wrap', gap: '12px' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-                        <div style={{ width: '48px', height: '48px', borderRadius: '14px', backgroundColor: 'rgba(0, 122, 255, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)' }}>
-                          <FileText size={24} />
+                  {/* Sub-header Bar: [ ← ] Back | ОПЦІЯ / КАТЕГОРІЯ | [ X ] Close */}
+                  <div className="ios-card bg-white" style={{ padding: '14px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', border: '1px solid #e2e8f0' }}>
+                    <div className="flex items-center gap-3 flex-1 min-w-[260px]">
+                      <button
+                        type="button"
+                        onClick={() => setOffsetSubTab('overview')}
+                        className="px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-xs flex items-center gap-1.5 transition-colors shadow-2xs"
+                        title="Повернутися до каталогу"
+                      >
+                        <ArrowLeft size={16} />
+                        <span>Назад</span>
+                      </button>
+                      
+                      <div className="flex flex-col">
+                        <div className="flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-wider text-slate-400">
+                          <span>Офсетний друк</span>
+                          <span>/</span>
+                          <span className="text-blue-600">{(category as string) || 'Листова продукція'}</span>
                         </div>
-                        <div>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '11px', fontWeight: '700', color: 'var(--text-medium)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                            <span>Офсетний друк</span>
-                            <span style={{ opacity: 0.5 }}>/</span>
-                            <span style={{ color: 'var(--primary)' }}>Листова продукція</span>
-                          </div>
-                          <h3 style={{ fontSize: '20px', fontWeight: '800', color: 'var(--text-dark)', margin: '2px 0 0 0' }}>
-                            {(category as string) || 'Візитівки'}
-                          </h3>
-                        </div>
+                        <span className="text-sm font-black text-slate-900 leading-tight">
+                          {(category as string) === 'Бланки' ? subCategory : (category as string)}
+                        </span>
                       </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            document.getElementById('detailed-sheet-calculation')?.scrollIntoView({ behavior: 'smooth' });
-                          }}
-                          className="ios-badge ios-badge-blue"
-                          style={{ padding: '8px 14px', borderRadius: 'var(--radius-md)', fontSize: '12px', fontWeight: '700', cursor: 'pointer', border: 'none', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
-                        >
-                          <Settings size={14} />
-                          <span>Розрахунок замовлення</span>
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setOffsetSubTab('overview')}
-                          style={{
-                            padding: '8px 14px',
-                            borderRadius: 'var(--radius-md)',
-                            border: '0.5px solid var(--border-light)',
-                            backgroundColor: 'var(--bg-card)',
-                            color: 'var(--text-dark)',
-                            fontSize: '12px',
-                            fontWeight: '700',
-                            cursor: 'pointer',
-                            boxShadow: 'var(--shadow-flat)'
-                          }}
-                        >
-                          ← Назад до категорій
-                        </button>
-                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          document.getElementById('detailed-sheet-calculation')?.scrollIntoView({ behavior: 'smooth' });
+                        }}
+                        className="px-3 py-2 rounded-xl bg-blue-50 border border-blue-200 text-blue-700 font-bold text-xs flex items-center gap-1.5 hover:bg-blue-100 transition-colors shadow-2xs"
+                      >
+                        <Settings size={14} />
+                        <span>Кошторис</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setOffsetSubTab('overview')}
+                        className="w-8 h-8 rounded-xl border border-slate-200 bg-slate-50 hover:bg-red-50 hover:border-red-200 hover:text-red-600 text-slate-500 font-bold text-sm flex items-center justify-center transition-colors shadow-2xs"
+                        title="Закрити сторінку продукту"
+                      >
+                        ✕
+                      </button>
                     </div>
                   </div>
 
@@ -4981,12 +4977,9 @@ export const Calculator: React.FC = () => {
                   <div className="ios-card bg-white" style={{ padding: '20px 24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       <h4 style={{ fontSize: '12px', fontWeight: '800', color: 'var(--text-dark)', textTransform: 'uppercase', letterSpacing: '0.5px', margin: 0 }}>
-                        {(category as string) === 'Буклети' ? 'Вид складання' :
-                         (category as string) === 'Візитки' ? 'Вид готового виробу' :
-                         (category as string) === 'Папки' ? 'Конструкція папки' :
-                         'Вид продукції'}
+                        ВИД / ГЕОМЕТРІЯ
                       </h4>
-                      <span className="text-xs text-slate-400 font-medium">Оберіть базовий вид або геометрію</span>
+                      <span className="text-xs text-slate-400 font-medium">Оберіть базовий вид або геометрію виробу</span>
                     </div>
 
                     {/* 1. Буклети: 12 Folding styles */}
@@ -5554,49 +5547,70 @@ export const Calculator: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* Right: Layout Preview Box */}
-                    <div className="bg-slate-50 border border-slate-200 rounded-xl p-5 flex flex-col items-center justify-center text-center">
+                    {/* Right: ВІЗУАЛ / РОЗГОРТКА */}
+                    <div className="bg-gradient-to-b from-slate-50 to-slate-100/60 border border-slate-200 rounded-xl p-5 flex flex-col items-center justify-between text-center min-h-[220px]">
+                      <div className="w-full flex items-center justify-between pb-2 border-b border-slate-200/60">
+                        <span className="text-[11px] font-extrabold text-slate-700 uppercase tracking-wider">
+                          ВІЗУАЛІЗАЦІЯ & РОЗГОРТКА
+                        </span>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">
+                          {sheetOrientation === 'horiz' ? 'Горизонтальний' : 'Вертикальний'}
+                        </span>
+                      </div>
+
                       {(category as string) === 'Буклети' ? (
-                        renderBookletFoldBlueprint(
-                          postFolding || '21',
-                          sheetCustomWidth || '297',
-                          sheetCustomHeight || '210',
-                          sheetUnit || 'мм',
-                          sheetOrientation,
-                          () => setSheetOrientation(prev => prev === 'horiz' ? 'vert' : 'horiz')
-                        )
+                        <div className="py-2 w-full flex items-center justify-center">
+                          {renderBookletFoldBlueprint(
+                            postFolding || '21',
+                            sheetCustomWidth || '297',
+                            sheetCustomHeight || '210',
+                            sheetUnit || 'мм',
+                            sheetOrientation,
+                            () => setSheetOrientation(prev => prev === 'horiz' ? 'vert' : 'horiz')
+                          )}
+                        </div>
                       ) : (
-                        <>
-                          <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Вид готового виробу</p>
-                          
+                        <div className="py-3 flex flex-col items-center justify-center">
                           {/* Visual scaled representation rectangle */}
                           <div
                             style={{
-                              width: sheetOrientation === 'horiz' ? '180px' : '120px',
-                              height: sheetOrientation === 'horiz' ? '120px' : '180px',
-                              borderRadius: cardKind === '7' || cardKind === '8' ? '50%' : cardKind === '9' ? '16px' : '8px'
+                              width: sheetOrientation === 'horiz' ? '190px' : '130px',
+                              height: sheetOrientation === 'horiz' ? '115px' : '170px',
+                              borderRadius: cardKind === '7' || cardKind === '8' ? '50%' : cardKind === '9' ? '16px' : '6px'
                             }}
-                            className="border-2 border-dashed border-blue-500 bg-white flex items-center justify-center mb-3 shadow-sm transition-all"
+                            className="border-2 border-dashed border-blue-500 bg-white flex flex-col items-center justify-center shadow-sm transition-all relative"
                           >
-                            <span className="text-xs font-bold text-slate-900 bg-slate-100/90 px-2.5 py-1 rounded-md">
+                            <span className="text-xs font-black text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200/60">
                               {sheetCustomWidth} × {sheetCustomHeight} {sheetUnit}
+                            </span>
+                            <span className="text-[9px] font-semibold text-slate-400 mt-1">
+                              Розмір готового виробу
                             </span>
                           </div>
 
-                          <div className="flex items-center gap-3 text-xs font-semibold">
-                            <span className={sheetOrientation === 'horiz' ? 'text-blue-600 font-bold' : 'text-slate-500'}>Горизонтальний</span>
+                          <div className="flex items-center gap-2 mt-3 text-xs font-semibold">
                             <button
                               type="button"
                               onClick={() => setSheetOrientation(prev => prev === 'horiz' ? 'vert' : 'horiz')}
-                              className="w-8 h-8 rounded-full border border-slate-200 bg-white hover:bg-slate-50 shadow-sm flex items-center justify-center text-slate-700 transition-colors"
-                              title="Повернути макет"
+                              className="px-2.5 py-1 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold shadow-2xs flex items-center gap-1.5 transition-colors"
                             >
-                              
+                              <RotateCcw size={13} />
+                              <span>Змінити орієнтацію</span>
                             </button>
-                            <span className={sheetOrientation === 'vert' ? 'text-blue-600 font-bold' : 'text-slate-500'}>Вертикальний</span>
                           </div>
-                        </>
+                        </div>
                       )}
+
+                      {/* Strip: Розгортка / Розмір у розкладці */}
+                      <div className="w-full bg-white p-2.5 rounded-lg border border-slate-200 flex items-center justify-between text-xs mt-2">
+                        <div className="flex items-center gap-1.5">
+                          <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                          <span className="text-slate-500 font-semibold">Розмір у розкладці (з вильотами 2мм):</span>
+                        </div>
+                        <strong className="text-slate-900 font-mono font-bold">
+                          {Number(sheetCustomWidth) + 4} × {Number(sheetCustomHeight) + 4} {sheetUnit}
+                        </strong>
+                      </div>
                     </div>
                   </div>
 
@@ -6260,116 +6274,117 @@ export const Calculator: React.FC = () => {
                           </div>
                         </div>
 
-                        {/* 2-Column Grid */}
-                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-                          {/* Left Column: Order Parameters Form & Specs (7 cols) */}
-                          <div className="lg:col-span-7 flex flex-col gap-4">
-                            {/* Row 1: Order Number and Client Selector / Manual Entry */}
-                            <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
-                              {/* Order Number */}
-                              <div className="sm:col-span-4 flex flex-col gap-1">
-                                <label className="text-[11px] font-bold text-slate-600 uppercase">Номер замовлення:</label>
-                                <div className="flex items-center gap-1.5">
-                                  <input
-                                    type="text"
-                                    value={`№ ${orderNumber}`}
-                                    onChange={(e) => {
-                                      const n = parseInt(e.target.value.replace(/\D/g, ''));
-                                      if (n) setOrderNumber(n);
-                                    }}
-                                    className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-extrabold text-blue-700"
-                                  />
-                                  <button
-                                    type="button"
-                                    onClick={() => setOrderNumber(Math.floor(10000 + Math.random() * 90000))}
-                                    className="px-2 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 text-slate-600 text-xs font-bold"
-                                    title="Згенерувати новий номер"
-                                  >
-                                    <RotateCcw size={13} />
-                                  </button>
-                                </div>
-                              </div>
-
-                              {/* Customer Selector or Manual Input */}
-                              <div className="sm:col-span-8 flex flex-col gap-1">
-                                <div className="flex items-center justify-between">
-                                  <label className="text-[11px] font-bold text-slate-600 uppercase">Замовник (Клієнт):</label>
-                                  <button
-                                    type="button"
-                                    onClick={() => setIsNewClientMode(!isNewClientMode)}
-                                    className="text-[10px] font-bold text-blue-600 hover:text-blue-800 underline"
-                                  >
-                                    {isNewClientMode ? 'Вибрати з бази' : '+ Вписати нового'}
-                                  </button>
-                                </div>
-
-                                {isNewClientMode ? (
-                                  <input
-                                    type="text"
-                                    placeholder="Введіть назву замовника (напр. ТОВ Едельвейс)"
-                                    value={customClientName}
-                                    onChange={(e) => setCustomClientName(e.target.value)}
-                                    className="w-full px-3 py-1.5 rounded-lg border border-blue-400 bg-white text-xs font-bold text-slate-900 focus:outline-none ring-2 ring-blue-500/20"
-                                    autoFocus
-                                  />
-                                ) : (
-                                  <select
-                                    value={selectedClientId}
-                                    onChange={(e) => setSelectedClientId(e.target.value)}
-                                    className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-bold text-slate-800 focus:outline-none"
-                                  >
-                                    <option value="">-- Оберіть замовника з бази --</option>
-                                    {clients.map(c => (
-                                      <option key={c.id} value={c.id}>{c.name}</option>
-                                    ))}
-                                  </select>
-                                )}
-                              </div>
-                            </div>
-
-                            {/* Row 2: Full Descriptive Product Name */}
-                            <div className="flex flex-col gap-1 p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
-                              <div className="flex items-center justify-between">
-                                <label className="text-[11px] font-bold text-slate-600 uppercase">Назва продукту для бази та документів:</label>
-                                <span className="text-[10px] text-slate-400 font-medium">Автоматично підтягується</span>
-                              </div>
+                        {/* Top 3-Field Strip: [ № ] [ ЗАМОВНИК ] [ ПРОДУКЦІЯ (авто) ] */}
+                        <div className="grid grid-cols-1 md:grid-cols-12 gap-3 p-4 rounded-xl bg-slate-50 border border-slate-200">
+                          {/* 1. Номер замовлення */}
+                          <div className="md:col-span-3 flex flex-col gap-1">
+                            <label className="text-[11px] font-extrabold text-slate-700 uppercase">№ Замовлення:</label>
+                            <div className="flex items-center gap-1.5">
                               <input
                                 type="text"
-                                value={name || fullComposedName}
-                                onChange={(e) => setName(e.target.value)}
-                                className="w-full px-3 py-2 rounded-lg border border-slate-200 bg-white text-xs font-semibold text-slate-800"
+                                value={`№ ${orderNumber}`}
+                                onChange={(e) => {
+                                  const n = parseInt(e.target.value.replace(/\D/g, ''));
+                                  if (n) setOrderNumber(n);
+                                }}
+                                className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-black text-blue-700"
                               />
+                              <button
+                                type="button"
+                                onClick={() => setOrderNumber(Math.floor(10000 + Math.random() * 90000))}
+                                className="px-2 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 text-slate-600 text-xs font-bold transition-colors"
+                                title="Згенерувати новий номер"
+                              >
+                                <RotateCcw size={13} />
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* 2. Замовник */}
+                          <div className="md:col-span-4 flex flex-col gap-1">
+                            <div className="flex items-center justify-between">
+                              <label className="text-[11px] font-extrabold text-slate-700 uppercase">Замовник:</label>
+                              <button
+                                type="button"
+                                onClick={() => setIsNewClientMode(!isNewClientMode)}
+                                className="text-[10px] font-bold text-blue-600 hover:text-blue-800 underline"
+                              >
+                                {isNewClientMode ? 'Вибрати з бази' : '+ Вписати нового'}
+                              </button>
                             </div>
 
-                            {/* Row 3: Turns Type (Спуск / Обороти), Quantity & Margin */}
-                            <div className="grid grid-cols-1 sm:grid-cols-12 gap-3 p-3.5 rounded-xl bg-slate-50 border border-slate-200/80">
-                              {/* Turns (Спуск) */}
-                              <div className="sm:col-span-6 flex flex-col gap-1">
-                                <label className="text-[11px] font-bold text-slate-600 uppercase">Спуск / Обороти:</label>
-                                <div className="grid grid-cols-3 gap-1 bg-white p-1 rounded-lg border border-slate-200">
-                                  {[
-                                    { id: 'sam_na_sebe', label: 'Сам на себе' },
-                                    { id: 'chuzhyi_oborut', label: 'Чужий (ч/о)' },
-                                    { id: 'bez_oborotu', label: 'Без обор.' }
-                                  ].map(t => (
-                                    <button
-                                      key={t.id}
-                                      type="button"
-                                      onClick={() => handleSelectTurnType(t.id as any)}
-                                      className={`py-1 px-1.5 rounded text-[10px] font-bold transition-all text-center ${
-                                        turnType === t.id
-                                          ? 'bg-blue-600 text-white shadow-2xs'
-                                          : 'text-slate-600 hover:bg-slate-100'
-                                      }`}
-                                    >
-                                      {t.label}
-                                    </button>
-                                  ))}
-                                </div>
+                            {isNewClientMode ? (
+                              <input
+                                type="text"
+                                placeholder="Введіть назву клієнта"
+                                value={customClientName}
+                                onChange={(e) => setCustomClientName(e.target.value)}
+                                className="w-full px-3 py-1.5 rounded-lg border border-blue-400 bg-white text-xs font-bold text-slate-900 focus:outline-none"
+                                autoFocus
+                              />
+                            ) : (
+                              <select
+                                value={selectedClientId}
+                                onChange={(e) => setSelectedClientId(e.target.value)}
+                                className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-bold text-slate-800 focus:outline-none"
+                              >
+                                <option value="">-- Оберіть замовника з бази --</option>
+                                {clients.map(c => (
+                                  <option key={c.id} value={c.id}>{c.name}</option>
+                                ))}
+                              </select>
+                            )}
+                          </div>
+
+                          {/* 3. Продукція (авто) */}
+                          <div className="md:col-span-5 flex flex-col gap-1">
+                            <div className="flex items-center justify-between">
+                              <label className="text-[11px] font-extrabold text-slate-700 uppercase">Продукція:</label>
+                              <span className="text-[9px] font-bold text-blue-700 bg-blue-100 px-1.5 py-0.2 rounded">авто</span>
+                            </div>
+                            <input
+                              type="text"
+                              value={name || fullComposedName}
+                              onChange={(e) => setName(e.target.value)}
+                              className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold text-slate-800"
+                            />
+                          </div>
+                        </div>
+
+                        {/* 3-Box Bottom Section matching user sketch exactly:
+                            Left: ОБОРОТ | Middle: РОЗРАХУНОК | Right: [ ШАБЛОН ] [ PDF ] [ КП ] [ ВИРОБНИЦТВО ] */}
+                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+                          {/* 1. Left Box (3 cols): ОБОРОТ & Параметри тиражу */}
+                          <div className="lg:col-span-3 flex flex-col gap-3 p-4 rounded-xl bg-white border border-slate-200 justify-between">
+                            <div className="flex flex-col gap-3">
+                              <div className="flex items-center justify-between pb-1.5 border-b border-slate-100">
+                                <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wider">ОБОРОТ (СПУСК):</span>
+                              </div>
+                              
+                              <div className="flex flex-col gap-1.5">
+                                {[
+                                  { id: 'sam_na_sebe', label: 'Сам на себе (с/с)' },
+                                  { id: 'chuzhyi_oborut', label: 'Чужий оборот (ч/о)' },
+                                  { id: 'bez_oborotu', label: 'Без обороту' }
+                                ].map(t => (
+                                  <button
+                                    key={t.id}
+                                    type="button"
+                                    onClick={() => handleSelectTurnType(t.id as any)}
+                                    className={`py-2 px-2.5 rounded-lg text-xs font-bold transition-all text-left flex items-center justify-between border ${
+                                      turnType === t.id
+                                        ? 'bg-blue-600 text-white border-blue-600 shadow-2xs'
+                                        : 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100'
+                                    }`}
+                                  >
+                                    <span>{t.label}</span>
+                                    {turnType === t.id && <span className="text-white text-xs font-black">✓</span>}
+                                  </button>
+                                ))}
                               </div>
 
-                              {/* Quantity */}
-                              <div className="sm:col-span-3 flex flex-col gap-1">
+                              {/* Tirazh */}
+                              <div className="flex flex-col gap-1 pt-1">
                                 <label className="text-[11px] font-bold text-slate-600 uppercase">Наклад (шт):</label>
                                 <input
                                   type="number"
@@ -6378,159 +6393,138 @@ export const Calculator: React.FC = () => {
                                     const val = parseInt(e.target.value) || 100;
                                     setSelectedSheetCalc(prev => prev ? { ...prev, tirazh: val } : null);
                                   }}
-                                  className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-bold text-slate-900 text-center"
+                                  className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 text-xs font-bold text-slate-900 text-center font-mono"
                                 />
                               </div>
 
-                              {/* Margin % */}
-                              <div className="sm:col-span-3 flex flex-col gap-1">
-                                <label className="text-[11px] font-bold text-slate-600 uppercase">Націнка (%):</label>
-                                <div className="flex items-center gap-1 bg-white p-1 rounded-lg border border-slate-200">
-                                  <input
-                                    type="number"
-                                    value={marginPercent}
-                                    onChange={(e) => setMarginPercent(Number(e.target.value) || 0)}
-                                    className="w-full text-xs font-bold text-center border-none focus:outline-none"
-                                  />
-                                  <span className="text-xs font-bold text-slate-400 pr-1">%</span>
+                              {/* Margin slider & presets */}
+                              <div className="flex flex-col gap-1 pt-1">
+                                <div className="flex items-center justify-between text-xs">
+                                  <label className="text-[11px] font-bold text-slate-600 uppercase">Націнка:</label>
+                                  <span className="font-extrabold text-blue-600 font-mono">{marginPercent}%</span>
                                 </div>
-                              </div>
-                            </div>
-
-                            {/* Row 4: Summary Specification Badges */}
-                            <div className="p-3.5 rounded-xl bg-white border border-slate-200 flex flex-col gap-2">
-                              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wide">
-                                Специфікація виробу:
-                              </span>
-                              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-                                <div className="bg-slate-50 p-2 rounded-lg border border-slate-100">
-                                  <span className="text-slate-400 block text-[10px]">Розмір:</span>
-                                  <strong className="text-slate-800 font-mono">{sheetCustomWidth} × {sheetCustomHeight} {sheetUnit}</strong>
-                                </div>
-                                <div className="bg-slate-50 p-2 rounded-lg border border-slate-100">
-                                  <span className="text-slate-400 block text-[10px]">Матеріал:</span>
-                                  <strong className="text-slate-800">{activeCalc.matName}</strong>
-                                </div>
-                                <div className="bg-slate-50 p-2 rounded-lg border border-slate-100">
-                                  <span className="text-slate-400 block text-[10px]">Покриття:</span>
-                                  <strong className="text-slate-800">{activeCalc.covName}</strong>
-                                </div>
-                                <div className="bg-slate-50 p-2 rounded-lg border border-slate-100">
-                                  <span className="text-slate-400 block text-[10px]">Друк:</span>
-                                  <strong className="text-slate-800 font-mono">{activeCalc.colStr} ({turnShortLabel})</strong>
+                                <input
+                                  type="range"
+                                  min="0"
+                                  max="300"
+                                  step="5"
+                                  value={marginPercent}
+                                  onChange={(e) => setMarginPercent(Number(e.target.value) || 0)}
+                                  className="w-full cursor-pointer accent-blue-600"
+                                />
+                                <div className="grid grid-cols-5 gap-1 pt-1">
+                                  {[20, 35, 50, 100, 150].map(m => (
+                                    <button
+                                      key={m}
+                                      type="button"
+                                      onClick={() => setMarginPercent(m)}
+                                      className={`py-1 text-[10px] font-bold rounded transition-all ${
+                                        marginPercent === m
+                                          ? 'bg-blue-600 text-white shadow-2xs'
+                                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                      }`}
+                                    >
+                                      {m}%
+                                    </button>
+                                  ))}
                                 </div>
                               </div>
                             </div>
                           </div>
 
-                          {/* Right Column: Cost Breakdown, Total Price & Actions (5 cols) */}
-                          <div className="lg:col-span-5 flex flex-col justify-between gap-4">
-                            {/* Cost Breakdown List */}
-                            <div className="p-3.5 rounded-xl bg-white border border-slate-200 flex flex-col gap-2.5 shadow-2xs">
+                          {/* 2. Middle Box (6 cols): РОЗРАХУНОК (Деталі кошторису 1С та РАЗОМ) */}
+                          <div className="lg:col-span-6 flex flex-col gap-3 p-4 rounded-xl bg-white border border-slate-200 justify-between">
+                            <div className="flex flex-col gap-2.5">
                               <div className="flex justify-between items-center pb-2 border-b border-slate-100">
-                                <span className="text-xs font-bold text-slate-800 uppercase tracking-wide">
-                                  Собівартість виробництва (Норми 1С):
+                                <span className="text-xs font-black text-slate-800 uppercase tracking-wide">
+                                  РОЗРАХУНОК (Собівартість & Норми 1С):
                                 </span>
-                                <strong className="text-sm font-extrabold text-slate-900 font-mono">
+                                <strong className="text-sm font-black text-slate-900 font-mono">
                                   {activeCalc.rawCost.toFixed(2)} ₴
                                 </strong>
                               </div>
 
-                              <div className="flex flex-col gap-1.5 text-xs">
-                                <div className="flex justify-between text-slate-600">
-                                  <span className="flex items-center gap-1.5">
-                                    <span className="w-2 h-2 rounded-full bg-amber-500"></span>
-                                    Матеріали / Папір:
-                                  </span>
-                                  <span className="font-mono font-semibold text-slate-800">{activeCalc.basePaperCost.toFixed(2)} ₴</span>
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                                <div className="flex justify-between p-2 rounded-lg bg-slate-50 border border-slate-100">
+                                  <span className="text-slate-600 font-medium">Матеріали / Папір:</span>
+                                  <strong className="font-mono text-slate-900">{activeCalc.basePaperCost.toFixed(2)} ₴</strong>
                                 </div>
-                                <div className="flex justify-between text-slate-600">
-                                  <span className="flex items-center gap-1.5">
-                                    <span className="w-2 h-2 rounded-full bg-blue-500"></span>
-                                    Друкарські роботи & CTP:
-                                  </span>
-                                  <span className="font-mono font-semibold text-slate-800">{activeCalc.printCost.toFixed(2)} ₴</span>
+                                <div className="flex justify-between p-2 rounded-lg bg-slate-50 border border-slate-100">
+                                  <span className="text-slate-600 font-medium">Друк & CTP-форми:</span>
+                                  <strong className="font-mono text-slate-900">{activeCalc.printCost.toFixed(2)} ₴</strong>
                                 </div>
-                                {activeCalc.lamCost > 0 && (
-                                  <div className="flex justify-between text-slate-600">
-                                    <span className="flex items-center gap-1.5">
-                                      <span className="w-2 h-2 rounded-full bg-indigo-500"></span>
-                                      Ламінація / Покриття:
-                                    </span>
-                                    <span className="font-mono font-semibold text-slate-800">{activeCalc.lamCost.toFixed(2)} ₴</span>
-                                  </div>
-                                )}
-                                {activeCalc.postpressSum > 0 && (
-                                  <div className="flex justify-between text-slate-600">
-                                    <span className="flex items-center gap-1.5">
-                                      <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-                                      Післядрукарські роботи:
-                                    </span>
-                                    <span className="font-mono font-semibold text-slate-800">{activeCalc.postpressSum.toFixed(2)} ₴</span>
-                                  </div>
-                                )}
+                                <div className="flex justify-between p-2 rounded-lg bg-slate-50 border border-slate-100">
+                                  <span className="text-slate-600 font-medium">Ламінація / Покриття:</span>
+                                  <strong className="font-mono text-slate-900">{activeCalc.lamCost.toFixed(2)} ₴</strong>
+                                </div>
+                                <div className="flex justify-between p-2 rounded-lg bg-slate-50 border border-slate-100">
+                                  <span className="text-slate-600 font-medium">Післядрукарські роботи:</span>
+                                  <strong className="font-mono text-slate-900">{activeCalc.postpressSum.toFixed(2)} ₴</strong>
+                                </div>
                                 {activeCalc.deliveryCost > 0 && (
-                                  <div className="flex justify-between text-slate-600">
-                                    <span className="flex items-center gap-1.5">
-                                      <span className="w-2 h-2 rounded-full bg-slate-400"></span>
-                                      Логістика / Доставка:
-                                    </span>
-                                    <span className="font-mono font-semibold text-slate-800">{activeCalc.deliveryCost.toFixed(2)} ₴</span>
+                                  <div className="flex justify-between p-2 rounded-lg bg-slate-50 border border-slate-100 col-span-2">
+                                    <span className="text-slate-600 font-medium">Доставка:</span>
+                                    <strong className="font-mono text-slate-900">{activeCalc.deliveryCost.toFixed(2)} ₴</strong>
                                   </div>
                                 )}
                               </div>
 
-                              <div className="pt-2 border-t border-slate-100 flex justify-between text-[11px] font-semibold text-slate-500">
-                                <span>Собівартість 1 примірника:</span>
-                                <span className="font-mono font-bold text-slate-800">
+                              <div className="flex justify-between text-[11px] font-semibold text-slate-500 px-1 pt-1">
+                                <span>Собівартість 1 екземпляра:</span>
+                                <strong className="font-mono text-slate-800">
                                   {(activeCalc.rawCost / activeCalc.tirazh).toFixed(4)} ₴ / шт
-                                </span>
+                                </strong>
                               </div>
                             </div>
 
-                            {/* Final Total Price Box */}
-                            <div className="p-4 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50/70 border border-blue-200/80 shadow-2xs">
+                            {/* Total Final Price Box */}
+                            <div className="p-3.5 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200">
                               <div className="flex justify-between items-baseline">
-                                <span className="text-xs font-bold text-slate-700 uppercase tracking-wide">РАЗОМ ДО СПЛАТИ:</span>
+                                <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wide">РАЗОМ ДО СПЛАТИ:</span>
                                 <span className="text-xs font-bold text-emerald-600 font-mono">
                                   +{liveMarginAmount.toFixed(2)} ₴ маржа
                                 </span>
                               </div>
-                              <p className="text-3xl font-black text-blue-600 my-1 font-mono tracking-tight">
-                                {liveFinalPrice} <span className="text-base font-bold text-slate-600">₴</span>
+                              <p className="text-2xl font-black text-blue-600 my-0.5 font-mono tracking-tight">
+                                {liveFinalPrice} <span className="text-sm font-bold text-slate-600">₴</span>
                               </p>
-                              <div className="flex justify-between items-center text-xs pt-2 border-t border-blue-200/60 font-semibold text-blue-900">
-                                <span>Ціна за 1 екземпляр:</span>
+                              <div className="flex justify-between items-center text-xs pt-1.5 border-t border-blue-200/60 font-semibold text-blue-900">
+                                <span>Ціна за 1 шт:</span>
                                 <strong className="font-mono font-bold">{liveUnitPrice.toFixed(2)} ₴ / шт</strong>
                               </div>
                             </div>
+                          </div>
 
-                            {/* Action Buttons Bar: Шаблон, ПДФ, КП, Виробництво */}
-                            <div className="flex flex-col gap-2 pt-1">
-                              <div className="grid grid-cols-3 gap-2">
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setShowTemplateModal(true);
-                                  }}
-                                  className="py-2 px-2.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold shadow-2xs transition-colors text-center"
-                                >
-                                  Шаблон
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    setName(fullComposedName);
-                                    setShowInvoice(true);
-                                  }}
-                                  className="py-2 px-2.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold shadow-2xs transition-colors text-center"
-                                >
-                                  ПДФ
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    const text = `Комерційна пропозиція № ${orderNumber}
+                          {/* 3. Right Box (3 cols): Vertical Stack of Action Buttons [ ШАБЛОН ] [ PDF ] [ КП ] [ ВИРОБНИЦТВО ] */}
+                          <div className="lg:col-span-3 flex flex-col gap-2 p-4 rounded-xl bg-white border border-slate-200 justify-between">
+                            <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wider pb-1.5 border-b border-slate-100">
+                              ДІЇ З ЗАМОВЛЕННЯМ:
+                            </span>
+
+                            <div className="flex flex-col gap-2 flex-1 justify-center">
+                              <button
+                                type="button"
+                                onClick={() => setShowTemplateModal(true)}
+                                className="w-full py-2.5 px-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-800 font-bold text-xs shadow-2xs transition-colors text-center"
+                              >
+                                Шаблон
+                              </button>
+                              
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setName(fullComposedName);
+                                  setShowInvoice(true);
+                                }}
+                                className="w-full py-2.5 px-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-800 font-bold text-xs shadow-2xs transition-colors text-center"
+                              >
+                                ПДФ
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const text = `Комерційна пропозиція № ${orderNumber}
 Замовник: ${effectiveClient}
 Продукція: ${category === 'Бланки' ? subCategory : (category as string)}
 Розмір: ${sheetCustomWidth} × ${sheetCustomHeight} ${sheetUnit}
@@ -6540,14 +6534,13 @@ export const Calculator: React.FC = () => {
 Тираж: ${activeCalc.tirazh} шт
 Вартість замовлення: ${liveFinalPrice} грн (${liveUnitPrice.toFixed(2)} грн/шт)
 Друкарня "Едельвейс і К"`;
-                                    navigator.clipboard.writeText(text);
-                                    alert('Комерційну пропозицію (КП) скопійовано в буфер обміну.');
-                                  }}
-                                  className="py-2 px-2.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold shadow-2xs transition-colors text-center"
-                                >
-                                  КП
-                                </button>
-                              </div>
+                                  navigator.clipboard.writeText(text);
+                                  alert('Комерційну пропозицію (КП) скопійовано в буфер обміну.');
+                                }}
+                                className="w-full py-2.5 px-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-800 font-bold text-xs shadow-2xs transition-colors text-center"
+                              >
+                                КП
+                              </button>
 
                               <button
                                 type="button"
@@ -6578,12 +6571,11 @@ export const Calculator: React.FC = () => {
                                   alert(`Замовлення № ${orderNumber} створено та передано у виробництво.`);
                                   setOrderNumber(Math.floor(10000 + Math.random() * 90000));
                                 }}
-                                className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md shadow-blue-500/20 transition-all text-center"
+                                className="w-full py-3 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs shadow-md shadow-blue-500/20 transition-all text-center"
                               >
                                 Виробництво
                               </button>
                             </div>
-
                           </div>
                         </div>
                       </div>
@@ -8653,6 +8645,423 @@ export const Calculator: React.FC = () => {
                       </table>
                     </div>
                   </div>
+
+                  {/* Digital Extended Order & Calculation Card matching user sketch */}
+                  {(() => {
+                    const digMatLabels: Record<string, string> = {
+                      '80': 'Офсет 80г',
+                      '90': 'Крейда МАТ 90г',
+                      '115': 'Крейда МАТ 115г',
+                      '130': 'Крейда МАТ 130г',
+                      '150': 'Крейда МАТ 150г',
+                      '170': 'Крейда МАТ 170г',
+                      '250': 'Крейда МАТ 250г',
+                      '300': 'Крейда МАТ 300г',
+                      '350': 'Крейда МАТ 350г',
+                      '450': 'Крейда МАТ 450г',
+                      'kraft_70': 'Крафт бурий 70г',
+                      'linen_300': 'Льон білий 300г',
+                      'tintoretto_crema': 'Tintoretto crema 300г',
+                      'tintoretto_gesso': 'Tintoretto gesso 300г',
+                      'stardream_opal': 'Stardream opal 285г',
+                      'stardream_diamond': 'Stardream diamond 285г',
+                      'stardream_topaz': 'Stardream topaz 285г',
+                      'raflatac': 'Самоклейка Raflatac',
+                    };
+                    const digCovLabels: Record<string, string> = {
+                      '0': 'Без покриття',
+                      '7': 'ГЛ ламінація 1+0',
+                      '8': 'ГЛ ламінація 1+1',
+                      '9': 'МАТ ламінація 1+0',
+                      '10': 'МАТ ламінація 1+1',
+                      '30': 'SOFT ламінація 1+0',
+                      '31': 'SOFT ламінація 1+1',
+                      'uv_10': 'УФ ЛАК 1+0',
+                      'uv_11': 'УФ ЛАК 1+1',
+                      'gibrid_10': 'Гібрид 1+0',
+                    };
+
+                    const digMatId = digitalSelectedMaterials[0] || '350';
+                    const digCovId = digitalSelectedCoverings[0] || '0';
+                    const digColId = digitalSelectedPrints[0] || '4+0';
+                    const digTir = selectedSheetCalc?.tirazh || 100;
+
+                    const digBaseRate = digColId.includes('4+4') || digColId.includes('5+5') ? 2.4 : 1.5;
+                    const digLamRate = digCovId === '0' ? 0 : digCovId.includes('3') ? 1.8 : 1.1;
+                    const digDeliv = digitalSheetWithDelivery ? 90 : 0;
+
+                    const digCorn = digitalSheetCornerCurve !== '0' ? 0.15 * digTir : 0;
+                    const digDr = digitalSheetDrilling !== '0' ? parseInt(digitalSheetDrilling) * 0.15 * digTir : 0;
+                    const digLuv = digitalSheetLuvers !== '0' ? 1.20 * digTir : 0;
+                    const digPers = digitalSheetPersonalization !== '0' ? 0.35 * digTir : 0;
+                    const digFld = digitalSheetFolding !== '0' ? parseInt(digitalSheetFolding) * norms.foldingPrice * digTir : 0;
+                    const digGl = digitalSheetGluingBlock !== '0' ? 0.25 * digTir : 0;
+                    const digPostSum = digCorn + digDr + digLuv + digPers + digFld + digGl;
+
+                    const digPaperCost = digTir * 0.85;
+                    const digPrintCost = digTir * digBaseRate;
+                    const digLamCost = digTir * digLamRate;
+                    const digRawCost = digPaperCost + digPrintCost + digLamCost + digPostSum + digDeliv + 45;
+
+                    const digFinalPrice = Math.round(digRawCost * (1 + marginPercent / 100));
+                    const digMarginAmount = Math.max(0, digFinalPrice - digRawCost);
+                    const digUnitPrice = digFinalPrice / digTir;
+
+                    const effectiveClient = isNewClientMode && customClientName.trim()
+                      ? customClientName.trim()
+                      : (activeClient?.name || 'Замовник');
+                    const turnShortLabel = turnType === 'sam_na_sebe' ? 'с/с' : turnType === 'bez_oborotu' ? 'без обор.' : 'ч/о';
+                    const fullComposedName = `№ ${orderNumber} - Цифровий друк ${sheetCustomWidth}×${sheetCustomHeight} ${sheetUnit} — ${effectiveClient} (${digMatLabels[digMatId] || '350г'}, ${digCovLabels[digCovId] || 'БП'}, ${digColId}, ${turnShortLabel}, ${digTir} шт.)`;
+
+                    return (
+                      <div id="detailed-digital-calculation" className="ios-card bg-white" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px', border: '1px solid #bfdbfe', boxShadow: '0 10px 25px -5px rgba(59, 130, 246, 0.1)' }}>
+                        {/* Section Header */}
+                        <div className="flex items-center justify-between flex-wrap gap-3 pb-3 border-b border-slate-100">
+                          <div className="flex items-center gap-3">
+                            <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center text-sm font-bold shadow-sm">
+                              <FileText size={18} />
+                            </div>
+                            <div>
+                              <h4 className="text-base font-black text-slate-900 m-0">
+                                Оформлення та кошторис: Цифровий друк
+                              </h4>
+                              <span className="text-xs text-slate-500 font-medium">
+                                Параметри розрахунку, розцінки 1С та формування документів
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-bold px-3 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+                              {digTir} шт
+                            </span>
+                            <span className="text-xs font-bold px-3 py-1 rounded-full bg-slate-100 text-slate-700">
+                              {digColId} ({turnShortLabel})
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Top 3-Field Strip: [ № ] [ ЗАМОВНИК ] [ ПРОДУКЦІЯ (авто) ] */}
+                        <div className="grid grid-cols-1 md:grid-cols-12 gap-3 p-4 rounded-xl bg-slate-50 border border-slate-200">
+                          {/* 1. Номер замовлення */}
+                          <div className="md:col-span-3 flex flex-col gap-1">
+                            <label className="text-[11px] font-extrabold text-slate-700 uppercase">№ Замовлення:</label>
+                            <div className="flex items-center gap-1.5">
+                              <input
+                                type="text"
+                                value={`№ ${orderNumber}`}
+                                onChange={(e) => {
+                                  const n = parseInt(e.target.value.replace(/\D/g, ''));
+                                  if (n) setOrderNumber(n);
+                                }}
+                                className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-black text-blue-700"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => setOrderNumber(Math.floor(10000 + Math.random() * 90000))}
+                                className="px-2 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 text-slate-600 text-xs font-bold transition-colors"
+                                title="Згенерувати новий номер"
+                              >
+                                <RotateCcw size={13} />
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* 2. Замовник */}
+                          <div className="md:col-span-4 flex flex-col gap-1">
+                            <div className="flex items-center justify-between">
+                              <label className="text-[11px] font-extrabold text-slate-700 uppercase">Замовник:</label>
+                              <button
+                                type="button"
+                                onClick={() => setIsNewClientMode(!isNewClientMode)}
+                                className="text-[10px] font-bold text-blue-600 hover:text-blue-800 underline"
+                              >
+                                {isNewClientMode ? 'Вибрати з бази' : '+ Вписати нового'}
+                              </button>
+                            </div>
+
+                            {isNewClientMode ? (
+                              <input
+                                type="text"
+                                placeholder="Введіть назву клієнта"
+                                value={customClientName}
+                                onChange={(e) => setCustomClientName(e.target.value)}
+                                className="w-full px-3 py-1.5 rounded-lg border border-blue-400 bg-white text-xs font-bold text-slate-900 focus:outline-none"
+                                autoFocus
+                              />
+                            ) : (
+                              <select
+                                value={selectedClientId}
+                                onChange={(e) => setSelectedClientId(e.target.value)}
+                                className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-bold text-slate-800 focus:outline-none"
+                              >
+                                <option value="">-- Оберіть замовника з бази --</option>
+                                {clients.map(c => (
+                                  <option key={c.id} value={c.id}>{c.name}</option>
+                                ))}
+                              </select>
+                            )}
+                          </div>
+
+                          {/* 3. Продукція (авто) */}
+                          <div className="md:col-span-5 flex flex-col gap-1">
+                            <div className="flex items-center justify-between">
+                              <label className="text-[11px] font-extrabold text-slate-700 uppercase">Продукція:</label>
+                              <span className="text-[9px] font-bold text-blue-700 bg-blue-100 px-1.5 py-0.2 rounded">авто</span>
+                            </div>
+                            <input
+                              type="text"
+                              value={name || fullComposedName}
+                              onChange={(e) => setName(e.target.value)}
+                              className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold text-slate-800"
+                            />
+                          </div>
+                        </div>
+
+                        {/* 3-Box Bottom Section matching user sketch exactly:
+                            Left: ОБОРОТ | Middle: РОЗРАХУНОК | Right: [ ШАБЛОН ] [ PDF ] [ КП ] [ ВИРОБНИЦТВО ] */}
+                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
+                          {/* 1. Left Box (3 cols): ОБОРОТ & Параметри тиражу */}
+                          <div className="lg:col-span-3 flex flex-col gap-3 p-4 rounded-xl bg-white border border-slate-200 justify-between">
+                            <div className="flex flex-col gap-3">
+                              <div className="flex items-center justify-between pb-1.5 border-b border-slate-100">
+                                <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wider">ОБОРОТ (СПУСК):</span>
+                              </div>
+                              
+                              <div className="flex flex-col gap-1.5">
+                                {[
+                                  { id: 'sam_na_sebe', label: 'Сам на себе (с/с)' },
+                                  { id: 'chuzhyi_oborut', label: 'Чужий оборот (ч/о)' },
+                                  { id: 'bez_oborotu', label: 'Без обороту' }
+                                ].map(t => (
+                                  <button
+                                    key={t.id}
+                                    type="button"
+                                    onClick={() => handleSelectTurnType(t.id as any)}
+                                    className={`py-2 px-2.5 rounded-lg text-xs font-bold transition-all text-left flex items-center justify-between border ${
+                                      turnType === t.id
+                                        ? 'bg-blue-600 text-white border-blue-600 shadow-2xs'
+                                        : 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100'
+                                    }`}
+                                  >
+                                    <span>{t.label}</span>
+                                    {turnType === t.id && <span className="text-white text-xs font-black">✓</span>}
+                                  </button>
+                                ))}
+                              </div>
+
+                              {/* Tirazh */}
+                              <div className="flex flex-col gap-1 pt-1">
+                                <label className="text-[11px] font-bold text-slate-600 uppercase">Наклад (шт):</label>
+                                <input
+                                  type="number"
+                                  value={digTir}
+                                  onChange={(e) => {
+                                    const val = parseInt(e.target.value) || 100;
+                                    setSelectedSheetCalc(prev => prev ? { ...prev, tirazh: val } : {
+                                      matId: digMatId,
+                                      covId: digCovId,
+                                      colStr: digColId,
+                                      tirazh: val,
+                                      matName: digMatLabels[digMatId] || 'Папір',
+                                      covName: digCovLabels[digCovId] || 'БП',
+                                      rawCost: digRawCost,
+                                      basePaperCost: digPaperCost,
+                                      printCost: digPrintCost,
+                                      lamCost: digLamCost,
+                                      postpressSum: digPostSum,
+                                      deliveryCost: digDeliv,
+                                      finalPrice: digFinalPrice,
+                                      unitPrice: digUnitPrice
+                                    });
+                                  }}
+                                  className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 text-xs font-bold text-slate-900 text-center font-mono"
+                                />
+                              </div>
+
+                              {/* Margin slider & presets */}
+                              <div className="flex flex-col gap-1 pt-1">
+                                <div className="flex items-center justify-between text-xs">
+                                  <label className="text-[11px] font-bold text-slate-600 uppercase">Націнка:</label>
+                                  <span className="font-extrabold text-blue-600 font-mono">{marginPercent}%</span>
+                                </div>
+                                <input
+                                  type="range"
+                                  min="0"
+                                  max="300"
+                                  step="5"
+                                  value={marginPercent}
+                                  onChange={(e) => setMarginPercent(Number(e.target.value) || 0)}
+                                  className="w-full cursor-pointer accent-blue-600"
+                                />
+                                <div className="grid grid-cols-5 gap-1 pt-1">
+                                  {[20, 35, 50, 100, 150].map(m => (
+                                    <button
+                                      key={m}
+                                      type="button"
+                                      onClick={() => setMarginPercent(m)}
+                                      className={`py-1 text-[10px] font-bold rounded transition-all ${
+                                        marginPercent === m
+                                          ? 'bg-blue-600 text-white shadow-2xs'
+                                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                      }`}
+                                    >
+                                      {m}%
+                                    </button>
+                                  ))}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* 2. Middle Box (6 cols): РОЗРАХУНОК (Деталі кошторису 1С та РАЗОМ) */}
+                          <div className="lg:col-span-6 flex flex-col gap-3 p-4 rounded-xl bg-white border border-slate-200 justify-between">
+                            <div className="flex flex-col gap-2.5">
+                              <div className="flex justify-between items-center pb-2 border-b border-slate-100">
+                                <span className="text-xs font-black text-slate-800 uppercase tracking-wide">
+                                  РОЗРАХУНОК (Собівартість & Норми 1С):
+                                </span>
+                                <strong className="text-sm font-black text-slate-900 font-mono">
+                                  {digRawCost.toFixed(2)} ₴
+                                </strong>
+                              </div>
+
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                                <div className="flex justify-between p-2 rounded-lg bg-slate-50 border border-slate-100">
+                                  <span className="text-slate-600 font-medium">Матеріали / Папір:</span>
+                                  <strong className="font-mono text-slate-900">{digPaperCost.toFixed(2)} ₴</strong>
+                                </div>
+                                <div className="flex justify-between p-2 rounded-lg bg-slate-50 border border-slate-100">
+                                  <span className="text-slate-600 font-medium">Цифровий друк:</span>
+                                  <strong className="font-mono text-slate-900">{digPrintCost.toFixed(2)} ₴</strong>
+                                </div>
+                                <div className="flex justify-between p-2 rounded-lg bg-slate-50 border border-slate-100">
+                                  <span className="text-slate-600 font-medium">Ламінація / Покриття:</span>
+                                  <strong className="font-mono text-slate-900">{digLamCost.toFixed(2)} ₴</strong>
+                                </div>
+                                <div className="flex justify-between p-2 rounded-lg bg-slate-50 border border-slate-100">
+                                  <span className="text-slate-600 font-medium">Післядрукарські роботи:</span>
+                                  <strong className="font-mono text-slate-900">{digPostSum.toFixed(2)} ₴</strong>
+                                </div>
+                                {digDeliv > 0 && (
+                                  <div className="flex justify-between p-2 rounded-lg bg-slate-50 border border-slate-100 col-span-2">
+                                    <span className="text-slate-600 font-medium">Доставка:</span>
+                                    <strong className="font-mono text-slate-900">{digDeliv.toFixed(2)} ₴</strong>
+                                  </div>
+                                )}
+                              </div>
+
+                              <div className="flex justify-between text-[11px] font-semibold text-slate-500 px-1 pt-1">
+                                <span>Собівартість 1 екземпляра:</span>
+                                <strong className="font-mono text-slate-800">
+                                  {(digRawCost / digTir).toFixed(4)} ₴ / шт
+                                </strong>
+                              </div>
+                            </div>
+
+                            {/* Total Final Price Box */}
+                            <div className="p-3.5 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200">
+                              <div className="flex justify-between items-baseline">
+                                <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wide">РАЗОМ ДО СПЛАТИ:</span>
+                                <span className="text-xs font-bold text-emerald-600 font-mono">
+                                  +{digMarginAmount.toFixed(2)} ₴ маржа
+                                </span>
+                              </div>
+                              <p className="text-2xl font-black text-blue-600 my-0.5 font-mono tracking-tight">
+                                {digFinalPrice} <span className="text-sm font-bold text-slate-600">₴</span>
+                              </p>
+                              <div className="flex justify-between items-center text-xs pt-1.5 border-t border-blue-200/60 font-semibold text-blue-900">
+                                <span>Ціна за 1 шт:</span>
+                                <strong className="font-mono font-bold">{digUnitPrice.toFixed(2)} ₴ / шт</strong>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* 3. Right Box (3 cols): Vertical Stack of Action Buttons [ ШАБЛОН ] [ PDF ] [ КП ] [ ВИРОБНИЦТВО ] */}
+                          <div className="lg:col-span-3 flex flex-col gap-2 p-4 rounded-xl bg-white border border-slate-200 justify-between">
+                            <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wider pb-1.5 border-b border-slate-100">
+                              ДІЇ З ЗАМОВЛЕННЯМ:
+                            </span>
+
+                            <div className="flex flex-col gap-2 flex-1 justify-center">
+                              <button
+                                type="button"
+                                onClick={() => setShowTemplateModal(true)}
+                                className="w-full py-2.5 px-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-800 font-bold text-xs shadow-2xs transition-colors text-center"
+                              >
+                                Шаблон
+                              </button>
+                              
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setName(fullComposedName);
+                                  setShowInvoice(true);
+                                }}
+                                className="w-full py-2.5 px-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-800 font-bold text-xs shadow-2xs transition-colors text-center"
+                              >
+                                ПДФ
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const text = `Комерційна пропозиція № ${orderNumber}
+Замовник: ${effectiveClient}
+Продукція: Цифровий друк
+Розмір: ${sheetCustomWidth} × ${sheetCustomHeight} ${sheetUnit}
+Матеріал: ${digMatLabels[digMatId] || '350г'}
+Покриття: ${digCovLabels[digCovId] || 'БП'}
+Друк: ${digColId} (Оборот: ${turnShortLabel})
+Тираж: ${digTir} шт
+Вартість замовлення: ${digFinalPrice} грн (${digUnitPrice.toFixed(2)} грн/шт)
+Друкарня "Едельвейс і К"`;
+                                  navigator.clipboard.writeText(text);
+                                  alert('Комерційну пропозицію (КП) скопійовано в буфер обміну.');
+                                }}
+                                className="w-full py-2.5 px-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-800 font-bold text-xs shadow-2xs transition-colors text-center"
+                              >
+                                КП
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  addOrder({
+                                    name: name || fullComposedName,
+                                    clientId: isNewClientMode ? (customClientName || 'Новий клієнт') : selectedClientId,
+                                    category: 'Цифровий друк',
+                                    quantity: digTir,
+                                    packingCount: 1,
+                                    paperType: 'coated',
+                                    colors: digColId,
+                                    isSamNaSebe: turnType === 'sam_na_sebe',
+                                    designCost: designCost,
+                                    margin: marginPercent,
+                                    machine: 'Цифрова машина Konica Minolta',
+                                    format: `${sheetCustomWidth}×${sheetCustomHeight}`,
+                                    physicalSheets: Math.ceil(digTir / 2),
+                                    itemsPerSheet: 2,
+                                    subtotal: digRawCost,
+                                    marginAmount: digMarginAmount,
+                                    finalPrice: digFinalPrice,
+                                    unitPrice: digUnitPrice,
+                                    paymentStatus: 'unpaid',
+                                    prepayment: 0,
+                                    notes: `Специфікація: ${name || fullComposedName}, ${sheetCustomWidth}×${sheetCustomHeight} ${sheetUnit}, ${digMatLabels[digMatId] || '350г'}, ${digCovLabels[digCovId] || 'БП'}, ${digColId}, ${digTir} шт.`
+                                  });
+                                  alert(`Замовлення № ${orderNumber} створено та передано у виробництво.`);
+                                  setOrderNumber(Math.floor(10000 + Math.random() * 90000));
+                                }}
+                                className="w-full py-3 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs shadow-md shadow-blue-500/20 transition-all text-center"
+                              >
+                                Виробництво
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
               )}
 
