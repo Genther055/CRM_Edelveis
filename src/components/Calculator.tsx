@@ -5303,7 +5303,6 @@ export const Calculator: React.FC = () => {
                             renderSvg: (active: boolean) => (
                               <svg width="60" height="38" viewBox="0 0 64 42" fill="none">
                                 <rect x="4" y="6" width="56" height="30" rx="3" stroke={active ? '#2563eb' : '#94a3b8'} strokeWidth="1.5" fill={active ? '#eff6ff' : '#ffffff'} />
-                                <rect x="27" y="16" width="10" height="10" stroke={active ? '#2563eb' : '#cbd5e1'} strokeWidth="1.2" fill="none" />
                               </svg>
                             )
                           },
@@ -5316,7 +5315,6 @@ export const Calculator: React.FC = () => {
                             renderSvg: (active: boolean) => (
                               <svg width="60" height="38" viewBox="0 0 64 42" fill="none">
                                 <rect x="17" y="6" width="30" height="30" rx="3" stroke={active ? '#2563eb' : '#94a3b8'} strokeWidth="1.5" fill={active ? '#eff6ff' : '#ffffff'} />
-                                <rect x="27" y="16" width="10" height="10" stroke={active ? '#2563eb' : '#cbd5e1'} strokeWidth="1.2" fill="none" />
                               </svg>
                             )
                           },
@@ -5343,7 +5341,6 @@ export const Calculator: React.FC = () => {
                             renderSvg: (active: boolean) => (
                               <svg width="60" height="38" viewBox="0 0 64 42" fill="none">
                                 <circle cx="32" cy="21" r="16" stroke={active ? '#2563eb' : '#94a3b8'} strokeWidth="1.5" fill={active ? '#eff6ff' : '#ffffff'} />
-                                <rect x="27" y="16" width="10" height="10" stroke={active ? '#2563eb' : '#cbd5e1'} strokeWidth="1.2" fill="none" />
                               </svg>
                             )
                           },
@@ -5356,7 +5353,6 @@ export const Calculator: React.FC = () => {
                             renderSvg: (active: boolean) => (
                               <svg width="60" height="38" viewBox="0 0 64 42" fill="none">
                                 <ellipse cx="32" cy="21" rx="26" ry="16" stroke={active ? '#2563eb' : '#94a3b8'} strokeWidth="1.5" fill={active ? '#eff6ff' : '#ffffff'} />
-                                <rect x="27" y="16" width="10" height="10" stroke={active ? '#2563eb' : '#cbd5e1'} strokeWidth="1.2" fill="none" />
                               </svg>
                             )
                           },
@@ -5369,7 +5365,6 @@ export const Calculator: React.FC = () => {
                             renderSvg: (active: boolean) => (
                               <svg width="60" height="38" viewBox="0 0 64 42" fill="none">
                                 <rect x="4" y="6" width="56" height="30" rx="8" stroke={active ? '#2563eb' : '#94a3b8'} strokeWidth="1.5" fill={active ? '#eff6ff' : '#ffffff'} />
-                                <rect x="27" y="16" width="10" height="10" stroke={active ? '#2563eb' : '#cbd5e1'} strokeWidth="1.2" fill="none" />
                               </svg>
                             )
                           }
