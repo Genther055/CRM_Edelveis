@@ -1001,6 +1001,22 @@ export const Calculator: React.FC = () => {
   // Table options
   const [includeDelivery, setIncludeDelivery] = useState<boolean>(false);
   const [priceCostVar, setPriceCostVar] = useState<'per_item' | 'per_tirazh'>('per_tirazh');
+  const [selectedSheetCalc, setSelectedSheetCalc] = useState<{
+    matId: string;
+    matName: string;
+    covId: string;
+    covName: string;
+    colStr: string;
+    tirazh: number;
+    basePaperCost: number;
+    printCost: number;
+    lamCost: number;
+    postpressSum: number;
+    deliveryCost: number;
+    rawCost: number;
+    finalPrice: number;
+    unitPrice: number;
+  } | null>(null);
 
   // Active info modal state ('instruction' | 'terms' | 'materials' | 'samples' | 'review' | 'bug' | null)
   const [activeInfoModal, setActiveInfoModal] = useState<string | null>(null);
@@ -3883,12 +3899,14 @@ export const Calculator: React.FC = () => {
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <button
                           type="button"
-                          onClick={() => setStep('editor')}
+                          onClick={() => {
+                            document.getElementById('detailed-sheet-calculation')?.scrollIntoView({ behavior: 'smooth' });
+                          }}
                           className="ios-badge ios-badge-blue"
                           style={{ padding: '8px 14px', borderRadius: 'var(--radius-md)', fontSize: '12px', fontWeight: '700', cursor: 'pointer', border: 'none', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
                         >
                           <Settings size={14} />
-                          <span>Конструктор розрахунку</span>
+                          <span>Розрахунок замовлення</span>
                         </button>
                         <button
                           type="button"
@@ -5018,19 +5036,60 @@ export const Calculator: React.FC = () => {
                                         const itemCost = rawTotal / tir;
                                         const displayVal = priceCostVar === 'per_item' ? itemCost.toFixed(2) : Math.round(rawTotal).toString();
 
+                                        const isSelectedCell = selectedSheetCalc && 
+                                          selectedSheetCalc.matId === matId && 
+                                          selectedSheetCalc.covId === covId && 
+                                          selectedSheetCalc.colStr === colStr && 
+                                          selectedSheetCalc.tirazh === tir;
+
                                         return (
                                           <td
                                             key={tir}
                                             onClick={() => {
-                                              setQuantity(tir);
-                                              setPaperType(matId === '80' ? 'offset' : 'coated');
-                                              setColors(colStr);
-                                              setCategory('Візитки');
-                                              setStep('editor');
+                                              setSelectedSheetCalc({
+                                                matId,
+                                                matName,
+                                                covId,
+                                                covName,
+                                                colStr,
+                                                tirazh: tir,
+                                                basePaperCost,
+                                                printCost,
+                                                lamCost,
+                                                postpressSum,
+                                                deliveryCost,
+                                                rawCost: (basePaperCost + printCost + lamCost + postpressSum + deliveryCost) * (sheetSetsCount || 1),
+                                                finalPrice: Math.round(rawTotal),
+                                                unitPrice: itemCost
+                                              });
+                                              setTimeout(() => {
+                                                document.getElementById('detailed-sheet-calculation')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                                              }, 50);
                                             }}
-                                            style={{ padding: '8px', fontWeight: '700', color: '#111', cursor: 'pointer', borderRight: '1px solid #e0e0e0', transition: 'all 0.12s ease' }}
-                                            onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#fff0f0'; e.currentTarget.style.color = '#c00'; }}
-                                            onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = 'transparent'; e.currentTarget.style.color = '#111'; }}
+                                            style={{
+                                              padding: '8px',
+                                              fontWeight: '700',
+                                              cursor: 'pointer',
+                                              borderRight: '1px solid #e0e0e0',
+                                              transition: 'all 0.15s ease',
+                                              backgroundColor: isSelectedCell ? '#e0f2fe' : (rowIdx % 2 === 0 ? '#ffffff' : '#fafafa'),
+                                              color: isSelectedCell ? '#0284c7' : '#111',
+                                              outline: isSelectedCell ? '2px solid #0284c7' : 'none',
+                                              zIndex: isSelectedCell ? 1 : 0,
+                                              position: isSelectedCell ? 'relative' : 'static'
+                                            }}
+                                            onMouseEnter={(e) => { 
+                                              if (!isSelectedCell) {
+                                                e.currentTarget.style.backgroundColor = '#fff0f0'; 
+                                                e.currentTarget.style.color = '#c00'; 
+                                              }
+                                            }}
+                                            onMouseLeave={(e) => { 
+                                              if (!isSelectedCell) {
+                                                e.currentTarget.style.backgroundColor = rowIdx % 2 === 0 ? '#ffffff' : '#fafafa'; 
+                                                e.currentTarget.style.color = '#111'; 
+                                              }
+                                            }}
                                           >
                                             {displayVal} грн
                                           </td>
@@ -5046,6 +5105,336 @@ export const Calculator: React.FC = () => {
                       </table>
                     </div>
                   </div>
+
+                  {/* Detailed Interactive Calculation & Order Generation Card directly on the SAME page */}
+                  {(() => {
+                    // Default calculation if none clicked yet
+                    const matId = selectedMaterials[0] || '130';
+                    const covId = selectedCoverings[0] || '0';
+                    const colStr = selectedPrintColors[0] || '4+4';
+                    const tir = 1000;
+                    const matLabels: Record<string, string> = {
+                      'kraft_70': 'Крафт бурий 70г',
+                      '80': 'Офсет 80г',
+                      'linen_300': 'Льон білий 300г',
+                      'tintoretto_crema': 'Tintoretto crema 300г',
+                      'tintoretto_gesso': 'Tintoretto gesso 300г',
+                      'stardream_opal': 'Stardream opal 285г',
+                      'stardream_diamond': 'Stardream diamond 285г',
+                      'stardream_topaz': 'Stardream topaz 285г',
+                      '90': 'Крейда МАТ 90г',
+                      '115': 'Крейда МАТ 115г',
+                      '130': 'Крейда МАТ 130г',
+                      '150': 'Крейда МАТ 150г',
+                      '170': 'Крейда МАТ 170г',
+                      '250': 'Крейда МАТ 250г',
+                      '300': 'Крейда МАТ 300г',
+                      '350': 'Крейда МАТ 350г',
+                      '450': 'Крейда МАТ 450г'
+                    };
+                    const covLabels: Record<string, string> = {
+                      '0': 'БП (Без покриття)',
+                      '7': 'Глянцева ламінація 1+0',
+                      '8': 'Глянцева ламінація 1+1',
+                      '9': 'Матова ламінація 1+0',
+                      '10': 'Матова ламінація 1+1',
+                      '30': 'SoftTouch ламінація 1+0',
+                      '31': 'SoftTouch ламінація 1+1',
+                      'uv_10': 'УФ ЛАК 1+0',
+                      'uv_11': 'УФ ЛАК 1+1',
+                      'gibrid_10': 'Гібрид 1+0'
+                    };
+                    const defaultMatName = matLabels[matId] || `Папір ${matId}г`;
+                    const defaultCovName = covLabels[covId] || 'Без покриття';
+                    const matDensity = parseInt(matId.replace(/\D/g, '')) || 300;
+                    const areaM2 = (parseFloat(sheetCustomWidth) / 1000) * (parseFloat(sheetCustomHeight) / 1000);
+                    const isDouble = colStr === '4+4' || colStr === '1+1';
+                    const foldingCostPerItem = postFolding !== '0' ? norms.foldingPrice : 0;
+                    const creasingCostPerItem = postCreasing !== '0' ? parseInt(postCreasing) * norms.foldingPrice : 0;
+                    const dieCutCostPerItem = cardKind === '7' || cardKind === '8' || cardKind === '9' ? norms.dieCuttingPrice : 0;
+                    const postpressTotalPerItem = foldingCostPerItem + creasingCostPerItem + dieCutCostPerItem;
+
+                    const defPaperCost = areaM2 * (matDensity * 0.08) * tir;
+                    const defPrintCost = (isDouble ? 0.35 : 0.20) * tir + (tir > 500 ? 80 : 120);
+                    const defLamCost = (covId !== '0' && covId !== '') ? areaM2 * norms.laminationMattePrice * tir * (covId.includes('1+1') ? 2 : 1) : 0;
+                    const defPostCost = postpressTotalPerItem * tir;
+                    const defDelivCost = includeDelivery ? 80 : 0;
+                    const defRawCost = (defPaperCost + defPrintCost + defLamCost + defPostCost + defDelivCost) * (sheetSetsCount || 1);
+                    const defFinalPrice = Math.round(defRawCost * (marginPercent / 100));
+                    const defUnitPrice = defFinalPrice / tir;
+
+                    const activeCalc = selectedSheetCalc || {
+                      matId,
+                      matName: defaultMatName,
+                      covId,
+                      covName: defaultCovName,
+                      colStr,
+                      tirazh: tir,
+                      basePaperCost: defPaperCost,
+                      printCost: defPrintCost,
+                      lamCost: defLamCost,
+                      postpressSum: defPostCost,
+                      deliveryCost: defDelivCost,
+                      rawCost: defRawCost,
+                      finalPrice: defFinalPrice,
+                      unitPrice: defUnitPrice
+                    };
+
+                    // Recompute live with current margin
+                    const liveFinalPrice = Math.round(activeCalc.rawCost * (marginPercent / 100));
+                    const liveUnitPrice = liveFinalPrice / activeCalc.tirazh;
+                    const liveMarginAmount = Math.max(0, liveFinalPrice - activeCalc.rawCost);
+
+                    return (
+                      <div id="detailed-sheet-calculation" className="ios-card bg-white" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px', border: '1px solid #bfdbfe', boxShadow: '0 10px 25px -5px rgba(59, 130, 246, 0.1)' }}>
+                        {/* Header */}
+                        <div className="flex items-center justify-between flex-wrap gap-3 pb-3 border-b border-slate-100">
+                          <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center text-lg font-bold shadow-sm">
+                              📊
+                            </div>
+                            <div>
+                              <h4 className="text-base font-black text-slate-900 m-0">
+                                Кошторис та оформлення замовлення: {category === 'Бланки' ? subCategory : (category as string)}
+                              </h4>
+                              <span className="text-xs text-slate-500 font-medium">
+                                Повний розрахунок вартості, виробничих норм 1С та собівартості для обраних параметрів
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-bold px-3 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+                              {activeCalc.tirazh} шт
+                            </span>
+                            <span className="text-xs font-bold px-3 py-1 rounded-full bg-slate-100 text-slate-700">
+                              {activeCalc.colStr}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* 2-Column Grid */}
+                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                          {/* Left Column: Full Specification & Cost Breakdown (7 cols) */}
+                          <div className="lg:col-span-7 flex flex-col gap-4">
+                            {/* Specs Grid */}
+                            <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/80 flex flex-col gap-2">
+                              <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wide">
+                                Параметри специфікації:
+                              </span>
+                              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 text-xs">
+                                <div>
+                                  <span className="text-slate-400 block text-[10px]">Розмір готового виробу:</span>
+                                  <strong className="text-slate-800 font-mono">{sheetCustomWidth} × {sheetCustomHeight} {sheetUnit}</strong>
+                                </div>
+                                <div>
+                                  <span className="text-slate-400 block text-[10px]">Матеріал:</span>
+                                  <strong className="text-slate-800">{activeCalc.matName}</strong>
+                                </div>
+                                <div>
+                                  <span className="text-slate-400 block text-[10px]">Покриття:</span>
+                                  <strong className="text-slate-800">{activeCalc.covName}</strong>
+                                </div>
+                                <div>
+                                  <span className="text-slate-400 block text-[10px]">Кольоровість:</span>
+                                  <strong className="text-slate-800 font-mono">{activeCalc.colStr}</strong>
+                                </div>
+                                <div>
+                                  <span className="text-slate-400 block text-[10px]">Тираж (Наклад):</span>
+                                  <strong className="text-blue-600 font-mono font-bold">{activeCalc.tirazh} шт</strong>
+                                </div>
+                                <div>
+                                  <span className="text-slate-400 block text-[10px]">Комплектів макетів:</span>
+                                  <strong className="text-slate-800 font-mono">{sheetSetsCount || 1} шт</strong>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Cost Breakdown */}
+                            <div className="p-3.5 rounded-xl bg-white border border-slate-200 flex flex-col gap-2.5">
+                              <div className="flex justify-between items-center pb-2 border-b border-slate-100">
+                                <span className="text-xs font-bold text-slate-800 uppercase tracking-wide">
+                                  Собівартість виробництва (Прямі норми 1С):
+                                </span>
+                                <strong className="text-sm font-extrabold text-slate-900 font-mono">
+                                  {activeCalc.rawCost.toFixed(2)} ₴
+                                </strong>
+                              </div>
+
+                              <div className="flex flex-col gap-1.5 text-xs">
+                                <div className="flex justify-between text-slate-600">
+                                  <span className="flex items-center gap-1.5">
+                                    <span className="w-2 h-2 rounded-full bg-amber-500"></span>
+                                    Папір / Матеріал:
+                                  </span>
+                                  <span className="font-mono font-semibold text-slate-800">{activeCalc.basePaperCost.toFixed(2)} ₴</span>
+                                </div>
+                                <div className="flex justify-between text-slate-600">
+                                  <span className="flex items-center gap-1.5">
+                                    <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                                    Друк & CTP-форми:
+                                  </span>
+                                  <span className="font-mono font-semibold text-slate-800">{activeCalc.printCost.toFixed(2)} ₴</span>
+                                </div>
+                                {activeCalc.lamCost > 0 && (
+                                  <div className="flex justify-between text-slate-600">
+                                    <span className="flex items-center gap-1.5">
+                                      <span className="w-2 h-2 rounded-full bg-indigo-500"></span>
+                                      Ламінування (плівка + робота):
+                                    </span>
+                                    <span className="font-mono font-semibold text-slate-800">{activeCalc.lamCost.toFixed(2)} ₴</span>
+                                  </div>
+                                )}
+                                {activeCalc.postpressSum > 0 && (
+                                  <div className="flex justify-between text-slate-600">
+                                    <span className="flex items-center gap-1.5">
+                                      <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                      Післядрук (фальцювання, бігування, порізка):
+                                    </span>
+                                    <span className="font-mono font-semibold text-slate-800">{activeCalc.postpressSum.toFixed(2)} ₴</span>
+                                  </div>
+                                )}
+                                {activeCalc.deliveryCost > 0 && (
+                                  <div className="flex justify-between text-slate-600">
+                                    <span className="flex items-center gap-1.5">
+                                      <span className="w-2 h-2 rounded-full bg-slate-400"></span>
+                                      Логістика / Доставка:
+                                    </span>
+                                    <span className="font-mono font-semibold text-slate-800">{activeCalc.deliveryCost.toFixed(2)} ₴</span>
+                                  </div>
+                                )}
+                              </div>
+
+                              <div className="pt-2 border-t border-slate-100 flex justify-between text-[11px] font-semibold text-slate-500">
+                                <span>Собівартість 1 примірника:</span>
+                                <span className="font-mono font-bold text-slate-800">
+                                  {(activeCalc.rawCost / activeCalc.tirazh).toFixed(4)} ₴ / шт
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Right Column: Margin, Price & Actions (5 cols) */}
+                          <div className="lg:col-span-5 flex flex-col justify-between gap-4">
+                            {/* Big Final Price Box */}
+                            <div className="p-4 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50/70 border border-blue-200/80">
+                              <div className="flex justify-between items-baseline">
+                                <span className="text-xs font-bold text-slate-600">Фінальна вартість для клієнта:</span>
+                                <span className="text-xs font-bold text-emerald-600 font-mono">
+                                  +{liveMarginAmount.toFixed(2)} ₴ прибуток
+                                </span>
+                              </div>
+                              <p className="text-3xl font-black text-blue-600 my-1 font-mono tracking-tight">
+                                {liveFinalPrice} <span className="text-base font-bold text-slate-600">₴</span>
+                              </p>
+                              <div className="flex justify-between items-center text-xs pt-2 border-t border-blue-200/60 font-semibold text-blue-900">
+                                <span>Ціна за 1 шт:</span>
+                                <strong className="font-mono font-bold">{liveUnitPrice.toFixed(2)} ₴ / шт</strong>
+                              </div>
+                            </div>
+
+                            {/* Margin Selector */}
+                            <div className="flex flex-col gap-2">
+                              <div className="flex justify-between items-center text-xs">
+                                <label className="font-semibold text-slate-600">Націнка (Маржа друкарні):</label>
+                                <span className="font-extrabold text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-200">
+                                  {marginPercent}%
+                                </span>
+                              </div>
+                              <input 
+                                type="range"
+                                min="0"
+                                max="300"
+                                step="5"
+                                value={marginPercent}
+                                onChange={(e) => setMarginPercent(Number(e.target.value))}
+                                className="w-full cursor-pointer accent-blue-600"
+                              />
+                              <div className="flex gap-1 bg-slate-100 p-1 rounded-lg">
+                                {[20, 35, 50, 100, 150].map(m => (
+                                  <button
+                                    key={m}
+                                    type="button"
+                                    onClick={() => setMarginPercent(m)}
+                                    className={`flex-1 py-1 text-[11px] font-bold rounded transition-all ${
+                                      marginPercent === m
+                                        ? 'bg-blue-600 text-white shadow-xs'
+                                        : 'text-slate-600 hover:text-slate-900'
+                                    }`}
+                                  >
+                                    {m}%
+                                  </button>
+                                ))}
+                              </div>
+                            </div>
+
+                            {/* Action Buttons */}
+                            <div className="flex flex-col gap-2 pt-1">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  addOrder({
+                                    name: `№ ${orderNumber} - ${category === 'Бланки' ? subCategory : (category as string)}`,
+                                    clientId: selectedClientId,
+                                    category: category === 'Бланки' ? subCategory : (category as string),
+                                    quantity: activeCalc.tirazh,
+                                    packingCount: 1,
+                                    paperType: activeCalc.matId === '80' ? 'offset' : 'coated',
+                                    colors: activeCalc.colStr,
+                                    isSamNaSebe: false,
+                                    designCost: 0,
+                                    margin: marginPercent,
+                                    machine: 'Офсетна машина',
+                                    format: `${sheetCustomWidth}×${sheetCustomHeight}`,
+                                    physicalSheets: Math.ceil(activeCalc.tirazh / 2),
+                                    itemsPerSheet: 2,
+                                    subtotal: activeCalc.rawCost,
+                                    marginAmount: liveMarginAmount,
+                                    finalPrice: liveFinalPrice,
+                                    unitPrice: liveUnitPrice,
+                                    paymentStatus: 'unpaid',
+                                    prepayment: 0,
+                                    notes: `Специфікація: ${category === 'Бланки' ? subCategory : (category as string)}, ${sheetCustomWidth}×${sheetCustomHeight} ${sheetUnit}, ${activeCalc.matName}, ${activeCalc.covName}, ${activeCalc.colStr}, ${activeCalc.tirazh} шт.`
+                                  });
+                                  alert(`Замовлення № ${orderNumber} успішно створено та надіслано у виробництво!`);
+                                  setOrderNumber(Math.floor(10000 + Math.random() * 90000));
+                                }}
+                                className="w-full py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-md shadow-blue-500/20 transition-all text-center"
+                              >
+                                🚀 Запустити у виробництво
+                              </button>
+                              <div className="grid grid-cols-2 gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => setShowInvoice(true)}
+                                  className="py-2 px-3 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-xs transition-colors text-center"
+                                >
+                                  Рахунок PDF
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const text = `Розрахунок замовлення: ${category === 'Бланки' ? subCategory : (category as string)}
+Формат: ${sheetCustomWidth} × ${sheetCustomHeight} ${sheetUnit}
+Матеріал: ${activeCalc.matName} (${activeCalc.covName})
+Друк: ${activeCalc.colStr}
+Наклад: ${activeCalc.tirazh} шт
+Ціна для клієнта: ${liveFinalPrice} грн (${liveUnitPrice.toFixed(2)} грн/шт)
+Друкарня "Едельвейс і К"`;
+                                    navigator.clipboard.writeText(text);
+                                    alert('Специфікацію та КП скопійовано для клієнта!');
+                                  }}
+                                  className="py-2 px-3 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-xs transition-colors text-center"
+                                >
+                                  Копіювати КП
+                                </button>
+                              </div>
+                            </div>
+
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
               )}
 
