@@ -32,7 +32,10 @@ import {
   Info,
   ChevronDown,
   Menu,
-  FileSpreadsheet
+  FileSpreadsheet,
+  Check,
+  Search,
+  RotateCcw
 } from 'lucide-react';
 import html2pdf from 'html2pdf.js';
 
@@ -58,6 +61,64 @@ interface CalcTemplate {
   laminationType?: 'none' | 'gloss' | 'matte' | 'softtouch';
   creaseCount?: number;
 }
+
+export interface MaterialPriceItem {
+  id: string;
+  name: string;
+  category: 'paper_offset' | 'paper_coated' | 'cardboard' | 'adhesive' | 'wide' | 'rigid' | 'film';
+  unit: string;
+  price: number;
+}
+
+export const defaultMaterialPrices: MaterialPriceItem[] = [
+  // 1. Папір офсетний та газетний
+  { id: 'off_70', name: 'Офсетний папір 70 г/м²', category: 'paper_offset', unit: 'грн/лист А1', price: 0.28 },
+  { id: 'off_80', name: 'Офсетний папір 80 г/м²', category: 'paper_offset', unit: 'грн/лист А1', price: 0.30 },
+  { id: 'off_90', name: 'Офсетний папір 90 г/м²', category: 'paper_offset', unit: 'грн/лист А1', price: 0.35 },
+  { id: 'gaz_45', name: 'Газетний папір 45 г/м²', category: 'paper_offset', unit: 'грн/лист А1', price: 0.18 },
+
+  // 2. Папір крейдований (мат / глянець)
+  { id: 'c_90', name: 'Крейдований 90 г/м²', category: 'paper_coated', unit: 'грн/лист А1', price: 0.42 },
+  { id: 'c_115', name: 'Крейдований 115 г/м²', category: 'paper_coated', unit: 'грн/лист А1', price: 0.48 },
+  { id: 'c_130', name: 'Крейдований 130 г/м²', category: 'paper_coated', unit: 'грн/лист А1', price: 0.60 },
+  { id: 'c_150', name: 'Крейдований 150 г/м²', category: 'paper_coated', unit: 'грн/лист А1', price: 0.68 },
+  { id: 'c_200', name: 'Крейдований 200 г/м²', category: 'paper_coated', unit: 'грн/лист А1', price: 0.85 },
+  { id: 'c_250', name: 'Крейдований 250 г/м²', category: 'paper_coated', unit: 'грн/лист А1', price: 1.10 },
+  { id: 'c_300', name: 'Крейдований 300 г/м²', category: 'paper_coated', unit: 'грн/лист А1', price: 1.35 },
+  { id: 'c_350', name: 'Крейдований 350 г/м²', category: 'paper_coated', unit: 'грн/лист А1', price: 1.65 },
+  { id: 'c_450', name: 'Крейдований 450 г/м²', category: 'paper_coated', unit: 'грн/лист А1', price: 2.40 },
+
+  // 3. Картони спеціальні та дизайнерські
+  { id: 'kraft_300', name: 'Крафт-картон 300 г/м²', category: 'cardboard', unit: 'грн/лист А1', price: 1.90 },
+  { id: 'beer_card', name: 'Пивний картон 1.5 мм', category: 'cardboard', unit: 'грн/лист А1', price: 4.50 },
+  { id: 'design_linen', name: 'Дизайнерський картон «Льон» 300г', category: 'cardboard', unit: 'грн/лист SRA3', price: 5.20 },
+  { id: 'design_dali', name: 'Дизайнерський картон «Dali / Flora» 285г', category: 'cardboard', unit: 'грн/лист SRA3', price: 6.00 },
+
+  // 4. Самоклейні матеріали
+  { id: 'raf_paper', name: 'Самоклейка Raflatac напівглянець (папір)', category: 'adhesive', unit: 'грн/лист SRA3', price: 1.80 },
+  { id: 'rit_white', name: 'Самоклейка Ritrama плівка біла', category: 'adhesive', unit: 'грн/лист SRA3', price: 3.20 },
+  { id: 'rit_trans', name: 'Самоклейка Ritrama плівка прозора', category: 'adhesive', unit: 'грн/лист SRA3', price: 3.50 },
+
+  // 5. Широкоформатний друк & Банери
+  { id: 'ban_440', name: 'Банер Frontlit 440 г/м² (ламінований)', category: 'wide', unit: 'грн/м²', price: 85.00 },
+  { id: 'ban_510', name: 'Банер Cast 510 г/м² (литий посилений)', category: 'wide', unit: 'грн/м²', price: 120.00 },
+  { id: 'ban_mesh', name: 'Банерна сітка Mesh 360 г/м²', category: 'wide', unit: 'грн/м²', price: 110.00 },
+  { id: 'post_city', name: 'Папір Citylight 150 г/м² (для лайтбоксів)', category: 'wide', unit: 'грн/м²', price: 75.00 },
+  { id: 'post_blue', name: 'Папір Blueback 115 г/м² (для білбордів)', category: 'wide', unit: 'грн/м²', price: 45.00 },
+  { id: 'canvas_nat', name: 'Художнє натуральне полотно (Canvas)', category: 'wide', unit: 'грн/м²', price: 220.00 },
+
+  // 6. Тверді матеріали & Пластики
+  { id: 'pvc_3', name: 'Пластик ПВХ 3 мм', category: 'rigid', unit: 'грн/м²', price: 160.00 },
+  { id: 'pvc_5', name: 'Пластик ПВХ 5 мм', category: 'rigid', unit: 'грн/м²', price: 240.00 },
+  { id: 'composite_3', name: 'Алюмінієвий композит 3 мм', category: 'rigid', unit: 'грн/м²', price: 420.00 },
+  { id: 'acrylic_3', name: 'Прозорий акрил 3 мм', category: 'rigid', unit: 'грн/м²', price: 550.00 },
+
+  // 7. Кольорові плівки
+  { id: 'oracal_641', name: 'Плівка ORACAL 641 (глянець/мат 60 кольорів)', category: 'film', unit: 'грн/м²', price: 95.00 },
+  { id: 'oramask_810', name: 'Трафаретна плівка ORAMASK 810', category: 'film', unit: 'грн/м²', price: 110.00 },
+  { id: 'oralite_ref', name: 'Світловідбиваюча спецплівка Oralite', category: 'film', unit: 'грн/м²', price: 380.00 },
+  { id: 'mount_film', name: 'Монтажна плівка з підкладкою', category: 'film', unit: 'грн/м²', price: 45.00 },
+];
 
 // Clean restored Calculator version 1.0.5
 export const Calculator: React.FC = () => {
@@ -393,6 +454,33 @@ export const Calculator: React.FC = () => {
     blockProcessing: 1
   });
 
+  // Automatically activate postpress operations when relevant options are configured
+  useEffect(() => {
+    setActiveOps(prev => {
+      let updated = false;
+      const next = { ...prev };
+      
+      if (laminationType !== 'none' && !next.lamination) {
+        next.lamination = true;
+        updated = true;
+      }
+      if (creaseCount > 0 && !next.folding) {
+        next.folding = true;
+        updated = true;
+      }
+      if (['staple', 'spring', 'glue', 'hardcover'].includes(bindingType) && !next.blockInsertion) {
+        next.blockInsertion = true;
+        updated = true;
+      }
+      if (bindingType === 'hardcover' && !next.coverMaking) {
+        next.coverMaking = true;
+        updated = true;
+      }
+      
+      return updated ? next : prev;
+    });
+  }, [bindingType, laminationType, creaseCount]);
+
   // Templates list
   const [templates, setTemplates] = useState<CalcTemplate[]>(() => {
     const saved = localStorage.getItem('crm_calc_templates');
@@ -404,6 +492,19 @@ export const Calculator: React.FC = () => {
   const [showNorms, setShowNorms] = useState(false);
   const [showInvoice, setShowInvoice] = useState(false);
   const [tempNorms, setTempNorms] = useState(norms);
+
+  // Material Pricing & Custom Rates state
+  const [materialPrices, setMaterialPrices] = useState<MaterialPriceItem[]>(() => {
+    const saved = localStorage.getItem('crm_custom_materials_pricing');
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) {}
+    }
+    return defaultMaterialPrices;
+  });
+  const [materialPriceCategory, setMaterialPriceCategory] = useState<string>('all');
+  const [materialSearch, setMaterialSearch] = useState<string>('');
+  const [materialSavedToast, setMaterialSavedToast] = useState<boolean>(false);
+  const [customPaperPrice, setCustomPaperPrice] = useState<string>('');
 
   const isAdmin = currentUser?.role === 'admin';
 
@@ -528,6 +629,18 @@ export const Calculator: React.FC = () => {
       setSelectedMaterials(['80', 'kraft']);
       setSelectedCoverings(['0']);
       setSelectedPrintColors(['1+0', '4+0']);
+      setActiveOps({
+        formMaking: true,
+        filmMounting: true,
+        printing: true,
+        lamination: false,
+        embossing: false,
+        dieCutting: false,
+        folding: false,
+        blockInsertion: false,
+        coverMaking: false,
+        blockProcessing: true
+      });
     } else if (cat === 'Візитки') {
       setMainCategoryTab('offset');
       setOffsetSubTab('sheets');
@@ -545,6 +658,18 @@ export const Calculator: React.FC = () => {
       setSelectedMaterials(['350', '300', 'linen', 'kraft']);
       setSelectedCoverings(['0', '7', '9', '30']);
       setSelectedPrintColors(['4+4', '4+0']);
+      setActiveOps({
+        formMaking: true,
+        filmMounting: true,
+        printing: true,
+        lamination: true,
+        embossing: false,
+        dieCutting: false,
+        folding: false,
+        blockInsertion: false,
+        coverMaking: false,
+        blockProcessing: true
+      });
     } else if (cat === 'Буклети') {
       setMainCategoryTab('offset');
       setOffsetSubTab('sheets');
@@ -563,6 +688,18 @@ export const Calculator: React.FC = () => {
       setSelectedMaterials(['130', '150', '170']);
       setSelectedCoverings(['0']);
       setSelectedPrintColors(['4+4']);
+      setActiveOps({
+        formMaking: true,
+        filmMounting: true,
+        printing: true,
+        lamination: false,
+        embossing: false,
+        dieCutting: false,
+        folding: true,
+        blockInsertion: false,
+        coverMaking: false,
+        blockProcessing: true
+      });
     } else if (cat === 'Дипломи випускні') {
       setStep('editor');
       setQuantity(50);
@@ -574,6 +711,18 @@ export const Calculator: React.FC = () => {
       setSelectedMaterials(['300', '350']);
       setSelectedCoverings(['7', '9']);
       setSelectedPrintColors(['4+0']);
+      setActiveOps({
+        formMaking: true,
+        filmMounting: true,
+        printing: true,
+        lamination: true,
+        embossing: true,
+        dieCutting: false,
+        folding: false,
+        blockInsertion: false,
+        coverMaking: false,
+        blockProcessing: true
+      });
     } else if (cat === 'Календарики кишенькові') {
       setMainCategoryTab('offset');
       setOffsetSubTab('sheets');
@@ -591,6 +740,18 @@ export const Calculator: React.FC = () => {
       setSelectedMaterials(['350', '450']);
       setSelectedCoverings(['8', '10']);
       setSelectedPrintColors(['4+4']);
+      setActiveOps({
+        formMaking: true,
+        filmMounting: true,
+        printing: true,
+        lamination: true,
+        embossing: false,
+        dieCutting: true,
+        folding: false,
+        blockInsertion: false,
+        coverMaking: false,
+        blockProcessing: true
+      });
     } else if (cat === 'Книги') {
       setMainCategoryTab('offset');
       setOffsetSubTab('multipage');
@@ -605,6 +766,18 @@ export const Calculator: React.FC = () => {
       setSelectedMaterials(['80', '130']);
       setSelectedCoverings(['0', '7']);
       setSelectedPrintColors(['1+1', '4+4']);
+      setActiveOps({
+        formMaking: true,
+        filmMounting: true,
+        printing: true,
+        lamination: true,
+        embossing: false,
+        dieCutting: false,
+        folding: true,
+        blockInsertion: true,
+        coverMaking: false,
+        blockProcessing: true
+      });
     } else if (cat === 'Листівки') {
       setMainCategoryTab('offset');
       setOffsetSubTab('sheets');
@@ -622,6 +795,18 @@ export const Calculator: React.FC = () => {
       setSelectedMaterials(['130', '150', '90', '115', '300']);
       setSelectedCoverings(['0', '7', '9']);
       setSelectedPrintColors(['4+4', '4+0']);
+      setActiveOps({
+        formMaking: true,
+        filmMounting: true,
+        printing: true,
+        lamination: false,
+        embossing: false,
+        dieCutting: false,
+        folding: false,
+        blockInsertion: false,
+        coverMaking: false,
+        blockProcessing: true
+      });
     } else if (cat === 'Сети') {
       setMainCategoryTab('offset');
       setOffsetSubTab('sheets');
@@ -639,6 +824,18 @@ export const Calculator: React.FC = () => {
       setSelectedMaterials(['80', 'kraft', '250']);
       setSelectedCoverings(['0']);
       setSelectedPrintColors(['1+0', '4+0']);
+      setActiveOps({
+        formMaking: true,
+        filmMounting: true,
+        printing: true,
+        lamination: false,
+        embossing: false,
+        dieCutting: false,
+        folding: false,
+        blockInsertion: false,
+        coverMaking: false,
+        blockProcessing: true
+      });
     } else if (cat === 'Папки') {
       setMainCategoryTab('offset');
       setOffsetSubTab('sheets');
@@ -656,12 +853,36 @@ export const Calculator: React.FC = () => {
       setSelectedMaterials(['350', '300', 'karton_250']);
       setSelectedCoverings(['0', '9', '30']);
       setSelectedPrintColors(['4+0', '4+4']);
+      setActiveOps({
+        formMaking: true,
+        filmMounting: true,
+        printing: true,
+        lamination: true,
+        embossing: false,
+        dieCutting: true,
+        folding: true,
+        blockInsertion: false,
+        coverMaking: true,
+        blockProcessing: true
+      });
     } else if (cat === 'Блокноти') {
       setMainCategoryTab('notebooks');
       setStep('catalog');
       setNotebookStandardSize('105x148');
       setNotebookWidth('105');
       setNotebookHeight('148');
+      setActiveOps({
+        formMaking: true,
+        filmMounting: true,
+        printing: true,
+        lamination: true,
+        embossing: false,
+        dieCutting: false,
+        folding: false,
+        blockInsertion: true,
+        coverMaking: false,
+        blockProcessing: true
+      });
     } else if (cat === 'Меню') {
       setMainCategoryTab('offset');
       setOffsetSubTab('sheets');
@@ -675,6 +896,18 @@ export const Calculator: React.FC = () => {
       setSelectedFormat('A4');
       setBindingType('spring');
       setLaminationType('matte');
+      setActiveOps({
+        formMaking: true,
+        filmMounting: true,
+        printing: true,
+        lamination: true,
+        embossing: false,
+        dieCutting: true,
+        folding: false,
+        blockInsertion: true,
+        coverMaking: false,
+        blockProcessing: true
+      });
     } else if (cat === 'Наклейки') {
       setMainCategoryTab('offset');
       setOffsetSubTab('sheets');
@@ -692,6 +925,18 @@ export const Calculator: React.FC = () => {
       setSelectedMaterials(['sk_kreyd_pros', 'sk_kreyd_bez', 'sk_ofset_pros']);
       setSelectedCoverings(['0', '7', '9']);
       setSelectedPrintColors(['4+0']);
+      setActiveOps({
+        formMaking: true,
+        filmMounting: true,
+        printing: true,
+        lamination: true,
+        embossing: false,
+        dieCutting: true,
+        folding: false,
+        blockInsertion: false,
+        coverMaking: false,
+        blockProcessing: true
+      });
     } else if (cat === 'Плакати') {
       setMainCategoryTab('offset');
       setOffsetSubTab('sheets');
@@ -709,6 +954,18 @@ export const Calculator: React.FC = () => {
       setSelectedMaterials(['130', '115', '150', '90', '80', 'kraft']);
       setSelectedCoverings(['0']);
       setSelectedPrintColors(['4+0']);
+      setActiveOps({
+        formMaking: true,
+        filmMounting: true,
+        printing: true,
+        lamination: false,
+        embossing: false,
+        dieCutting: false,
+        folding: false,
+        blockInsertion: false,
+        coverMaking: false,
+        blockProcessing: true
+      });
     } else if (cat === 'Флаєри') {
       setMainCategoryTab('offset');
       setOffsetSubTab('sheets');
@@ -726,6 +983,18 @@ export const Calculator: React.FC = () => {
       setSelectedMaterials(['130', '150', '90', '115', '250']);
       setSelectedCoverings(['0', '7', '9']);
       setSelectedPrintColors(['4+4', '4+0']);
+      setActiveOps({
+        formMaking: true,
+        filmMounting: true,
+        printing: true,
+        lamination: false,
+        embossing: false,
+        dieCutting: false,
+        folding: false,
+        blockInsertion: false,
+        coverMaking: false,
+        blockProcessing: true
+      });
     } else if (cat === 'Нотаріальні книги') {
       setStep('editor');
       setQuantity(10);
@@ -734,6 +1003,18 @@ export const Calculator: React.FC = () => {
       setSelectedFormat('A4');
       setBindingType('hardcover');
       setLaminationType('none');
+      setActiveOps({
+        formMaking: true,
+        filmMounting: true,
+        printing: true,
+        lamination: false,
+        embossing: true,
+        dieCutting: false,
+        folding: true,
+        blockInsertion: true,
+        coverMaking: true,
+        blockProcessing: true
+      });
     } else if (cat === 'Дипломи і палітурка') {
       setStep('editor');
       setQuantity(20);
@@ -742,6 +1023,18 @@ export const Calculator: React.FC = () => {
       setSelectedFormat('A4');
       setBindingType('hardcover');
       setLaminationType('matte');
+      setActiveOps({
+        formMaking: true,
+        filmMounting: true,
+        printing: true,
+        lamination: true,
+        embossing: true,
+        dieCutting: false,
+        folding: true,
+        blockInsertion: true,
+        coverMaking: true,
+        blockProcessing: true
+      });
     } else if (cat === 'Логотипи виготовлення') {
       setStep('editor');
       setQuantity(100);
@@ -750,6 +1043,18 @@ export const Calculator: React.FC = () => {
       setSelectedFormat('A4');
       setBindingType('none');
       setLaminationType('softtouch');
+      setActiveOps({
+        formMaking: false,
+        filmMounting: true,
+        printing: true,
+        lamination: true,
+        embossing: false,
+        dieCutting: true,
+        folding: false,
+        blockInsertion: false,
+        coverMaking: false,
+        blockProcessing: true
+      });
     } else if (cat === 'Шкільні журнали') {
       setStep('editor');
       setQuantity(50);
@@ -758,6 +1063,18 @@ export const Calculator: React.FC = () => {
       setSelectedFormat('A4');
       setBindingType('hardcover');
       setLaminationType('none');
+      setActiveOps({
+        formMaking: true,
+        filmMounting: true,
+        printing: true,
+        lamination: false,
+        embossing: false,
+        dieCutting: false,
+        folding: true,
+        blockInsertion: true,
+        coverMaking: true,
+        blockProcessing: true
+      });
     } else if (cat === 'Етикетки') {
       setMainCategoryTab('offset');
       setOffsetSubTab('sheets');
@@ -772,6 +1089,18 @@ export const Calculator: React.FC = () => {
       setSelectedFormat('90x50 мм');
       setBindingType('none');
       setLaminationType('none');
+      setActiveOps({
+        formMaking: true,
+        filmMounting: true,
+        printing: true,
+        lamination: false,
+        embossing: false,
+        dieCutting: true,
+        folding: false,
+        blockInsertion: false,
+        coverMaking: false,
+        blockProcessing: true
+      });
     } else if (cat === 'Календарі') {
       setMainCategoryTab('offset');
       setOffsetSubTab('sheets');
@@ -786,6 +1115,18 @@ export const Calculator: React.FC = () => {
       setSelectedFormat('A3');
       setBindingType('spring');
       setLaminationType('none');
+      setActiveOps({
+        formMaking: true,
+        filmMounting: true,
+        printing: true,
+        lamination: true,
+        embossing: false,
+        dieCutting: false,
+        folding: false,
+        blockInsertion: true,
+        coverMaking: false,
+        blockProcessing: true
+      });
     } else {
       // Бланки standard
       setStep('editor');
@@ -849,6 +1190,13 @@ export const Calculator: React.FC = () => {
     let paperPrice = norms.paperOffsetPrice;
     if (paperType === 'gazetka') paperPrice = norms.paperGazetkaPrice;
     if (paperType === 'coated') paperPrice = norms.paperCoatedPrice;
+
+    if (customPaperPrice.trim() !== '') {
+      const parsedCustom = parseFloat(customPaperPrice.replace(',', '.'));
+      if (!isNaN(parsedCustom) && parsedCustom >= 0) {
+        paperPrice = parsedCustom;
+      }
+    }
     const paperCost = physicalSheets * paperPrice;
 
     const passes = ['1+1', '4+4'].includes(colors) ? 2 : 1;
@@ -973,7 +1321,7 @@ export const Calculator: React.FC = () => {
       packingCost,
       totalPackages
     };
-  }, [quantity, paperType, colors, designCost, norms, packingCount, marginPercent, activeOps, opCustomRates, opVolumes, category, calcMode, selectedFormat, bindingType, laminationType, creaseCount]);
+  }, [quantity, paperType, colors, designCost, norms, packingCount, marginPercent, activeOps, opCustomRates, opVolumes, category, calcMode, selectedFormat, bindingType, laminationType, creaseCount, customPaperPrice]);
 
   // Check if warehouse has enough paper
   const paperWarehouseStatus = useMemo(() => {
@@ -4930,11 +5278,11 @@ export const Calculator: React.FC = () => {
               {/* Active Info Modal Popup */}
               {activeInfoModal && (
                 <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-                  <div className="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-slate-200 relative animate-in fade-in zoom-in duration-150">
+                  <div className={`bg-white rounded-2xl ${activeInfoModal === 'materials' ? 'max-w-3xl' : 'max-w-lg'} w-full p-6 shadow-2xl border border-slate-200 relative animate-in fade-in zoom-in duration-150 max-h-[90vh] flex flex-col`}>
                     <button
                       type="button"
                       onClick={() => setActiveInfoModal(null)}
-                      className="absolute top-4 right-4 text-slate-400 hover:text-slate-700 w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center transition-colors"
+                      className="absolute top-4 right-4 text-slate-400 hover:text-slate-700 w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center transition-colors z-10"
                     >
                       ✕
                     </button>
@@ -4978,14 +5326,150 @@ export const Calculator: React.FC = () => {
                       </div>
                     )}
                     {activeInfoModal === 'materials' && (
-                      <div className="flex flex-col gap-3">
-                        <div className="flex items-center gap-2 text-blue-600 font-bold text-base">
-                          <Layers size={20} />
-                          <span>Матеріали</span>
+                      <div className="flex flex-col gap-4 overflow-hidden">
+                        <div className="flex items-center justify-between flex-wrap gap-2 border-b border-slate-100 pb-3 pr-8">
+                          <div className="flex items-center gap-2.5 text-blue-600 font-bold text-base">
+                            <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
+                              <Layers size={18} />
+                            </div>
+                            <div>
+                              <span className="block font-black text-slate-900 text-sm">Прайс та налаштування цін матеріалів</span>
+                              <span className="block text-[11px] text-slate-500 font-normal">Встановіть базову вартість сировини (ціни миттєво застосовуються у калькуляторі)</span>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setMaterialPrices(defaultMaterialPrices);
+                                localStorage.setItem('crm_custom_materials_pricing', JSON.stringify(defaultMaterialPrices));
+                                setMaterialSavedToast(true);
+                                setTimeout(() => setMaterialSavedToast(false), 2500);
+                              }}
+                              className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-[11px] font-bold text-slate-700 transition-colors"
+                              title="Скинути до базових цін"
+                            >
+                              <RotateCcw size={12} />
+                              <span>Скинути</span>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                localStorage.setItem('crm_custom_materials_pricing', JSON.stringify(materialPrices));
+                                const off80 = materialPrices.find(m => m.id === 'off_80')?.price || norms.paperOffsetPrice;
+                                const c130 = materialPrices.find(m => m.id === 'c_130')?.price || norms.paperCoatedPrice;
+                                const gaz45 = materialPrices.find(m => m.id === 'gaz_45')?.price || norms.paperGazetkaPrice;
+                                updateNorms({
+                                  ...norms,
+                                  paperOffsetPrice: off80,
+                                  paperCoatedPrice: c130,
+                                  paperGazetkaPrice: gaz45
+                                });
+                                setMaterialSavedToast(true);
+                                setTimeout(() => setMaterialSavedToast(false), 3000);
+                              }}
+                              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all shadow-sm shadow-blue-500/20"
+                            >
+                              <Save size={13} />
+                              <span>Зберегти ціни</span>
+                            </button>
+                          </div>
                         </div>
-                        <p className="text-xs text-slate-600 leading-relaxed m-0">
-                          Доступні папери: Офсетний 80 г/м², Крейдований матовий та глянцевий від 90 до 450 г/м², а також дизайнерські картони (Льон, Tintoretto, Stardream).
-                        </p>
+
+                        {materialSavedToast && (
+                          <div className="p-2.5 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-xs font-bold flex items-center gap-2 animate-in fade-in">
+                            <Check size={16} className="text-emerald-600" />
+                            <span>Ціни на матеріали успішно збережено та застосовано до калькулятора!</span>
+                          </div>
+                        )}
+
+                        {/* Filter & Search Bar */}
+                        <div className="flex items-center justify-between gap-2 flex-wrap">
+                          <div className="flex items-center gap-1 overflow-x-auto pb-1 max-w-full">
+                            {[
+                              { id: 'all', label: 'Усі' },
+                              { id: 'paper_offset', label: 'Офсет / Газетка' },
+                              { id: 'paper_coated', label: 'Крейдований' },
+                              { id: 'cardboard', label: 'Картони' },
+                              { id: 'adhesive', label: 'Самоклейка' },
+                              { id: 'wide', label: 'Банери & Постери' },
+                              { id: 'rigid', label: 'Пластик / ПВХ' },
+                              { id: 'film', label: 'Плівки ORACAL' },
+                            ].map(cat => (
+                              <button
+                                key={cat.id}
+                                type="button"
+                                onClick={() => setMaterialPriceCategory(cat.id)}
+                                className={`px-2.5 py-1 rounded-lg text-[11px] font-bold whitespace-nowrap transition-all ${
+                                  materialPriceCategory === cat.id
+                                    ? 'bg-blue-600 text-white shadow-xs'
+                                    : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                                }`}
+                              >
+                                {cat.label}
+                              </button>
+                            ))}
+                          </div>
+                          <div className="relative min-w-[160px]">
+                            <input
+                              type="text"
+                              placeholder="Пошук матеріалу..."
+                              value={materialSearch}
+                              onChange={(e) => setMaterialSearch(e.target.value)}
+                              className="w-full pl-7 pr-2.5 py-1 text-xs border border-slate-200 rounded-lg bg-slate-50 focus:bg-white focus:outline-none"
+                            />
+                            <Search size={12} className="absolute left-2.5 top-2 text-slate-400" />
+                          </div>
+                        </div>
+
+                        {/* Materials Table */}
+                        <div className="max-h-72 overflow-y-auto border border-slate-200 rounded-xl">
+                          <table className="w-full text-xs text-left">
+                            <thead className="bg-slate-100/80 sticky top-0 text-slate-600 font-bold border-b border-slate-200">
+                              <tr>
+                                <th className="py-2 px-3">Матеріал</th>
+                                <th className="py-2 px-2">Категорія</th>
+                                <th className="py-2 px-2">Одиниця</th>
+                                <th className="py-2 px-3 text-right">Ціна (грн)</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100">
+                              {materialPrices
+                                .filter(m => materialPriceCategory === 'all' || m.category === materialPriceCategory)
+                                .filter(m => materialSearch === '' || m.name.toLowerCase().includes(materialSearch.toLowerCase()))
+                                .map(mat => (
+                                  <tr key={mat.id} className="hover:bg-blue-50/30 transition-colors">
+                                    <td className="py-2 px-3 font-semibold text-slate-900">{mat.name}</td>
+                                    <td className="py-2 px-2 text-slate-500 text-[10px]">
+                                      {mat.category === 'paper_offset' ? 'Офсетний' :
+                                       mat.category === 'paper_coated' ? 'Крейда' :
+                                       mat.category === 'cardboard' ? 'Картон' :
+                                       mat.category === 'adhesive' ? 'Самоклейка' :
+                                       mat.category === 'wide' ? 'Широкоформат' :
+                                       mat.category === 'rigid' ? 'Пластик' : 'Плівка'}
+                                    </td>
+                                    <td className="py-2 px-2 text-slate-500 font-mono text-[10px]">{mat.unit}</td>
+                                    <td className="py-2 px-3 text-right">
+                                      <div className="inline-flex items-center gap-1 justify-end">
+                                        <input
+                                          type="number"
+                                          step="0.01"
+                                          min="0"
+                                          value={mat.price}
+                                          onChange={(e) => {
+                                            const newPrice = Math.max(0, parseFloat(e.target.value) || 0);
+                                            setMaterialPrices(prev => prev.map(p => p.id === mat.id ? { ...p, price: newPrice } : p));
+                                          }}
+                                          className="w-20 px-2 py-1 text-right font-mono font-bold text-xs rounded border border-slate-200 bg-white text-slate-900 focus:border-blue-500 focus:outline-none"
+                                        />
+                                        <span className="text-slate-400 font-bold text-[11px]">₴</span>
+                                      </div>
+                                    </td>
+                                  </tr>
+                                ))}
+                            </tbody>
+                          </table>
+                        </div>
                       </div>
                     )}
                     {activeInfoModal === 'tech_pur' && (
@@ -11271,6 +11755,41 @@ export const Calculator: React.FC = () => {
                       </div>
                     </div>
                   )}
+
+                  {/* Material Price Setting & Override */}
+                  <div className="pt-2 border-t border-slate-100 flex items-center justify-between flex-wrap gap-2">
+                    <div className="flex items-center gap-2">
+                      <label className="text-xs font-bold text-slate-700">Своя ціна паперу/матеріалу:</label>
+                      <div className="flex items-center gap-1">
+                        <input
+                          type="text"
+                          placeholder="з прайсу"
+                          value={customPaperPrice}
+                          onChange={(e) => setCustomPaperPrice(e.target.value)}
+                          className="w-28 px-2.5 py-1 rounded-lg border border-slate-200 bg-white text-xs font-mono font-bold text-slate-800 focus:border-blue-500 focus:outline-none"
+                        />
+                        <span className="text-xs text-slate-400 font-bold">грн/лист</span>
+                      </div>
+                      {customPaperPrice && (
+                        <button
+                          type="button"
+                          onClick={() => setCustomPaperPrice('')}
+                          className="text-[11px] text-slate-400 hover:text-red-500 font-bold"
+                          title="Скинути до стандартної ціни"
+                        >
+                          ✕
+                        </button>
+                      )}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setActiveInfoModal('materials')}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-colors"
+                    >
+                      <Layers size={13} className="text-blue-600" />
+                      <span>Прайс матеріалів</span>
+                    </button>
+                  </div>
                 </div>
               )}
 
