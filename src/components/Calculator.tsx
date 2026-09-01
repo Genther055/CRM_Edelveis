@@ -6611,27 +6611,11 @@ export const Calculator: React.FC = () => {
 
                         {/* Top 3-Field Strip: [ № ] [ ЗАМОВНИК ] [ ПРОДУКЦІЯ (авто) ] */}
                         <div className="grid grid-cols-1 md:grid-cols-12 gap-3 p-4 rounded-xl bg-slate-50 border border-slate-200">
-                          {/* 1. Номер замовлення */}
+                          {/* 1. Номер замовлення (Фіксований ID рахунку) */}
                           <div className="md:col-span-3 flex flex-col gap-1">
-                            <label className="text-[11px] font-extrabold text-slate-700 uppercase">№ Замовлення:</label>
-                            <div className="flex items-center gap-1.5">
-                              <input
-                                type="text"
-                                value={`№ ${orderNumber}`}
-                                onChange={(e) => {
-                                  const n = parseInt(e.target.value.replace(/\D/g, ''));
-                                  if (n) setOrderNumber(n);
-                                }}
-                                className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-black text-blue-700"
-                              />
-                              <button
-                                type="button"
-                                onClick={() => setOrderNumber(Math.floor(10000 + Math.random() * 90000))}
-                                className="px-2 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 text-slate-600 text-xs font-bold transition-colors"
-                                title="Згенерувати новий номер"
-                              >
-                                <RotateCcw size={13} />
-                              </button>
+                            <label className="text-[11px] font-extrabold text-slate-700 uppercase">№ Замовлення (ID):</label>
+                            <div className="w-full px-3 py-2 rounded-xl bg-slate-100/90 border border-slate-200 text-xs font-black text-blue-700 font-mono flex items-center select-none cursor-default shadow-2xs">
+                              № {orderNumber}
                             </div>
                           </div>
 
@@ -9034,27 +9018,11 @@ export const Calculator: React.FC = () => {
 
                         {/* Top 3-Field Strip: [ № ] [ ЗАМОВНИК ] [ ПРОДУКЦІЯ (авто) ] */}
                         <div className="grid grid-cols-1 md:grid-cols-12 gap-3 p-4 rounded-xl bg-slate-50 border border-slate-200">
-                          {/* 1. Номер замовлення */}
+                          {/* 1. Номер замовлення (Фіксований ID рахунку) */}
                           <div className="md:col-span-3 flex flex-col gap-1">
-                            <label className="text-[11px] font-extrabold text-slate-700 uppercase">№ Замовлення:</label>
-                            <div className="flex items-center gap-1.5">
-                              <input
-                                type="text"
-                                value={`№ ${orderNumber}`}
-                                onChange={(e) => {
-                                  const n = parseInt(e.target.value.replace(/\D/g, ''));
-                                  if (n) setOrderNumber(n);
-                                }}
-                                className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-black text-blue-700"
-                              />
-                              <button
-                                type="button"
-                                onClick={() => setOrderNumber(Math.floor(10000 + Math.random() * 90000))}
-                                className="px-2 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 text-slate-600 text-xs font-bold transition-colors"
-                                title="Згенерувати новий номер"
-                              >
-                                <RotateCcw size={13} />
-                              </button>
+                            <label className="text-[11px] font-extrabold text-slate-700 uppercase">№ Замовлення (ID):</label>
+                            <div className="w-full px-3 py-2 rounded-xl bg-slate-100/90 border border-slate-200 text-xs font-black text-blue-700 font-mono flex items-center select-none cursor-default shadow-2xs">
+                              № {orderNumber}
                             </div>
                           </div>
 
@@ -12267,27 +12235,11 @@ export const Calculator: React.FC = () => {
 
                         {/* Top 3-Field Strip: [ № ] [ ЗАМОВНИК ] [ ПРОДУКЦІЯ (авто) ] */}
                         <div className="grid grid-cols-1 md:grid-cols-12 gap-3 p-4 rounded-xl bg-slate-50 border border-slate-200">
-                          {/* 1. Номер замовлення */}
+                          {/* 1. Номер замовлення (Фіксований ID рахунку) */}
                           <div className="md:col-span-3 flex flex-col gap-1">
-                            <label className="text-[11px] font-extrabold text-slate-700 uppercase">№ Замовлення:</label>
-                            <div className="flex items-center gap-1.5">
-                              <input
-                                type="text"
-                                value={`№ ${orderNumber}`}
-                                onChange={(e) => {
-                                  const n = parseInt(e.target.value.replace(/\D/g, ''));
-                                  if (n) setOrderNumber(n);
-                                }}
-                                className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-black text-blue-700"
-                              />
-                              <button
-                                type="button"
-                                onClick={() => setOrderNumber(Math.floor(10000 + Math.random() * 90000))}
-                                className="px-2 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 text-slate-600 text-xs font-bold transition-colors"
-                                title="Згенерувати новий номер"
-                              >
-                                <RotateCcw size={13} />
-                              </button>
+                            <label className="text-[11px] font-extrabold text-slate-700 uppercase">№ Замовлення (ID):</label>
+                            <div className="w-full px-3 py-2 rounded-xl bg-slate-100/90 border border-slate-200 text-xs font-black text-blue-700 font-mono flex items-center select-none cursor-default shadow-2xs">
+                              № {orderNumber}
                             </div>
                           </div>
 
@@ -13231,29 +13183,13 @@ export const Calculator: React.FC = () => {
 
                       {/* Top 3-Field Strip: [ № ] [ ЗАМОВНИК ] [ ПРОДУКЦІЯ (авто) ] */}
                       <div className="grid grid-cols-1 md:grid-cols-12 gap-3 p-4 rounded-xl bg-slate-50 border border-slate-200">
-                        {/* 1. Номер замовлення */}
-                        <div className="md:col-span-3 flex flex-col gap-1">
-                          <label className="text-[11px] font-extrabold text-slate-700 uppercase">№ Замовлення:</label>
-                          <div className="flex items-center gap-1.5">
-                            <input
-                              type="text"
-                              value={`№ ${orderNumber}`}
-                              onChange={(e) => {
-                                const n = parseInt(e.target.value.replace(/\D/g, ''));
-                                if (n) setOrderNumber(n);
-                              }}
-                              className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-black text-blue-700"
-                            />
-                            <button
-                              type="button"
-                              onClick={() => setOrderNumber(Math.floor(10000 + Math.random() * 90000))}
-                              className="px-2 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-100 text-slate-600 text-xs font-bold transition-colors"
-                              title="Згенерувати новий номер"
-                            >
-                              <RotateCcw size={13} />
-                            </button>
+                        {/* 1. Номер замовлення (Фіксований ID рахунку) */}
+                          <div className="md:col-span-3 flex flex-col gap-1">
+                            <label className="text-[11px] font-extrabold text-slate-700 uppercase">№ Замовлення (ID):</label>
+                            <div className="w-full px-3 py-2 rounded-xl bg-slate-100/90 border border-slate-200 text-xs font-black text-blue-700 font-mono flex items-center select-none cursor-default shadow-2xs">
+                              № {orderNumber}
+                            </div>
                           </div>
-                        </div>
 
                         {/* 2. Замовник */}
                         <div className="md:col-span-4 flex flex-col gap-1">
