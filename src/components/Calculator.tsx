@@ -14686,15 +14686,15 @@ export const Calculator: React.FC = () => {
                     {/* Left info column */}
                     <div className="flex flex-col gap-1.5 text-[11px]">
                       <div className="flex">
-                        <span className="w-32 font-bold text-slate-700">№ наряда:</span>
+                        <span className="w-32 font-bold text-slate-700">№ наряду:</span>
                         <strong className="font-mono font-black text-black text-xs">{orderNumber}</strong>
                       </div>
                       <div className="flex">
-                        <span className="w-32 font-bold text-slate-700">Заказчик:</span>
+                        <span className="w-32 font-bold text-slate-700">Замовник:</span>
                         <strong className="font-bold text-black">{clientDisplayName}</strong>
                       </div>
                       <div className="flex">
-                        <span className="w-32 font-bold text-slate-700">Продукция:</span>
+                        <span className="w-32 font-bold text-slate-700">Продукція:</span>
                         <strong className="font-bold text-black">{prodTitle}</strong>
                       </div>
                       <div className="flex">
@@ -14712,7 +14712,7 @@ export const Calculator: React.FC = () => {
                         <span className="font-semibold text-black">Менеджер</span>
                       </div>
                       <div className="flex pt-1 border-t border-slate-300">
-                        <span className="w-32 font-bold text-slate-700">Итого расчетная стоимость:</span>
+                        <span className="w-32 font-bold text-slate-700">Разом вартість:</span>
                         <strong className="font-mono font-black text-black">{livePrice.toFixed(2)} грн.</strong>
                       </div>
                     </div>
@@ -14723,7 +14723,7 @@ export const Calculator: React.FC = () => {
                         <span className="font-black uppercase tracking-wider block mb-1.5 text-black">Материалы:</span>
                         <div className="flex justify-between items-center py-1 border-b border-slate-200">
                           <span className="text-slate-800 font-semibold">{matNameDisplay}</span>
-                          <span className="font-mono font-bold text-black">Кол-во: {physSheetsCalc}</span>
+                          <span className="font-mono font-bold text-black">К-сть: {physSheetsCalc}</span>
                         </div>
                       </div>
                       <div className="text-slate-500 text-[10px] italic">
@@ -14733,23 +14733,23 @@ export const Calculator: React.FC = () => {
                   </div>
                 </div>
 
-                {/* 2. Таблиця «ПЕЧАТЬ» (ДРУК) */}
+                {/* 2. Таблиця «ДРУК (ОБЛАДНАННЯ ТА СПУСК)» (ДРУК) */}
                 <div className="mb-4">
-                  <h4 className="text-[11px] font-black uppercase text-black m-0 mb-1 tracking-wider">ПЕЧАТЬ</h4>
+                  <h4 className="text-[11px] font-black uppercase text-black m-0 mb-1 tracking-wider">ДРУК (ОБЛАДНАННЯ ТА СПУСК)</h4>
                   <table className="w-full border-collapse border border-black text-[10.5px] text-center">
                     <thead>
                       <tr className="bg-slate-100 border-b border-black text-black font-bold">
                         <th className="p-1.5 border-r border-black w-8">№ п/п</th>
-                        <th className="p-1.5 border-r border-black text-left">Оборудование</th>
-                        <th className="p-1.5 border-r border-black text-left">Бумага / Материал</th>
-                        <th className="p-1.5 border-r border-black">Размер, мм</th>
-                        <th className="p-1.5 border-r border-black">Красочность</th>
-                        <th className="p-1.5 border-r border-black">К-во на листе</th>
-                        <th className="p-1.5 border-r border-black">Кол-во печат. лист.</th>
+                        <th className="p-1.5 border-r border-black text-left">Обладнання</th>
+                        <th className="p-1.5 border-r border-black text-left">Папір / Матеріал</th>
+                        <th className="p-1.5 border-r border-black">Розмір, мм</th>
+                        <th className="p-1.5 border-r border-black">Кольоровість</th>
+                        <th className="p-1.5 border-r border-black">Вихід на листі</th>
+                        <th className="p-1.5 border-r border-black">Наклад листів</th>
                         <th className="p-1.5 border-r border-black">Приладка</th>
-                        <th className="p-1.5 border-r border-black">Тех. отходы</th>
-                        <th className="p-1.5 border-r border-black font-black">Фактически в печать</th>
-                        <th className="p-1.5">Оборот с/с, б/о, ч/о</th>
+                        <th className="p-1.5 border-r border-black">Техвідходи</th>
+                        <th className="p-1.5 border-r border-black font-black">Фактично в друк</th>
+                        <th className="p-1.5">Оборот (с/с, б/о, ч/о)</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -14770,15 +14770,15 @@ export const Calculator: React.FC = () => {
                   </table>
                 </div>
 
-                {/* 3. Таблиця «ДОПЕЧАТНЫЙ ПРОЦЕСС» */}
+                {/* 3. Таблиця «ДОДРУКАРСЬКИЙ ПРОЦЕС» */}
                 <div className="mb-4">
-                  <h4 className="text-[11px] font-black uppercase text-black m-0 mb-1 tracking-wider">ДОПЕЧАТНЫЙ ПРОЦЕСС</h4>
+                  <h4 className="text-[11px] font-black uppercase text-black m-0 mb-1 tracking-wider">ДОДРУКАРСЬКИЙ ПРОЦЕС</h4>
                   <table className="w-full border-collapse border border-black text-[10.5px]">
                     <thead>
                       <tr className="bg-slate-100 border-b border-black text-black font-bold text-left">
                         <th className="p-1.5 border-r border-black w-10 text-center">№ п/п</th>
-                        <th className="p-1.5 border-r border-black">Операция</th>
-                        <th className="p-1.5 text-center w-36">К-во операций</th>
+                        <th className="p-1.5 border-r border-black">Операція</th>
+                        <th className="p-1.5 text-center w-36">Кількість операцій</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -14800,19 +14800,19 @@ export const Calculator: React.FC = () => {
                   </table>
                 </div>
 
-                {/* 4. Таблиця «ПОСЛЕПЕЧАТНЫЙ ПРОЦЕСС» */}
+                {/* 4. Таблиця «ПІСЛЯДРУКАРСЬКИЙ ПРОЦЕС ТА УПАКОВКА» */}
                 <div className="mb-4">
-                  <h4 className="text-[11px] font-black uppercase text-black m-0 mb-1 tracking-wider">ПОСЛЕПЕЧАТНЫЙ ПРОЦЕСС</h4>
+                  <h4 className="text-[11px] font-black uppercase text-black m-0 mb-1 tracking-wider">ПІСЛЯДРУКАРСЬКИЙ ПРОЦЕС ТА УПАКОВКА</h4>
                   <table className="w-full border-collapse border border-black text-[10.5px]">
                     <thead>
                       <tr className="bg-slate-100 border-b border-black text-black font-bold text-left">
                         <th className="p-1.5 border-r border-black w-8 text-center">№ п/п</th>
-                        <th className="p-1.5 border-r border-black">Операция</th>
-                        <th className="p-1.5 border-r border-black text-center w-28">К-во операций</th>
-                        <th className="p-1.5 border-r border-black text-center w-28">Фамилия</th>
-                        <th className="p-1.5 border-r border-black text-center w-20">Время</th>
-                        <th className="p-1.5 border-r border-black text-center w-28">Фамилия</th>
-                        <th className="p-1.5 text-center w-20">Время</th>
+                        <th className="p-1.5 border-r border-black">Операція</th>
+                        <th className="p-1.5 border-r border-black text-center w-28">Кількість операцій</th>
+                        <th className="p-1.5 border-r border-black text-center w-28">Прізвище</th>
+                        <th className="p-1.5 border-r border-black text-center w-20">Час</th>
+                        <th className="p-1.5 border-r border-black text-center w-28">Прізвище</th>
+                        <th className="p-1.5 text-center w-20">Час</th>
                       </tr>
                     </thead>
                     <tbody>
