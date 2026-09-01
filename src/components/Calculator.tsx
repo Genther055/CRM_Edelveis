@@ -3,6 +3,9 @@ import { useApp } from '../context/AppContext';
 import { 
   Settings, 
   FileText,
+  LayoutTemplate,
+  FileDown,
+  Send,
   BookOpen,
   Layout,
   Layers,
@@ -6670,26 +6673,29 @@ export const Calculator: React.FC = () => {
                               </div>
                               
                               {/* Turn Type Pill Selector */}
-                              <div className="grid grid-cols-3 gap-1.5 p-1 bg-slate-100 rounded-xl border border-slate-200/60">
+                              <div className="grid grid-cols-3 gap-2">
                                 {[
                                   { id: 'sam_na_sebe', label: 'Сам на себе (с/с)' },
                                   { id: 'chuzhyi_oborut', label: 'Чужий оборот (ч/о)' },
                                   { id: 'bez_oborotu', label: 'Без обороту' }
-                                ].map(t => (
-                                  <button
-                                    key={t.id}
-                                    type="button"
-                                    onClick={() => handleSelectTurnType(t.id as any)}
-                                    className={`py-2 px-2 rounded-lg text-xs font-bold transition-all text-center flex items-center justify-center gap-1 ${
-                                      turnType === t.id
-                                        ? 'bg-blue-600 text-white shadow-2xs'
-                                        : 'text-slate-700 hover:bg-white/80'
-                                    }`}
-                                  >
-                                    <span>{t.label}</span>
-                                    {turnType === t.id && <span className="text-white text-xs font-black">✓</span>}
-                                  </button>
-                                ))}
+                                ].map(t => {
+                                  const isSel = turnType === t.id;
+                                  return (
+                                    <button
+                                      key={t.id}
+                                      type="button"
+                                      onClick={() => handleSelectTurnType(t.id as any)}
+                                      className={`py-2 px-2 rounded-xl text-xs font-bold transition-all text-center flex items-center justify-center gap-1.5 border ${
+                                        isSel
+                                          ? 'bg-blue-50 text-blue-700 border-blue-400 ring-2 ring-blue-500/20 shadow-2xs'
+                                          : 'bg-slate-50/80 hover:bg-slate-100 text-slate-700 border-slate-200/80'
+                                      }`}
+                                    >
+                                      <span>{t.label}</span>
+                                      {isSel && <Check size={13} className="text-blue-600 font-bold" />}
+                                    </button>
+                                  );
+                                })}
                               </div>
 
                               {/* Tirazh Input */}
@@ -6721,21 +6727,24 @@ export const Calculator: React.FC = () => {
                                   onChange={(e) => setMarginPercent(Number(e.target.value) || 0)}
                                   className="w-full cursor-pointer accent-blue-600 h-2 bg-slate-200 rounded-lg"
                                 />
-                                <div className="grid grid-cols-5 gap-2 p-1.5 bg-slate-100/90 rounded-xl border border-slate-200/60">
-                                  {[20, 35, 50, 100, 150].map(m => (
-                                    <button
-                                      key={m}
-                                      type="button"
-                                      onClick={() => setMarginPercent(m)}
-                                      className={`py-2 text-xs font-bold rounded-lg transition-all text-center flex items-center justify-center ${
-                                        marginPercent === m
-                                          ? 'bg-blue-600 text-white shadow-2xs'
-                                          : 'text-slate-600 hover:bg-white'
-                                      }`}
-                                    >
-                                      {m}%
-                                    </button>
-                                  ))}
+                                <div className="grid grid-cols-5 gap-2">
+                                  {[20, 35, 50, 100, 150].map(m => {
+                                    const isSel = marginPercent === m;
+                                    return (
+                                      <button
+                                        key={m}
+                                        type="button"
+                                        onClick={() => setMarginPercent(m)}
+                                        className={`py-2 text-xs font-bold rounded-xl transition-all text-center flex items-center justify-center border ${
+                                          isSel
+                                            ? 'bg-blue-50 text-blue-700 border-blue-400 ring-2 ring-blue-500/20 shadow-2xs font-extrabold'
+                                            : 'bg-slate-50/80 hover:bg-slate-100 text-slate-700 border-slate-200/80'
+                                        }`}
+                                      >
+                                        {m}%
+                                      </button>
+                                    );
+                                  })}
                                 </div>
                               </div>
                             </div>
@@ -6786,19 +6795,21 @@ export const Calculator: React.FC = () => {
                               </div>
 
                               {/* Total Final Price Box */}
-                              <div className="p-3.5 rounded-xl bg-gradient-to-br from-blue-50/90 via-indigo-50/50 to-white border border-blue-200/80">
-                                <div className="flex justify-between items-baseline">
-                                  <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wide">РАЗОМ ДО СПЛАТИ:</span>
-                                  <span className="text-xs font-bold text-emerald-600 font-mono">
+                              <div className="p-4 rounded-2xl bg-slate-50/90 border border-slate-200 flex flex-col gap-2">
+                                <div className="flex justify-between items-center">
+                                  <span className="text-xs font-black text-slate-800 uppercase tracking-wider">РАЗОМ ДО СПЛАТИ:</span>
+                                  <span className="text-xs font-extrabold text-emerald-700 font-mono bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-200/60">
                                     +{liveMarginAmount.toFixed(2)} ₴ маржа
                                   </span>
                                 </div>
-                                <p className="text-2xl font-black text-blue-600 my-0.5 font-mono tracking-tight">
-                                  {liveFinalPrice} <span className="text-sm font-bold text-slate-600">₴</span>
-                                </p>
-                                <div className="flex justify-between items-center text-xs pt-1.5 border-t border-blue-200/60 font-semibold text-blue-900">
-                                  <span>Ціна за 1 шт:</span>
-                                  <strong className="font-mono font-bold">{liveUnitPrice.toFixed(2)} ₴ / шт</strong>
+                                <div className="flex items-baseline justify-between pt-1">
+                                  <p className="text-3xl font-black text-blue-600 my-0 font-mono tracking-tight leading-none">
+                                    {liveFinalPrice} <span className="text-base font-bold text-slate-600">₴</span>
+                                  </p>
+                                  <div className="text-right">
+                                    <span className="text-[11px] text-slate-500 font-medium block">Ціна за 1 шт:</span>
+                                    <strong className="text-sm font-black text-slate-900 font-mono">{liveUnitPrice.toFixed(2)} ₴ / шт</strong>
+                                  </div>
                                 </div>
                               </div>
                             </div>
@@ -6808,9 +6819,10 @@ export const Calculator: React.FC = () => {
                               <button
                                 type="button"
                                 onClick={() => setShowTemplateModal(true)}
-                                className="py-2.5 px-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-2xs transition-colors text-center"
+                                className="py-2.5 px-2 rounded-xl border border-slate-200/80 bg-slate-50/80 hover:bg-slate-100 text-slate-700 font-bold text-xs shadow-2xs transition-all text-center flex items-center justify-center gap-1.5"
                               >
-                                Шаблон
+                                <LayoutTemplate size={14} className="text-slate-500" />
+                                <span>Шаблон</span>
                               </button>
                               
                               <button
@@ -6819,9 +6831,10 @@ export const Calculator: React.FC = () => {
                                   setName(fullComposedName);
                                   setShowInvoice(true);
                                 }}
-                                className="py-2.5 px-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-2xs transition-colors text-center"
+                                className="py-2.5 px-2 rounded-xl border border-slate-200/80 bg-slate-50/80 hover:bg-slate-100 text-slate-700 font-bold text-xs shadow-2xs transition-all text-center flex items-center justify-center gap-1.5"
                               >
-                                ПДФ
+                                <FileDown size={14} className="text-slate-500" />
+                                <span>ПДФ</span>
                               </button>
 
                               <button
@@ -6840,9 +6853,10 @@ export const Calculator: React.FC = () => {
                                   navigator.clipboard.writeText(text);
                                   alert('Комерційну пропозицію (КП) скопійовано в буфер обміну.');
                                 }}
-                                className="py-2.5 px-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-2xs transition-colors text-center"
+                                className="py-2.5 px-2 rounded-xl border border-slate-200/80 bg-slate-50/80 hover:bg-slate-100 text-slate-700 font-bold text-xs shadow-2xs transition-all text-center flex items-center justify-center gap-1.5"
                               >
-                                КП
+                                <FileText size={14} className="text-slate-500" />
+                                <span>КП</span>
                               </button>
 
                               <button
@@ -6874,9 +6888,10 @@ export const Calculator: React.FC = () => {
                                   alert(`Замовлення № ${orderNumber} створено та передано у виробництво.`);
                                   setOrderNumber(Math.floor(10000 + Math.random() * 90000));
                                 }}
-                                className="py-2.5 px-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs shadow-md shadow-blue-500/20 transition-all text-center"
+                                className="py-2.5 px-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs shadow-md shadow-blue-500/25 transition-all text-center flex items-center justify-center gap-1.5"
                               >
-                                Виробництво
+                                <Send size={14} className="text-white" />
+                                <span>Виробництво</span>
                               </button>
                             </div>
                           </div>
@@ -9077,26 +9092,29 @@ export const Calculator: React.FC = () => {
                               </div>
                               
                               {/* Turn Type Pill Selector */}
-                              <div className="grid grid-cols-3 gap-1.5 p-1 bg-slate-100 rounded-xl border border-slate-200/60">
+                              <div className="grid grid-cols-3 gap-2">
                                 {[
                                   { id: 'sam_na_sebe', label: 'Сам на себе (с/с)' },
                                   { id: 'chuzhyi_oborut', label: 'Чужий оборот (ч/о)' },
                                   { id: 'bez_oborotu', label: 'Без обороту' }
-                                ].map(t => (
-                                  <button
-                                    key={t.id}
-                                    type="button"
-                                    onClick={() => handleSelectTurnType(t.id as any)}
-                                    className={`py-2 px-2 rounded-lg text-xs font-bold transition-all text-center flex items-center justify-center gap-1 ${
-                                      turnType === t.id
-                                        ? 'bg-blue-600 text-white shadow-2xs'
-                                        : 'text-slate-700 hover:bg-white/80'
-                                    }`}
-                                  >
-                                    <span>{t.label}</span>
-                                    {turnType === t.id && <span className="text-white text-xs font-black">✓</span>}
-                                  </button>
-                                ))}
+                                ].map(t => {
+                                  const isSel = turnType === t.id;
+                                  return (
+                                    <button
+                                      key={t.id}
+                                      type="button"
+                                      onClick={() => handleSelectTurnType(t.id as any)}
+                                      className={`py-2 px-2 rounded-xl text-xs font-bold transition-all text-center flex items-center justify-center gap-1.5 border ${
+                                        isSel
+                                          ? 'bg-blue-50 text-blue-700 border-blue-400 ring-2 ring-blue-500/20 shadow-2xs'
+                                          : 'bg-slate-50/80 hover:bg-slate-100 text-slate-700 border-slate-200/80'
+                                      }`}
+                                    >
+                                      <span>{t.label}</span>
+                                      {isSel && <Check size={13} className="text-blue-600 font-bold" />}
+                                    </button>
+                                  );
+                                })}
                               </div>
 
                               {/* Tirazh Input */}
@@ -9143,21 +9161,24 @@ export const Calculator: React.FC = () => {
                                   onChange={(e) => setMarginPercent(Number(e.target.value) || 0)}
                                   className="w-full cursor-pointer accent-blue-600 h-2 bg-slate-200 rounded-lg"
                                 />
-                                <div className="grid grid-cols-5 gap-2 p-1.5 bg-slate-100/90 rounded-xl border border-slate-200/60">
-                                  {[20, 35, 50, 100, 150].map(m => (
-                                    <button
-                                      key={m}
-                                      type="button"
-                                      onClick={() => setMarginPercent(m)}
-                                      className={`py-2 text-xs font-bold rounded-lg transition-all text-center flex items-center justify-center ${
-                                        marginPercent === m
-                                          ? 'bg-blue-600 text-white shadow-2xs'
-                                          : 'text-slate-600 hover:bg-white'
-                                      }`}
-                                    >
-                                      {m}%
-                                    </button>
-                                  ))}
+                                <div className="grid grid-cols-5 gap-2">
+                                  {[20, 35, 50, 100, 150].map(m => {
+                                    const isSel = marginPercent === m;
+                                    return (
+                                      <button
+                                        key={m}
+                                        type="button"
+                                        onClick={() => setMarginPercent(m)}
+                                        className={`py-2 text-xs font-bold rounded-xl transition-all text-center flex items-center justify-center border ${
+                                          isSel
+                                            ? 'bg-blue-50 text-blue-700 border-blue-400 ring-2 ring-blue-500/20 shadow-2xs font-extrabold'
+                                            : 'bg-slate-50/80 hover:bg-slate-100 text-slate-700 border-slate-200/80'
+                                        }`}
+                                      >
+                                        {m}%
+                                      </button>
+                                    );
+                                  })}
                                 </div>
                               </div>
                             </div>
@@ -9208,19 +9229,21 @@ export const Calculator: React.FC = () => {
                               </div>
 
                               {/* Total Final Price Box */}
-                              <div className="p-3.5 rounded-xl bg-gradient-to-br from-blue-50/90 via-indigo-50/50 to-white border border-blue-200/80">
-                                <div className="flex justify-between items-baseline">
-                                  <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wide">РАЗОМ ДО СПЛАТИ:</span>
-                                  <span className="text-xs font-bold text-emerald-600 font-mono">
+                              <div className="p-4 rounded-2xl bg-slate-50/90 border border-slate-200 flex flex-col gap-2">
+                                <div className="flex justify-between items-center">
+                                  <span className="text-xs font-black text-slate-800 uppercase tracking-wider">РАЗОМ ДО СПЛАТИ:</span>
+                                  <span className="text-xs font-extrabold text-emerald-700 font-mono bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-200/60">
                                     +{digMarginAmount.toFixed(2)} ₴ маржа
                                   </span>
                                 </div>
-                                <p className="text-2xl font-black text-blue-600 my-0.5 font-mono tracking-tight">
-                                  {digFinalPrice} <span className="text-sm font-bold text-slate-600">₴</span>
-                                </p>
-                                <div className="flex justify-between items-center text-xs pt-1.5 border-t border-blue-200/60 font-semibold text-blue-900">
-                                  <span>Ціна за 1 шт:</span>
-                                  <strong className="font-mono font-bold">{digUnitPrice.toFixed(2)} ₴ / шт</strong>
+                                <div className="flex items-baseline justify-between pt-1">
+                                  <p className="text-3xl font-black text-blue-600 my-0 font-mono tracking-tight leading-none">
+                                    {digFinalPrice} <span className="text-base font-bold text-slate-600">₴</span>
+                                  </p>
+                                  <div className="text-right">
+                                    <span className="text-[11px] text-slate-500 font-medium block">Ціна за 1 шт:</span>
+                                    <strong className="text-sm font-black text-slate-900 font-mono">{digUnitPrice.toFixed(2)} ₴ / шт</strong>
+                                  </div>
                                 </div>
                               </div>
                             </div>
@@ -12336,21 +12359,24 @@ export const Calculator: React.FC = () => {
                                   onChange={(e) => setMarginPercent(Number(e.target.value) || 0)}
                                   className="w-full cursor-pointer accent-blue-600 h-2 bg-slate-200 rounded-lg"
                                 />
-                                <div className="grid grid-cols-5 gap-2 p-1.5 bg-slate-100/90 rounded-xl border border-slate-200/60">
-                                  {[20, 35, 50, 100, 150].map(m => (
-                                    <button
-                                      key={m}
-                                      type="button"
-                                      onClick={() => setMarginPercent(m)}
-                                      className={`py-2 text-xs font-bold rounded-lg transition-all text-center flex items-center justify-center ${
-                                        marginPercent === m
-                                          ? 'bg-blue-600 text-white shadow-2xs'
-                                          : 'text-slate-600 hover:bg-white'
-                                      }`}
-                                    >
-                                      {m}%
-                                    </button>
-                                  ))}
+                                <div className="grid grid-cols-5 gap-2">
+                                  {[20, 35, 50, 100, 150].map(m => {
+                                    const isSel = marginPercent === m;
+                                    return (
+                                      <button
+                                        key={m}
+                                        type="button"
+                                        onClick={() => setMarginPercent(m)}
+                                        className={`py-2 text-xs font-bold rounded-xl transition-all text-center flex items-center justify-center border ${
+                                          isSel
+                                            ? 'bg-blue-50 text-blue-700 border-blue-400 ring-2 ring-blue-500/20 shadow-2xs font-extrabold'
+                                            : 'bg-slate-50/80 hover:bg-slate-100 text-slate-700 border-slate-200/80'
+                                        }`}
+                                      >
+                                        {m}%
+                                      </button>
+                                    );
+                                  })}
                                 </div>
                               </div>
                             </div>
@@ -12397,19 +12423,21 @@ export const Calculator: React.FC = () => {
                               </div>
 
                               {/* Total Final Price Box */}
-                              <div className="p-3.5 rounded-xl bg-gradient-to-br from-blue-50/90 via-indigo-50/50 to-white border border-blue-200/80">
-                                <div className="flex justify-between items-baseline">
-                                  <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wide">РАЗОМ ДО СПЛАТИ:</span>
-                                  <span className="text-xs font-bold text-emerald-600 font-mono">
+                              <div className="p-4 rounded-2xl bg-slate-50/90 border border-slate-200 flex flex-col gap-2">
+                                <div className="flex justify-between items-center">
+                                  <span className="text-xs font-black text-slate-800 uppercase tracking-wider">РАЗОМ ДО СПЛАТИ:</span>
+                                  <span className="text-xs font-extrabold text-emerald-700 font-mono bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-200/60">
                                     +{wideMarginAmount.toFixed(2)} ₴ маржа
                                   </span>
                                 </div>
-                                <p className="text-2xl font-black text-blue-600 my-0.5 font-mono tracking-tight">
-                                  {wideFinalPrice} <span className="text-sm font-bold text-slate-600">₴</span>
-                                </p>
-                                <div className="flex justify-between items-center text-xs pt-1.5 border-t border-blue-200/60 font-semibold text-blue-900">
-                                  <span>Ціна за 1 шт:</span>
-                                  <strong className="font-mono font-bold">{wideUnitPrice.toFixed(2)} ₴ / шт</strong>
+                                <div className="flex items-baseline justify-between pt-1">
+                                  <p className="text-3xl font-black text-blue-600 my-0 font-mono tracking-tight leading-none">
+                                    {wideFinalPrice} <span className="text-base font-bold text-slate-600">₴</span>
+                                  </p>
+                                  <div className="text-right">
+                                    <span className="text-[11px] text-slate-500 font-medium block">Ціна за 1 шт:</span>
+                                    <strong className="text-sm font-black text-slate-900 font-mono">{wideUnitPrice.toFixed(2)} ₴ / шт</strong>
+                                  </div>
                                 </div>
                               </div>
                             </div>
@@ -13339,19 +13367,21 @@ export const Calculator: React.FC = () => {
                             </div>
 
                             {/* Total Final Price Box */}
-                            <div className="p-3.5 rounded-xl bg-gradient-to-br from-blue-50/90 via-indigo-50/50 to-white border border-blue-200/80">
-                              <div className="flex justify-between items-baseline">
-                                <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wide">РАЗОМ ДО СПЛАТИ:</span>
-                                <span className="text-xs font-bold text-emerald-600 font-mono">
+                            <div className="p-4 rounded-2xl bg-slate-50/90 border border-slate-200 flex flex-col gap-2">
+                              <div className="flex justify-between items-center">
+                                <span className="text-xs font-black text-slate-800 uppercase tracking-wider">РАЗОМ ДО СПЛАТИ:</span>
+                                <span className="text-xs font-extrabold text-emerald-700 font-mono bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-200/60">
                                   +{rollMarginAmount.toFixed(2)} ₴ маржа
                                 </span>
                               </div>
-                              <p className="text-2xl font-black text-blue-600 my-0.5 font-mono tracking-tight">
-                                {rollFinalPrice} <span className="text-sm font-bold text-slate-600">₴</span>
-                              </p>
-                              <div className="flex justify-between items-center text-xs pt-1.5 border-t border-blue-200/60 font-semibold text-blue-900">
-                                <span>Ціна за 1 шт:</span>
-                                <strong className="font-mono font-bold">{rollUnitPrice.toFixed(4)} ₴ / шт</strong>
+                              <div className="flex items-baseline justify-between pt-1">
+                                <p className="text-3xl font-black text-blue-600 my-0 font-mono tracking-tight leading-none">
+                                  {rollFinalPrice} <span className="text-base font-bold text-slate-600">₴</span>
+                                </p>
+                                <div className="text-right">
+                                  <span className="text-[11px] text-slate-500 font-medium block">Ціна за 1 шт:</span>
+                                  <strong className="text-sm font-black text-slate-900 font-mono">{rollUnitPrice.toFixed(4)} ₴ / шт</strong>
+                                </div>
                               </div>
                             </div>
                           </div>
