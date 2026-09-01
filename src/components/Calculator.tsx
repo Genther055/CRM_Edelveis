@@ -6351,17 +6351,19 @@ export const Calculator: React.FC = () => {
                           </div>
                         </div>
 
-                        {/* 3-Box Bottom Section matching user sketch exactly:
-                            Left: ОБОРОТ | Middle: РОЗРАХУНОК | Right: [ ШАБЛОН ] [ PDF ] [ КП ] [ ВИРОБНИЦТВО ] */}
-                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
-                          {/* 1. Left Box (3 cols): ОБОРОТ & Параметри тиражу */}
-                          <div className="lg:col-span-3 flex flex-col gap-3 p-4 rounded-xl bg-white border border-slate-200 justify-between">
-                            <div className="flex flex-col gap-3">
-                              <div className="flex items-center justify-between pb-1.5 border-b border-slate-100">
+                        {/* 2-Column Main Section: Left = ОБОРОТ (СПУСК) | Right = РОЗРАХУНОК + Горизонтальні кнопки */}
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-stretch">
+                          {/* 1. Left Column (50%): ОБОРОТ (СПУСК) & Параметри тиражу */}
+                          <div className="ios-card bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-4">
+                            <div className="flex flex-col gap-4">
+                              {/* Header */}
+                              <div className="flex items-center justify-between pb-2 border-b border-slate-100">
                                 <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wider">ОБОРОТ (СПУСК):</span>
+                                <span className="text-[11px] font-bold text-slate-400">Схема друку</span>
                               </div>
                               
-                              <div className="flex flex-col gap-1.5">
+                              {/* Turn Type Pill Selector */}
+                              <div className="grid grid-cols-3 gap-1.5 p-1 bg-slate-100 rounded-xl border border-slate-200/60">
                                 {[
                                   { id: 'sam_na_sebe', label: 'Сам на себе (с/с)' },
                                   { id: 'chuzhyi_oborut', label: 'Чужий оборот (ч/о)' },
@@ -6371,10 +6373,10 @@ export const Calculator: React.FC = () => {
                                     key={t.id}
                                     type="button"
                                     onClick={() => handleSelectTurnType(t.id as any)}
-                                    className={`py-2 px-2.5 rounded-lg text-xs font-bold transition-all text-left flex items-center justify-between border ${
+                                    className={`py-2 px-2 rounded-lg text-xs font-bold transition-all text-center flex items-center justify-center gap-1 ${
                                       turnType === t.id
-                                        ? 'bg-blue-600 text-white border-blue-600 shadow-2xs'
-                                        : 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100'
+                                        ? 'bg-blue-600 text-white shadow-2xs'
+                                        : 'text-slate-700 hover:bg-white/80'
                                     }`}
                                   >
                                     <span>{t.label}</span>
@@ -6383,9 +6385,9 @@ export const Calculator: React.FC = () => {
                                 ))}
                               </div>
 
-                              {/* Tirazh */}
-                              <div className="flex flex-col gap-1 pt-1">
-                                <label className="text-[11px] font-bold text-slate-600 uppercase">Наклад (шт):</label>
+                              {/* Tirazh Input */}
+                              <div className="flex flex-col gap-1.5">
+                                <label className="text-xs font-extrabold text-slate-700 uppercase">НАКЛАД (ШТ):</label>
                                 <input
                                   type="number"
                                   value={activeCalc.tirazh}
@@ -6393,15 +6395,15 @@ export const Calculator: React.FC = () => {
                                     const val = parseInt(e.target.value) || 100;
                                     setSelectedSheetCalc(prev => prev ? { ...prev, tirazh: val } : null);
                                   }}
-                                  className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 text-xs font-bold text-slate-900 text-center font-mono"
+                                  className="w-full px-3.5 py-2 rounded-xl border border-slate-200 bg-slate-50 font-bold text-xs text-slate-900 focus:bg-white focus:border-blue-600 focus:outline-none"
                                 />
                               </div>
 
                               {/* Margin slider & presets */}
-                              <div className="flex flex-col gap-1 pt-1">
+                              <div className="flex flex-col gap-2">
                                 <div className="flex items-center justify-between text-xs">
-                                  <label className="text-[11px] font-bold text-slate-600 uppercase">Націнка:</label>
-                                  <span className="font-extrabold text-blue-600 font-mono">{marginPercent}%</span>
+                                  <label className="text-xs font-extrabold text-slate-700 uppercase">НАЦІНКА (МАРЖА):</label>
+                                  <span className="font-extrabold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-lg border border-blue-200">{marginPercent}%</span>
                                 </div>
                                 <input
                                   type="range"
@@ -6410,18 +6412,18 @@ export const Calculator: React.FC = () => {
                                   step="5"
                                   value={marginPercent}
                                   onChange={(e) => setMarginPercent(Number(e.target.value) || 0)}
-                                  className="w-full cursor-pointer accent-blue-600"
+                                  className="w-full cursor-pointer accent-blue-600 h-2 bg-slate-200 rounded-lg"
                                 />
-                                <div className="grid grid-cols-5 gap-1 pt-1">
+                                <div className="grid grid-cols-5 gap-1.5 p-1 bg-slate-100 rounded-xl border border-slate-200/60">
                                   {[20, 35, 50, 100, 150].map(m => (
                                     <button
                                       key={m}
                                       type="button"
                                       onClick={() => setMarginPercent(m)}
-                                      className={`py-1 text-[10px] font-bold rounded transition-all ${
+                                      className={`py-1.5 text-xs font-bold rounded-lg transition-all ${
                                         marginPercent === m
                                           ? 'bg-blue-600 text-white shadow-2xs'
-                                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                          : 'text-slate-600 hover:bg-white'
                                       }`}
                                     >
                                       {m}%
@@ -6432,12 +6434,12 @@ export const Calculator: React.FC = () => {
                             </div>
                           </div>
 
-                          {/* 2. Middle Box (6 cols): РОЗРАХУНОК (Деталі кошторису 1С та РАЗОМ) */}
-                          <div className="lg:col-span-6 flex flex-col gap-3 p-4 rounded-xl bg-white border border-slate-200 justify-between">
-                            <div className="flex flex-col gap-2.5">
+                          {/* 2. Right Column (50%): РОЗРАХУНОК + ГОРИЗОНТАЛЬНІ КНОПКИ СПРАВА */}
+                          <div className="ios-card bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-4">
+                            <div className="flex flex-col gap-3">
                               <div className="flex justify-between items-center pb-2 border-b border-slate-100">
                                 <span className="text-xs font-black text-slate-800 uppercase tracking-wide">
-                                  РОЗРАХУНОК (Собівартість & Норми 1С):
+                                  РОЗРАХУНОК (СОБІВАРТІСТЬ & НОРМИ 1С):
                                 </span>
                                 <strong className="text-sm font-black text-slate-900 font-mono">
                                   {activeCalc.rawCost.toFixed(2)} ₴
@@ -6445,67 +6447,61 @@ export const Calculator: React.FC = () => {
                               </div>
 
                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                                <div className="flex justify-between p-2 rounded-lg bg-slate-50 border border-slate-100">
+                                <div className="flex justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/60">
                                   <span className="text-slate-600 font-medium">Матеріали / Папір:</span>
                                   <strong className="font-mono text-slate-900">{activeCalc.basePaperCost.toFixed(2)} ₴</strong>
                                 </div>
-                                <div className="flex justify-between p-2 rounded-lg bg-slate-50 border border-slate-100">
+                                <div className="flex justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/60">
                                   <span className="text-slate-600 font-medium">Друк & CTP-форми:</span>
                                   <strong className="font-mono text-slate-900">{activeCalc.printCost.toFixed(2)} ₴</strong>
                                 </div>
-                                <div className="flex justify-between p-2 rounded-lg bg-slate-50 border border-slate-100">
+                                <div className="flex justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/60">
                                   <span className="text-slate-600 font-medium">Ламінація / Покриття:</span>
                                   <strong className="font-mono text-slate-900">{activeCalc.lamCost.toFixed(2)} ₴</strong>
                                 </div>
-                                <div className="flex justify-between p-2 rounded-lg bg-slate-50 border border-slate-100">
+                                <div className="flex justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/60">
                                   <span className="text-slate-600 font-medium">Післядрукарські роботи:</span>
                                   <strong className="font-mono text-slate-900">{activeCalc.postpressSum.toFixed(2)} ₴</strong>
                                 </div>
                                 {activeCalc.deliveryCost > 0 && (
-                                  <div className="flex justify-between p-2 rounded-lg bg-slate-50 border border-slate-100 col-span-2">
+                                  <div className="flex justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/60 col-span-2">
                                     <span className="text-slate-600 font-medium">Доставка:</span>
                                     <strong className="font-mono text-slate-900">{activeCalc.deliveryCost.toFixed(2)} ₴</strong>
                                   </div>
                                 )}
                               </div>
 
-                              <div className="flex justify-between text-[11px] font-semibold text-slate-500 px-1 pt-1">
+                              <div className="flex justify-between text-[11px] font-semibold text-slate-500 px-1">
                                 <span>Собівартість 1 екземпляра:</span>
                                 <strong className="font-mono text-slate-800">
                                   {(activeCalc.rawCost / activeCalc.tirazh).toFixed(4)} ₴ / шт
                                 </strong>
                               </div>
+
+                              {/* Total Final Price Box */}
+                              <div className="p-3.5 rounded-xl bg-gradient-to-br from-blue-50/90 via-indigo-50/50 to-white border border-blue-200/80">
+                                <div className="flex justify-between items-baseline">
+                                  <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wide">РАЗОМ ДО СПЛАТИ:</span>
+                                  <span className="text-xs font-bold text-emerald-600 font-mono">
+                                    +{liveMarginAmount.toFixed(2)} ₴ маржа
+                                  </span>
+                                </div>
+                                <p className="text-2xl font-black text-blue-600 my-0.5 font-mono tracking-tight">
+                                  {liveFinalPrice} <span className="text-sm font-bold text-slate-600">₴</span>
+                                </p>
+                                <div className="flex justify-between items-center text-xs pt-1.5 border-t border-blue-200/60 font-semibold text-blue-900">
+                                  <span>Ціна за 1 шт:</span>
+                                  <strong className="font-mono font-bold">{liveUnitPrice.toFixed(2)} ₴ / шт</strong>
+                                </div>
+                              </div>
                             </div>
 
-                            {/* Total Final Price Box */}
-                            <div className="p-3.5 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200">
-                              <div className="flex justify-between items-baseline">
-                                <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wide">РАЗОМ ДО СПЛАТИ:</span>
-                                <span className="text-xs font-bold text-emerald-600 font-mono">
-                                  +{liveMarginAmount.toFixed(2)} ₴ маржа
-                                </span>
-                              </div>
-                              <p className="text-2xl font-black text-blue-600 my-0.5 font-mono tracking-tight">
-                                {liveFinalPrice} <span className="text-sm font-bold text-slate-600">₴</span>
-                              </p>
-                              <div className="flex justify-between items-center text-xs pt-1.5 border-t border-blue-200/60 font-semibold text-blue-900">
-                                <span>Ціна за 1 шт:</span>
-                                <strong className="font-mono font-bold">{liveUnitPrice.toFixed(2)} ₴ / шт</strong>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* 3. Right Box (3 cols): Vertical Stack of Action Buttons [ ШАБЛОН ] [ PDF ] [ КП ] [ ВИРОБНИЦТВО ] */}
-                          <div className="lg:col-span-3 flex flex-col gap-2 p-4 rounded-xl bg-white border border-slate-200 justify-between">
-                            <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wider pb-1.5 border-b border-slate-100">
-                              ДІЇ З ЗАМОВЛЕННЯМ:
-                            </span>
-
-                            <div className="flex flex-col gap-2 flex-1 justify-center">
+                            {/* Horizontal Action Buttons Right: [ ШАБЛОН ] [ PDF ] [ КП ] [ ВИРОБНИЦТВО ] */}
+                            <div className="grid grid-cols-4 gap-2 pt-1 border-t border-slate-100">
                               <button
                                 type="button"
                                 onClick={() => setShowTemplateModal(true)}
-                                className="w-full py-2.5 px-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-800 font-bold text-xs shadow-2xs transition-colors text-center"
+                                className="py-2.5 px-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-2xs transition-colors text-center"
                               >
                                 Шаблон
                               </button>
@@ -6516,7 +6512,7 @@ export const Calculator: React.FC = () => {
                                   setName(fullComposedName);
                                   setShowInvoice(true);
                                 }}
-                                className="w-full py-2.5 px-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-800 font-bold text-xs shadow-2xs transition-colors text-center"
+                                className="py-2.5 px-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-2xs transition-colors text-center"
                               >
                                 ПДФ
                               </button>
@@ -6537,7 +6533,7 @@ export const Calculator: React.FC = () => {
                                   navigator.clipboard.writeText(text);
                                   alert('Комерційну пропозицію (КП) скопійовано в буфер обміну.');
                                 }}
-                                className="w-full py-2.5 px-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-800 font-bold text-xs shadow-2xs transition-colors text-center"
+                                className="py-2.5 px-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-2xs transition-colors text-center"
                               >
                                 КП
                               </button>
@@ -6571,7 +6567,7 @@ export const Calculator: React.FC = () => {
                                   alert(`Замовлення № ${orderNumber} створено та передано у виробництво.`);
                                   setOrderNumber(Math.floor(10000 + Math.random() * 90000));
                                 }}
-                                className="w-full py-3 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs shadow-md shadow-blue-500/20 transition-all text-center"
+                                className="py-2.5 px-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs shadow-md shadow-blue-500/20 transition-all text-center"
                               >
                                 Виробництво
                               </button>
@@ -8817,17 +8813,19 @@ export const Calculator: React.FC = () => {
                           </div>
                         </div>
 
-                        {/* 3-Box Bottom Section matching user sketch exactly:
-                            Left: ОБОРОТ | Middle: РОЗРАХУНОК | Right: [ ШАБЛОН ] [ PDF ] [ КП ] [ ВИРОБНИЦТВО ] */}
-                        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 items-stretch">
-                          {/* 1. Left Box (3 cols): ОБОРОТ & Параметри тиражу */}
-                          <div className="lg:col-span-3 flex flex-col gap-3 p-4 rounded-xl bg-white border border-slate-200 justify-between">
-                            <div className="flex flex-col gap-3">
-                              <div className="flex items-center justify-between pb-1.5 border-b border-slate-100">
+                        {/* 2-Column Main Section: Left = ОБОРОТ (СПУСК) | Right = РОЗРАХУНОК + Горизонтальні кнопки */}
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-stretch">
+                          {/* 1. Left Column (50%): ОБОРОТ (СПУСК) & Параметри тиражу */}
+                          <div className="ios-card bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-4">
+                            <div className="flex flex-col gap-4">
+                              {/* Header */}
+                              <div className="flex items-center justify-between pb-2 border-b border-slate-100">
                                 <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wider">ОБОРОТ (СПУСК):</span>
+                                <span className="text-[11px] font-bold text-slate-400">Схема друку</span>
                               </div>
                               
-                              <div className="flex flex-col gap-1.5">
+                              {/* Turn Type Pill Selector */}
+                              <div className="grid grid-cols-3 gap-1.5 p-1 bg-slate-100 rounded-xl border border-slate-200/60">
                                 {[
                                   { id: 'sam_na_sebe', label: 'Сам на себе (с/с)' },
                                   { id: 'chuzhyi_oborut', label: 'Чужий оборот (ч/о)' },
@@ -8837,10 +8835,10 @@ export const Calculator: React.FC = () => {
                                     key={t.id}
                                     type="button"
                                     onClick={() => handleSelectTurnType(t.id as any)}
-                                    className={`py-2 px-2.5 rounded-lg text-xs font-bold transition-all text-left flex items-center justify-between border ${
+                                    className={`py-2 px-2 rounded-lg text-xs font-bold transition-all text-center flex items-center justify-center gap-1 ${
                                       turnType === t.id
-                                        ? 'bg-blue-600 text-white border-blue-600 shadow-2xs'
-                                        : 'border-slate-200 bg-slate-50 text-slate-700 hover:bg-slate-100'
+                                        ? 'bg-blue-600 text-white shadow-2xs'
+                                        : 'text-slate-700 hover:bg-white/80'
                                     }`}
                                   >
                                     <span>{t.label}</span>
@@ -8849,9 +8847,9 @@ export const Calculator: React.FC = () => {
                                 ))}
                               </div>
 
-                              {/* Tirazh */}
-                              <div className="flex flex-col gap-1 pt-1">
-                                <label className="text-[11px] font-bold text-slate-600 uppercase">Наклад (шт):</label>
+                              {/* Tirazh Input */}
+                              <div className="flex flex-col gap-1.5">
+                                <label className="text-xs font-extrabold text-slate-700 uppercase">НАКЛАД (ШТ):</label>
                                 <input
                                   type="number"
                                   value={digTir}
@@ -8874,15 +8872,15 @@ export const Calculator: React.FC = () => {
                                       unitPrice: digUnitPrice
                                     });
                                   }}
-                                  className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-slate-50 text-xs font-bold text-slate-900 text-center font-mono"
+                                  className="w-full px-3.5 py-2 rounded-xl border border-slate-200 bg-slate-50 font-bold text-xs text-slate-900 focus:bg-white focus:border-blue-600 focus:outline-none"
                                 />
                               </div>
 
                               {/* Margin slider & presets */}
-                              <div className="flex flex-col gap-1 pt-1">
+                              <div className="flex flex-col gap-2">
                                 <div className="flex items-center justify-between text-xs">
-                                  <label className="text-[11px] font-bold text-slate-600 uppercase">Націнка:</label>
-                                  <span className="font-extrabold text-blue-600 font-mono">{marginPercent}%</span>
+                                  <label className="text-xs font-extrabold text-slate-700 uppercase">НАЦІНКА (МАРЖА):</label>
+                                  <span className="font-extrabold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-lg border border-blue-200">{marginPercent}%</span>
                                 </div>
                                 <input
                                   type="range"
@@ -8891,18 +8889,18 @@ export const Calculator: React.FC = () => {
                                   step="5"
                                   value={marginPercent}
                                   onChange={(e) => setMarginPercent(Number(e.target.value) || 0)}
-                                  className="w-full cursor-pointer accent-blue-600"
+                                  className="w-full cursor-pointer accent-blue-600 h-2 bg-slate-200 rounded-lg"
                                 />
-                                <div className="grid grid-cols-5 gap-1 pt-1">
+                                <div className="grid grid-cols-5 gap-1.5 p-1 bg-slate-100 rounded-xl border border-slate-200/60">
                                   {[20, 35, 50, 100, 150].map(m => (
                                     <button
                                       key={m}
                                       type="button"
                                       onClick={() => setMarginPercent(m)}
-                                      className={`py-1 text-[10px] font-bold rounded transition-all ${
+                                      className={`py-1.5 text-xs font-bold rounded-lg transition-all ${
                                         marginPercent === m
                                           ? 'bg-blue-600 text-white shadow-2xs'
-                                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                                          : 'text-slate-600 hover:bg-white'
                                       }`}
                                     >
                                       {m}%
@@ -8913,12 +8911,12 @@ export const Calculator: React.FC = () => {
                             </div>
                           </div>
 
-                          {/* 2. Middle Box (6 cols): РОЗРАХУНОК (Деталі кошторису 1С та РАЗОМ) */}
-                          <div className="lg:col-span-6 flex flex-col gap-3 p-4 rounded-xl bg-white border border-slate-200 justify-between">
-                            <div className="flex flex-col gap-2.5">
+                          {/* 2. Right Column (50%): РОЗРАХУНОК + ГОРИЗОНТАЛЬНІ КНОПКИ СПРАВА */}
+                          <div className="ios-card bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-4">
+                            <div className="flex flex-col gap-3">
                               <div className="flex justify-between items-center pb-2 border-b border-slate-100">
                                 <span className="text-xs font-black text-slate-800 uppercase tracking-wide">
-                                  РОЗРАХУНОК (Собівартість & Норми 1С):
+                                  РОЗРАХУНОК (СОБІВАРТІСТЬ & НОРМИ 1С):
                                 </span>
                                 <strong className="text-sm font-black text-slate-900 font-mono">
                                   {digRawCost.toFixed(2)} ₴
@@ -8926,67 +8924,61 @@ export const Calculator: React.FC = () => {
                               </div>
 
                               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                                <div className="flex justify-between p-2 rounded-lg bg-slate-50 border border-slate-100">
+                                <div className="flex justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/60">
                                   <span className="text-slate-600 font-medium">Матеріали / Папір:</span>
                                   <strong className="font-mono text-slate-900">{digPaperCost.toFixed(2)} ₴</strong>
                                 </div>
-                                <div className="flex justify-between p-2 rounded-lg bg-slate-50 border border-slate-100">
+                                <div className="flex justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/60">
                                   <span className="text-slate-600 font-medium">Цифровий друк:</span>
                                   <strong className="font-mono text-slate-900">{digPrintCost.toFixed(2)} ₴</strong>
                                 </div>
-                                <div className="flex justify-between p-2 rounded-lg bg-slate-50 border border-slate-100">
+                                <div className="flex justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/60">
                                   <span className="text-slate-600 font-medium">Ламінація / Покриття:</span>
                                   <strong className="font-mono text-slate-900">{digLamCost.toFixed(2)} ₴</strong>
                                 </div>
-                                <div className="flex justify-between p-2 rounded-lg bg-slate-50 border border-slate-100">
+                                <div className="flex justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/60">
                                   <span className="text-slate-600 font-medium">Післядрукарські роботи:</span>
                                   <strong className="font-mono text-slate-900">{digPostSum.toFixed(2)} ₴</strong>
                                 </div>
                                 {digDeliv > 0 && (
-                                  <div className="flex justify-between p-2 rounded-lg bg-slate-50 border border-slate-100 col-span-2">
+                                  <div className="flex justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/60 col-span-2">
                                     <span className="text-slate-600 font-medium">Доставка:</span>
                                     <strong className="font-mono text-slate-900">{digDeliv.toFixed(2)} ₴</strong>
                                   </div>
                                 )}
                               </div>
 
-                              <div className="flex justify-between text-[11px] font-semibold text-slate-500 px-1 pt-1">
+                              <div className="flex justify-between text-[11px] font-semibold text-slate-500 px-1">
                                 <span>Собівартість 1 екземпляра:</span>
                                 <strong className="font-mono text-slate-800">
                                   {(digRawCost / digTir).toFixed(4)} ₴ / шт
                                 </strong>
                               </div>
+
+                              {/* Total Final Price Box */}
+                              <div className="p-3.5 rounded-xl bg-gradient-to-br from-blue-50/90 via-indigo-50/50 to-white border border-blue-200/80">
+                                <div className="flex justify-between items-baseline">
+                                  <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wide">РАЗОМ ДО СПЛАТИ:</span>
+                                  <span className="text-xs font-bold text-emerald-600 font-mono">
+                                    +{digMarginAmount.toFixed(2)} ₴ маржа
+                                  </span>
+                                </div>
+                                <p className="text-2xl font-black text-blue-600 my-0.5 font-mono tracking-tight">
+                                  {digFinalPrice} <span className="text-sm font-bold text-slate-600">₴</span>
+                                </p>
+                                <div className="flex justify-between items-center text-xs pt-1.5 border-t border-blue-200/60 font-semibold text-blue-900">
+                                  <span>Ціна за 1 шт:</span>
+                                  <strong className="font-mono font-bold">{digUnitPrice.toFixed(2)} ₴ / шт</strong>
+                                </div>
+                              </div>
                             </div>
 
-                            {/* Total Final Price Box */}
-                            <div className="p-3.5 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200">
-                              <div className="flex justify-between items-baseline">
-                                <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wide">РАЗОМ ДО СПЛАТИ:</span>
-                                <span className="text-xs font-bold text-emerald-600 font-mono">
-                                  +{digMarginAmount.toFixed(2)} ₴ маржа
-                                </span>
-                              </div>
-                              <p className="text-2xl font-black text-blue-600 my-0.5 font-mono tracking-tight">
-                                {digFinalPrice} <span className="text-sm font-bold text-slate-600">₴</span>
-                              </p>
-                              <div className="flex justify-between items-center text-xs pt-1.5 border-t border-blue-200/60 font-semibold text-blue-900">
-                                <span>Ціна за 1 шт:</span>
-                                <strong className="font-mono font-bold">{digUnitPrice.toFixed(2)} ₴ / шт</strong>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* 3. Right Box (3 cols): Vertical Stack of Action Buttons [ ШАБЛОН ] [ PDF ] [ КП ] [ ВИРОБНИЦТВО ] */}
-                          <div className="lg:col-span-3 flex flex-col gap-2 p-4 rounded-xl bg-white border border-slate-200 justify-between">
-                            <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wider pb-1.5 border-b border-slate-100">
-                              ДІЇ З ЗАМОВЛЕННЯМ:
-                            </span>
-
-                            <div className="flex flex-col gap-2 flex-1 justify-center">
+                            {/* Horizontal Action Buttons Right: [ ШАБЛОН ] [ PDF ] [ КП ] [ ВИРОБНИЦТВО ] */}
+                            <div className="grid grid-cols-4 gap-2 pt-1 border-t border-slate-100">
                               <button
                                 type="button"
                                 onClick={() => setShowTemplateModal(true)}
-                                className="w-full py-2.5 px-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-800 font-bold text-xs shadow-2xs transition-colors text-center"
+                                className="py-2.5 px-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-2xs transition-colors text-center"
                               >
                                 Шаблон
                               </button>
@@ -8997,7 +8989,7 @@ export const Calculator: React.FC = () => {
                                   setName(fullComposedName);
                                   setShowInvoice(true);
                                 }}
-                                className="w-full py-2.5 px-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-800 font-bold text-xs shadow-2xs transition-colors text-center"
+                                className="py-2.5 px-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-2xs transition-colors text-center"
                               >
                                 ПДФ
                               </button>
@@ -9018,7 +9010,7 @@ export const Calculator: React.FC = () => {
                                   navigator.clipboard.writeText(text);
                                   alert('Комерційну пропозицію (КП) скопійовано в буфер обміну.');
                                 }}
-                                className="w-full py-2.5 px-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-800 font-bold text-xs shadow-2xs transition-colors text-center"
+                                className="py-2.5 px-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-2xs transition-colors text-center"
                               >
                                 КП
                               </button>
@@ -9052,7 +9044,7 @@ export const Calculator: React.FC = () => {
                                   alert(`Замовлення № ${orderNumber} створено та передано у виробництво.`);
                                   setOrderNumber(Math.floor(10000 + Math.random() * 90000));
                                 }}
-                                className="w-full py-3 px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs shadow-md shadow-blue-500/20 transition-all text-center"
+                                className="py-2.5 px-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs shadow-md shadow-blue-500/20 transition-all text-center"
                               >
                                 Виробництво
                               </button>
