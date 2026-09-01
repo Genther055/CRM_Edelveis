@@ -869,13 +869,13 @@ export const Calculator: React.FC = () => {
   const [digitalSheetGluingBlock, setDigitalSheetGluingBlock] = useState<string>('0');
 
   // Multi-selection Filter States for Digital Sheets & Felling (Matching Offset Style)
-  const [digitalSelectedMaterials, setDigitalSelectedMaterials] = useState<string[]>(['80', '130', '300', '350']);
-  const [digitalSelectedCoverings, setDigitalSelectedCoverings] = useState<string[]>(['0', '7', '10']);
-  const [digitalSelectedPrints, setDigitalSelectedPrints] = useState<string[]>(['4+0', '4+4']);
+  const [digitalSelectedMaterials, setDigitalSelectedMaterials] = useState<string[]>(['300']);
+  const [digitalSelectedCoverings, setDigitalSelectedCoverings] = useState<string[]>(['0']);
+  const [digitalSelectedPrints, setDigitalSelectedPrints] = useState<string[]>(['4+4']);
 
-  const [fellingSelectedMaterials, setFellingSelectedMaterials] = useState<string[]>(['300', '350']);
-  const [fellingSelectedCoverings, setFellingSelectedCoverings] = useState<string[]>(['0', '7', '10']);
-  const [fellingSelectedPrints, setFellingSelectedPrints] = useState<string[]>(['4+0', '4+4']);
+  const [fellingSelectedMaterials, setFellingSelectedMaterials] = useState<string[]>(['350']);
+  const [fellingSelectedCoverings, setFellingSelectedCoverings] = useState<string[]>(['0']);
+  const [fellingSelectedPrints, setFellingSelectedPrints] = useState<string[]>(['4+4']);
 
   // Wide Format Specific States
   const [wideSubTab, setWideSubTab] = useState<'overview' | 'banner' | 'film' | 'paper' | 'custom' | 'pvc' | 'foam_board' | 'composite' | 'acrylic' | 'canvas' | 'stands'>('overview');
@@ -901,9 +901,9 @@ export const Calculator: React.FC = () => {
   const [wideStandModel, setWideStandModel] = useState<string>('rollup_80x200');
 
   // Multi-selection Filter States for Wide Format
-  const [wideSelectedMaterials, setWideSelectedMaterials] = useState<string[]>(['frontlit_440', 'frontlit_510']);
-  const [wideSelectedResolutions, setWideSelectedResolutions] = useState<string[]>(['720', '1440']);
-  const [wideSelectedFinishes, setWideSelectedFinishes] = useState<string[]>(['luvers_hemming', 'clean_cut']);
+  const [wideSelectedMaterials, setWideSelectedMaterials] = useState<string[]>(['frontlit_440']);
+  const [wideSelectedResolutions, setWideSelectedResolutions] = useState<string[]>(['1440']);
+  const [wideSelectedFinishes, setWideSelectedFinishes] = useState<string[]>(['luvers_hemming']);
 
   // Notepad (Блокноти) State Hooks
   const [notebookPrintMethod, setNotebookPrintMethod] = useState<'digital' | 'offset'>('digital');
@@ -955,6 +955,9 @@ export const Calculator: React.FC = () => {
     folderSpine?: '0' | '5' | '7';
     folderRezinka?: 'none' | 'blue' | 'red' | 'white' | 'black';
     envelopeFormat?: 'E65' | 'C6' | 'C5' | 'C4';
+    materials?: string[];
+    coverings?: string[];
+    prints?: string[];
   }) => {
     setMainCategoryTab('offset');
     setOffsetSubTab(params.subTab || 'sheets');
@@ -972,6 +975,47 @@ export const Calculator: React.FC = () => {
     if (params.folderSpine) setFolderSpine(params.folderSpine);
     if (params.folderRezinka) setFolderRezinka(params.folderRezinka);
     if (params.envelopeFormat) setEnvelopeFormat(params.envelopeFormat);
+
+    // Set intelligent product-specific single defaults
+    if (params.materials) {
+      setSelectedMaterials(params.materials);
+    } else if (params.category === 'Візитки') {
+      setSelectedMaterials(['350']);
+    } else if (params.category === 'Флаєри' || params.category === 'Буклети') {
+      setSelectedMaterials(['130']);
+    } else if (params.category === 'Листівки') {
+      setSelectedMaterials(['300']);
+    } else if (params.category === 'Плакати') {
+      setSelectedMaterials(['130']);
+    } else if (params.category === 'Бланки' || params.category === 'Сети') {
+      setSelectedMaterials(['80']);
+    } else if (params.category === 'Календарі кишенькові') {
+      setSelectedMaterials(['350']);
+    } else if (params.category === 'Папки') {
+      setSelectedMaterials(['350']);
+    } else {
+      setSelectedMaterials(['300']);
+    }
+
+    if (params.coverings) {
+      setSelectedCoverings(params.coverings);
+    } else if (params.category === 'Календарі кишенькові') {
+      setSelectedCoverings(['10']);
+    } else if (params.category === 'Папки') {
+      setSelectedCoverings(['9']);
+    } else {
+      setSelectedCoverings(['0']);
+    }
+
+    if (params.prints) {
+      setSelectedPrintColors(params.prints);
+    } else if (params.category === 'Плакати' || params.category === 'Бланки' || params.category === 'Папки') {
+      setSelectedPrintColors(['4+0']);
+    } else {
+      setSelectedPrintColors(['4+4']);
+    }
+
+    setSelectedSheetCalc(null);
   };
 
   // Postpress options states
@@ -992,9 +1036,9 @@ export const Calculator: React.FC = () => {
   const [sheetSetsCount, setSheetSetsCount] = useState<number>(1);
 
   // Filters for Sheet Calculator
-  const [selectedMaterials, setSelectedMaterials] = useState<string[]>(['80', '130', '300']);
-  const [selectedCoverings, setSelectedCoverings] = useState<string[]>(['0', '7', '10']);
-  const [selectedPrintColors, setSelectedPrintColors] = useState<string[]>(['4+0', '4+4']);
+  const [selectedMaterials, setSelectedMaterials] = useState<string[]>(['300']);
+  const [selectedCoverings, setSelectedCoverings] = useState<string[]>(['0']);
+  const [selectedPrintColors, setSelectedPrintColors] = useState<string[]>(['4+4']);
 
   // Table options
   const [includeDelivery, setIncludeDelivery] = useState<boolean>(false);
@@ -6010,10 +6054,16 @@ export const Calculator: React.FC = () => {
                                   const isDouble = colStr === '4+4' || colStr === '1+1';
 
                                   // 1C Postpress calculation rates
+                                  const personalizationCost = postPersonalization !== '0' ? 0.35 : 0;
+                                  const luversCost = postLuvers !== '0' ? (postLuversCount || 1) * 1.20 : 0;
+                                  const cornersCost = postCorners !== '0' ? 0.15 : 0;
+                                  const gluingCost = postGluing !== '0' ? 0.20 : 0;
+                                  const drillingCost = postDrilling !== '0' ? 0.15 : 0;
                                   const foldingCostPerItem = postFolding !== '0' ? norms.foldingPrice : 0;
                                   const creasingCostPerItem = postCreasing !== '0' ? parseInt(postCreasing) * norms.foldingPrice : 0;
-                                  const dieCutCostPerItem = cardKind === '7' || cardKind === '8' || cardKind === '9' ? norms.dieCuttingPrice : 0;
-                                  const postpressTotalPerItem = foldingCostPerItem + creasingCostPerItem + dieCutCostPerItem;
+                                  const perforationCost = postPerforation !== '0' ? 0.15 : 0;
+                                  const dieCutCostPerItem = (cardKind === '7' || cardKind === '8' || cardKind === '9') ? norms.dieCuttingPrice : 0;
+                                  const postpressTotalPerItem = personalizationCost + luversCost + cornersCost + gluingCost + drillingCost + foldingCostPerItem + creasingCostPerItem + perforationCost + dieCutCostPerItem;
 
                                   return (
                                     <tr key={`${matId}-${covId}-${colStr}-${rowIdx}`} style={{ backgroundColor: rowIdx % 2 === 0 ? '#ffffff' : '#fafafa', borderBottom: '1px solid #e8e8e8' }}>
@@ -6150,10 +6200,16 @@ export const Calculator: React.FC = () => {
                     const matDensity = parseInt(matId.replace(/\D/g, '')) || 300;
                     const areaM2 = (parseFloat(sheetCustomWidth) / 1000) * (parseFloat(sheetCustomHeight) / 1000);
                     const isDouble = colStr === '4+4' || colStr === '1+1';
+                    const personalizationCost = postPersonalization !== '0' ? 0.35 : 0;
+                    const luversCost = postLuvers !== '0' ? (postLuversCount || 1) * 1.20 : 0;
+                    const cornersCost = postCorners !== '0' ? 0.15 : 0;
+                    const gluingCost = postGluing !== '0' ? 0.20 : 0;
+                    const drillingCost = postDrilling !== '0' ? 0.15 : 0;
                     const foldingCostPerItem = postFolding !== '0' ? norms.foldingPrice : 0;
                     const creasingCostPerItem = postCreasing !== '0' ? parseInt(postCreasing) * norms.foldingPrice : 0;
-                    const dieCutCostPerItem = cardKind === '7' || cardKind === '8' || cardKind === '9' ? norms.dieCuttingPrice : 0;
-                    const postpressTotalPerItem = foldingCostPerItem + creasingCostPerItem + dieCutCostPerItem;
+                    const perforationCost = postPerforation !== '0' ? 0.15 : 0;
+                    const dieCutCostPerItem = (cardKind === '7' || cardKind === '8' || cardKind === '9') ? norms.dieCuttingPrice : 0;
+                    const postpressTotalPerItem = personalizationCost + luversCost + cornersCost + gluingCost + drillingCost + foldingCostPerItem + creasingCostPerItem + perforationCost + dieCutCostPerItem;
 
                     const defPaperCost = areaM2 * (matDensity * 0.08) * tir;
                     const defPrintCost = (isDouble ? 0.35 : 0.20) * tir + (tir > 500 ? 80 : 120);
@@ -8452,6 +8508,14 @@ export const Calculator: React.FC = () => {
                                   const lamRate = covId === '0' ? 0 : covId.includes('3') ? 1.8 : 1.1;
                                   const deliveryFee = digitalSheetWithDelivery ? 90 : 0;
 
+                                  const digCorners = digitalSheetCornerCurve !== '0' ? 0.15 : 0;
+                                  const digDrill = digitalSheetDrilling !== '0' ? parseInt(digitalSheetDrilling) * 0.15 : 0;
+                                  const digLuvers = digitalSheetLuvers !== '0' ? 1.20 : 0;
+                                  const digPerson = digitalSheetPersonalization !== '0' ? 0.35 : 0;
+                                  const digFold = digitalSheetFolding !== '0' ? parseInt(digitalSheetFolding) * norms.foldingPrice : 0;
+                                  const digGlue = digitalSheetGluingBlock !== '0' ? 0.25 : 0;
+                                  const digPostpressPerItem = digCorners + digDrill + digLuvers + digPerson + digFold + digGlue;
+
                                   return (
                                     <tr key={`${matId}-${covId}-${colId}`} className="hover:bg-blue-50/30 transition-colors border-b border-slate-100">
                                       <td className="py-3 px-4 text-left font-bold text-slate-800 border-r border-slate-100">
@@ -8464,7 +8528,7 @@ export const Calculator: React.FC = () => {
                                         1 день
                                       </td>
                                       {[1, 25, 50, 100, 200, 500, 1000].map(tir => {
-                                        const cost = Math.round(tir * digitalSheetSets * (baseRate + lamRate) + deliveryFee + 65);
+                                        const cost = Math.round(tir * digitalSheetSets * (baseRate + lamRate + digPostpressPerItem) + deliveryFee + 65);
                                         const displayCost = digitalSheetPerPiece ? (cost / tir).toFixed(2) : cost;
 
                                         return (
