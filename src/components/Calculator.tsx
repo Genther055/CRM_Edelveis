@@ -4654,7 +4654,7 @@ export const Calculator: React.FC = () => {
 
           {/* TAB 2: OFFSET PRINTING (Overview & Sheet Detailed Calculator) */}
           {mainCategoryTab === 'offset' && (
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-6 md:gap-7">
               {offsetSubTab === 'overview' && (
                 /* 4 Universal Technology Hero Cards - Unified Cupertino Blue Style */
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -5197,7 +5197,7 @@ export const Calculator: React.FC = () => {
 
               {/* DETAILED SHEET CALCULATOR (Офсетний друк / Листова) */}
               {offsetSubTab === 'sheets' && (
-                <div className="flex flex-col gap-6">
+                <div className="flex flex-col gap-6 md:gap-7">
                   {/* Sub-header Bar: [ ← ] Back | ОПЦІЯ / КАТЕГОРІЯ | [ X ] Close */}
                   <div className="ios-card bg-white" style={{ padding: '14px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', border: '1px solid #e2e8f0' }}>
                     <div className="flex items-center gap-3 flex-1 min-w-[260px]">
@@ -5686,7 +5686,7 @@ export const Calculator: React.FC = () => {
                   </div>
 
                   {/* Size Selector and Product Preview Block */}
-                  <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <div className="ios-card bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-7">
                     {/* Left: Size Controls */}
                     <div className="flex flex-col gap-4">
                       <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider m-0 border-b border-slate-100 pb-2">Розмір</h4>
@@ -5950,11 +5950,11 @@ export const Calculator: React.FC = () => {
                   </div>
 
                   {/* Side-by-Side 2 Columns (50% / 50%): Left = Materials Filter & Sets, Right = Postpress */}
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-stretch">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-7 items-stretch">
                     {/* Left Column (50%): Filter Options & Sets Counter */}
                     <div className="flex flex-col gap-4">
                       {/* Filter Options (Materials, Coating, Color Printing) */}
-                      <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden flex-1">
+                      <div className="ios-card bg-white rounded-2xl border border-slate-200/80 shadow-2xs overflow-hidden flex-1">
                         <div className="px-5 py-3.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
                           <h4 className="text-sm font-bold text-slate-900 m-0">
                             Фільтр специфікацій та матеріалів
@@ -5993,7 +5993,7 @@ export const Calculator: React.FC = () => {
                                         prev.includes(mat.id) ? [] : [mat.id]
                                       );
                                     }}
-                                    className={`px-2 py-1 text-[11px] font-semibold rounded-lg border transition-all ${
+                                    className={`px-3 py-1.5 text-xs font-bold rounded-xl border transition-all ${
                                       isSel
                                         ? 'bg-blue-600 text-white border-blue-600 shadow-2xs font-bold'
                                         : 'bg-slate-100 hover:bg-slate-200/80 text-slate-700 border-slate-200/60'
@@ -6031,7 +6031,7 @@ export const Calculator: React.FC = () => {
                                         prev.includes(cov.id) ? [] : [cov.id]
                                       );
                                     }}
-                                    className={`px-2 py-1 text-[11px] font-semibold rounded-lg border transition-all ${
+                                    className={`px-3 py-1.5 text-xs font-bold rounded-xl border transition-all ${
                                       isSel
                                         ? 'bg-blue-600 text-white border-blue-600 shadow-2xs font-bold'
                                         : 'bg-slate-100 hover:bg-slate-200/80 text-slate-700 border-slate-200/60'
@@ -6064,7 +6064,7 @@ export const Calculator: React.FC = () => {
                                         prev.includes(col.id) ? [] : [col.id]
                                       );
                                     }}
-                                    className={`px-2.5 py-1 text-xs font-semibold rounded-lg border transition-all ${
+                                    className={`px-3 py-1.5 text-xs font-bold rounded-xl border transition-all ${
                                       isSel
                                         ? 'bg-blue-600 text-white border-blue-600 shadow-2xs font-bold'
                                         : 'bg-slate-100 hover:bg-slate-200/80 text-slate-700 border-slate-200/60'
@@ -6080,7 +6080,7 @@ export const Calculator: React.FC = () => {
                       </div>
 
                       {/* Sets Counter Bar */}
-                      <div className="bg-white border border-slate-200 rounded-xl p-3.5 shadow-sm flex items-center justify-between flex-wrap gap-4">
+                      <div className="ios-card bg-white p-4 rounded-2xl border border-slate-200/80 shadow-2xs flex items-center justify-between flex-wrap gap-4">
                         <div className="flex items-center gap-3">
                           <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">Комплектів макетів:</span>
                           <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-lg border border-slate-200">
@@ -6113,7 +6113,7 @@ export const Calculator: React.FC = () => {
                     </div>
 
                     {/* Right Column (50%): Післядрукарська обробка */}
-                    <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden flex flex-col h-full">
+                    <div className="ios-card bg-white rounded-2xl border border-slate-200/80 shadow-2xs overflow-hidden flex flex-col h-full">
                       <div className="px-5 py-3.5 bg-slate-50/90 flex items-center justify-between border-b border-slate-200">
                         <div className="flex items-center gap-2.5">
                           <SlidersHorizontal size={18} className="text-blue-600" />
@@ -6276,7 +6276,7 @@ export const Calculator: React.FC = () => {
                   </div>
 
                   {/* Price Calculation Matrix Table */}
-                  <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+                  <div className="ios-card bg-white rounded-2xl border border-slate-200/80 shadow-2xs overflow-hidden">
                     {/* Banner Controls Bar */}
                     <div className="bg-slate-900 text-white px-5 py-3.5 flex items-center justify-between flex-wrap gap-4">
                       <div className="flex items-center gap-2">
@@ -6583,7 +6583,7 @@ export const Calculator: React.FC = () => {
                     const fullComposedName = `№ ${orderNumber} - ${category === 'Бланки' ? subCategory : (category as string)} ${sheetCustomWidth}×${sheetCustomHeight} ${sheetUnit} — ${effectiveClient} (${activeCalc.matName}, ${activeCalc.covName}, ${activeCalc.colStr}, ${turnShortLabel}, ${activeCalc.tirazh} шт.)`;
 
                     return (
-                      <div id="detailed-sheet-calculation" className="ios-card bg-white" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px', border: '1px solid #bfdbfe', boxShadow: '0 10px 25px -5px rgba(59, 130, 246, 0.1)' }}>
+                      <div id="detailed-sheet-calculation" className="ios-card bg-white p-6 md:p-7 rounded-2xl border border-blue-200 shadow-lg shadow-blue-500/5 flex flex-col gap-6 md:gap-7">
                         {/* Section Header */}
                         <div className="flex items-center justify-between flex-wrap gap-3 pb-3 border-b border-slate-100">
                           <div className="flex items-center gap-3">
@@ -6687,9 +6687,9 @@ export const Calculator: React.FC = () => {
                         </div>
 
                         {/* 2-Column Main Section: Left = ОБОРОТ (СПУСК) | Right = РОЗРАХУНОК + Горизонтальні кнопки */}
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-stretch">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-7 items-stretch">
                           {/* 1. Left Column (50%): ОБОРОТ (СПУСК) & Параметри тиражу */}
-                          <div className="ios-card bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-4">
+                          <div className="ios-card bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-5">
                             <div className="flex flex-col gap-4">
                               {/* Header */}
                               <div className="flex items-center justify-between pb-2 border-b border-slate-100">
@@ -6749,7 +6749,7 @@ export const Calculator: React.FC = () => {
                                   onChange={(e) => setMarginPercent(Number(e.target.value) || 0)}
                                   className="w-full cursor-pointer accent-blue-600 h-2 bg-slate-200 rounded-lg"
                                 />
-                                <div className="grid grid-cols-5 gap-1.5 p-1 bg-slate-100 rounded-xl border border-slate-200/60">
+                                <div className="grid grid-cols-5 gap-2 p-1.5 bg-slate-100/90 rounded-xl border border-slate-200/60">
                                   {[20, 35, 50, 100, 150].map(m => (
                                     <button
                                       key={m}
@@ -6770,7 +6770,7 @@ export const Calculator: React.FC = () => {
                           </div>
 
                           {/* 2. Right Column (50%): РОЗРАХУНОК + ГОРИЗОНТАЛЬНІ КНОПКИ СПРАВА */}
-                          <div className="ios-card bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-4">
+                          <div className="ios-card bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-5">
                             <div className="flex flex-col gap-3">
                               <div className="flex justify-between items-center pb-2 border-b border-slate-100">
                                 <span className="text-xs font-black text-slate-800 uppercase tracking-wide">
@@ -6832,7 +6832,7 @@ export const Calculator: React.FC = () => {
                             </div>
 
                             {/* Horizontal Action Buttons Right: [ ШАБЛОН ] [ PDF ] [ КП ] [ ВИРОБНИЦТВО ] */}
-                            <div className="grid grid-cols-4 gap-2 pt-1 border-t border-slate-100">
+                            <div className="grid grid-cols-4 gap-3 pt-3 border-t border-slate-100">
                               <button
                                 type="button"
                                 onClick={() => setShowTemplateModal(true)}
@@ -6917,7 +6917,7 @@ export const Calculator: React.FC = () => {
 
               {/* DETAILED DIE-CUT CALCULATOR (Офсетний друк / Висічна) */}
               {offsetSubTab === 'felling' && (
-                <div className="flex flex-col gap-6">
+                <div className="flex flex-col gap-6 md:gap-7">
                   {/* Top Information Buttons Bar */}
                   <div className="ios-card bg-white" style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -7272,7 +7272,7 @@ export const Calculator: React.FC = () => {
 
               {/* DETAILED MULTIPAGE CALCULATOR (Офсетний друк / Багатосторінкова) */}
               {offsetSubTab === 'multipage' && (
-                <div className="flex flex-col gap-6">
+                <div className="flex flex-col gap-6 md:gap-7">
                   {/* Top Information Buttons Bar */}
                   <div className="ios-card bg-white" style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -7573,7 +7573,7 @@ export const Calculator: React.FC = () => {
                   </div>
 
                   {/* Pricing Matrix Table for Multipage */}
-                  <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+                  <div className="ios-card bg-white rounded-2xl border border-slate-200/80 shadow-2xs overflow-hidden">
                     <div className="bg-slate-900 text-white px-5 py-3.5 flex items-center justify-between flex-wrap gap-4">
                       <h4 className="text-xs font-bold uppercase tracking-wider text-slate-200 m-0">Специфікація розрахунків та прайс-лист багатосторінкової продукції</h4>
 
@@ -8495,11 +8495,11 @@ export const Calculator: React.FC = () => {
                   </div>
 
                   {/* Side-by-Side 2 Columns (50% / 50%): Left = Materials Filter & Sets, Right = Postpress */}
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-stretch">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-7 items-stretch">
                     {/* Left Column (50%): Filter & Sets Counter */}
                     <div className="flex flex-col gap-4">
                       {/* Section: Фільтр специфікацій та матеріалів (Exact CRM Offset Pill Buttons) */}
-                      <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden flex-1">
+                      <div className="ios-card bg-white rounded-2xl border border-slate-200/80 shadow-2xs overflow-hidden flex-1">
                         <div className="px-5 py-3.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
                           <h4 className="text-sm font-bold text-slate-900 m-0">
                             Фільтр специфікацій та матеріалів
@@ -8539,7 +8539,7 @@ export const Calculator: React.FC = () => {
                                         prev.includes(mat.id) ? [] : [mat.id]
                                       );
                                     }}
-                                    className={`px-2 py-1 text-[11px] font-semibold rounded-lg border transition-all ${
+                                    className={`px-3 py-1.5 text-xs font-bold rounded-xl border transition-all ${
                                       isSel
                                         ? 'bg-blue-600 text-white border-blue-600 shadow-2xs font-bold'
                                         : 'bg-slate-100 hover:bg-slate-200/80 text-slate-700 border-slate-200/60'
@@ -8577,7 +8577,7 @@ export const Calculator: React.FC = () => {
                                         prev.includes(cov.id) ? [] : [cov.id]
                                       );
                                     }}
-                                    className={`px-2 py-1 text-[11px] font-semibold rounded-lg border transition-all ${
+                                    className={`px-3 py-1.5 text-xs font-bold rounded-xl border transition-all ${
                                       isSel
                                         ? 'bg-blue-600 text-white border-blue-600 shadow-2xs font-bold'
                                         : 'bg-slate-100 hover:bg-slate-200/80 text-slate-700 border-slate-200/60'
@@ -8614,7 +8614,7 @@ export const Calculator: React.FC = () => {
                                         prev.includes(col.id) ? [] : [col.id]
                                       );
                                     }}
-                                    className={`px-2.5 py-1 text-xs font-semibold rounded-lg border transition-all ${
+                                    className={`px-3 py-1.5 text-xs font-bold rounded-xl border transition-all ${
                                       isSel
                                         ? 'bg-blue-600 text-white border-blue-600 shadow-2xs font-bold'
                                         : 'bg-slate-100 hover:bg-slate-200/80 text-slate-700 border-slate-200/60'
@@ -8630,7 +8630,7 @@ export const Calculator: React.FC = () => {
                       </div>
 
                       {/* Section: КОМПЛЕКТІВ МАКЕТІВ Bar */}
-                      <div className="bg-white border border-slate-200 rounded-xl p-3.5 shadow-sm flex items-center justify-between flex-wrap gap-4">
+                      <div className="ios-card bg-white p-4 rounded-2xl border border-slate-200/80 shadow-2xs flex items-center justify-between flex-wrap gap-4">
                         <div className="flex items-center gap-3">
                           <span className="text-xs font-extrabold uppercase text-slate-800">КОМПЛЕКТІВ МАКЕТІВ:</span>
                           <div className="flex items-center gap-1">
@@ -8776,7 +8776,7 @@ export const Calculator: React.FC = () => {
                   </div>
 
                   {/* Price Calculation Matrix Table (Matching Exact Offset Design) */}
-                  <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+                  <div className="ios-card bg-white rounded-2xl border border-slate-200/80 shadow-2xs overflow-hidden">
                     {/* Banner Controls Bar */}
                     <div className="bg-slate-900 text-white px-5 py-3.5 flex items-center justify-between flex-wrap gap-4">
                       <div className="flex items-center gap-2">
@@ -9006,7 +9006,7 @@ export const Calculator: React.FC = () => {
                     const fullComposedName = `№ ${orderNumber} - Цифровий друк ${sheetCustomWidth}×${sheetCustomHeight} ${sheetUnit} — ${effectiveClient} (${digMatLabels[digMatId] || '350г'}, ${digCovLabels[digCovId] || 'БП'}, ${digColId}, ${turnShortLabel}, ${digTir} шт.)`;
 
                     return (
-                      <div id="detailed-digital-calculation" className="ios-card bg-white" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px', border: '1px solid #bfdbfe', boxShadow: '0 10px 25px -5px rgba(59, 130, 246, 0.1)' }}>
+                      <div id="detailed-digital-calculation" className="ios-card bg-white p-6 md:p-7 rounded-2xl border border-blue-200 shadow-lg shadow-blue-500/5 flex flex-col gap-6 md:gap-7">
                         {/* Section Header */}
                         <div className="flex items-center justify-between flex-wrap gap-3 pb-3 border-b border-slate-100">
                           <div className="flex items-center gap-3">
@@ -9110,9 +9110,9 @@ export const Calculator: React.FC = () => {
                         </div>
 
                         {/* 2-Column Main Section: Left = ОБОРОТ (СПУСК) | Right = РОЗРАХУНОК + Горизонтальні кнопки */}
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-stretch">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-7 items-stretch">
                           {/* 1. Left Column (50%): ОБОРОТ (СПУСК) & Параметри тиражу */}
-                          <div className="ios-card bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-4">
+                          <div className="ios-card bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-5">
                             <div className="flex flex-col gap-4">
                               {/* Header */}
                               <div className="flex items-center justify-between pb-2 border-b border-slate-100">
@@ -9187,7 +9187,7 @@ export const Calculator: React.FC = () => {
                                   onChange={(e) => setMarginPercent(Number(e.target.value) || 0)}
                                   className="w-full cursor-pointer accent-blue-600 h-2 bg-slate-200 rounded-lg"
                                 />
-                                <div className="grid grid-cols-5 gap-1.5 p-1 bg-slate-100 rounded-xl border border-slate-200/60">
+                                <div className="grid grid-cols-5 gap-2 p-1.5 bg-slate-100/90 rounded-xl border border-slate-200/60">
                                   {[20, 35, 50, 100, 150].map(m => (
                                     <button
                                       key={m}
@@ -9208,7 +9208,7 @@ export const Calculator: React.FC = () => {
                           </div>
 
                           {/* 2. Right Column (50%): РОЗРАХУНОК + ГОРИЗОНТАЛЬНІ КНОПКИ СПРАВА */}
-                          <div className="ios-card bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-4">
+                          <div className="ios-card bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-5">
                             <div className="flex flex-col gap-3">
                               <div className="flex justify-between items-center pb-2 border-b border-slate-100">
                                 <span className="text-xs font-black text-slate-800 uppercase tracking-wide">
@@ -9270,7 +9270,7 @@ export const Calculator: React.FC = () => {
                             </div>
 
                             {/* Horizontal Action Buttons Right: [ ШАБЛОН ] [ PDF ] [ КП ] [ ВИРОБНИЦТВО ] */}
-                            <div className="grid grid-cols-4 gap-2 pt-1 border-t border-slate-100">
+                            <div className="grid grid-cols-4 gap-3 pt-3 border-t border-slate-100">
                               <button
                                 type="button"
                                 onClick={() => setShowTemplateModal(true)}
@@ -9482,7 +9482,7 @@ export const Calculator: React.FC = () => {
                   </div>
 
                   {/* Section: Фільтр специфікацій та матеріалів (Exact CRM Offset Pill Buttons) */}
-                  <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+                  <div className="ios-card bg-white rounded-2xl border border-slate-200/80 shadow-2xs overflow-hidden">
                     <div className="px-5 py-3.5 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
                       <h4 className="text-sm font-bold text-slate-900 m-0">
                         Фільтр специфікацій та матеріалів
@@ -9515,7 +9515,7 @@ export const Calculator: React.FC = () => {
                                     prev.includes(mat.id) ? prev.filter(x => x !== mat.id) : [...prev, mat.id]
                                   );
                                 }}
-                                className={`px-2.5 py-1 text-xs font-semibold rounded-lg border transition-all ${
+                                className={`px-3 py-1.5 text-xs font-bold rounded-xl border transition-all ${
                                   isSel
                                     ? 'bg-blue-600 text-white border-blue-600 shadow-sm font-bold'
                                     : 'bg-slate-100 hover:bg-slate-200/80 text-slate-700 border-slate-200/60'
@@ -9553,7 +9553,7 @@ export const Calculator: React.FC = () => {
                                     prev.includes(cov.id) ? prev.filter(x => x !== cov.id) : [...prev, cov.id]
                                   );
                                 }}
-                                className={`px-2.5 py-1 text-xs font-semibold rounded-lg border transition-all ${
+                                className={`px-3 py-1.5 text-xs font-bold rounded-xl border transition-all ${
                                   isSel
                                     ? 'bg-blue-600 text-white border-blue-600 shadow-sm font-bold'
                                     : 'bg-slate-100 hover:bg-slate-200/80 text-slate-700 border-slate-200/60'
@@ -9588,7 +9588,7 @@ export const Calculator: React.FC = () => {
                                     prev.includes(col.id) ? prev.filter(x => x !== col.id) : [...prev, col.id]
                                   );
                                 }}
-                                className={`px-2.5 py-1 text-xs font-semibold rounded-lg border transition-all ${
+                                className={`px-3 py-1.5 text-xs font-bold rounded-xl border transition-all ${
                                   isSel
                                     ? 'bg-blue-600 text-white border-blue-600 shadow-sm font-bold'
                                     : 'bg-slate-100 hover:bg-slate-200/80 text-slate-700 border-slate-200/60'
@@ -9604,7 +9604,7 @@ export const Calculator: React.FC = () => {
                   </div>
 
                   {/* Price Calculation Matrix Table (Matching Exact Offset Design) */}
-                  <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+                  <div className="ios-card bg-white rounded-2xl border border-slate-200/80 shadow-2xs overflow-hidden">
                     {/* Banner Controls Bar */}
                     <div className="bg-slate-900 text-white px-5 py-3.5 flex items-center justify-between flex-wrap gap-4">
                       <div className="flex items-center gap-2">
@@ -10339,7 +10339,7 @@ export const Calculator: React.FC = () => {
 
               {/* 4. DIGITAL CUSTOM (ІНДИВІДУАЛЬНИЙ РОЗРАХУНОК) */}
               {digitalSubTab === 'custom' && (
-                <div className="flex flex-col gap-6">
+                <div className="flex flex-col gap-6 md:gap-7">
                   <div className="ios-card bg-white p-6 flex flex-col md:flex-row items-center justify-between gap-6">
                     <div className="flex items-center gap-4">
                       <div style={{ width: '56px', height: '56px', borderRadius: '18px', backgroundColor: 'rgba(0, 122, 255, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)' }}>
@@ -10363,7 +10363,7 @@ export const Calculator: React.FC = () => {
 
               {/* 5. MOUNTED (КАШИРОВАНА ПРОДУКЦІЯ) */}
               {digitalSubTab === 'mounted' && (
-                <div className="flex flex-col gap-6">
+                <div className="flex flex-col gap-6 md:gap-7">
                   <div className="ios-card bg-white" style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                       <div style={{ width: '44px', height: '44px', borderRadius: '14px', backgroundColor: 'rgba(0, 122, 255, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)' }}>
@@ -10490,7 +10490,7 @@ export const Calculator: React.FC = () => {
 
               {/* 6. IN SHEETS (ДРУК В ЛИСТАХ) */}
               {digitalSubTab === 'in_sheets' && (
-                <div className="flex flex-col gap-6">
+                <div className="flex flex-col gap-6 md:gap-7">
                   <div className="ios-card bg-white" style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                       <div style={{ width: '44px', height: '44px', borderRadius: '14px', backgroundColor: 'rgba(0, 122, 255, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)' }}>
@@ -10575,7 +10575,7 @@ export const Calculator: React.FC = () => {
 
               {/* 7. POUCH LAMINATION (КОНВЕРТНА ЛАМІНАЦІЯ) */}
               {digitalSubTab === 'pouch_lam' && (
-                <div className="flex flex-col gap-6">
+                <div className="flex flex-col gap-6 md:gap-7">
                   <div className="ios-card bg-white" style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                       <div style={{ width: '44px', height: '44px', borderRadius: '14px', backgroundColor: 'rgba(0, 122, 255, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)' }}>
@@ -10689,7 +10689,7 @@ export const Calculator: React.FC = () => {
 
               {/* 8. PLOTTER CUTTING (ПЛОТЕРНА ПОРІЗКА) */}
               {digitalSubTab === 'plotter_cut' && (
-                <div className="flex flex-col gap-6">
+                <div className="flex flex-col gap-6 md:gap-7">
                   <div className="ios-card bg-white" style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                       <div style={{ width: '44px', height: '44px', borderRadius: '14px', backgroundColor: 'rgba(0, 122, 255, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)' }}>
@@ -10800,7 +10800,7 @@ export const Calculator: React.FC = () => {
 
               {/* 9. CNC DIE-CUT CUSTOM (ФІГУРНА ПОРІЗКА) */}
               {digitalSubTab === 'die_cut_custom' && (
-                <div className="flex flex-col gap-6">
+                <div className="flex flex-col gap-6 md:gap-7">
                   <div className="ios-card bg-white" style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                       <div style={{ width: '44px', height: '44px', borderRadius: '14px', backgroundColor: 'rgba(0, 122, 255, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)' }}>
@@ -10880,7 +10880,7 @@ export const Calculator: React.FC = () => {
 
               {/* 10. FOLDERS WITH POCKET (ПАПКИ З ВКЛЕЄНОЮ КИШЕНЕЮ) */}
               {digitalSubTab === 'folders' && (
-                <div className="flex flex-col gap-6">
+                <div className="flex flex-col gap-6 md:gap-7">
                   <div className="ios-card bg-white" style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                       <div style={{ width: '44px', height: '44px', borderRadius: '14px', backgroundColor: 'rgba(0, 122, 255, 0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--primary)' }}>
@@ -11006,7 +11006,7 @@ export const Calculator: React.FC = () => {
 
           {/* TAB 4: WIDE FORMAT (ШИРОКОФОРМАТНИЙ ДРУК) */}
           {mainCategoryTab === 'wide' && (
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-6 md:gap-7">
               {/* OVERVIEW: 4 HERO CARDS + 6 SPECIALIZED CATEGORIES IN EXACT MATCHING STYLE */}
               {wideSubTab === 'overview' && (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
@@ -11423,9 +11423,9 @@ export const Calculator: React.FC = () => {
                   </div>
 
                   {/* Row 1 (50% / 50%): Left = РОЗМІР, Right = ВІЗУАЛІЗАЦІЯ & ПРОПОРЦІЯ */}
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-stretch">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-7 items-stretch">
                     {/* Left: РОЗМІР */}
-                    <div className="ios-card bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-4">
+                    <div className="ios-card bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-5">
                       <div className="flex flex-col gap-3">
                         <div className="flex items-center justify-between pb-2 border-b border-slate-100">
                           <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wider">РОЗМІР:</span>
@@ -11592,9 +11592,9 @@ export const Calculator: React.FC = () => {
                   </div>
 
                   {/* Row 2 (50% / 50%): Left = МАТЕРІАЛИ ТА ЯКІСТЬ ДРУКУ, Right = ПІСЛЯДРУКАРСЬКА ОБРОБКА ТА ФУРНІТУРА */}
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-stretch">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-7 items-stretch">
                     {/* Left Column (50%): Фільтр матеріалів та параметрів */}
-                    <div className="ios-card bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-4">
+                    <div className="ios-card bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-5">
                       <div className="flex flex-col gap-3">
                         <div className="flex items-center justify-between pb-2 border-b border-slate-100">
                           <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wider">
@@ -11759,7 +11759,7 @@ export const Calculator: React.FC = () => {
                     </div>
 
                     {/* Right Column (50%): Післядрукарська обробка та фурнітура */}
-                    <div className="ios-card bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-4">
+                    <div className="ios-card bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-5">
                       <div className="flex flex-col gap-3">
                         <div className="flex items-center justify-between pb-2 border-b border-slate-100">
                           <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wider">
@@ -11987,7 +11987,7 @@ export const Calculator: React.FC = () => {
                   </div>
 
                   {/* Price Calculation Matrix Table (Matching Exact Offset & Digital Design) */}
-                  <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+                  <div className="ios-card bg-white rounded-2xl border border-slate-200/80 shadow-2xs overflow-hidden">
                     {/* Banner Controls Bar */}
                     <div className="bg-slate-900 text-white px-5 py-3.5 flex items-center justify-between flex-wrap gap-4">
                       <div className="flex items-center gap-2">
@@ -12239,7 +12239,7 @@ export const Calculator: React.FC = () => {
                     const fullComposedName = `№ ${orderNumber} - Широкоформатний друк ${wideWidth}×${wideHeight} ${wideUnit} — ${effectiveClient} (${matInfo.label}, ${wideResId} dpi, ${wideTir} шт.)`;
 
                     return (
-                      <div id="detailed-wide-calculation" className="ios-card bg-white" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px', border: '1px solid #bfdbfe', boxShadow: '0 10px 25px -5px rgba(59, 130, 246, 0.1)' }}>
+                      <div id="detailed-wide-calculation" className="ios-card bg-white p-6 md:p-7 rounded-2xl border border-blue-200 shadow-lg shadow-blue-500/5 flex flex-col gap-6 md:gap-7">
                         {/* Section Header */}
                         <div className="flex items-center justify-between flex-wrap gap-3 pb-3 border-b border-slate-100">
                           <div className="flex items-center gap-3">
@@ -12343,9 +12343,9 @@ export const Calculator: React.FC = () => {
                         </div>
 
                         {/* 2-Column Main Section: Left = НАКЛАД ТА НАЦІНКА | Right = РОЗРАХУНОК + Горизонтальні кнопки */}
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-stretch">
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-7 items-stretch">
                           {/* 1. Left Column (50%): Параметри тиражу та націнка */}
-                          <div className="ios-card bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-4">
+                          <div className="ios-card bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-5">
                             <div className="flex flex-col gap-4">
                               <div className="flex items-center justify-between pb-2 border-b border-slate-100">
                                 <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wider">ПАРАМЕТРИ ТИРАЖУ:</span>
@@ -12396,7 +12396,7 @@ export const Calculator: React.FC = () => {
                                   onChange={(e) => setMarginPercent(Number(e.target.value) || 0)}
                                   className="w-full cursor-pointer accent-blue-600 h-2 bg-slate-200 rounded-lg"
                                 />
-                                <div className="grid grid-cols-5 gap-1.5 p-1 bg-slate-100 rounded-xl border border-slate-200/60">
+                                <div className="grid grid-cols-5 gap-2 p-1.5 bg-slate-100/90 rounded-xl border border-slate-200/60">
                                   {[20, 35, 50, 100, 150].map(m => (
                                     <button
                                       key={m}
@@ -12417,7 +12417,7 @@ export const Calculator: React.FC = () => {
                           </div>
 
                           {/* 2. Right Column (50%): РОЗРАХУНОК + ГОРИЗОНТАЛЬНІ КНОПКИ СПРАВА */}
-                          <div className="ios-card bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-4">
+                          <div className="ios-card bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-5">
                             <div className="flex flex-col gap-3">
                               <div className="flex justify-between items-center pb-2 border-b border-slate-100">
                                 <span className="text-xs font-black text-slate-800 uppercase tracking-wide">
@@ -12475,7 +12475,7 @@ export const Calculator: React.FC = () => {
                             </div>
 
                             {/* Horizontal Action Buttons Right: [ ШАБЛОН ] [ PDF ] [ КП ] [ ВИРОБНИЦТВО ] */}
-                            <div className="grid grid-cols-4 gap-2 pt-1 border-t border-slate-100">
+                            <div className="grid grid-cols-4 gap-3 pt-3 border-t border-slate-100">
                               <button
                                 type="button"
                                 onClick={() => setShowTemplateModal(true)}
@@ -13307,9 +13307,9 @@ export const Calculator: React.FC = () => {
                       </div>
 
                       {/* 2-Column Main Section: Left = ТЕХНІЧНІ ДАНІ НАМОТКИ ТА НАЦІНКА | Right = РОЗРАХУНОК + Горизонтальні кнопки */}
-                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-stretch">
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-7 items-stretch">
                         {/* 1. Left Column (50%): Технічні параметри намотки та націнка */}
-                        <div className="ios-card bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-4">
+                        <div className="ios-card bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-5">
                           <div className="flex flex-col gap-3">
                             <div className="flex items-center justify-between pb-2 border-b border-slate-100">
                               <span className="text-xs font-extrabold text-slate-800 uppercase tracking-wider">ПАРАМЕТРИ НАМОТКИ В РУЛОНИ:</span>
@@ -13350,7 +13350,7 @@ export const Calculator: React.FC = () => {
                                 onChange={(e) => setMarginPercent(Number(e.target.value) || 0)}
                                 className="w-full cursor-pointer accent-blue-600 h-2 bg-slate-200 rounded-lg"
                               />
-                              <div className="grid grid-cols-5 gap-1.5 p-1 bg-slate-100 rounded-xl border border-slate-200/60">
+                              <div className="grid grid-cols-5 gap-2 p-1.5 bg-slate-100/90 rounded-xl border border-slate-200/60">
                                 {[20, 35, 50, 100, 150].map(m => (
                                   <button
                                     key={m}
@@ -13371,7 +13371,7 @@ export const Calculator: React.FC = () => {
                         </div>
 
                         {/* 2. Right Column (50%): РОЗРАХУНОК + ГОРИЗОНТАЛЬНІ КНОПКИ СПРАВА */}
-                        <div className="ios-card bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-4">
+                        <div className="ios-card bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-5">
                           <div className="flex flex-col gap-3">
                             <div className="flex justify-between items-center pb-2 border-b border-slate-100">
                               <span className="text-xs font-black text-slate-800 uppercase tracking-wide">
@@ -13433,7 +13433,7 @@ export const Calculator: React.FC = () => {
                           </div>
 
                           {/* Horizontal Action Buttons Right: [ ШАБЛОН ] [ PDF ] [ КП ] [ ВИРОБНИЦТВО ] */}
-                          <div className="grid grid-cols-4 gap-2 pt-1 border-t border-slate-100">
+                          <div className="grid grid-cols-4 gap-3 pt-3 border-t border-slate-100">
                             <button
                               type="button"
                               onClick={() => setShowTemplateModal(true)}
@@ -13640,7 +13640,7 @@ export const Calculator: React.FC = () => {
           
         </div>
       ) : (
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-6 md:gap-7">
           {/* Editor Header Navigation */}
           <div className="ios-card bg-white" style={{ padding: '16px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
             <button 
