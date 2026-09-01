@@ -5975,11 +5975,15 @@ export const Calculator: React.FC = () => {
                             <span className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">МАТЕРІАЛ:</span>
                             <div className="flex gap-1.5 flex-wrap items-center">
                               {[
-                                { id: 'kraft_70', label: 'Крафт 70' },
+                                { id: 'gazetka_45', label: 'Газетка 45' },
+                                { id: 'offset_65', label: 'Офсет 65' },
+                                { id: 'offset_70', label: 'Офсет 70' },
                                 { id: '80', label: 'Офсет 80' },
-                                { id: 'linen_300', label: 'Льон 300' },
-                                { id: 'tintoretto_crema', label: 'Tintoretto 300' },
-                                { id: 'stardream_opal', label: 'Stardream 285' },
+                                { id: 'offset_100', label: 'Офсет 100' },
+                                { id: 'offset_120', label: 'Офсет 120' },
+                                { id: 'offset_160', label: 'Офсет 160' },
+                                { id: 'samokopir_55', label: 'Самокопірка 55' },
+                                { id: 'kraft_70', label: 'Крафт 70' },
                                 { id: '90', label: 'Крейда МАТ 90' },
                                 { id: '115', label: 'Крейда МАТ 115' },
                                 { id: '130', label: 'Крейда МАТ 130' },
@@ -5988,7 +5992,10 @@ export const Calculator: React.FC = () => {
                                 { id: '250', label: 'Крейда МАТ 250' },
                                 { id: '300', label: 'Крейда МАТ 300' },
                                 { id: '350', label: 'Крейда МАТ 350' },
-                                { id: '450', label: 'Крейда МАТ 450' }
+                                { id: '450', label: 'Крейда МАТ 450' },
+                                { id: 'linen_300', label: 'Льон 300' },
+                                { id: 'tintoretto_crema', label: 'Tintoretto 300' },
+                                { id: 'stardream_opal', label: 'Stardream 285' }
                               ].map(mat => {
                                 const isSel = selectedMaterials.includes(mat.id);
                                 return (
@@ -6325,8 +6332,15 @@ export const Calculator: React.FC = () => {
                               selectedCoverings.flatMap(covId => 
                                 selectedPrintColors.map((colStr, rowIdx) => {
                                   const matLabels: Record<string, string> = {
+                                    'gazetka_45': 'Газетний 45г',
+                                    'offset_65': 'Офсетний 65г',
+                                    'offset_70': 'Офсетний 70г',
+                                    '80': 'Офсетний 80г',
+                                    'offset_100': 'Офсетний 100г',
+                                    'offset_120': 'Офсетний 120г',
+                                    'offset_160': 'Офсетний 160г',
+                                    'samokopir_55': 'Самокопіювальний 55г',
                                     'kraft_70': 'Крафт бурий 70г',
-                                    '80': 'Офсет 80г',
                                     'linen_300': 'Льон білий 300г',
                                     'tintoretto_crema': 'Tintoretto crema 300г',
                                     'tintoretto_gesso': 'Tintoretto gesso 300г',
@@ -6696,8 +6710,29 @@ export const Calculator: React.FC = () => {
                                   type="number"
                                   value={activeCalc.tirazh}
                                   onChange={(e) => {
-                                    const val = parseInt(e.target.value) || 100;
-                                    setSelectedSheetCalc(prev => prev ? { ...prev, tirazh: val } : null);
+                                    const val = Math.max(1, parseInt(e.target.value) || 0);
+                                    setQuantity(val);
+                                    setSelectedSheetCalc(prev => {
+                                      const base = prev || activeCalc;
+                                      const oldTir = base.tirazh || 1;
+                                      const perItemPaper = (base.basePaperCost / oldTir);
+                                      const perItemLam = (base.lamCost / oldTir);
+                                      const perItemPost = (base.postpressSum / oldTir);
+                                      const newPaper = perItemPaper * val;
+                                      const newLam = perItemLam * val;
+                                      const newPost = perItemPost * val;
+                                      const newRaw = newPaper + base.printCost + newLam + newPost + (base.deliveryCost || 0);
+                                      return {
+                                        ...base,
+                                        tirazh: val,
+                                        basePaperCost: newPaper,
+                                        lamCost: newLam,
+                                        postpressSum: newPost,
+                                        rawCost: newRaw,
+                                        finalPrice: Math.round(newRaw * (marginPercent / 100)),
+                                        unitPrice: val > 0 ? (newRaw * (marginPercent / 100)) / val : 0
+                                      };
+                                    });
                                   }}
                                   className="w-full px-3.5 py-2 rounded-xl border border-slate-200 bg-slate-50 font-bold text-xs text-slate-900 focus:bg-white focus:border-blue-600 focus:outline-none"
                                 />
