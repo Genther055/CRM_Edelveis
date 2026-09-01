@@ -1325,7 +1325,7 @@ export const Calculator: React.FC = () => {
       setLaminationType('none');
       setName('Бланки А4');
       setSubCategory('Бланки');
-      setSelectedMaterials(['80', 'kraft']);
+      setSelectedMaterials(['80']);
       setSelectedCoverings(['0']);
       setSelectedPrintColors(['1+0', '4+0']);
       setActiveOps({
@@ -1354,9 +1354,9 @@ export const Calculator: React.FC = () => {
       setSelectedFormat('90x50 мм');
       setBindingType('none');
       setLaminationType('matte');
-      setSelectedMaterials(['350', '300', 'linen', 'kraft']);
-      setSelectedCoverings(['0', '7', '9', '30']);
-      setSelectedPrintColors(['4+4', '4+0']);
+      setSelectedMaterials(['350']);
+      setSelectedCoverings(['0']);
+      setSelectedPrintColors(['4+4']);
       setActiveOps({
         formMaking: true,
         filmMounting: true,
@@ -1384,7 +1384,7 @@ export const Calculator: React.FC = () => {
       setBindingType('none');
       setLaminationType('none');
       setCreaseCount(2);
-      setSelectedMaterials(['130', '150', '170']);
+      setSelectedMaterials(['130']);
       setSelectedCoverings(['0']);
       setSelectedPrintColors(['4+4']);
       setActiveOps({
@@ -1407,8 +1407,8 @@ export const Calculator: React.FC = () => {
       setSelectedFormat('A4');
       setBindingType('none');
       setLaminationType('gloss');
-      setSelectedMaterials(['300', '350']);
-      setSelectedCoverings(['7', '9']);
+      setSelectedMaterials(['350']);
+      setSelectedCoverings(['7']);
       setSelectedPrintColors(['4+0']);
       setActiveOps({
         formMaking: true,
@@ -1436,7 +1436,7 @@ export const Calculator: React.FC = () => {
       setSelectedFormat('70x100 мм');
       setBindingType('none');
       setLaminationType('gloss');
-      setSelectedMaterials(['350', '450']);
+      setSelectedMaterials(['350']);
       setSelectedCoverings(['8', '10']);
       setSelectedPrintColors(['4+4']);
       setActiveOps({
@@ -1462,7 +1462,7 @@ export const Calculator: React.FC = () => {
       setSelectedFormat('A5');
       setBindingType('staple');
       setLaminationType('gloss');
-      setSelectedMaterials(['80', '130']);
+      setSelectedMaterials(['80']);
       setSelectedCoverings(['0', '7']);
       setSelectedPrintColors(['1+1', '4+4']);
       setActiveOps({
@@ -1491,9 +1491,9 @@ export const Calculator: React.FC = () => {
       setSelectedFormat('A5');
       setBindingType('none');
       setLaminationType('none');
-      setSelectedMaterials(['130', '150', '90', '115', '300']);
+      setSelectedMaterials(['130']);
       setSelectedCoverings(['0', '7', '9']);
-      setSelectedPrintColors(['4+4', '4+0']);
+      setSelectedPrintColors(['4+4']);
       setActiveOps({
         formMaking: true,
         filmMounting: true,
@@ -1520,7 +1520,7 @@ export const Calculator: React.FC = () => {
       setSelectedFormat('A3');
       setBindingType('none');
       setLaminationType('none');
-      setSelectedMaterials(['80', 'kraft', '250']);
+      setSelectedMaterials(['80']);
       setSelectedCoverings(['0']);
       setSelectedPrintColors(['1+0', '4+0']);
       setActiveOps({
@@ -1549,7 +1549,7 @@ export const Calculator: React.FC = () => {
       setSelectedFormat('A4');
       setBindingType('none');
       setLaminationType('matte');
-      setSelectedMaterials(['350', '300', 'karton_250']);
+      setSelectedMaterials(['350']);
       setSelectedCoverings(['0', '9', '30']);
       setSelectedPrintColors(['4+0', '4+4']);
       setActiveOps({
@@ -1623,7 +1623,7 @@ export const Calculator: React.FC = () => {
       setSelectedFormat('A4');
       setBindingType('none');
       setLaminationType('gloss');
-      setSelectedMaterials(['sk_kreyd_pros', 'sk_kreyd_bez', 'sk_ofset_pros']);
+      setSelectedMaterials(['sk_kreyd_pros']);
       setSelectedCoverings(['0', '7', '9']);
       setSelectedPrintColors(['4+0']);
       setActiveOps({
@@ -1652,7 +1652,7 @@ export const Calculator: React.FC = () => {
       setSelectedFormat('A3');
       setBindingType('none');
       setLaminationType('none');
-      setSelectedMaterials(['130', '115', '150', '90', '80', 'kraft']);
+      setSelectedMaterials(['130']);
       setSelectedCoverings(['0']);
       setSelectedPrintColors(['4+0']);
       setActiveOps({
@@ -1681,9 +1681,9 @@ export const Calculator: React.FC = () => {
       setSelectedFormat('Euro');
       setBindingType('none');
       setLaminationType('none');
-      setSelectedMaterials(['130', '150', '90', '115', '250']);
+      setSelectedMaterials(['130']);
       setSelectedCoverings(['0', '7', '9']);
-      setSelectedPrintColors(['4+4', '4+0']);
+      setSelectedPrintColors(['4+4']);
       setActiveOps({
         formMaking: true,
         filmMounting: true,
@@ -5990,7 +5990,7 @@ export const Calculator: React.FC = () => {
                                     type="button"
                                     onClick={() => {
                                       setSelectedMaterials(prev => 
-                                        prev.includes(mat.id) ? prev.filter(x => x !== mat.id) : [...prev, mat.id]
+                                        prev.includes(mat.id) ? [] : [mat.id]
                                       );
                                     }}
                                     className={`px-2 py-1 text-[11px] font-semibold rounded-lg border transition-all ${
@@ -6028,7 +6028,7 @@ export const Calculator: React.FC = () => {
                                     type="button"
                                     onClick={() => {
                                       setSelectedCoverings(prev => 
-                                        prev.includes(cov.id) ? prev.filter(x => x !== cov.id) : [...prev, cov.id]
+                                        prev.includes(cov.id) ? [] : [cov.id]
                                       );
                                     }}
                                     className={`px-2 py-1 text-[11px] font-semibold rounded-lg border transition-all ${
@@ -6061,7 +6061,7 @@ export const Calculator: React.FC = () => {
                                     type="button"
                                     onClick={() => {
                                       setSelectedPrintColors(prev => 
-                                        prev.includes(col.id) ? prev.filter(x => x !== col.id) : [...prev, col.id]
+                                        prev.includes(col.id) ? [] : [col.id]
                                       );
                                     }}
                                     className={`px-2.5 py-1 text-xs font-semibold rounded-lg border transition-all ${
@@ -6493,8 +6493,8 @@ export const Calculator: React.FC = () => {
 
                   {/* Detailed Interactive Calculation & Order Generation Card directly on the SAME page */}
                   {(() => {
-                    // Default calculation if none clicked yet
-                    const matId = selectedMaterials[0] || '130';
+                    const hasMaterial = selectedMaterials.length > 0;
+                    const matId = hasMaterial ? selectedMaterials[0] : '';
                     const covId = selectedCoverings[0] || '0';
                     const colStr = selectedPrintColors[0] || '4+4';
                     const tir = 1000;
@@ -6545,14 +6545,14 @@ export const Calculator: React.FC = () => {
                     const dieCutCostPerItem = (cardKind === '7' || cardKind === '8' || cardKind === '9') ? norms.dieCuttingPrice : 0;
                     const postpressTotalPerItem = personalizationCost + luversCost + cornersCost + gluingCost + drillingCost + foldingCostPerItem + creasingCostPerItem + perforationCost + dieCutCostPerItem;
 
-                    const defPaperCost = areaM2 * (matDensity * 0.08) * tir;
-                    const defPrintCost = (isDouble ? 0.35 : 0.20) * tir + (tir > 500 ? 80 : 120);
-                    const defLamCost = (covId !== '0' && covId !== '') ? areaM2 * norms.laminationMattePrice * tir * (covId.includes('1+1') ? 2 : 1) : 0;
-                    const defPostCost = postpressTotalPerItem * tir;
-                    const defDelivCost = includeDelivery ? 80 : 0;
+                    const defPaperCost = hasMaterial ? areaM2 * (matDensity * 0.08) * tir : 0;
+                    const defPrintCost = hasMaterial ? (isDouble ? 0.35 : 0.20) * tir + (tir > 500 ? 80 : 120) : 0;
+                    const defLamCost = (hasMaterial && covId !== '0' && covId !== '') ? areaM2 * norms.laminationMattePrice * tir * (covId.includes('1+1') ? 2 : 1) : 0;
+                    const defPostCost = hasMaterial ? postpressTotalPerItem * tir : 0;
+                    const defDelivCost = (hasMaterial && includeDelivery) ? 80 : 0;
                     const defRawCost = (defPaperCost + defPrintCost + defLamCost + defPostCost + defDelivCost) * (sheetSetsCount || 1);
-                    const defFinalPrice = Math.round(defRawCost * (marginPercent / 100));
-                    const defUnitPrice = defFinalPrice / tir;
+                    const defFinalPrice = hasMaterial ? Math.round(defRawCost * (marginPercent / 100)) : 0;
+                    const defUnitPrice = hasMaterial && tir > 0 ? defFinalPrice / tir : 0;
 
                     const activeCalc = selectedSheetCalc || {
                       matId,
@@ -8536,7 +8536,7 @@ export const Calculator: React.FC = () => {
                                     type="button"
                                     onClick={() => {
                                       setDigitalSelectedMaterials(prev => 
-                                        prev.includes(mat.id) ? prev.filter(x => x !== mat.id) : [...prev, mat.id]
+                                        prev.includes(mat.id) ? [] : [mat.id]
                                       );
                                     }}
                                     className={`px-2 py-1 text-[11px] font-semibold rounded-lg border transition-all ${
@@ -8574,7 +8574,7 @@ export const Calculator: React.FC = () => {
                                     type="button"
                                     onClick={() => {
                                       setDigitalSelectedCoverings(prev => 
-                                        prev.includes(cov.id) ? prev.filter(x => x !== cov.id) : [...prev, cov.id]
+                                        prev.includes(cov.id) ? [] : [cov.id]
                                       );
                                     }}
                                     className={`px-2 py-1 text-[11px] font-semibold rounded-lg border transition-all ${
@@ -8611,7 +8611,7 @@ export const Calculator: React.FC = () => {
                                     type="button"
                                     onClick={() => {
                                       setDigitalSelectedPrints(prev => 
-                                        prev.includes(col.id) ? prev.filter(x => x !== col.id) : [...prev, col.id]
+                                        prev.includes(col.id) ? [] : [col.id]
                                       );
                                     }}
                                     className={`px-2.5 py-1 text-xs font-semibold rounded-lg border transition-all ${
@@ -8989,14 +8989,15 @@ export const Calculator: React.FC = () => {
                     const digGl = digitalSheetGluingBlock !== '0' ? 0.25 * digTir : 0;
                     const digPostSum = digCorn + digDr + digLuv + digPers + digFld + digGl;
 
-                    const digPaperCost = digTir * 0.85;
-                    const digPrintCost = digTir * digBaseRate;
-                    const digLamCost = digTir * digLamRate;
-                    const digRawCost = digPaperCost + digPrintCost + digLamCost + digPostSum + digDeliv + 45;
+                    const hasDigMaterial = digitalSelectedMaterials.length > 0;
+                    const digPaperCost = hasDigMaterial ? digTir * 0.85 : 0;
+                    const digPrintCost = hasDigMaterial ? digTir * digBaseRate : 0;
+                    const digLamCost = hasDigMaterial ? digTir * digLamRate : 0;
+                    const digRawCost = hasDigMaterial ? (digPaperCost + digPrintCost + digLamCost + digPostSum + digDeliv + 45) : 0;
 
-                    const digFinalPrice = Math.round(digRawCost * (1 + marginPercent / 100));
-                    const digMarginAmount = Math.max(0, digFinalPrice - digRawCost);
-                    const digUnitPrice = digFinalPrice / digTir;
+                    const digFinalPrice = hasDigMaterial ? Math.round(digRawCost * (1 + marginPercent / 100)) : 0;
+                    const digMarginAmount = hasDigMaterial ? Math.max(0, digFinalPrice - digRawCost) : 0;
+                    const digUnitPrice = hasDigMaterial && digTir > 0 ? digFinalPrice / digTir : 0;
 
                     const effectiveClient = isNewClientMode && customClientName.trim()
                       ? customClientName.trim()
@@ -11684,7 +11685,7 @@ export const Calculator: React.FC = () => {
                                   type="button"
                                   onClick={() => {
                                     setWideSelectedMaterials(prev =>
-                                      isSelected ? (prev.length > 1 ? prev.filter(x => x !== mat.id) : prev) : [...prev, mat.id]
+                                      prev.includes(mat.id) ? [] : [mat.id]
                                     );
                                   }}
                                   className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all text-center ${
@@ -11717,7 +11718,7 @@ export const Calculator: React.FC = () => {
                                   type="button"
                                   onClick={() => {
                                     setWideSelectedResolutions(prev =>
-                                      isSelected ? (prev.length > 1 ? prev.filter(x => x !== res.id) : prev) : [...prev, res.id]
+                                      prev.includes(res.id) ? [] : [res.id]
                                     );
                                   }}
                                   className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all text-center ${
@@ -12179,6 +12180,7 @@ export const Calculator: React.FC = () => {
 
                   {/* Extended Order & 1C Calculation Card for Wide Format */}
                   {(() => {
+                    const hasWideMat = wideSelectedMaterials.length > 0;
                     const areaM2 = Math.max(0.1, (Number(wideWidth || 2000) * Number(wideHeight || 1000)) / (wideUnit === 'mm' ? 1000000 : wideUnit === 'cm' ? 10000 : 1));
                     const perimeterM = (2 * (Number(wideWidth || 2000) + Number(wideHeight || 1000))) / (wideUnit === 'mm' ? 1000 : wideUnit === 'cm' ? 100 : 1);
                     const wideTir = selectedSheetCalc?.tirazh || 1;
@@ -12221,15 +12223,15 @@ export const Calculator: React.FC = () => {
                     const stretcherCost = wideStretcher === 'gallery' ? 180 : wideStretcher === 'standard' ? 130 : 0;
                     const postPressPerUnit = (perimeterM * (luversCostPerM + hemmingCostPerM)) + (areaM2 * lamCostPerSqm) + stretcherCost;
 
-                    const widePaperCost = Math.round(wideTir * areaM2 * (matInfo.sqmPrice * 0.65));
-                    const widePrintCost = Math.round(wideTir * areaM2 * (matInfo.sqmPrice * 0.35 * resMultiplier));
-                    const widePostSum = Math.round(wideTir * postPressPerUnit);
-                    const wideDelivery = wideWithDelivery ? 120 : 0;
-                    const wideRawCost = widePaperCost + widePrintCost + widePostSum + wideDelivery + 50;
+                    const widePaperCost = hasWideMat ? Math.round(wideTir * areaM2 * (matInfo.sqmPrice * 0.65)) : 0;
+                    const widePrintCost = hasWideMat ? Math.round(wideTir * areaM2 * (matInfo.sqmPrice * 0.35 * resMultiplier)) : 0;
+                    const widePostSum = hasWideMat ? Math.round(wideTir * postPressPerUnit) : 0;
+                    const wideDelivery = (hasWideMat && wideWithDelivery) ? 120 : 0;
+                    const wideRawCost = hasWideMat ? (widePaperCost + widePrintCost + widePostSum + wideDelivery + 50) : 0;
 
-                    const wideFinalPrice = Math.round(wideRawCost * (1 + marginPercent / 100));
-                    const wideMarginAmount = Math.max(0, wideFinalPrice - wideRawCost);
-                    const wideUnitPrice = wideFinalPrice / wideTir;
+                    const wideFinalPrice = hasWideMat ? Math.round(wideRawCost * (1 + marginPercent / 100)) : 0;
+                    const wideMarginAmount = hasWideMat ? Math.max(0, wideFinalPrice - wideRawCost) : 0;
+                    const wideUnitPrice = hasWideMat && wideTir > 0 ? wideFinalPrice / wideTir : 0;
 
                     const effectiveClient = isNewClientMode && customClientName.trim()
                       ? customClientName.trim()
