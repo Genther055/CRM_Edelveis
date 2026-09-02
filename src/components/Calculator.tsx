@@ -3379,6 +3379,8 @@ export const Calculator: React.FC = () => {
                       type="button"
                       onClick={() => {
                         setMainCategoryTab(tab.key as any);
+                        if (tab.key === 'digital') setDigitalSubTab('overview');
+                        if (tab.key === 'offset') setOffsetSubTab('overview');
                         setIsMegaMenuOpen(false);
                       }}
                       style={{
@@ -8280,7 +8282,51 @@ export const Calculator: React.FC = () => {
 
           {/* TAB 3: DIGITAL PRINTING */}
           {mainCategoryTab === 'digital' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              {/* Universal Digital Sub-Navigation Bar */}
+              <div className="flex items-center justify-between gap-2 p-2 bg-slate-100/80 rounded-xl border border-slate-200 overflow-x-auto shrink-0 scrollbar-none">
+                <div className="flex items-center gap-1.5 overflow-x-auto">
+                  <button
+                    type="button"
+                    onClick={() => setDigitalSubTab('overview')}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer ${
+                      digitalSubTab === 'overview'
+                        ? 'bg-blue-600 text-white shadow-xs'
+                        : 'text-slate-700 hover:bg-white'
+                    }`}
+                  >
+                    <BookOpen size={13} />
+                    <span>Каталог послуг</span>
+                  </button>
+                  <div className="w-[1px] h-4 bg-slate-300 mx-1 shrink-0" />
+                  {[
+                    { id: 'sheets', label: 'Листовий друк' },
+                    { id: 'felling', label: 'Висічка' },
+                    { id: 'multipage', label: 'Багатосторінкова' },
+                    { id: 'notebooks', label: 'Блокноти' },
+                    { id: 'pouch_lam', label: 'Конвертна ламінація' },
+                    { id: 'plotter_cut', label: 'Плоттерна порізка' },
+                    { id: 'in_sheets', label: 'Друк у листах' },
+                    { id: 'custom', label: 'Конструктор' }
+                  ].map(sub => {
+                    const isSubActive = digitalSubTab === sub.id;
+                    return (
+                      <button
+                        key={sub.id}
+                        type="button"
+                        onClick={() => setDigitalSubTab(sub.id as any)}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-bold shrink-0 transition-all cursor-pointer ${
+                          isSubActive
+                            ? 'bg-blue-600 text-white shadow-xs'
+                            : 'text-slate-600 hover:bg-white'
+                        }`}
+                      >
+                        {sub.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
               {digitalSubTab === 'overview' && (
                 /* 10 CATEGORIES OVERVIEW */
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
@@ -10964,34 +11010,41 @@ export const Calculator: React.FC = () => {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="ios-card bg-white p-5 flex flex-col gap-4">
-                      <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800 m-0">Товщина ламінаційного пакета</h4>
-                      <div className="grid grid-cols-3 gap-3">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div className="ios-card bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col gap-3">
+                      <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-700 m-0 pb-2 border-b border-slate-100">
+                        Товщина ламінаційного пакета
+                      </h4>
+                      <div className="grid grid-cols-3 gap-2.5">
                         {[
                           { id: '125', label: '125 мкм', desc: 'Гнучкий надійний захист' },
                           { id: '175', label: '175 мкм', desc: 'Напівжорсткий для меню' },
-                          { id: '250', label: '250 мкм', desc: 'Максимальна пластикова жорсткість' },
-                        ].map(t => (
-                          <button
-                            key={t.id}
-                            type="button"
-                            onClick={() => setDigitalPouchThickness(t.id as any)}
-                            className={`p-3 rounded-xl text-center transition-all ${
-                              digitalPouchThickness === t.id
-                                ? 'bg-blue-600 text-white shadow-md'
-                                : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                            }`}
-                          >
-                            <div className="text-sm font-bold">{t.label}</div>
-                            <div className="text-[10px] opacity-80 mt-0.5">{t.desc}</div>
-                          </button>
-                        ))}
+                          { id: '250', label: '250 мкм', desc: 'Максимальна жорсткість' },
+                        ].map(t => {
+                          const isSel = digitalPouchThickness === t.id;
+                          return (
+                            <button
+                              key={t.id}
+                              type="button"
+                              onClick={() => setDigitalPouchThickness(t.id as any)}
+                              className={`p-3 rounded-xl text-center transition-all cursor-pointer border ${
+                                isSel
+                                  ? 'bg-blue-50 text-blue-700 border-blue-400 ring-2 ring-blue-500/20 shadow-2xs font-extrabold'
+                                  : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200/80'
+                              }`}
+                            >
+                              <div className="text-xs font-extrabold">{t.label}</div>
+                              <div className="text-[10px] text-slate-500 font-medium mt-0.5">{t.desc}</div>
+                            </button>
+                          );
+                        })}
                       </div>
                     </div>
 
-                    <div className="ios-card bg-white p-5 flex flex-col justify-between gap-4">
-                      <h4 className="text-xs font-bold uppercase tracking-wider text-slate-800 m-0">Формати конвертів</h4>
+                    <div className="ios-card bg-white p-5 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-3">
+                      <h4 className="text-xs font-extrabold uppercase tracking-wider text-slate-700 m-0 pb-2 border-b border-slate-100">
+                        Формати конвертів
+                      </h4>
                       <div className="flex flex-wrap gap-2">
                         {[
                           { id: 'a3', label: 'А3 (303 × 426 мм)' },
@@ -10999,20 +11052,23 @@ export const Calculator: React.FC = () => {
                           { id: 'a5', label: 'А5 (154 × 216 мм)' },
                           { id: 'a6', label: 'А6 (111 × 154 мм)' },
                           { id: 'badge', label: 'Бейдж (90 × 60 мм)' },
-                        ].map(f => (
-                          <button
-                            key={f.id}
-                            type="button"
-                            onClick={() => setDigitalPouchFormat(f.id)}
-                            className={`px-3.5 py-1.5 rounded-lg text-xs font-bold transition-all ${
-                              digitalPouchFormat === f.id
-                                ? 'bg-blue-600 text-white shadow-sm'
-                                : 'bg-slate-100 text-slate-700 hover:bg-slate-200'
-                            }`}
-                          >
-                            {f.label}
-                          </button>
-                        ))}
+                        ].map(f => {
+                          const isSel = digitalPouchFormat === f.id;
+                          return (
+                            <button
+                              key={f.id}
+                              type="button"
+                              onClick={() => setDigitalPouchFormat(f.id)}
+                              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer border ${
+                                isSel
+                                  ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
+                                  : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200/80'
+                              }`}
+                            >
+                              {f.label}
+                            </button>
+                          );
+                        })}
                       </div>
                     </div>
                   </div>
