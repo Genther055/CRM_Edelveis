@@ -76,11 +76,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
         />
       )}
 
-      {/* Sidebar Drawer (Fixed on desktop, slide-out on mobile) */}
+      {/* Sidebar Drawer (Hidden on mobile by default, Overlay when open, Fixed on desktop) */}
       <div 
-        className={`fixed md:static inset-y-0 left-0 z-50 w-[240px] md:w-[230px] h-full max-h-screen flex flex-col justify-between p-4 md:p-3 shrink-0 transition-transform duration-300 ease-in-out overflow-y-auto ${
-          isOpenOnMobile ? 'translate-x-0 shadow-2xl' : '-translate-x-full md:translate-x-0'
-        }`}
+        className={`${
+          isOpenOnMobile
+            ? 'fixed inset-y-0 left-0 z-50 flex w-[260px] shadow-2xl'
+            : 'hidden md:flex md:static md:w-[230px]'
+        } h-full max-h-screen flex-col justify-between p-4 md:p-3 shrink-0 overflow-y-auto`}
         style={{
           backgroundColor: isDark ? '#111827' : '#ffffff',
           borderRight: isDark ? '1px solid #1f2937' : '1px solid var(--border-light)'
