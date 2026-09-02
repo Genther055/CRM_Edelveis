@@ -3226,16 +3226,25 @@ export const Calculator: React.FC = () => {
     <div className="main-content" style={{ backgroundColor: 'var(--bg-system)' }}>
       {step === 'catalog' ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-          {/* Header */}
-          <div className="header-title-container flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          {/* Header Row: Title on Left, Search Bar on Right */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            gap: '20px',
+            marginBottom: '20px',
+            paddingBottom: '12px',
+            borderBottom: '0.5px solid var(--border-light)',
+            width: '100%'
+          }}>
             <div>
-              <h2 className="page-title">Поліграфічний калькулятор</h2>
-              <p className="subtitle">Оберіть категорію продукції для детального прорахунку</p>
+              <h2 className="page-title" style={{ margin: 0 }}>Поліграфічний калькулятор</h2>
+              <p className="subtitle" style={{ margin: '3px 0 0 0' }}>Оберіть категорію продукції для детального прорахунку</p>
             </div>
 
-            {/* Prominent Live Search Bar at Top Right */}
-            <div className="relative flex items-center w-full sm:w-80 shadow-xs">
-              <Search size={16} className="absolute left-3.5 text-blue-600 pointer-events-none" />
+            {/* Prominent Live Search Bar on the Right side */}
+            <div style={{ position: 'relative', width: '380px', flexShrink: 0 }}>
+              <Search size={16} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#007AFF', pointerEvents: 'none' }} />
               <input
                 type="text"
                 value={productSearchQuery}
@@ -3246,13 +3255,38 @@ export const Calculator: React.FC = () => {
                   }
                 }}
                 placeholder="Пошук продукції (Журнали, Бланки, Буклети...)"
-                className="w-full pl-9 pr-8 py-2 rounded-xl border border-slate-200 bg-white text-xs font-semibold text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
+                style={{
+                  width: '100%',
+                  padding: '9px 34px 9px 38px',
+                  borderRadius: '12px',
+                  border: '1px solid var(--border-light)',
+                  backgroundColor: '#ffffff',
+                  fontSize: '12.5px',
+                  fontWeight: '600',
+                  color: 'var(--text-dark)',
+                  boxShadow: 'var(--shadow-flat)',
+                  outline: 'none',
+                  transition: 'all 0.15s ease'
+                }}
+                className="focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
               />
               {productSearchQuery && (
                 <button
                   type="button"
                   onClick={() => setProductSearchQuery('')}
-                  className="absolute right-2.5 text-slate-400 hover:text-slate-700 text-xs font-bold"
+                  style={{
+                    position: 'absolute',
+                    right: '10px',
+                    top: '50%',
+                    transform: 'translateY(-50%)',
+                    background: 'none',
+                    border: 'none',
+                    color: 'var(--text-medium)',
+                    cursor: 'pointer',
+                    fontWeight: 'bold',
+                    fontSize: '12px',
+                    padding: '4px'
+                  }}
                 >
                   ✕
                 </button>
