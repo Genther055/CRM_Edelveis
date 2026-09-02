@@ -39,8 +39,7 @@ import {
   Check,
   Search,
   RotateCcw,
-  ArrowLeftRight,
-  X
+  ArrowLeftRight
 } from 'lucide-react';
 import html2pdf from 'html2pdf.js';
 
@@ -15462,33 +15461,82 @@ export const Calculator: React.FC = () => {
 
                   {/* Material & Postpress Prices Modal - Clean CRM Design, No Emojis, 100% Editable List */}
       {showMaterialPricesModal && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 sm:p-6">
+        <div 
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(15, 23, 42, 0.65)',
+            backdropFilter: 'blur(4px)',
+            zIndex: 9999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '16px'
+          }}
+        >
           <div 
-            className="bg-white rounded-2xl max-w-xl w-full shadow-2xl border border-slate-200 overflow-hidden flex flex-col"
-            style={{ maxHeight: '86vh', height: '86vh' }}
+            className="ios-card"
+            style={{
+              backgroundColor: 'var(--bg-card)',
+              border: '1px solid var(--border-light)',
+              borderRadius: '12px',
+              width: '100%',
+              maxWidth: '560px',
+              maxHeight: '86vh',
+              height: '86vh',
+              display: 'flex',
+              flexDirection: 'column',
+              overflow: 'hidden',
+              padding: 0,
+              boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.15), 0 8px 10px -6px rgba(0, 0, 0, 0.1)'
+            }}
           >
             {/* Modal Header - Exact CRM Style (КАРТКА ЗАПИТУ style) */}
-            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between shrink-0 bg-white">
+            <div style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              padding: '16px 20px',
+              borderBottom: '1px solid var(--border-light)',
+              backgroundColor: 'var(--bg-card)',
+              flexShrink: 0
+            }}>
               <div>
-                <h3 className="text-xs font-black text-slate-800 uppercase tracking-wider m-0">
+                <h3 style={{ fontSize: '13px', fontWeight: '800', color: 'var(--text-dark)', textTransform: 'uppercase', margin: 0, letterSpacing: '0.5px' }}>
                   ПРАЙС-ЛИСТ: ЦІНИ НА МАТЕРІАЛИ ТА РОБОТИ
                 </h3>
-                <span className="text-[11px] font-semibold text-slate-400 mt-0.5 block">
-                  Базові тарифи підприємства на матеріали, друк та післядрук
+                <span style={{ fontSize: '11px', color: 'var(--text-medium)', marginTop: '2px', display: 'block' }}>
+                  Базові нормативи підприємства на матеріали, друк та післядрук
                 </span>
               </div>
               <button 
                 type="button" 
                 onClick={() => setShowMaterialPricesModal(false)} 
-                className="text-slate-400 hover:text-slate-700 w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center transition-colors text-sm font-bold cursor-pointer"
+                style={{
+                  border: 'none',
+                  background: 'transparent',
+                  color: 'var(--text-medium)',
+                  cursor: 'pointer',
+                  fontSize: '18px',
+                  lineHeight: 1,
+                  padding: '4px 8px'
+                }}
                 title="Закрити"
               >
-                <X size={16} />
+                ✕
               </button>
             </div>
 
-            {/* Modal Tabs Switcher - Clean CRM Rounded Pills */}
-            <div className="px-6 py-3 bg-slate-50 border-b border-slate-200/80 flex gap-2 shrink-0 overflow-x-auto">
+            {/* Modal Tabs Switcher - Clean CRM Style */}
+            <div style={{
+              display: 'flex',
+              gap: '6px',
+              padding: '10px 20px',
+              backgroundColor: 'var(--bg-system)',
+              borderBottom: '1px solid var(--border-light)',
+              flexShrink: 0,
+              overflowX: 'auto'
+            }}>
               {[
                 { id: 'paper', label: 'Папір та матеріали', icon: <FileText size={13} /> },
                 { id: 'postpress', label: 'Післядрукарська обробка', icon: <Scissors size={13} /> },
@@ -15500,11 +15548,21 @@ export const Calculator: React.FC = () => {
                     key={tab.id}
                     type="button"
                     onClick={() => setMaterialPricesTab(tab.id as any)}
-                    className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 cursor-pointer ${
-                      isCurrent
-                        ? 'bg-blue-600 text-white shadow-xs font-extrabold'
-                        : 'bg-slate-100 hover:bg-slate-200 text-slate-600 font-semibold'
-                    }`}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '6px',
+                      padding: '6px 12px',
+                      borderRadius: '6px',
+                      fontSize: '12px',
+                      fontWeight: isCurrent ? '700' : '600',
+                      border: isCurrent ? '1px solid var(--primary)' : '1px solid transparent',
+                      backgroundColor: isCurrent ? 'var(--primary)' : 'rgba(120, 120, 128, 0.08)',
+                      color: isCurrent ? '#ffffff' : 'var(--text-dark)',
+                      cursor: 'pointer',
+                      whiteSpace: 'nowrap',
+                      transition: 'all 0.15s ease'
+                    }}
                   >
                     {tab.icon}
                     <span>{tab.label}</span>
@@ -15531,31 +15589,61 @@ export const Calculator: React.FC = () => {
                 setShowMaterialPricesModal(false); 
                 alert('Ціни на матеріали та тарифи успішно збережено!'); 
               }} 
-              className="flex flex-col flex-1 min-h-0 overflow-hidden"
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                flex: 1,
+                minHeight: 0,
+                overflow: 'hidden'
+              }}
             >
-              <div className="p-5 sm:p-6 overflow-y-auto flex-1 min-h-0 flex flex-col gap-3 bg-white">
+              <div style={{
+                padding: '16px 20px',
+                overflowY: 'auto',
+                flex: 1,
+                minHeight: 0,
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '8px',
+                backgroundColor: 'var(--bg-card)'
+              }}>
                 {materialPricesTab === 'paper' && (
-                  <div className="flex flex-col gap-2">
-                    <div className="flex items-center justify-between pb-1.5 border-b border-slate-100">
-                      <span className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      paddingBottom: '6px',
+                      borderBottom: '1px solid var(--border-light)',
+                      marginBottom: '2px'
+                    }}>
+                      <span style={{ fontSize: '10px', fontWeight: '800', color: 'var(--text-medium)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                         НАЙМЕНУВАННЯ МАТЕРІАЛУ
                       </span>
-                      <span className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">
+                      <span style={{ fontSize: '10px', fontWeight: '800', color: 'var(--text-medium)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                         ЦІНА ЗА ОДИНИЦЮ
                       </span>
                     </div>
 
-                    <div className="flex flex-col gap-2 pt-1">
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                       {materialPrices.map(item => (
                         <div 
                           key={item.id} 
-                          className="p-2.5 px-3 rounded-xl bg-slate-50/70 hover:bg-white border border-slate-200/60 hover:border-slate-300 transition-all flex items-center justify-between gap-3 shadow-2xs"
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            gap: '12px',
+                            padding: '8px 12px',
+                            backgroundColor: 'var(--bg-card-subtle)',
+                            border: '1px solid var(--border-light)',
+                            borderRadius: '8px'
+                          }}
                         >
-                          <div className="flex flex-col">
-                            <span className="text-xs font-bold text-slate-800">{item.name}</span>
-                            <span className="text-[10.5px] text-slate-400 font-medium">{item.unit}</span>
+                          <div style={{ display: 'flex', flexDirection: 'column' }}>
+                            <span style={{ fontSize: '12px', fontWeight: '700', color: 'var(--text-dark)' }}>{item.name}</span>
+                            <span style={{ fontSize: '10.5px', color: 'var(--text-medium)' }}>{item.unit}</span>
                           </div>
-                          <div className="flex items-center gap-1.5 shrink-0">
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
                             <input
                               type="number"
                               step="any"
@@ -15564,9 +15652,22 @@ export const Calculator: React.FC = () => {
                                 const val = Number(e.target.value) || 0;
                                 setMaterialPrices(prev => prev.map(m => m.id === item.id ? { ...m, price: val } : m));
                               }}
-                              className="w-24 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white font-mono font-bold text-xs text-right text-slate-800 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                              style={{
+                                width: '90px',
+                                height: '30px',
+                                padding: '0 8px',
+                                borderRadius: '6px',
+                                border: '1px solid var(--border-light)',
+                                backgroundColor: '#ffffff',
+                                textAlign: 'right',
+                                fontWeight: '700',
+                                fontSize: '12px',
+                                color: 'var(--text-dark)',
+                                fontFamily: 'var(--font-mono)',
+                                outline: 'none'
+                              }}
                             />
-                            <span className="text-xs font-bold text-slate-400 w-3">₴</span>
+                            <span style={{ fontSize: '12px', fontWeight: '700', color: 'var(--text-medium)', width: '12px' }}>₴</span>
                           </div>
                         </div>
                       ))}
@@ -15575,17 +15676,23 @@ export const Calculator: React.FC = () => {
                 )}
 
                 {materialPricesTab === 'postpress' && (
-                  <div className="flex flex-col gap-2">
-                    <div className="flex items-center justify-between pb-1.5 border-b border-slate-100">
-                      <span className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      paddingBottom: '6px',
+                      borderBottom: '1px solid var(--border-light)',
+                      marginBottom: '2px'
+                    }}>
+                      <span style={{ fontSize: '10px', fontWeight: '800', color: 'var(--text-medium)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                         ПІСЛЯДРУКАРСЬКА ОПЕРАЦІЯ
                       </span>
-                      <span className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">
+                      <span style={{ fontSize: '10px', fontWeight: '800', color: 'var(--text-medium)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                         ТАРИФ (ГРН)
                       </span>
                     </div>
 
-                    <div className="flex flex-col gap-2 pt-1">
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                       {[
                         { 
                           label: 'Матова ламінація 1+0', 
@@ -15650,21 +15757,43 @@ export const Calculator: React.FC = () => {
                       ].map((op, idx) => (
                         <div 
                           key={idx} 
-                          className="p-2.5 px-3 rounded-xl bg-slate-50/70 hover:bg-white border border-slate-200/60 hover:border-slate-300 transition-all flex items-center justify-between gap-3 shadow-2xs"
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            gap: '12px',
+                            padding: '8px 12px',
+                            backgroundColor: 'var(--bg-card-subtle)',
+                            border: '1px solid var(--border-light)',
+                            borderRadius: '8px'
+                          }}
                         >
-                          <div className="flex flex-col">
-                            <span className="text-xs font-bold text-slate-800">{op.label}</span>
-                            <span className="text-[10.5px] text-slate-400 font-medium">{op.unit}</span>
+                          <div style={{ display: 'flex', flexDirection: 'column' }}>
+                            <span style={{ fontSize: '12px', fontWeight: '700', color: 'var(--text-dark)' }}>{op.label}</span>
+                            <span style={{ fontSize: '10.5px', color: 'var(--text-medium)' }}>{op.unit}</span>
                           </div>
-                          <div className="flex items-center gap-1.5 shrink-0">
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
                             <input
                               type="number"
                               step="any"
                               value={op.val}
                               onChange={(e) => op.set(Number(e.target.value) || 0)}
-                              className="w-24 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white font-mono font-bold text-xs text-right text-slate-800 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                              style={{
+                                width: '90px',
+                                height: '30px',
+                                padding: '0 8px',
+                                borderRadius: '6px',
+                                border: '1px solid var(--border-light)',
+                                backgroundColor: '#ffffff',
+                                textAlign: 'right',
+                                fontWeight: '700',
+                                fontSize: '12px',
+                                color: 'var(--text-dark)',
+                                fontFamily: 'var(--font-mono)',
+                                outline: 'none'
+                              }}
                             />
-                            <span className="text-xs font-bold text-slate-400 w-3">₴</span>
+                            <span style={{ fontSize: '12px', fontWeight: '700', color: 'var(--text-medium)', width: '12px' }}>₴</span>
                           </div>
                         </div>
                       ))}
@@ -15673,17 +15802,23 @@ export const Calculator: React.FC = () => {
                 )}
 
                 {materialPricesTab === 'print' && (
-                  <div className="flex flex-col gap-2">
-                    <div className="flex items-center justify-between pb-1.5 border-b border-slate-100">
-                      <span className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      paddingBottom: '6px',
+                      borderBottom: '1px solid var(--border-light)',
+                      marginBottom: '2px'
+                    }}>
+                      <span style={{ fontSize: '10px', fontWeight: '800', color: 'var(--text-medium)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                         ПАРАМЕТРИ ДРУКУ ТА CTP
                       </span>
-                      <span className="text-[11px] font-extrabold text-slate-400 uppercase tracking-wider">
+                      <span style={{ fontSize: '10px', fontWeight: '800', color: 'var(--text-medium)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                         ВАРТІСТЬ (ГРН)
                       </span>
                     </div>
 
-                    <div className="flex flex-col gap-2 pt-1">
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                       {[
                         { 
                           label: 'Виготовлення CTP пластин (форм)', 
@@ -15724,21 +15859,43 @@ export const Calculator: React.FC = () => {
                       ].map((pr, idx) => (
                         <div 
                           key={idx} 
-                          className="p-2.5 px-3 rounded-xl bg-slate-50/70 hover:bg-white border border-slate-200/60 hover:border-slate-300 transition-all flex items-center justify-between gap-3 shadow-2xs"
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            gap: '12px',
+                            padding: '8px 12px',
+                            backgroundColor: 'var(--bg-card-subtle)',
+                            border: '1px solid var(--border-light)',
+                            borderRadius: '8px'
+                          }}
                         >
-                          <div className="flex flex-col">
-                            <span className="text-xs font-bold text-slate-800">{pr.label}</span>
-                            <span className="text-[10.5px] text-slate-400 font-medium">{pr.unit}</span>
+                          <div style={{ display: 'flex', flexDirection: 'column' }}>
+                            <span style={{ fontSize: '12px', fontWeight: '700', color: 'var(--text-dark)' }}>{pr.label}</span>
+                            <span style={{ fontSize: '10.5px', color: 'var(--text-medium)' }}>{pr.unit}</span>
                           </div>
-                          <div className="flex items-center gap-1.5 shrink-0">
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
                             <input
                               type="number"
                               step="any"
                               value={pr.val}
                               onChange={(e) => pr.set(Number(e.target.value) || 0)}
-                              className="w-24 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white font-mono font-bold text-xs text-right text-slate-800 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                              style={{
+                                width: '90px',
+                                height: '30px',
+                                padding: '0 8px',
+                                borderRadius: '6px',
+                                border: '1px solid var(--border-light)',
+                                backgroundColor: '#ffffff',
+                                textAlign: 'right',
+                                fontWeight: '700',
+                                fontSize: '12px',
+                                color: 'var(--text-dark)',
+                                fontFamily: 'var(--font-mono)',
+                                outline: 'none'
+                              }}
                             />
-                            <span className="text-xs font-bold text-slate-400 w-3">₴</span>
+                            <span style={{ fontSize: '12px', fontWeight: '700', color: 'var(--text-medium)', width: '12px' }}>₴</span>
                           </div>
                         </div>
                       ))}
@@ -15748,17 +15905,46 @@ export const Calculator: React.FC = () => {
               </div>
 
               {/* Modal Footer - Exact CRM Style (media_1788336527786.png buttons) */}
-              <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center gap-3 shrink-0">
+              <div style={{
+                padding: '14px 20px',
+                backgroundColor: 'var(--bg-system)',
+                borderTop: '1px solid var(--border-light)',
+                display: 'flex',
+                gap: '10px',
+                flexShrink: 0
+              }}>
                 <button 
                   type="button" 
                   onClick={() => setShowMaterialPricesModal(false)} 
-                  className="flex-1 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all text-center cursor-pointer border border-transparent"
+                  className="ios-btn ios-btn-secondary"
+                  style={{
+                    flex: 1,
+                    height: '38px',
+                    borderRadius: '8px',
+                    fontWeight: '700',
+                    fontSize: '13px',
+                    cursor: 'pointer'
+                  }}
                 >
                   Скасувати
                 </button>
                 <button 
                   type="submit" 
-                  className="flex-1 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-sm shadow-blue-500/20 transition-all text-center flex items-center justify-center gap-2 cursor-pointer active:scale-95"
+                  className="ios-btn ios-btn-primary"
+                  style={{
+                    flex: 1,
+                    height: '38px',
+                    borderRadius: '8px',
+                    fontWeight: '700',
+                    fontSize: '13px',
+                    backgroundColor: 'var(--primary)',
+                    color: '#ffffff',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '6px'
+                  }}
                 >
                   <Save size={14} />
                   <span>Зберегти ціни</span>
