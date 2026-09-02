@@ -847,6 +847,7 @@ export const Calculator: React.FC = () => {
 
   // Mega Menu Interactive Dropdown States
   const [isMegaMenuOpen, setIsMegaMenuOpen] = useState<boolean>(false);
+  const [productSearchQuery, setProductSearchQuery] = useState<string>('');
   const [hoveredMegaProduct, setHoveredMegaProduct] = useState<string>('cards');
 
   // Sub-tabs in Digital printing: 'overview' | 'sheets' | 'felling' | 'multipage' | 'custom' | 'mounted' | 'in_sheets' | 'pouch_lam' | 'plotter_cut' | 'die_cut_custom' | 'folders'
@@ -3226,10 +3227,36 @@ export const Calculator: React.FC = () => {
       {step === 'catalog' ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           {/* Header */}
-          <div className="header-title-container">
+          <div className="header-title-container flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <h2 className="page-title">Поліграфічний калькулятор</h2>
               <p className="subtitle">Оберіть категорію продукції для детального прорахунку</p>
+            </div>
+
+            {/* Prominent Live Search Bar at Top Right */}
+            <div className="relative flex items-center w-full sm:w-80 shadow-xs">
+              <Search size={16} className="absolute left-3.5 text-blue-600 pointer-events-none" />
+              <input
+                type="text"
+                value={productSearchQuery}
+                onChange={(e) => {
+                  setProductSearchQuery(e.target.value);
+                  if (mainCategoryTab !== 'products' && e.target.value.trim()) {
+                    setMainCategoryTab('products');
+                  }
+                }}
+                placeholder="Пошук продукції (Журнали, Бланки, Буклети...)"
+                className="w-full pl-9 pr-8 py-2 rounded-xl border border-slate-200 bg-white text-xs font-semibold text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all"
+              />
+              {productSearchQuery && (
+                <button
+                  type="button"
+                  onClick={() => setProductSearchQuery('')}
+                  className="absolute right-2.5 text-slate-400 hover:text-slate-700 text-xs font-bold"
+                >
+                  ✕
+                </button>
+              )}
             </div>
           </div>
 
@@ -4238,13 +4265,8 @@ export const Calculator: React.FC = () => {
           </div>
 
           {/* TAB 1: PRODUCTS (All Categories - Exact Dashboard iOS Card Grid) */}
-          {mainCategoryTab === 'products' && (
-            <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-              gap: '20px'
-            }}>
-              {[
+          {mainCategoryTab === 'products' && (() => {
+            const allProducts = [
                 {
                   title: 'Банери',
                   desc: 'Банерні вивіски, розтяжки, тенти, брандмауери, вітростійка сітка Mesh.',
@@ -4263,6 +4285,7 @@ export const Calculator: React.FC = () => {
                   badgeClass: 'ios-badge-blue',
                   badge: 'Бланки',
                   metric: 'Офсет / самоклейка',
+                  keywords: ['бланк', 'бланки', 'газетка', 'газетний', 'офсет', 'офсетний', 'самокопірка', 'самокопіювальний', 'лист', 'листи'],
                   onClick: () => handleSelectCategory('Бланки')
                 },
                 {
@@ -4276,13 +4299,14 @@ export const Calculator: React.FC = () => {
                   onClick: () => handleSelectCategory('Блокноти')
                 },
                 {
-                  title: 'Брошури, Каталоги',
-                  desc: 'Багатосторінкові брошури, каталоги, річні звіти на скобу або PUR-клей.',
+                  title: 'Брошури, Каталоги, Журнали',
+                  desc: 'Багатосторінкові брошури, каталоги, журнали, періодичні видання, річні звіти на скобу або PUR-клей.',
                   icon: <BookOpen size={30} style={{ color: '#34c759' }} />,
                   color: 'rgba(52, 199, 89, 0.1)',
                   badgeClass: 'ios-badge-green',
-                  badge: 'Каталоги',
+                  badge: 'Каталоги / Журнали',
                   metric: 'Скоба / PUR клей',
+                  keywords: ['журнал', 'журнали', 'каталог', 'каталоги', 'брошура', 'брошури', 'книга', 'книги', 'періодика', 'звіт', 'звіти', 'багатосторінкова'],
                   onClick: () => handleSelectCategory('Книги')
                 },
                 {
@@ -4583,71 +4607,123 @@ export const Calculator: React.FC = () => {
                   badgeClass: 'ios-badge-red',
                   badge: 'Журнали',
                   metric: 'Шкільні реєстри',
+                  keywords: ['журнал', 'журнали', 'класний', 'школа', 'облік', 'реєстр'],
                   onClick: () => handleSelectCategory('Шкільні журнали')
                 }
-              ].map(item => (
-                <div 
-                  key={item.title}
-                  onClick={item.onClick}
-                  className="ios-card bg-white"
-                  style={{
-                    display: 'flex',
-                    flexDirection: 'column',
-                    justifyContent: 'space-between',
-                    padding: '24px',
-                    cursor: 'pointer',
-                    transition: 'all 0.2s ease',
-                    minHeight: '200px',
-                    position: 'relative'
-                  }}
-                  onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
-                  onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; }}
-                >
-                  <div>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                      <div style={{
-                        width: '56px',
-                        height: '56px',
-                        borderRadius: '16px',
-                        backgroundColor: item.color,
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                      }}>
-                        {item.icon}
-                      </div>
-                      <span className={`ios-badge ${item.badgeClass}`} style={{ fontSize: '11px', padding: '3px 8px' }}>
-                        {item.badge}
+              ];
+
+              const q = productSearchQuery.trim().toLowerCase();
+              const filteredProducts = q
+                ? allProducts.filter(item => 
+                    item.title.toLowerCase().includes(q) ||
+                    item.desc.toLowerCase().includes(q) ||
+                    item.badge.toLowerCase().includes(q) ||
+                    item.metric.toLowerCase().includes(q) ||
+                    (item.keywords && item.keywords.some((k: string) => k.toLowerCase().includes(q)))
+                  )
+                : allProducts;
+
+              return (
+                <div className="flex flex-col gap-4">
+                  {productSearchQuery && (
+                    <div className="flex items-center justify-between px-1">
+                      <span className="text-xs font-bold text-slate-700">
+                        Результати пошуку за запитом <span className="text-blue-600">"{productSearchQuery}"</span> ({filteredProducts.length}):
                       </span>
+                      <button
+                        type="button"
+                        onClick={() => setProductSearchQuery('')}
+                        className="text-xs text-blue-600 hover:underline font-semibold"
+                      >
+                        Скинути фільтр
+                      </button>
                     </div>
+                  )}
 
-                    <h4 style={{ fontSize: '15px', fontWeight: '800', marginBottom: '6px', color: 'var(--text-dark)' }}>
-                      {item.title}
-                    </h4>
-                    <p style={{ fontSize: '12px', color: 'var(--text-medium)', lineHeight: '1.4' }}>
-                      {item.desc}
-                    </p>
-                  </div>
+                  {filteredProducts.length === 0 ? (
+                    <div className="ios-card bg-white p-12 text-center rounded-2xl border border-slate-200 flex flex-col items-center gap-3">
+                      <Search size={32} className="text-slate-400" />
+                      <p className="text-sm font-bold text-slate-700 m-0">Нічого не знайдено за запитом "{productSearchQuery}"</p>
+                      <button
+                        type="button"
+                        onClick={() => setProductSearchQuery('')}
+                        className="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-200 hover:bg-blue-100"
+                      >
+                        Показати всі вироби
+                      </button>
+                    </div>
+                  ) : (
+                    <div style={{
+                      display: 'grid',
+                      gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+                      gap: '20px'
+                    }}>
+                      {filteredProducts.map(item => (
+                        <div 
+                          key={item.title}
+                          onClick={item.onClick}
+                          className="ios-card bg-white"
+                          style={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            justifyContent: 'space-between',
+                            padding: '24px',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s ease',
+                            minHeight: '200px',
+                            position: 'relative'
+                          }}
+                          onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                          onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; }}
+                        >
+                          <div>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                              <div style={{
+                                width: '56px',
+                                height: '56px',
+                                borderRadius: '16px',
+                                backgroundColor: item.color,
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
+                              }}>
+                                {item.icon}
+                              </div>
+                              <span className={`ios-badge ${item.badgeClass}`} style={{ fontSize: '11px', padding: '3px 8px' }}>
+                                {item.badge}
+                              </span>
+                            </div>
 
-                  <div style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    borderTop: '0.5px solid var(--border-light)',
-                    paddingTop: '12px',
-                    marginTop: '16px'
-                  }}>
-                    <span style={{ fontSize: '11px', fontWeight: '600', color: 'var(--text-medium)' }}>
-                      {item.metric}
-                    </span>
-                    <span style={{ color: 'var(--primary)', display: 'flex', alignItems: 'center', fontSize: '12px', fontWeight: '700' }}>
-                      Відкрити <ChevronRight size={14} />
-                    </span>
-                  </div>
+                            <h4 style={{ fontSize: '15px', fontWeight: '800', marginBottom: '6px', color: 'var(--text-dark)' }}>
+                              {item.title}
+                            </h4>
+                            <p style={{ fontSize: '12px', color: 'var(--text-medium)', lineHeight: '1.4' }}>
+                              {item.desc}
+                            </p>
+                          </div>
+
+                          <div style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            borderTop: '0.5px solid var(--border-light)',
+                            paddingTop: '12px',
+                            marginTop: '16px'
+                          }}>
+                            <span style={{ fontSize: '11px', fontWeight: '600', color: 'var(--text-medium)' }}>
+                              {item.metric}
+                            </span>
+                            <span style={{ color: 'var(--primary)', display: 'flex', alignItems: 'center', fontSize: '12px', fontWeight: '700' }}>
+                              Відкрити <ChevronRight size={14} />
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              ))}
-            </div>
-          )}
+              );
+            })()}
 
           {/* TAB 2: OFFSET PRINTING (Overview & Sheet Detailed Calculator) */}
           {mainCategoryTab === 'offset' && (
