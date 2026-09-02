@@ -18,7 +18,8 @@ import {
   Settings as SettingsIcon,
   LogOut,
   Moon,
-  Sun
+  Sun,
+  X
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -67,220 +68,415 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <>
-      {/* Mobile Backdrop Overlay */}
+      {/* 1. Mobile Drawer Modal (ONLY rendered in DOM on mobile when isOpenOnMobile is true) */}
       {isOpenOnMobile && (
         <div 
-          onClick={onCloseMobile}
-          className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 md:hidden transition-opacity duration-300"
-          aria-hidden="true"
-        />
+          className="fixed inset-0 z-50 md:hidden flex"
+          style={{ position: 'fixed', inset: 0, zIndex: 9999 }}
+        >
+          {/* Backdrop Blur Overlay */}
+          <div 
+            onClick={onCloseMobile}
+            className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm transition-opacity"
+            style={{ position: 'fixed', inset: 0, backgroundColor: 'rgba(15, 23, 42, 0.65)', backdropFilter: 'blur(4px)' }}
+          />
+
+          {/* Slide-out Menu Panel */}
+          <div 
+            className="relative w-[270px] max-w-[85vw] h-full flex flex-col justify-between p-4 shadow-2xl overflow-y-auto"
+            style={{
+              position: 'relative',
+              width: '270px',
+              maxWidth: '85vw',
+              height: '100%',
+              backgroundColor: isDark ? '#111827' : '#ffffff',
+              borderRight: isDark ? '1px solid #1f2937' : '1px solid var(--border-light)',
+              zIndex: 10000,
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'space-between',
+              padding: '16px'
+            }}
+          >
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%', minHeight: 0, flexGrow: 1 }}>
+              {/* Mobile Header with Title and Close Button */}
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', paddingBottom: '10px', borderBottom: isDark ? '1px solid #1f2937' : '1px solid #f1f5f9' }}>
+                <span style={{ fontSize: '12px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.5px', color: isDark ? '#f3f4f6' : '#1e293b' }}>
+                  Меню CRM
+                </span>
+                <button
+                  type="button"
+                  onClick={onCloseMobile}
+                  style={{
+                    width: '32px',
+                    height: '32px',
+                    borderRadius: '8px',
+                    border: 'none',
+                    backgroundColor: isDark ? '#374151' : '#f1f5f9',
+                    color: isDark ? '#f3f4f6' : '#64748b',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    cursor: 'pointer'
+                  }}
+                >
+                  <X size={16} />
+                </button>
+              </div>
+
+              {/* User Profile Avatar */}
+              <div 
+                onClick={() => handleSelectTab('profile')}
+                style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: '10px', 
+                  width: '100%', 
+                  cursor: 'pointer',
+                  padding: '8px 10px',
+                  borderRadius: '8px',
+                  backgroundColor: activeTab === 'profile' 
+                    ? (isDark ? '#1f2937' : 'rgba(0,122,255,0.08)') 
+                    : (isDark ? 'rgba(255, 255, 255, 0.03)' : 'transparent'),
+                  border: isDark ? '1px solid #374151' : 'none',
+                  transition: 'all 0.15s ease',
+                  flexShrink: 0
+                }}
+              >
+                <div 
+                  style={{
+                    width: '34px',
+                    height: '34px',
+                    borderRadius: '50%',
+                    backgroundColor: isDark ? '#374151' : '#f4f4f6',
+                    border: activeTab === 'profile' 
+                      ? (isDark ? '2px solid #3b82f6' : '2px solid var(--primary)') 
+                      : (isDark ? '1px solid #4b5563' : '1px solid var(--border-light)'),
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: isDark ? '#f3f4f6' : 'var(--text-dark)',
+                    overflow: 'hidden',
+                    flexShrink: 0
+                  }}
+                >
+                  <UserIcon size={17} />
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+                  <span style={{ fontSize: '12px', fontWeight: '750', color: isDark ? '#f3f4f6' : 'var(--text-dark)', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
+                    {currentUser?.name || 'Гість'}
+                  </span>
+                  <span style={{ fontSize: '10px', color: isDark ? '#9ca3af' : 'var(--text-medium)', fontWeight: '500' }}>
+                    {role === 'admin' ? 'Адміністратор' : role === 'manager' ? 'Менеджер' : 'Оператор'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Navigation Items */}
+              <div style={{ width: '100%', overflowY: 'auto', flexGrow: 1, minHeight: 0 }}>
+                <nav style={{ display: 'flex', flexDirection: 'column', gap: '3px', width: '100%' }}>
+                  {menuItems.map(item => {
+                    if (!item.visible) return null;
+                    const Icon = item.icon;
+                    const isActive = activeTab === item.id;
+                    return (
+                      <button
+                        key={item.id}
+                        type="button"
+                        onClick={() => handleSelectTab(item.id)}
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '12px',
+                          width: '100%',
+                          padding: '9px 12px',
+                          borderRadius: '6px',
+                          border: 'none',
+                          backgroundColor: isActive 
+                            ? (isDark ? 'rgba(59, 130, 246, 0.16)' : 'var(--primary)') 
+                            : 'transparent',
+                          color: isActive 
+                            ? (isDark ? '#3b82f6' : '#ffffff') 
+                            : (isDark ? '#9ca3af' : 'var(--text-dark)'),
+                          cursor: 'pointer',
+                          fontSize: '12.5px',
+                          fontWeight: isActive ? '750' : '600',
+                          textAlign: 'left'
+                        }}
+                      >
+                        <Icon size={17} style={{ flexShrink: 0 }} />
+                        <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.name}</span>
+                      </button>
+                    );
+                  })}
+                </nav>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div style={{
+              borderTop: isDark ? '1px solid #1f2937' : '1px solid var(--border-light)',
+              paddingTop: '12px',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: '6px',
+              width: '100%',
+              flexShrink: 0
+            }}>
+              <button
+                onClick={toggleTheme}
+                type="button"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  width: '100%',
+                  padding: '8px 12px',
+                  backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.03)',
+                  color: isDark ? '#f3f4f6' : 'var(--text-dark)',
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontSize: '12px',
+                  fontWeight: '750'
+                }}
+              >
+                {theme === 'dark' ? (
+                  <>
+                    <Sun size={16} className="text-amber-400" style={{ flexShrink: 0 }} />
+                    <span>Світла тема</span>
+                  </>
+                ) : (
+                  <>
+                    <Moon size={16} className="text-indigo-600" style={{ flexShrink: 0 }} />
+                    <span>Темна тема</span>
+                  </>
+                )}
+              </button>
+
+              <button
+                onClick={logout}
+                type="button"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '12px',
+                  width: '100%',
+                  padding: '8px 12px',
+                  backgroundColor: 'rgba(255, 59, 48, 0.08)',
+                  color: 'var(--danger)',
+                  border: 'none',
+                  borderRadius: '8px',
+                  cursor: 'pointer',
+                  fontSize: '12px',
+                  fontWeight: '750'
+                }}
+              >
+                <LogOut size={16} style={{ flexShrink: 0 }} />
+                <span>Вийти</span>
+              </button>
+            </div>
+          </div>
+        </div>
       )}
 
-      {/* Sidebar Drawer (Hidden on mobile by default, Overlay when open, Fixed on desktop) */}
-      <div 
-        className={`${
-          isOpenOnMobile
-            ? 'fixed inset-y-0 left-0 z-50 flex w-[260px] shadow-2xl'
-            : 'hidden md:flex md:static md:w-[230px]'
-        } h-full max-h-screen flex-col justify-between p-4 md:p-3 shrink-0 overflow-y-auto`}
+      {/* 2. Desktop Sidebar (STRICTLY hidden on mobile < 768px via className="sidebar-desktop-container") */}
+      <aside 
+        className="sidebar-desktop-container"
         style={{
+          width: '230px',
+          height: '100vh',
+          maxHeight: '100vh',
           backgroundColor: isDark ? '#111827' : '#ffffff',
-          borderRight: isDark ? '1px solid #1f2937' : '1px solid var(--border-light)'
+          flexDirection: 'column',
+          padding: '16px 12px',
+          justifyContent: 'space-between',
+          alignItems: 'stretch',
+          flexShrink: 0,
+          borderRight: isDark ? '1px solid #1f2937' : '1px solid var(--border-light)',
+          zIndex: 40,
+          overflowY: 'auto'
         }}
       >
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%', minHeight: 0, flexGrow: 1 }}>
-          {/* Mobile Header with Close Button */}
-          <div className="flex md:hidden items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
-            <span className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200">
-              Меню CRM
-            </span>
-            <button
-              type="button"
-              onClick={onCloseMobile}
-              className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-800 flex items-center justify-center font-bold text-sm"
-            >
-              ✕
-            </button>
-          </div>
-
-          {/* User Profile Avatar */}
+          {/* User Profile Avatar at the top */}
           <div 
-            onClick={() => handleSelectTab('profile')}
-          style={{ 
-            display: 'flex', 
-            alignItems: 'center', 
-            gap: '10px', 
-            width: '100%', 
-            cursor: 'pointer',
-            padding: '8px 10px',
-            borderRadius: '8px',
-            backgroundColor: activeTab === 'profile' 
-              ? (isDark ? '#1f2937' : 'rgba(0,122,255,0.08)') 
-              : (isDark ? 'rgba(255, 255, 255, 0.03)' : 'transparent'),
-            border: isDark ? '1px solid #374151' : 'none',
-            transition: 'all 0.15s ease',
-            flexShrink: 0
-          }}
-        >
-          <div 
-            style={{
-              width: '34px',
-              height: '34px',
-              borderRadius: '50%',
-              backgroundColor: isDark ? '#374151' : '#f4f4f6',
-              border: activeTab === 'profile' 
-                ? (isDark ? '2px solid #3b82f6' : '2px solid var(--primary)') 
-                : (isDark ? '1px solid #4b5563' : '1px solid var(--border-light)'),
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: isDark ? '#f3f4f6' : 'var(--text-dark)',
-              overflow: 'hidden',
+            onClick={() => setActiveTab('profile')}
+            style={{ 
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '10px', 
+              width: '100%', 
+              cursor: 'pointer',
+              padding: '8px 10px',
+              borderRadius: '8px',
+              backgroundColor: activeTab === 'profile' 
+                ? (isDark ? '#1f2937' : 'rgba(0,122,255,0.08)') 
+                : (isDark ? 'rgba(255, 255, 255, 0.03)' : 'transparent'),
+              border: isDark ? '1px solid #374151' : 'none',
+              transition: 'all 0.15s ease',
               flexShrink: 0
             }}
           >
-            <UserIcon size={17} />
+            <div 
+              style={{
+                width: '34px',
+                height: '34px',
+                borderRadius: '50%',
+                backgroundColor: isDark ? '#374151' : '#f4f4f6',
+                border: activeTab === 'profile' 
+                  ? (isDark ? '2px solid #3b82f6' : '2px solid var(--primary)') 
+                  : (isDark ? '1px solid #4b5563' : '1px solid var(--border-light)'),
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: isDark ? '#f3f4f6' : 'var(--text-dark)',
+                overflow: 'hidden',
+                flexShrink: 0
+              }}
+            >
+              <UserIcon size={17} />
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
+              <span style={{ fontSize: '12px', fontWeight: '750', color: isDark ? '#f3f4f6' : 'var(--text-dark)', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
+                {currentUser?.name || 'Гість'}
+              </span>
+              <span style={{ fontSize: '10px', color: isDark ? '#9ca3af' : 'var(--text-medium)', fontWeight: '500' }}>
+                {role === 'admin' ? 'Адміністратор' : role === 'manager' ? 'Менеджер' : 'Оператор'}
+              </span>
+            </div>
           </div>
-          <div style={{ display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-            <span style={{ fontSize: '12px', fontWeight: '750', color: isDark ? '#f3f4f6' : 'var(--text-dark)', whiteSpace: 'nowrap', textOverflow: 'ellipsis', overflow: 'hidden' }}>
-              {currentUser?.name || 'Гість'}
-            </span>
-            <span style={{ fontSize: '10px', color: isDark ? '#9ca3af' : 'var(--text-medium)', fontWeight: '500' }}>
-              {role === 'admin' ? 'Адміністратор' : role === 'manager' ? 'Менеджер' : 'Оператор'}
-            </span>
+
+          {/* Navigation Items - Scrollable List */}
+          <div style={{
+            width: '100%',
+            overflowY: 'auto',
+            flexGrow: 1,
+            minHeight: 0,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '3px'
+          }} className="sidebar-scroll-container">
+            <nav style={{ display: 'flex', flexDirection: 'column', gap: '3px', width: '100%' }}>
+              {menuItems.map(item => {
+                if (!item.visible) return null;
+                const Icon = item.icon;
+                const isActive = activeTab === item.id;
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={() => setActiveTab(item.id)}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '12px',
+                      width: '100%',
+                      padding: '8px 12px',
+                      borderRadius: '6px',
+                      border: 'none',
+                      backgroundColor: isActive 
+                        ? (isDark ? 'rgba(59, 130, 246, 0.16)' : 'var(--primary)') 
+                        : 'transparent',
+                      color: isActive 
+                        ? (isDark ? '#3b82f6' : '#ffffff') 
+                        : (isDark ? '#9ca3af' : 'var(--text-dark)'),
+                      cursor: 'pointer',
+                      transition: 'all 0.15s ease',
+                      fontSize: '12px',
+                      fontWeight: isActive ? '750' : '600',
+                      textAlign: 'left'
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!isActive) {
+                        e.currentTarget.style.backgroundColor = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)';
+                        e.currentTarget.style.color = isDark ? '#ffffff' : 'var(--text-dark)';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isActive) {
+                        e.currentTarget.style.backgroundColor = 'transparent';
+                        e.currentTarget.style.color = isDark ? '#9ca3af' : 'var(--text-dark)';
+                      }
+                    }}
+                  >
+                    <Icon size={17} style={{ flexShrink: 0 }} />
+                    <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.name}</span>
+                  </button>
+                );
+              })}
+            </nav>
           </div>
         </div>
 
-        {/* Navigation Items - Scrollable List */}
+        {/* Footer / Theme & Logout */}
         <div style={{
-          width: '100%',
-          overflowY: 'auto',
-          flexGrow: 1,
-          minHeight: 0,
+          borderTop: isDark ? '1px solid #1f2937' : '1px solid var(--border-light)',
+          paddingTop: '12px',
           display: 'flex',
           flexDirection: 'column',
-          gap: '3px'
-        }} className="sidebar-scroll-container">
-          <nav style={{ display: 'flex', flexDirection: 'column', gap: '3px', width: '100%' }}>
-            {menuItems.map(item => {
-              if (!item.visible) return null;
-              const Icon = item.icon;
-              const isActive = activeTab === item.id;
-              return (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() => handleSelectTab(item.id)}
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '12px',
-                    width: '100%',
-                    padding: '8px 12px',
-                    borderRadius: '6px',
-                    border: 'none',
-                    backgroundColor: isActive 
-                      ? (isDark ? 'rgba(59, 130, 246, 0.16)' : 'var(--primary)') 
-                      : 'transparent',
-                    color: isActive 
-                      ? (isDark ? '#3b82f6' : '#ffffff') 
-                      : (isDark ? '#9ca3af' : 'var(--text-dark)'),
-                    cursor: 'pointer',
-                    transition: 'all 0.15s ease',
-                    fontSize: '12px',
-                    fontWeight: isActive ? '750' : '600',
-                    textAlign: 'left'
-                  }}
-                  onMouseEnter={(e) => {
-                    if (!isActive) {
-                      e.currentTarget.style.backgroundColor = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)';
-                      e.currentTarget.style.color = isDark ? '#ffffff' : 'var(--text-dark)';
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    if (!isActive) {
-                      e.currentTarget.style.backgroundColor = 'transparent';
-                      e.currentTarget.style.color = isDark ? '#9ca3af' : 'var(--text-dark)';
-                    }
-                  }}
-                >
-                  <Icon size={17} style={{ flexShrink: 0 }} />
-                  <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.name}</span>
-                </button>
-              );
-            })}
-          </nav>
+          gap: '6px',
+          width: '100%',
+          flexShrink: 0
+        }}>
+          <button
+            onClick={toggleTheme}
+            type="button"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              width: '100%',
+              padding: '8px 12px',
+              backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.03)',
+              color: isDark ? '#f3f4f6' : 'var(--text-dark)',
+              border: 'none',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+              fontSize: '12px',
+              fontWeight: '750'
+            }}
+          >
+            {theme === 'dark' ? (
+              <>
+                <Sun size={16} className="text-amber-400" style={{ flexShrink: 0 }} />
+                <span>Світла тема</span>
+              </>
+            ) : (
+              <>
+                <Moon size={16} className="text-indigo-600" style={{ flexShrink: 0 }} />
+                <span>Темна тема</span>
+              </>
+            )}
+          </button>
+
+          <button
+            onClick={logout}
+            type="button"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '12px',
+              width: '100%',
+              padding: '8px 12px',
+              backgroundColor: 'rgba(255, 59, 48, 0.08)',
+              color: 'var(--danger)',
+              border: 'none',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              transition: 'all 0.15s ease',
+              fontSize: '12px',
+              fontWeight: '750'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255, 59, 48, 0.15)'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(255, 59, 48, 0.08)'}
+          >
+            <LogOut size={16} style={{ flexShrink: 0 }} />
+            <span>Вийти</span>
+          </button>
         </div>
-      </div>
-
-      {/* Footer / Theme & Logout */}
-      <div style={{
-        borderTop: isDark ? '1px solid #1f2937' : '1px solid var(--border-light)',
-        paddingTop: '12px',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '6px',
-        width: '100%',
-        flexShrink: 0
-      }}>
-        <button
-          onClick={toggleTheme}
-          type="button"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px',
-            width: '100%',
-            padding: '8px 12px',
-            backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.03)',
-            color: isDark ? '#f3f4f6' : 'var(--text-dark)',
-            border: 'none',
-            borderRadius: '8px',
-            cursor: 'pointer',
-            transition: 'all 0.15s ease',
-            fontSize: '12px',
-            fontWeight: '750'
-          }}
-        >
-          {theme === 'dark' ? (
-            <>
-              <Sun size={16} className="text-amber-400" style={{ flexShrink: 0 }} />
-              <span>Світла тема</span>
-            </>
-          ) : (
-            <>
-              <Moon size={16} className="text-indigo-600" style={{ flexShrink: 0 }} />
-              <span>Темна тема</span>
-            </>
-          )}
-        </button>
-
-        <button
-          onClick={logout}
-          type="button"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '12px',
-            width: '100%',
-            padding: '8px 12px',
-            backgroundColor: 'rgba(255, 59, 48, 0.08)',
-            color: 'var(--danger)',
-            border: 'none',
-            borderRadius: '8px',
-            cursor: 'pointer',
-            transition: 'all 0.15s ease',
-            fontSize: '12px',
-            fontWeight: '750'
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255, 59, 48, 0.15)'}
-          onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(255, 59, 48, 0.08)'}
-        >
-          <LogOut size={16} style={{ flexShrink: 0 }} />
-          <span>Вийти</span>
-        </button>
-      </div>
-    </div>
+      </aside>
     </>
   );
 };
