@@ -1,7 +1,17 @@
 declare const process: any;
+declare const Buffer: any;
 
 export default async function handler(req: any, res: any) {
-  const fallback = Buffer.from('ODg1NDU1MzY2NjpBQUczM0xwODFxMW1Qbi0xejdYTE1CSU9melBsOVdLdV9SQQ==', 'base64').toString('utf-8');
+  let fallback = '';
+  try {
+    if (typeof Buffer !== 'undefined') {
+      fallback = Buffer.from('ODg1NDU1MzY2NjpBQUczM0xwODFxMW1Qbi0xejdYTE1CSU9melBsOVdLdV9SQQ==', 'base64').toString('utf-8');
+    } else if (typeof atob !== 'undefined') {
+      fallback = atob('ODg1NDU1MzY2NjpBQUczM0xwODFxMW1Qbi0xejdYTE1CSU9melBsOVdLdV9SQQ==');
+    }
+  } catch {
+    fallback = '';
+  }
   const BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || fallback;
   const TELEGRAM_API = `https://api.telegram.org/bot${BOT_TOKEN}`;
 
