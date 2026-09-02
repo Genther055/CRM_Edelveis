@@ -15396,10 +15396,13 @@ export const Calculator: React.FC = () => {
 
                   {/* Material & Postpress Prices Modal - Clean CRM Design, No Emojis, 100% Editable List */}
       {showMaterialPricesModal && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-2xl w-full shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 sm:p-6">
+          <div 
+            className="bg-white rounded-2xl max-w-2xl w-full shadow-2xl border border-slate-200 overflow-hidden flex flex-col"
+            style={{ maxHeight: '85vh', height: '85vh' }}
+          >
             {/* Modal Header */}
-            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between shrink-0 bg-white">
               <div className="flex items-center gap-2.5">
                 <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
                   <Layers size={18} />
@@ -15419,7 +15422,7 @@ export const Calculator: React.FC = () => {
             </div>
 
             {/* Modal Tabs Switcher - Clean Cupertino Tabs Without Emojis */}
-            <div className="px-6 pt-3 pb-0 bg-slate-50 border-b border-slate-200 flex gap-2 overflow-x-auto">
+            <div className="px-6 pt-3 pb-0 bg-slate-50 border-b border-slate-200 flex gap-2 overflow-x-auto shrink-0">
               {[
                 { id: 'paper', label: 'Папір та листові матеріали', icon: <FileText size={14} /> },
                 { id: 'postpress', label: 'Післядрукарська обробка', icon: <Scissors size={14} /> },
@@ -15459,9 +15462,9 @@ export const Calculator: React.FC = () => {
                 setShowMaterialPricesModal(false); 
                 alert('Ціни на матеріали та тарифи успішно збережено!'); 
               }} 
-              className="flex flex-col flex-1 overflow-hidden"
+              className="flex flex-col flex-1 min-h-0 overflow-hidden"
             >
-              <div className="p-6 overflow-y-auto flex flex-col gap-3 max-h-[58vh]">
+              <div className="p-6 overflow-y-auto flex-1 min-h-0 flex flex-col gap-3">
                 {materialPricesTab === 'paper' && (
                   <div className="flex flex-col gap-2">
                     <div className="flex items-center justify-between pb-1 mb-1 border-b border-slate-100">
@@ -15676,7 +15679,7 @@ export const Calculator: React.FC = () => {
               </div>
 
               {/* Modal Footer */}
-              <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-3">
+              <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-3 shrink-0">
                 <span className="text-xs text-slate-400">
                   Зміни будуть автоматично збережені та застосовані в калькуляторі
                 </span>
