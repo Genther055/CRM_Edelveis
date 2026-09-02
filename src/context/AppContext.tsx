@@ -56,7 +56,8 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 const initialUsers: User[] = [
   { id: '1', username: 'admin', role: 'admin', name: 'Працівник А' },
   { id: '2', username: 'manager', role: 'manager', name: 'Працівник Б' },
-  { id: '3', username: 'operator', role: 'operator', name: 'Працівник В' }
+  { id: '3', username: 'operator', role: 'operator', name: 'Працівник В' },
+  { id: 'client-guest', username: 'client', role: 'client', name: 'Клієнт друкарні' }
 ];
 
 const initialClients: Client[] = [
@@ -434,7 +435,25 @@ const defaultStageDurations = {
 };
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [currentUser, setCurrentUser] = useState<User | null>(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('mode') === 'client' || params.get('role') === 'client' || params.get('tg') === '1') {
+        const clientUser: User = { id: 'client-guest', username: 'client', role: 'client', name: 'Клієнт друкарні' };
+        try {
+          localStorage.setItem('crm_user', JSON.stringify(clientUser));
+        } catch (e) {}
+        return clientUser;
+      }
+      const savedUser = localStorage.getItem('crm_user');
+      if (savedUser) {
+        try {
+          return JSON.parse(savedUser);
+        } catch (e) {}
+      }
+    }
+    return null;
+  });
   const [users, setUsers] = useState<User[]>(initialUsers);
 
   useEffect(() => {

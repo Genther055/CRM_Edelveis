@@ -56,7 +56,7 @@ export const Documents: React.FC = () => {
     const dateStr = getUkrainianDateString();
     const clientName = client?.name || (order?.clientId ? (clients.find(c => c.id === order.clientId)?.name) : 'ТОВ «ФармаТрейд»') || 'Замовник';
     const clientEdrpou = client?.edrpou || '39482019';
-    const clientPhone = client?.phone || '+38 (067) 123-45-67';
+    const clientPhone = client?.phone || '+38 (067) 840-97-81';
     const clientAddress = client?.address || 'м. Вінниця, вул. Соборна, 45';
     const clientPerson = client?.contactPerson || 'Іваненко О.П.';
 
@@ -118,10 +118,10 @@ export const Documents: React.FC = () => {
             <div style="border: 1px solid #e2e8f0; padding: 12px; border-radius: 6px; background-color: #f8fafc; font-size: 11px;">
               <h4 style="margin: 0 0 6px 0; font-size: 12px; font-weight: 800; color: #0f172a;">ВИКОНАВЕЦЬ:</h4>
               <p style="margin: 0; line-height: 1.5;"><strong>ТОВ «Едельвейс і К»</strong><br/>
-              м. Вінниця, вул. Київська, 16<br/>
+              м. Вінниця, вул. 600-річчя, 17, 21000<br/>
               Код ЄДРПОУ 38819201<br/>
               IBAN: UA31300001000002600112233<br/>
-              Тел.: +38 (0432) 55-00-11<br/><br/>
+              Тел.: +38 (067) 840-97-81<br/><br/>
               Директор: _______________ / Шевченко І.В. /</p>
             </div>
             <div style="border: 1px solid #e2e8f0; padding: 12px; border-radius: 6px; background-color: #f8fafc; font-size: 11px;">

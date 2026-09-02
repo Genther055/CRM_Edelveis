@@ -125,6 +125,113 @@ export const defaultMaterialPrices: MaterialPriceItem[] = [
 ];
 
 // Helper: Custom SVG Mini-Thumbnails for 12 Booklet Folding Types
+
+export interface BookletPreset {
+  label: string;
+  w: string;
+  h: string;
+  fold: string;
+  desc: string;
+}
+
+export const getBookletPresetsForFold = (foldType: string): BookletPreset[] => {
+  switch (foldType) {
+    case '1':
+      return [
+        { label: 'А4 в А5 (1 згин)', w: '297', h: '210', fold: '1', desc: 'У згині 148.5×210 мм (А5)' },
+        { label: 'А3 в А4 (1 згин)', w: '420', h: '297', fold: '1', desc: 'У згині 210×297 мм (А4)' },
+        { label: 'А5 в А6 (1 згин)', w: '210', h: '148', fold: '1', desc: 'У згині 105×148 мм (А6)' },
+        { label: 'Квадрат 200×200 (1 згин)', w: '400', h: '200', fold: '1', desc: 'У згині 200×200 мм' },
+        { label: 'Квадрат 150×150 (1 згин)', w: '300', h: '150', fold: '1', desc: 'У згині 150×150 мм' },
+        { label: 'Міні 100×100 (1 згин)', w: '200', h: '100', fold: '1', desc: 'У згині 100×100 мм' },
+      ];
+    case '121':
+      return [
+        { label: 'А4 з клапаном 80 мм', w: '297', h: '210', fold: '121', desc: 'У згині 217×210 мм' },
+        { label: 'А5 з клапаном 50 мм', w: '210', h: '148', fold: '121', desc: 'У згині 160×148 мм' },
+        { label: 'Євро з клапаном', w: '250', h: '210', fold: '121', desc: 'У згині 150×210 мм' },
+        { label: 'Папка-буклет з клапаном', w: '450', h: '310', fold: '121', desc: 'У згині 230×310 мм' },
+      ];
+    case '21':
+      return [
+        { label: 'Євробуклет А4 (2 згини)', w: '297', h: '210', fold: '21', desc: 'У згині 100×210 мм' },
+        { label: 'Буклет А3 (2 згини)', w: '420', h: '297', fold: '21', desc: 'У згині 140×297 мм' },
+        { label: 'Міні-буклет А5 (2 згини)', w: '210', h: '148', fold: '21', desc: 'У згині 70×148 мм' },
+        { label: 'Квадрат 200×200 (3 секції)', w: '600', h: '200', fold: '21', desc: 'У згині 200×200 мм' },
+        { label: 'Квадрат 150×150 (3 секції)', w: '450', h: '150', fold: '21', desc: 'У згині 150×150 мм' },
+        { label: 'Подовжений 630×297 мм', w: '630', h: '297', fold: '21', desc: 'У згині 210×297 мм' },
+      ];
+    case '22':
+      return [
+        { label: 'Євро-гармошка А4 (2 згини)', w: '297', h: '210', fold: '22', desc: 'У згині 99×210 мм' },
+        { label: 'Гармошка А3 (2 згини)', w: '420', h: '297', fold: '22', desc: 'У згині 140×297 мм' },
+        { label: 'Міні-гармошка А5 (2 згини)', w: '210', h: '148', fold: '22', desc: 'У згині 70×148 мм' },
+        { label: 'Квадрат 200×200 (2 згини)', w: '600', h: '200', fold: '22', desc: 'У згині 200×200 мм' },
+        { label: 'Квадрат 150×150 (2 згини)', w: '450', h: '150', fold: '22', desc: 'У згині 150×150 мм' },
+        { label: 'Подовжений 630×297 мм', w: '630', h: '297', fold: '22', desc: 'У згині 210×297 мм' },
+      ];
+    case '23':
+      return [
+        { label: 'Вікно А4 (74+148+74 мм)', w: '297', h: '210', fold: '23', desc: 'У згині 148×210 мм' },
+        { label: 'Вікно А3 (105+210+105 мм)', w: '420', h: '297', fold: '23', desc: 'У згині 210×297 мм' },
+        { label: 'Вікно А5 (52+105+52 мм)', w: '210', h: '148', fold: '23', desc: 'У згині 105×148 мм' },
+        { label: 'Вікно Квадрат 200×200', w: '400', h: '200', fold: '23', desc: 'У згині 200×200 мм' },
+      ];
+    case '34':
+      return [
+        { label: 'Хрестовий згин А3 в А5', w: '420', h: '297', fold: '34', desc: 'У згині 210×148 мм' },
+        { label: 'Хрестовий згин А2 в А4', w: '594', h: '420', fold: '34', desc: 'У згині 297×210 мм' },
+        { label: 'Хрестовий згин А4 в А6', w: '297', h: '210', fold: '34', desc: 'У згині 148×105 мм' },
+      ];
+    case '31':
+      return [
+        { label: 'А4 на 4 секції (Намотування)', w: '297', h: '210', fold: '31', desc: 'У згині 74×210 мм' },
+        { label: 'Подовжений 396×210 мм', w: '396', h: '210', fold: '31', desc: 'У згині 99×210 мм' },
+        { label: 'А3 на 4 секції (Намотування)', w: '420', h: '297', fold: '31', desc: 'У згині 105×297 мм' },
+        { label: 'Панорама 800×200 мм', w: '800', h: '200', fold: '31', desc: 'У згині 200×200 мм' },
+      ];
+    case '32':
+      return [
+        { label: 'Гармошка 396×210 (4 секції)', w: '396', h: '210', fold: '32', desc: 'У згині 99×210 мм' },
+        { label: 'Гармошка А4 (4 секції по 74 мм)', w: '297', h: '210', fold: '32', desc: 'У згині 74×210 мм' },
+        { label: 'Гармошка А3 (4 секції по 105 мм)', w: '420', h: '297', fold: '32', desc: 'У згині 105×297 мм' },
+        { label: 'Гармошка Квадрат 4×150 мм', w: '600', h: '150', fold: '32', desc: 'У згині 150×150 мм' },
+      ];
+    case '33':
+      return [
+        { label: 'Подвійне вікно А3 (4 секції)', w: '420', h: '297', fold: '33', desc: 'У згині 105×297 мм' },
+        { label: 'Подвійне вікно 396×210 мм', w: '396', h: '210', fold: '33', desc: 'У згині 99×210 мм' },
+        { label: 'Подвійне вікно 600×200 мм', w: '600', h: '200', fold: '33', desc: 'У згині 150×200 мм' },
+      ];
+    case '41':
+      return [
+        { label: 'Намотування 5 секцій 495×210', w: '495', h: '210', fold: '41', desc: 'У згині 99×210 мм' },
+        { label: 'Намотування А3 (5 секцій по 84 мм)', w: '420', h: '297', fold: '41', desc: 'У згині 84×297 мм' },
+        { label: 'Намотування А4 (5 секцій по 59 мм)', w: '297', h: '210', fold: '41', desc: 'У згині 59.4×210 мм' },
+      ];
+    case '42':
+      return [
+        { label: 'Гармошка 5 секцій 495×210', w: '495', h: '210', fold: '42', desc: 'У згині 99×210 мм' },
+        { label: 'Гармошка А3 (5 секцій по 84 мм)', w: '420', h: '297', fold: '42', desc: 'У згині 84×297 мм' },
+        { label: 'Гармошка А4 (5 секцій по 59.4 мм)', w: '297', h: '210', fold: '42', desc: 'У згині 59.4×210 мм' },
+        { label: 'Гармошка Квадрат 5×150 мм', w: '750', h: '150', fold: '42', desc: 'У згині 150×150 мм' },
+      ];
+    case '52':
+      return [
+        { label: 'Гармошка 6 секцій 594×210', w: '594', h: '210', fold: '52', desc: 'У згині 99×210 мм' },
+        { label: 'Гармошка А3 (6 секцій по 70 мм)', w: '420', h: '297', fold: '52', desc: 'У згині 70×297 мм' },
+        { label: 'Гармошка А4 (6 секцій по 49.5 мм)', w: '297', h: '210', fold: '52', desc: 'У згині 49.5×210 мм' },
+        { label: 'Гармошка 6×100 мм (Міні)', w: '600', h: '100', fold: '52', desc: 'У згині 100×100 мм' },
+      ];
+    default:
+      return [
+        { label: 'Євробуклет А4 (2 згини)', w: '297', h: '210', fold: '21', desc: 'У згині 100×210 мм' },
+        { label: 'Буклет А3 (2 згини)', w: '420', h: '297', fold: '21', desc: 'У згині 140×297 мм' },
+        { label: 'Міні-буклет А5 (2 згини)', w: '210', h: '148', fold: '21', desc: 'У згині 70×148 мм' },
+      ];
+  }
+};
+
 const renderFoldThumbnail = (foldId: string, isActive: boolean) => {
   const stroke = isActive ? '#2563eb' : '#64748b';
   const fillLight = isActive ? '#eff6ff' : '#ffffff';
@@ -135,7 +242,8 @@ const renderFoldThumbnail = (foldId: string, isActive: boolean) => {
 
   switch (foldId) {
     case '1': // Книжка (1 складання / Half Fold)
-      return (
+
+  return (
         <svg width="54" height="36" viewBox="0 0 54 36" fill="none">
           <polygon points="6,9 27,13 27,33 6,29" fill={fillMid} stroke={stroke} strokeWidth="1.3" strokeLinejoin="round" />
           <polygon points="27,13 48,9 48,29 27,33" fill={fillLight} stroke={stroke} strokeWidth="1.3" strokeLinejoin="round" />
@@ -3225,7 +3333,7 @@ export const Calculator: React.FC = () => {
   };
 
   return (
-    <div className="main-content" style={{ backgroundColor: 'var(--bg-system)' }}>
+    <div className="main-content" style={{ backgroundColor: 'var(--bg-system)', width: '100%', minHeight: '100%', padding: '0 0 40px 0', overflowY: 'visible' }}>
       {step === 'catalog' ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           {/* Header Row: Title on Left, Search Bar on Right */}
@@ -3247,6 +3355,7 @@ export const Calculator: React.FC = () => {
 
             {/* Action Buttons & Prominent Live Search Bar */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+              {currentUser?.role !== 'client' && (
               <button
                 type="button"
                 onClick={() => {
@@ -3271,6 +3380,7 @@ export const Calculator: React.FC = () => {
                 <Layers size={15} style={{ color: 'var(--primary)' }} />
                 <span>Ціни на матеріали</span>
               </button>
+              )}
 
               <div style={{ position: 'relative', width: '320px', maxWidth: '100%' }}>
                 <Search size={15} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--primary)', pointerEvents: 'none' }} />
@@ -5415,6 +5525,13 @@ export const Calculator: React.FC = () => {
                                 setCardKind('6');
                                 setPostFolding(fold.folding);
                                 setPostCreasing(fold.creases.toString());
+                                const presets = getBookletPresetsForFold(fold.folding);
+                                if (presets && presets.length > 0) {
+                                  setSheetCustomWidth(presets[0].w);
+                                  setSheetCustomHeight(presets[0].h);
+                                  setSheetSizePreset('custom');
+                                  setTurnType('chuzhyi_oborut');
+                                }
                               }}
                               className={`p-3 rounded-xl border flex flex-col items-center gap-2 cursor-pointer transition-all ${
                                 isActive
@@ -5974,20 +6091,8 @@ export const Calculator: React.FC = () => {
                         </div>
 
                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
-                          {((category as string) === 'Буклети'
-                            ? [
-                                { label: 'Євробуклет А4 (2 згини)', w: '297', h: '210', fold: '21', desc: 'У згині 100×210' },
-                                { label: 'Міні-буклет А5 (2 згини)', w: '210', h: '148', fold: '21', desc: 'У згині 70×148' },
-                                { label: 'Буклет А3 (2 згини)', w: '420', h: '297', fold: '21', desc: 'У згині 140×297' },
-                                { label: 'Книжка А4 в А5 (1 згин)', w: '297', h: '210', fold: '20', desc: 'У згині 148×210' },
-                                { label: 'Книжка А3 в А4 (1 згин)', w: '420', h: '297', fold: '20', desc: 'У згині 210×297' },
-                                { label: 'Книжка А5 в А6 (1 згин)', w: '210', h: '148', fold: '20', desc: 'У згині 105×148' },
-                                { label: 'Квадрат 200×200 (2 згини)', w: '600', h: '200', fold: '21', desc: 'У згині 200×200' },
-                                { label: 'Квадрат 150×150 (2 згини)', w: '450', h: '150', fold: '21', desc: 'У згині 150×150' },
-                                { label: 'Гармошка 3 згини (4 пол.)', w: '396', h: '210', fold: '23', desc: 'У згині 99×210' },
-                                { label: 'Віконце Gate-fold', w: '297', h: '210', fold: '22', desc: 'У згині 148×210' },
-                                { label: 'Мапа / План 4 згини', w: '420', h: '594', fold: '24', desc: 'Складна схема' },
-                              ]
+                          {(((category as string) === 'Буклети'
+                            ? getBookletPresetsForFold(postFolding)
                             : [
                                 { label: 'А4 (210 × 297 мм)', w: '210', h: '297', fold: '', desc: 'Стандарт' },
                                 { label: 'А5 (148 × 210 мм)', w: '148', h: '210', fold: '', desc: 'Листівка' },
@@ -5999,7 +6104,7 @@ export const Calculator: React.FC = () => {
                                 { label: 'Календарик (100 × 70 мм)', w: '100', h: '70', fold: '', desc: 'Кишеньковий' },
                                 { label: 'Квадрат (105 × 105 мм)', w: '105', h: '105', fold: '', desc: 'Кубик' },
                               ]
-                          ).map((sz, idx) => {
+                          ) as BookletPreset[]).map((sz: BookletPreset, idx: number) => {
                             const isCurrent = sheetCustomWidth === sz.w && sheetCustomHeight === sz.h && (!sz.fold || postFolding === sz.fold);
                             return (
                               <button

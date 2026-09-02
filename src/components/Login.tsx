@@ -123,7 +123,7 @@ export const Login: React.FC = () => {
             fontWeight: '600',
             textAlign: 'center'
           }}>
-            ⚠️ {error}
+            {error}
           </div>
         )}
 
@@ -139,7 +139,7 @@ export const Login: React.FC = () => {
             fontWeight: '600',
             textAlign: 'center'
           }}>
-            ✅ {successMsg}
+            {successMsg}
           </div>
         )}
 
@@ -261,6 +261,14 @@ export const Login: React.FC = () => {
                 style={{ fontSize: '11px', padding: '6px 12px', color: '#1c1c1e', backgroundColor: '#f2f2f7', border: '1px solid rgba(0,0,0,0.05)' }}
               >
                 Менеджер
+              </button>
+              <button 
+                type="button"
+                onClick={() => handleQuickSelect('client')}
+                className="ios-btn ios-btn-secondary"
+                style={{ fontSize: '11px', padding: '6px 12px', color: '#007aff', backgroundColor: '#e0f2fe', border: '1px solid #bae6fd', fontWeight: '700' }}
+              >
+                Клієнт
               </button>
               <button 
                 type="button"

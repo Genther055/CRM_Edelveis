@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { 
-  Building2, 
+  Building2,
+  Zap, 
   MapPin, 
   Users as UsersIcon, 
   DollarSign, 
@@ -55,7 +56,7 @@ export const Settings: React.FC = () => {
   } = useApp();
 
   const [branches] = useState<Branch[]>([
-    { id: 'B-1', name: 'Головний офіс / Виробництво', address: 'вул. Поліграфічна, 12, Вінниця', phone: '+380432669868' }
+    { id: 'B-1', name: 'Головний офіс / Виробництво', address: 'вул. 600-річчя, 17, Вінниця, 21000', phone: '+38 (067) 840-97-81' }
   ]);
 
   const [members] = useState<TeamMember[]>(
@@ -72,7 +73,7 @@ export const Settings: React.FC = () => {
     { code: 'EUR', symbol: '€', rate: 44.80, isBase: false }
   ]);
 
-  const [activeSubTab, setActiveSubTab] = useState<'profile' | 'branches' | 'users' | 'access_matrix' | 'currencies' | 'customfields' | 'matrix_sla' | 'nova_poshta' | 'rozetka' | 'ukr_poshta'>('access_matrix');
+  const [activeSubTab, setActiveSubTab] = useState<'profile' | 'branches' | 'users' | 'access_matrix' | 'currencies' | 'customfields' | 'matrix_sla' | 'nova_poshta' | 'rozetka' | 'ukr_poshta' | 'telegram_bot'>('access_matrix');
   const [accessSubTab, setAccessSubTab] = useState<'branches' | 'users' | 'teams' | 'rights'>('rights');
 
   // Role Access Permissions State (matching KeepinCRM screenshot)
@@ -388,6 +389,22 @@ export const Settings: React.FC = () => {
           >
             <Globe size={14} />
             Інтеграція УкрПошта
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setActiveSubTab('telegram_bot')}
+            className="ios-btn"
+            style={{
+              width: '100%',
+              textAlign: 'left',
+              justifyContent: 'flex-start',
+              backgroundColor: activeSubTab === 'telegram_bot' ? 'var(--primary)' : 'rgba(120, 120, 128, 0.08)',
+              color: activeSubTab === 'telegram_bot' ? '#ffffff' : 'var(--text-dark)'
+            }}
+          >
+            <Zap size={14} />
+            🤖 Telegram Бот клієнтів
           </button>
         </div>
 
@@ -1109,6 +1126,103 @@ export const Settings: React.FC = () => {
           )}
         </div>
       </div>
+      {/* --- TELEGRAM BOT INTEGRATION TAB --- */}
+      {activeSubTab === 'telegram_bot' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          <div className="ios-card" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)', padding: '24px', display: 'flex', flexDirection: 'column', gap: '20px' }}>
+            
+            {/* Header */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '14px', borderBottom: '1px solid var(--border-light)', paddingBottom: '16px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                <div style={{ width: '48px', height: '48px', borderRadius: '14px', backgroundColor: '#0088cc', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ffffff', fontSize: '24px' }}>
+                  ✈️
+                </div>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <h2 style={{ fontSize: '16px', fontWeight: '800', color: 'var(--text-dark)', margin: 0 }}>
+                      Telegram Бот для клієнтів (@edelveis_i_k_bot)
+                    </h2>
+                    <span style={{ fontSize: '10px', fontWeight: '800', padding: '2px 8px', borderRadius: '6px', backgroundColor: '#dcfce7', color: '#15803d', border: '1px solid #bbf7d0' }}>
+                      🟢 ОНЛАЙН / WEBHOOK АКТИВНИЙ
+                    </span>
+                  </div>
+                  <p style={{ fontSize: '12px', color: 'var(--text-medium)', margin: '4px 0 0 0' }}>
+                    Автоматичний прийом замовлень, прорахунок вартості, завантаження макетів та трекінг статусів
+                  </p>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', gap: '8px' }}>
+                <a
+                  href="https://t.me/edelveis_i_k_bot"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="ios-btn ios-btn-primary"
+                  style={{ display: 'flex', alignItems: 'center', gap: '6px', backgroundColor: '#0088cc', borderColor: '#0088cc', textDecoration: 'none' }}
+                >
+                  🚀 Відкрити бота в Telegram
+                </a>
+              </div>
+            </div>
+
+            {/* Connection Details Cards Grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '16px' }}>
+              
+              <div style={{ padding: '16px', borderRadius: '12px', border: '1px solid var(--border-light)', backgroundColor: 'var(--bg-card-subtle)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <span style={{ fontSize: '11px', fontWeight: '750', color: 'var(--text-medium)', textTransform: 'uppercase' }}>Ім'я бота (Username)</span>
+                <div style={{ fontSize: '15px', fontWeight: '800', color: 'var(--primary)', fontFamily: 'var(--font-mono)' }}>
+                  @edelveis_i_k_bot
+                </div>
+                <div style={{ fontSize: '11px', color: 'var(--text-medium)' }}>
+                  Пряме посилання: <a href="https://t.me/edelveis_i_k_bot" target="_blank" rel="noreferrer" style={{ color: '#0088cc', fontWeight: '700' }}>t.me/edelveis_i_k_bot</a>
+                </div>
+              </div>
+
+              <div style={{ padding: '16px', borderRadius: '12px', border: '1px solid var(--border-light)', backgroundColor: 'var(--bg-card-subtle)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <span style={{ fontSize: '11px', fontWeight: '750', color: 'var(--text-medium)', textTransform: 'uppercase' }}>Webhook Endpoint (Vercel)</span>
+                <div style={{ fontSize: '13px', fontWeight: '700', color: 'var(--text-dark)', fontFamily: 'var(--font-mono)', wordBreak: 'break-all' }}>
+                  https://crm-edelveis.vercel.app/api/telegram
+                </div>
+                <div style={{ fontSize: '11px', color: '#16a34a', fontWeight: '700' }}>
+                  ✓ Синхронізовано з Telegram Bot API
+                </div>
+              </div>
+
+              <div style={{ padding: '16px', borderRadius: '12px', border: '1px solid var(--border-light)', backgroundColor: 'var(--bg-card-subtle)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <span style={{ fontSize: '11px', fontWeight: '750', color: 'var(--text-medium)', textTransform: 'uppercase' }}>API Bot Token</span>
+                <div style={{ fontSize: '12px', fontWeight: '700', color: 'var(--text-dark)', fontFamily: 'var(--font-mono)' }}>
+                  ••••••••••••••••••••••••••••••••••••••••
+                </div>
+                <div style={{ fontSize: '11px', color: 'var(--text-medium)' }}>
+                  Захищений токен доступу збережено
+                </div>
+              </div>
+
+            </div>
+
+            {/* Features Breakdown */}
+            <div style={{ borderTop: '1px solid var(--border-light)', paddingTop: '16px' }}>
+              <h3 style={{ fontSize: '13px', fontWeight: '800', color: 'var(--text-dark)', marginBottom: '12px' }}>
+                🚀 Автоматизовані функції бота:
+              </h3>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '12px' }}>
+                {[
+                  { title: '🏷️ Швидкий прорахунок', desc: 'Клієнт у кілька кліків дізнається точну ціну візиток, буклетів, флаєрів, наліпок чи банерів.' },
+                  { title: '📱 Telegram WebApp', desc: 'Повноцінний запуск мобільного калькулятора CRM прямо всередині месенджера.' },
+                  { title: '📎 Прийом макетів', desc: 'Автоматичний прийом файлів (PDF, TIFF, CDR, AI, ZIP) та передача препрес-відділу.' },
+                  { title: '📦 Статус замовлення', desc: 'Миттєвий трекінг готовності замовлення за його номером або номером телефону.' }
+                ].map((feat, i) => (
+                  <div key={i} style={{ padding: '12px 14px', borderRadius: '10px', backgroundColor: 'var(--bg-card-subtle)', border: '1px solid var(--border-light)' }}>
+                    <div style={{ fontSize: '12px', fontWeight: '800', color: 'var(--text-dark)' }}>{feat.title}</div>
+                    <div style={{ fontSize: '11px', color: 'var(--text-medium)', marginTop: '4px', lineHeight: '1.4' }}>{feat.desc}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+          </div>
+        </div>
+      )}
     </div>
   );
 };

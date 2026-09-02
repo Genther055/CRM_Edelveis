@@ -64,22 +64,46 @@ body.dark-theme {
   -webkit-font-smoothing: antialiased;
 }
 
+html {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
 body {
   background-color: var(--bg-system);
   color: var(--text-dark);
   min-height: 100vh;
-  overflow: hidden;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
 }
 
 #root {
   display: flex;
-  height: 100vh;
-  width: 100vw;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100%;
   background-color: var(--bg-workspace);
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.client-portal-wrapper {
+  width: 100%;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow-y: auto;
+  background-color: var(--bg-system);
 }
 
 .app-container {
