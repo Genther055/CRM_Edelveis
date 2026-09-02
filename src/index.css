@@ -152,16 +152,32 @@ body {
   opacity: 0.6;
 }
 
-input:not([type="checkbox"]):not([type="radio"]), select, textarea {
+input:not([type="checkbox"]):not([type="radio"]), textarea {
   width: 100%;
-  padding: 10px 12px;
+  padding: 8px 12px;
   background-color: rgba(120, 120, 128, 0.12); /* iOS system input bg */
   border: none;
   border-radius: var(--radius-md);
-  font-size: 14px;
+  font-size: 13px;
   color: var(--text-dark);
   outline: none;
   transition: all 0.15s ease;
+}
+
+select {
+  width: 100%;
+  padding: 4px 10px !important;
+  min-height: 34px !important;
+  background-color: rgba(120, 120, 128, 0.12);
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 13px !important;
+  color: var(--text-dark);
+  outline: none;
+  transition: all 0.15s ease;
+  line-height: normal !important;
+  display: inline-flex;
+  align-items: center;
 }
 
 input[type="checkbox"], input[type="radio"] {

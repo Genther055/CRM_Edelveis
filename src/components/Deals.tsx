@@ -520,7 +520,7 @@ export const Deals: React.FC = () => {
                         setSelectedOrder(updated);
                         addSystemNotification(`👤 Угода ${selectedOrder.id}: Змінено замовника на "${getClientName(e.target.value)}"`);
                       }}
-                      style={{ height: '32px', fontSize: '12px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
+                      style={{ height: '34px', minHeight: '34px', fontSize: '12.5px', padding: '4px 10px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
                     >
                       {clients.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                     </select>

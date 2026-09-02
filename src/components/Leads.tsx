@@ -406,7 +406,7 @@ export const Leads: React.FC = () => {
           <select 
             value={filterSource}
             onChange={(e) => setFilterSource(e.target.value)}
-            style={{ height: '32px', fontSize: '12px', width: '120px' }}
+            style={{ height: '34px', minHeight: '34px', fontSize: '12px', width: '130px', padding: '4px 8px' }}
           >
             <option value="all">Всі джерела</option>
             <option value="Site">Сайт</option>
