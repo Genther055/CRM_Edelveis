@@ -3228,88 +3228,54 @@ export const Calculator: React.FC = () => {
     <div className="main-content" style={{ backgroundColor: 'var(--bg-system)' }}>
       {step === 'catalog' ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-          {/* Header Row: Title on Left, Search Bar on Right */}
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            gap: '20px',
-            marginBottom: '20px',
-            paddingBottom: '12px',
-            borderBottom: '0.5px solid var(--border-light)',
-            width: '100%'
-          }}>
+          {/* Header Row: Title on Left, Search Bar on Right - Fully Responsive */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 pb-3 border-b border-slate-200 dark:border-slate-800 w-full">
             <div>
-              <h2 className="page-title" style={{ margin: 0 }}>Поліграфічний калькулятор</h2>
-              <p className="subtitle" style={{ margin: '3px 0 0 0' }}>Оберіть категорію продукції для детального прорахунку</p>
+              <h2 className="page-title text-xl sm:text-2xl font-bold text-slate-900 dark:text-white m-0">Поліграфічний калькулятор</h2>
+              <p className="subtitle text-xs text-slate-500 dark:text-slate-400 m-0 mt-0.5">Оберіть категорію продукції для детального прорахунку</p>
             </div>
 
             {/* Action Buttons & Prominent Live Search Bar */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
               <button
                 type="button"
                 onClick={() => {
                   setTempNorms(norms);
                   setShowMaterialPricesModal(true);
                 }}
-                className="px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-200/90 text-slate-700 font-bold text-xs flex items-center gap-2 transition-all shadow-2xs shrink-0 cursor-pointer"
+                className="px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-200/90 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-2xs shrink-0 cursor-pointer"
                 title="Прайс-лист матеріалів та послуг підприємства"
               >
-                <Layers size={15} className="text-blue-600" />
+                <Layers size={15} className="text-blue-600 dark:text-blue-400" />
                 <span>Ціни на матеріали</span>
               </button>
 
-                <div style={{ position: 'relative', width: '360px', flexShrink: 0 }}>
-                <Search size={16} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#007AFF', pointerEvents: 'none' }} />
-              <input
-                type="text"
-                value={productSearchQuery}
-                onChange={(e) => {
-                  setProductSearchQuery(e.target.value);
-                  if (mainCategoryTab !== 'products' && e.target.value.trim()) {
-                    setMainCategoryTab('products');
-                  }
-                }}
-                placeholder="Пошук продукції (Журнали, Бланки, Буклети...)"
-                style={{
-                  width: '100%',
-                  padding: '9px 34px 9px 38px',
-                  borderRadius: '12px',
-                  border: '1px solid var(--border-light)',
-                  backgroundColor: '#ffffff',
-                  fontSize: '12.5px',
-                  fontWeight: '600',
-                  color: 'var(--text-dark)',
-                  boxShadow: 'var(--shadow-flat)',
-                  outline: 'none',
-                  transition: 'all 0.15s ease'
-                }}
-                className="focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
-              />
-              {productSearchQuery && (
-                <button
-                  type="button"
-                  onClick={() => setProductSearchQuery('')}
-                  style={{
-                    position: 'absolute',
-                    right: '10px',
-                    top: '50%',
-                    transform: 'translateY(-50%)',
-                    background: 'none',
-                    border: 'none',
-                    color: 'var(--text-medium)',
-                    cursor: 'pointer',
-                    fontWeight: 'bold',
-                    fontSize: '12px',
-                    padding: '4px'
+              <div className="relative w-full sm:w-[320px] md:w-[360px] shrink-0">
+                <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-blue-600 pointer-events-none" />
+                <input
+                  type="text"
+                  value={productSearchQuery}
+                  onChange={(e) => {
+                    setProductSearchQuery(e.target.value);
+                    if (mainCategoryTab !== 'products' && e.target.value.trim()) {
+                      setMainCategoryTab('products');
+                    }
                   }}
-                >
-                  ✕
-                </button>
-              )}
+                  placeholder="Пошук продукції (Журнали, Бланки...)"
+                  className="w-full pl-9 pr-8 py-2 rounded-xl border border-slate-200/90 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs font-semibold text-slate-900 dark:text-white placeholder:text-slate-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-500/20 outline-none transition-all shadow-2xs"
+                />
+                {productSearchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setProductSearchQuery('')}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 text-xs font-bold p-1 cursor-pointer"
+                  >
+                    ✕
+                  </button>
+                )}
+              </div>
             </div>
           </div>
-        </div>
 
           {/* Top Category Tabs Navigation - Cupertino iOS Switcher with Mega Menu Trigger */}
           <div style={{ position: 'relative', zIndex: 40 }}>
@@ -3325,7 +3291,7 @@ export const Calculator: React.FC = () => {
               boxShadow: 'var(--shadow-flat)',
               marginBottom: '8px'
             }}>
-              <div style={{ display: 'flex', gap: '8px', overflowX: 'auto', flex: 1 }}>
+              <div style={{ display: 'flex', gap: '6px', overflowX: 'auto', flex: 1, WebkitOverflowScrolling: 'touch' }} className="scrollbar-none">
                 {/* Catalog Mega Menu Button Trigger */}
                 <button
                   type="button"
@@ -7111,7 +7077,7 @@ export const Calculator: React.FC = () => {
                             </div>
 
                             {/* Horizontal Action Buttons Right: [ ШАБЛОН ] [ PDF ] [ КП ] [ ВИРОБНИЦТВО ] */}
-                            <div className="grid grid-cols-4 gap-3 pt-3 border-t border-slate-100">
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 pt-3 border-t border-slate-100">
                               <button
                                 type="button"
                                 onClick={() => {
@@ -9633,7 +9599,7 @@ export const Calculator: React.FC = () => {
                             </div>
 
                             {/* Horizontal Action Buttons Right: [ ШАБЛОН ] [ PDF ] [ КП ] [ ВИРОБНИЦТВО ] */}
-                            <div className="grid grid-cols-4 gap-3 pt-3 border-t border-slate-100">
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 pt-3 border-t border-slate-100">
                               <button
                                 type="button"
                                 onClick={() => {
@@ -12864,7 +12830,7 @@ export const Calculator: React.FC = () => {
                             </div>
 
                             {/* Horizontal Action Buttons Right: [ ШАБЛОН ] [ PDF ] [ КП ] [ ВИРОБНИЦТВО ] */}
-                            <div className="grid grid-cols-4 gap-3 pt-3 border-t border-slate-100">
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 pt-3 border-t border-slate-100">
                               <button
                                 type="button"
                                 onClick={() => {
@@ -13827,7 +13793,7 @@ export const Calculator: React.FC = () => {
                           </div>
 
                           {/* Horizontal Action Buttons Right: [ ШАБЛОН ] [ PDF ] [ КП ] [ ВИРОБНИЦТВО ] */}
-                          <div className="grid grid-cols-4 gap-3 pt-3 border-t border-slate-100">
+                          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 pt-3 border-t border-slate-100">
                             <button
                               type="button"
                               onClick={() => {

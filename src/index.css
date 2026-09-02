@@ -906,3 +906,92 @@ body.dark-theme .bg-\[\#F2F2F7\] {
   background-color: #111827 !important;
 }
 
+/* ==========================================================================
+   Mobile Responsive Adaptation Styles (< 768px and < 1024px)
+   ========================================================================== */
+
+@media (max-width: 1024px) {
+  .main-content {
+    padding: 16px 20px 90px 20px !important;
+  }
+}
+
+@media (max-width: 768px) {
+  body {
+    overflow: auto !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  #root {
+    height: auto !important;
+    min-height: 100vh !important;
+    overflow-x: hidden !important;
+  }
+
+  .app-container {
+    flex-direction: column !important;
+    min-height: 100vh !important;
+    width: 100vw !important;
+    overflow-x: hidden !important;
+  }
+
+  .main-content {
+    padding: 12px 12px 100px 12px !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+    height: auto !important;
+    overflow-y: visible !important;
+  }
+
+  .header-title-container {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 8px !important;
+    margin-bottom: 14px !important;
+  }
+
+  .page-title {
+    font-size: 20px !important;
+  }
+
+  .subtitle {
+    font-size: 11.5px !important;
+  }
+
+  .ios-card {
+    padding: 14px 12px !important;
+    border-radius: 12px !important;
+  }
+
+  /* Tables horizontal scroll container on mobile */
+  .ios-table-container {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    margin-left: -4px !important;
+    margin-right: -4px !important;
+    width: calc(100% + 8px) !important;
+    border-radius: 10px !important;
+  }
+
+  .ios-table th, .ios-table td {
+    padding: 8px 10px !important;
+    font-size: 11.5px !important;
+    white-space: nowrap !important;
+  }
+
+  /* Form inputs & buttons touch friendly */
+  input, select, textarea, button {
+    font-size: 13px !important;
+  }
+
+  /* Mobile scrollbar cleaner */
+  .scrollbar-none::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-none {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+

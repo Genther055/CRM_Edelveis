@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Menu } from 'lucide-react';
 import { AppProvider, useApp } from './context/AppContext';
 import { Login } from './components/Login';
 import { Sidebar } from './components/Sidebar';
@@ -24,6 +25,7 @@ import './App.css';
 function AppContent() {
   const { currentUser } = useApp();
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   if (!currentUser) {
     return <Login />;
@@ -31,9 +33,65 @@ function AppContent() {
 
   const role = currentUser.role;
 
+  const moduleTitles: Record<string, string> = {
+    dashboard: 'Робочий стіл',
+    leads: 'Запити',
+    clients: 'Замовники',
+    employees: 'Співробітники',
+    pm: 'Дизайн макетів',
+    deals: 'Угоди',
+    delivery: 'Доставка',
+    calculator: 'Калькулятор',
+    warehouse: 'Склад',
+    production: 'Виробництво',
+    tasks: 'Завдання',
+    chats: 'Чати',
+    documents: 'Документи',
+    finance: 'BAS Бухгалтерія',
+    triggers: 'Автоматизація',
+    settings: 'Налаштування',
+    profile: 'Профіль'
+  };
+
   return (
     <div className="app-container">
-      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+      {/* Mobile Top App Bar (< 768px) */}
+      <header className="md:hidden flex items-center justify-between px-4 py-2.5 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 shrink-0 sticky top-0 z-30 shadow-2xs">
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            onClick={() => setIsMobileMenuOpen(true)}
+            className="w-9 h-9 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-200 flex items-center justify-center transition-colors active:scale-95 cursor-pointer"
+            title="Відкрити меню"
+          >
+            <Menu size={20} />
+          </button>
+          <div className="flex flex-col">
+            <span className="text-xs font-black tracking-tight text-slate-900 dark:text-white leading-tight">
+              {moduleTitles[activeTab] || 'Поліграфія CRM'}
+            </span>
+            <span className="text-[10px] font-semibold text-blue-600 dark:text-blue-400 leading-none">
+              Едельвейс CRM
+            </span>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab('profile')}
+          className="w-8 h-8 rounded-full bg-blue-50 dark:bg-slate-800 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-slate-700 flex items-center justify-center text-xs font-bold cursor-pointer"
+          title="Профіль"
+        >
+          {currentUser?.name?.slice(0, 1) || 'U'}
+        </button>
+      </header>
+
+      <Sidebar 
+        activeTab={activeTab} 
+        setActiveTab={setActiveTab}
+        isOpenOnMobile={isMobileMenuOpen}
+        onCloseMobile={() => setIsMobileMenuOpen(false)}
+      />
       
       {activeTab === 'dashboard' && (
         <Dashboard setActiveTab={setActiveTab} />

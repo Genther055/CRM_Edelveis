@@ -24,9 +24,16 @@ import {
 interface SidebarProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
+  isOpenOnMobile?: boolean;
+  onCloseMobile?: () => void;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ 
+  activeTab, 
+  setActiveTab,
+  isOpenOnMobile = false,
+  onCloseMobile
+}) => {
   const { currentUser, logout, theme, toggleTheme } = useApp();
   const role = currentUser?.role || 'operator';
 
@@ -51,26 +58,52 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
 
   const isDark = theme === 'dark';
 
+  const handleSelectTab = (id: string) => {
+    setActiveTab(id);
+    if (onCloseMobile) {
+      onCloseMobile();
+    }
+  };
+
   return (
-    <div style={{
-      width: '230px',
-      height: '100vh',
-      maxHeight: '100vh',
-      backgroundColor: isDark ? '#111827' : '#ffffff',
-      display: 'flex',
-      flexDirection: 'column',
-      padding: '16px 12px',
-      justifyContent: 'space-between',
-      alignItems: 'stretch',
-      flexShrink: 0,
-      borderRight: isDark ? '1px solid #1f2937' : '1px solid var(--border-light)',
-      zIndex: 40,
-      overflowY: 'auto'
-    }}>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%', minHeight: 0, flexGrow: 1 }}>
-        {/* User Profile Avatar at the top */}
+    <>
+      {/* Mobile Backdrop Overlay */}
+      {isOpenOnMobile && (
         <div 
-          onClick={() => setActiveTab('profile')}
+          onClick={onCloseMobile}
+          className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-40 md:hidden transition-opacity duration-300"
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Sidebar Drawer (Fixed on desktop, slide-out on mobile) */}
+      <div 
+        className={`fixed md:static inset-y-0 left-0 z-50 w-[240px] md:w-[230px] h-full max-h-screen flex flex-col justify-between p-4 md:p-3 shrink-0 transition-transform duration-300 ease-in-out overflow-y-auto ${
+          isOpenOnMobile ? 'translate-x-0 shadow-2xl' : '-translate-x-full md:translate-x-0'
+        }`}
+        style={{
+          backgroundColor: isDark ? '#111827' : '#ffffff',
+          borderRight: isDark ? '1px solid #1f2937' : '1px solid var(--border-light)'
+        }}
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', width: '100%', minHeight: 0, flexGrow: 1 }}>
+          {/* Mobile Header with Close Button */}
+          <div className="flex md:hidden items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
+            <span className="text-xs font-black uppercase tracking-wider text-slate-800 dark:text-slate-200">
+              Меню CRM
+            </span>
+            <button
+              type="button"
+              onClick={onCloseMobile}
+              className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-500 hover:text-slate-800 flex items-center justify-center font-bold text-sm"
+            >
+              ✕
+            </button>
+          </div>
+
+          {/* User Profile Avatar */}
+          <div 
+            onClick={() => handleSelectTab('profile')}
           style={{ 
             display: 'flex', 
             alignItems: 'center', 
@@ -135,7 +168,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
                 <button
                   key={item.id}
                   type="button"
-                  onClick={() => setActiveTab(item.id)}
+                  onClick={() => handleSelectTab(item.id)}
                   style={{
                     display: 'flex',
                     alignItems: 'center',
@@ -148,32 +181,29 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
                       ? (isDark ? 'rgba(59, 130, 246, 0.16)' : 'var(--primary)') 
                       : 'transparent',
                     color: isActive 
-                      ? (isDark ? '#60a5fa' : '#ffffff') 
+                      ? (isDark ? '#3b82f6' : '#ffffff') 
                       : (isDark ? '#9ca3af' : 'var(--text-dark)'),
                     cursor: 'pointer',
                     transition: 'all 0.15s ease',
-                    fontWeight: isActive ? '750' : '500',
                     fontSize: '12px',
-                    textAlign: 'left',
-                    borderLeft: isActive && isDark ? '3px solid #3b82f6' : '3px solid transparent'
+                    fontWeight: isActive ? '750' : '600',
+                    textAlign: 'left'
                   }}
                   onMouseEnter={(e) => {
                     if (!isActive) {
-                      e.currentTarget.style.backgroundColor = isDark ? 'rgba(255, 255, 255, 0.05)' : '#f4f4f6';
-                      if (isDark) e.currentTarget.style.color = '#f3f4f6';
+                      e.currentTarget.style.backgroundColor = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)';
+                      e.currentTarget.style.color = isDark ? '#ffffff' : 'var(--text-dark)';
                     }
                   }}
                   onMouseLeave={(e) => {
                     if (!isActive) {
                       e.currentTarget.style.backgroundColor = 'transparent';
-                      if (isDark) e.currentTarget.style.color = '#9ca3af';
+                      e.currentTarget.style.color = isDark ? '#9ca3af' : 'var(--text-dark)';
                     }
                   }}
                 >
-                  <Icon size={16} style={{ flexShrink: 0, color: isActive ? (isDark ? '#60a5fa' : '#ffffff') : 'inherit' }} />
-                  <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {item.name}
-                  </span>
+                  <Icon size={17} style={{ flexShrink: 0 }} />
+                  <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.name}</span>
                 </button>
               );
             })}
@@ -181,8 +211,16 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
         </div>
       </div>
 
-      {/* Theme & Logout Buttons Footer */}
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', marginTop: '12px' }}>
+      {/* Footer / Theme & Logout */}
+      <div style={{
+        borderTop: isDark ? '1px solid #1f2937' : '1px solid var(--border-light)',
+        paddingTop: '12px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '6px',
+        width: '100%',
+        flexShrink: 0
+      }}>
         <button
           onClick={toggleTheme}
           type="button"
@@ -192,8 +230,8 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
             gap: '12px',
             width: '100%',
             padding: '8px 12px',
-            backgroundColor: theme === 'dark' ? '#334155' : 'rgba(120, 120, 128, 0.1)',
-            color: theme === 'dark' ? '#f8fafc' : 'var(--text-dark)',
+            backgroundColor: isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.03)',
+            color: isDark ? '#f3f4f6' : 'var(--text-dark)',
             border: 'none',
             borderRadius: '8px',
             cursor: 'pointer',
@@ -241,5 +279,6 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab }) => 
         </button>
       </div>
     </div>
+    </>
   );
 };
