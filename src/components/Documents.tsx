@@ -39,6 +39,284 @@ interface DocTemplate {
 
 export const Documents: React.FC = () => {
   const { orders, clients } = useApp();
+  // --- CRM AUTO-FILL AUTOMATION ---
+  const [selectedOrderIdForDoc, setSelectedOrderIdForDoc] = useState<string>('');
+  const [selectedDocType, setSelectedDocType] = useState<'contract' | 'invoice' | 'act' | 'spec'>('contract');
+
+  // Helper: Format Ukrainian Date
+  const getUkrainianDateString = () => {
+    const months = ['січня', 'лютого', 'березня', 'квітня', 'травня', 'червня', 'липня', 'серпня', 'вересня', 'жовтня', 'листопада', 'грудня'];
+    const now = new Date();
+    return `«${now.getDate().toString().padStart(2, '0')}» ${months[now.getMonth()]} ${now.getFullYear()} р.`;
+  };
+
+  // Generate Document HTML based on Type and Data
+  const generateDocumentHTML = (type: 'contract' | 'invoice' | 'act' | 'spec', order: any, client: any) => {
+    const docNum = order ? `${order.id}/26` : '64841/26';
+    const dateStr = getUkrainianDateString();
+    const clientName = client?.name || (order?.clientId ? (clients.find(c => c.id === order.clientId)?.name) : 'ТОВ «ФармаТрейд»') || 'Замовник';
+    const clientEdrpou = client?.edrpou || '39482019';
+    const clientPhone = client?.phone || '+38 (067) 123-45-67';
+    const clientAddress = client?.address || 'м. Вінниця, вул. Соборна, 45';
+    const clientPerson = client?.contactPerson || 'Іваненко О.П.';
+
+    const prodName = order?.name || 'Буклети рекламні 210×297 мм, крейда 130г, 4+4';
+    const prodQuantity = order?.quantity || 1000;
+    const prodFormat = order?.format || 'A4 (210×297 мм)';
+    const prodColors = order?.colors || '4+4 (Повноколірний)';
+    const prodTotal = order?.finalPrice ? order.finalPrice.toFixed(2) : '1571.00';
+    const prodUnitPrice = (Number(prodTotal) / (prodQuantity || 1)).toFixed(2);
+
+    if (type === 'contract') {
+      return `
+        <div style="font-family: Arial, sans-serif; font-size: 13px; color: #1e293b; line-height: 1.6;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start; border-bottom: 2px solid #0f172a; padding-bottom: 12px; margin-bottom: 20px;">
+            <div>
+              <h2 style="font-size: 18px; font-weight: 800; color: #0f172a; margin: 0;">ДОГОВІР ПОЛІГРАФІЧНИХ ПОСЛУГ № ${docNum}</h2>
+              <p style="font-size: 11px; color: #64748b; margin: 4px 0 0 0;">Поліграфічна компанія «Едельвейс і К»</p>
+            </div>
+            <div style="text-align: right; background-color: #f8fafc; padding: 6px 14px; border-radius: 6px; border: 1px solid #e2e8f0;">
+              <p style="margin: 0; font-weight: 700; font-size: 12px;">м. Вінниця</p>
+              <p style="margin: 2px 0 0 0; font-size: 11px; color: #64748b;">Дата: ${dateStr}</p>
+            </div>
+          </div>
+
+          <p>Виконавець <strong>ТОВ «Едельвейс і К»</strong>, в особі директора Шевченка І.В., що діє на підставі Статуту, з одного боку, та Замовник <strong>${clientName}</strong>, в особі ${clientPerson}, що діє на підставі довіреності, з іншого боку, уклали цей Договір про наступне:</p>
+
+          <h3 style="font-size: 13px; font-weight: 800; color: #2563eb; margin-top: 16px; border-bottom: 1px solid #cbd5e1; padding-bottom: 4px;">1. ПРЕДМЕТ ДОГОВОРУ ТА СПЕЦИФІКАЦІЯ</h3>
+          <p>Замовник доручає, а Виконавець бере на себе зобов'язання якісно та у встановлений строк виготовити наступну поліграфічну продукцію:</p>
+
+          <table style="width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 12px;">
+            <thead>
+              <tr style="background-color: #f1f5f9; text-align: left;">
+                <th style="border: 1px solid #cbd5e1; padding: 8px 10px;">№</th>
+                <th style="border: 1px solid #cbd5e1; padding: 8px 10px;">Найменування продукції</th>
+                <th style="border: 1px solid #cbd5e1; padding: 8px 10px; text-align: center;">Тираж</th>
+                <th style="border: 1px solid #cbd5e1; padding: 8px 10px;">Параметри друку</th>
+                <th style="border: 1px solid #cbd5e1; padding: 8px 10px; text-align: right;">Сума (грн)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="border: 1px solid #cbd5e1; padding: 8px 10px;">1</td>
+                <td style="border: 1px solid #cbd5e1; padding: 8px 10px; font-weight: 700;">${prodName}</td>
+                <td style="border: 1px solid #cbd5e1; padding: 8px 10px; text-align: center; font-weight: 700;">${prodQuantity.toLocaleString()} шт.</td>
+                <td style="border: 1px solid #cbd5e1; padding: 8px 10px;">${prodFormat}, ${prodColors}</td>
+                <td style="border: 1px solid #cbd5e1; padding: 8px 10px; text-align: right; font-weight: 800; color: #2563eb;">${prodTotal} ₴</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <p style="text-align: right; font-weight: 700; margin-top: 4px;">Загальна сума договору: <strong>${prodTotal} грн. Без ПДВ</strong></p>
+
+          <h3 style="font-size: 13px; font-weight: 800; color: #2563eb; margin-top: 14px; border-bottom: 1px solid #cbd5e1; padding-bottom: 4px;">2. ПОРЯДОК РОЗРАХУНКІВ ТА ПРИЙОМУ РОБІТ</h3>
+          <p style="font-size: 11.5px; margin: 4px 0;">2.1. Оплата здійснюється шляхом безготівкового переказу коштів на розрахунковий рахунок Виконавця.</p>
+          <p style="font-size: 11.5px; margin: 4px 0;">2.2. Готова продукція передається Замовнику за Актом прийому-передачі або видатковою накладною.</p>
+
+          <h3 style="font-size: 13px; font-weight: 800; color: #2563eb; margin-top: 18px; border-bottom: 1px solid #cbd5e1; padding-bottom: 4px;">3. АДРЕСИ ТА РЕКВІЗИТИ СТОРІН</h3>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 12px;">
+            <div style="border: 1px solid #e2e8f0; padding: 12px; border-radius: 6px; background-color: #f8fafc; font-size: 11px;">
+              <h4 style="margin: 0 0 6px 0; font-size: 12px; font-weight: 800; color: #0f172a;">ВИКОНАВЕЦЬ:</h4>
+              <p style="margin: 0; line-height: 1.5;"><strong>ТОВ «Едельвейс і К»</strong><br/>
+              м. Вінниця, вул. Київська, 16<br/>
+              Код ЄДРПОУ 38819201<br/>
+              IBAN: UA31300001000002600112233<br/>
+              Тел.: +38 (0432) 55-00-11<br/><br/>
+              Директор: _______________ / Шевченко І.В. /</p>
+            </div>
+            <div style="border: 1px solid #e2e8f0; padding: 12px; border-radius: 6px; background-color: #f8fafc; font-size: 11px;">
+              <h4 style="margin: 0 0 6px 0; font-size: 12px; font-weight: 800; color: #0f172a;">ЗАМОВНИК:</h4>
+              <p style="margin: 0; line-height: 1.5;"><strong>${clientName}</strong><br/>
+              Адреса: ${clientAddress}<br/>
+              ЄДРПОУ / ІПН: ${clientEdrpou}<br/>
+              Тел.: ${clientPhone}<br/><br/>
+              Представник: _______________ / ${clientPerson} /</p>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    if (type === 'invoice') {
+      return `
+        <div style="font-family: Arial, sans-serif; font-size: 13px; color: #1e293b; line-height: 1.5;">
+          <div style="border-bottom: 2px solid #2563eb; padding-bottom: 10px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: flex-end;">
+            <div>
+              <h1 style="font-size: 20px; font-weight: 900; color: #0f172a; margin: 0;">РАХУНОК-ФАКТУРА № ${docNum}</h1>
+              <p style="font-size: 12px; color: #64748b; margin: 2px 0 0 0;">від ${dateStr}</p>
+            </div>
+            <div style="text-align: right; font-size: 11px; color: #64748b;">
+              Тип оплати: Безготівковий розрахунок
+            </div>
+          </div>
+
+          <table style="width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 11.5px;">
+            <tr>
+              <td style="padding: 4px 8px; width: 100px; font-weight: 700; color: #64748b;">Постачальник:</td>
+              <td style="padding: 4px 8px; font-weight: 600;"><strong>ТОВ «Едельвейс і К»</strong>, ЄДРПОУ 38819201, р/р UA31300001000002600112233 у ПАТ «ПриватБанк», МФО 305299, м. Вінниця</td>
+            </tr>
+            <tr>
+              <td style="padding: 4px 8px; font-weight: 700; color: #64748b;">Платник:</td>
+              <td style="padding: 4px 8px; font-weight: 600;"><strong>${clientName}</strong>, ЄДРПОУ ${clientEdrpou}, тел. ${clientPhone}, ${clientAddress}</td>
+            </tr>
+            <tr>
+              <td style="padding: 4px 8px; font-weight: 700; color: #64748b;">Підстава:</td>
+              <td style="padding: 4px 8px;">Замовлення поліграфії № ${docNum}</td>
+            </tr>
+          </table>
+
+          <table style="width: 100%; border-collapse: collapse; margin-bottom: 16px; font-size: 12px;">
+            <thead>
+              <tr style="background-color: #f1f5f9; text-align: left;">
+                <th style="border: 1px solid #cbd5e1; padding: 6px 8px; width: 30px; text-align: center;">№</th>
+                <th style="border: 1px solid #cbd5e1; padding: 6px 8px;">Товари / Послуги</th>
+                <th style="border: 1px solid #cbd5e1; padding: 6px 8px; text-align: center; width: 60px;">Кіл-сть</th>
+                <th style="border: 1px solid #cbd5e1; padding: 6px 8px; text-align: center; width: 45px;">Од.</th>
+                <th style="border: 1px solid #cbd5e1; padding: 6px 8px; text-align: right; width: 90px;">Ціна (грн)</th>
+                <th style="border: 1px solid #cbd5e1; padding: 6px 8px; text-align: right; width: 100px;">Сума (грн)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="border: 1px solid #cbd5e1; padding: 8px; text-align: center;">1</td>
+                <td style="border: 1px solid #cbd5e1; padding: 8px;"><strong>${prodName}</strong><div style="font-size: 10.5px; color: #64748b;">${prodFormat}, ${prodColors}</div></td>
+                <td style="border: 1px solid #cbd5e1; padding: 8px; text-align: center; font-weight: 700;">${prodQuantity}</td>
+                <td style="border: 1px solid #cbd5e1; padding: 8px; text-align: center;">шт.</td>
+                <td style="border: 1px solid #cbd5e1; padding: 8px; text-align: right; font-mono;">${prodUnitPrice}</td>
+                <td style="border: 1px solid #cbd5e1; padding: 8px; text-align: right; font-weight: 800; color: #2563eb;">${prodTotal}</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div style="display: flex; justify-content: flex-end; margin-bottom: 20px;">
+            <table style="width: 260px; font-size: 12px; border-collapse: collapse;">
+              <tr>
+                <td style="padding: 4px; font-weight: 600;">Разом:</td>
+                <td style="padding: 4px; text-align: right; font-weight: 700;">${prodTotal} грн</td>
+              </tr>
+              <tr>
+                <td style="padding: 4px; font-weight: 600;">Без ПДВ:</td>
+                <td style="padding: 4px; text-align: right; font-weight: 700;">0.00 грн</td>
+              </tr>
+              <tr style="border-top: 1px solid #cbd5e1;">
+                <td style="padding: 6px 4px; font-weight: 800; font-size: 14px; color: #2563eb;">До сплати:</td>
+                <td style="padding: 6px 4px; text-align: right; font-weight: 900; font-size: 15px; color: #2563eb;">${prodTotal} грн</td>
+              </tr>
+            </table>
+          </div>
+
+          <p style="font-size: 12px; border-top: 1px solid #e2e8f0; padding-top: 8px;">Всього до сплати на суму: <strong>${prodTotal} грн. Без ПДВ</strong></p>
+
+          <div style="display: flex; justify-content: space-between; margin-top: 40px; border-top: 1px dashed #cbd5e1; padding-top: 16px;">
+            <div style="font-size: 12px;">
+              Виписав(ла): __________________ / Шевченко І.В. /
+            </div>
+            <div style="font-size: 12px; text-align: right;">
+              М.П.
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    if (type === 'act') {
+      return `
+        <div style="font-family: Arial, sans-serif; font-size: 13px; color: #1e293b; line-height: 1.5;">
+          <div style="text-align: center; border-bottom: 2px solid #0f172a; padding-bottom: 12px; margin-bottom: 16px;">
+            <h1 style="font-size: 18px; font-weight: 900; color: #0f172a; margin: 0; text-transform: uppercase;">АКТ ПРИЙОМУ-ПЕРЕДАЧІ НАДАНИХ ПОСЛУГ № ${docNum}</h1>
+            <p style="font-size: 12px; color: #64748b; margin: 4px 0 0 0;">від ${dateStr}, м. Вінниця</p>
+          </div>
+
+          <p style="font-size: 12px;">Ми, що нижче підписалися, Виконавець <strong>ТОВ «Едельвейс і К»</strong> з однієї сторони, та Замовник <strong>${clientName}</strong> з іншої сторони, склали цей Акт про те, що Виконавцем були виконані, а Замовником прийняті наступні поліграфічні роботи:</p>
+
+          <table style="width: 100%; border-collapse: collapse; margin: 14px 0; font-size: 12px;">
+            <thead>
+              <tr style="background-color: #f1f5f9; text-align: left;">
+                <th style="border: 1px solid #cbd5e1; padding: 6px 8px; width: 30px; text-align: center;">№</th>
+                <th style="border: 1px solid #cbd5e1; padding: 6px 8px;">Найменування робіт (послуг)</th>
+                <th style="border: 1px solid #cbd5e1; padding: 6px 8px; text-align: center; width: 60px;">Кіл-сть</th>
+                <th style="border: 1px solid #cbd5e1; padding: 6px 8px; text-align: center; width: 45px;">Од.</th>
+                <th style="border: 1px solid #cbd5e1; padding: 6px 8px; text-align: right; width: 90px;">Ціна (грн)</th>
+                <th style="border: 1px solid #cbd5e1; padding: 6px 8px; text-align: right; width: 100px;">Сума (грн)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td style="border: 1px solid #cbd5e1; padding: 8px; text-align: center;">1</td>
+                <td style="border: 1px solid #cbd5e1; padding: 8px;">Виготовлення поліграфічної продукції: <strong>${prodName}</strong></td>
+                <td style="border: 1px solid #cbd5e1; padding: 8px; text-align: center; font-weight: 700;">${prodQuantity}</td>
+                <td style="border: 1px solid #cbd5e1; padding: 8px; text-align: center;">шт.</td>
+                <td style="border: 1px solid #cbd5e1; padding: 8px; text-align: right;">${prodUnitPrice}</td>
+                <td style="border: 1px solid #cbd5e1; padding: 8px; text-align: right; font-weight: 800; color: #2563eb;">${prodTotal}</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <p style="font-size: 12px; margin: 12px 0;">Загальна вартість виконаних робіт становить: <strong>${prodTotal} грн. Без ПДВ</strong></p>
+          <p style="font-size: 11.5px; color: #475569;">Роботи виконані якісно, в повному обсязі, у встановлений строк. Сторони взаємних претензій за якістю та строками не мають.</p>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 30px;">
+            <div style="font-size: 11.5px;">
+              <strong>РОБОТУ ЗДАВ (ВИКОНАВЕЦЬ):</strong><br/><br/>
+              Директор ТОВ «Едельвейс і К»<br/><br/>
+              _______________ / Шевченко І.В. /<br/>
+              М.П.
+            </div>
+            <div style="font-size: 11.5px;">
+              <strong>РОБОТУ ПРИЙНЯВ (ЗАМОВНИК):</strong><br/><br/>
+              Представник ${clientName}<br/><br/>
+              _______________ / ${clientPerson} /<br/>
+              М.П.
+            </div>
+          </div>
+        </div>
+      `;
+    }
+
+    // Default Specification
+    return `
+      <div style="font-family: Arial, sans-serif; font-size: 13px; color: #1e293b; line-height: 1.5;">
+        <h2 style="font-size: 18px; font-weight: 800; color: #0f172a; margin: 0 0 10px 0;">ТЕХНОЛОГІЧНА СПЕЦИФІКАЦІЯ ЗАМОВЛЕННЯ № ${docNum}</h2>
+        <p style="font-size: 12px; color: #64748b; margin-bottom: 16px;">Замовник: <strong>${clientName}</strong> | Дата: ${dateStr}</p>
+
+        <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 14px; margin-bottom: 16px;">
+          <h3 style="font-size: 13px; font-weight: 800; color: #2563eb; margin: 0 0 8px 0;">ПАРАМЕТРИ ВИРОБУ:</h3>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 12px;">
+            <div><strong>Найменування:</strong> ${prodName}</div>
+            <div><strong>Тираж:</strong> ${prodQuantity.toLocaleString()} шт.</div>
+            <div><strong>Формат:</strong> ${prodFormat}</div>
+            <div><strong>Кольоровість:</strong> ${prodColors}</div>
+            <div><strong>Вартість замовлення:</strong> <span style="font-weight: 800; color: #2563eb;">${prodTotal} ₴</span></div>
+            <div><strong>Ціна за 1 шт:</strong> ${prodUnitPrice} ₴</div>
+          </div>
+        </div>
+      </div>
+    `;
+  };
+
+  // Handler to perform Auto-fill
+  const handleAutoFillDocument = () => {
+    let orderToUse = orders.find(o => String(o.id) === String(selectedOrderIdForDoc));
+    if (!orderToUse && orders.length > 0) {
+      orderToUse = orders[0];
+    }
+    const clientToUse = orderToUse ? clients.find(c => c.id === orderToUse.clientId) : (clients[0] || null);
+
+    const generatedHTML = generateDocumentHTML(selectedDocType, orderToUse, clientToUse);
+    const docTypeTitles = {
+      contract: `Договір поліграфічних послуг №${orderToUse?.id || '64841'}`,
+      invoice: `Рахунок-фактура №${orderToUse?.id || '64841'}`,
+      act: `Акт прийому-передачі робіт №${orderToUse?.id || '64841'}`,
+      spec: `Технічна специфікація №${orderToUse?.id || '64841'}`
+    };
+
+    setDocumentTitle(docTypeTitles[selectedDocType] || 'Документ');
+    if (editorRef.current) {
+      editorRef.current.innerHTML = generatedHTML;
+    }
+    alert(`✨ Документ успішно згенеровано та заповнено реальними реквізитами замовлення №${orderToUse?.id || '64841'}!`);
+  };
+
   const [activeSubTab, setActiveSubTab] = useState<'registry' | 'templates' | 'editor' | 'autonumber'>('registry');
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -421,7 +699,107 @@ export const Documents: React.FC = () => {
 
       {/* --- 1. EDITOR & TABLE BUILDER TAB --- */}
       {activeSubTab === 'editor' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          
+          {/* ⚡ CRM SMART AUTO-FILL CONTROL BAR */}
+          <div className="ios-card bg-white" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)', padding: '14px 18px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap', flex: 1 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span style={{ fontSize: '13px' }}>⚡</span>
+                <span style={{ fontSize: '12px', fontWeight: '800', textTransform: 'uppercase', color: 'var(--primary)', letterSpacing: '0.5px' }}>
+                  Автозаповнення з CRM:
+                </span>
+              </div>
+
+              {/* Order / Deal Selector */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-medium)' }}>Замовлення:</span>
+                <select
+                  value={selectedOrderIdForDoc}
+                  onChange={(e) => setSelectedOrderIdForDoc(e.target.value)}
+                  style={{
+                    height: '34px',
+                    fontSize: '12px',
+                    fontWeight: '700',
+                    backgroundColor: 'var(--bg-card-subtle)',
+                    border: '1px solid var(--border-light)',
+                    borderRadius: '8px',
+                    padding: '0 10px',
+                    minWidth: '220px',
+                    maxWidth: '320px'
+                  }}
+                >
+                  <option value="">-- Останнє замовлення --</option>
+                  {orders.map(o => {
+                    const c = clients.find(cl => cl.id === o.clientId);
+                    return (
+                      <option key={o.id} value={o.id}>
+                        №{o.id} - {o.name.slice(0, 26)}... ({c?.name || 'Клієнт'})
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
+
+              {/* Document Type Selector */}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <span style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-medium)' }}>Тип документа:</span>
+                <div style={{ display: 'flex', gap: '4px', backgroundColor: 'var(--bg-system)', padding: '3px', borderRadius: '8px', border: '1px solid var(--border-light)' }}>
+                  {[
+                    { id: 'contract', label: 'Договір послуг' },
+                    { id: 'invoice', label: 'Рахунок-фактура' },
+                    { id: 'act', label: 'Акт виконаних робіт' },
+                    { id: 'spec', label: 'Специфікація' }
+                  ].map(dt => {
+                    const isCur = selectedDocType === dt.id;
+                    return (
+                      <button
+                        key={dt.id}
+                        type="button"
+                        onClick={() => setSelectedDocType(dt.id as any)}
+                        style={{
+                          fontSize: '11px',
+                          fontWeight: isCur ? '800' : '600',
+                          padding: '4px 10px',
+                          borderRadius: '6px',
+                          border: 'none',
+                          backgroundColor: isCur ? 'var(--primary)' : 'transparent',
+                          color: isCur ? '#ffffff' : 'var(--text-dark)',
+                          cursor: 'pointer',
+                          transition: 'all 0.15s ease'
+                        }}
+                      >
+                        {dt.label}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+
+            {/* Action Auto-fill Button */}
+            <button
+              type="button"
+              onClick={handleAutoFillDocument}
+              className="ios-btn ios-btn-primary"
+              style={{
+                height: '36px',
+                padding: '0 16px',
+                borderRadius: '8px',
+                fontWeight: '800',
+                fontSize: '12.5px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                backgroundColor: 'var(--primary)',
+                color: '#ffffff',
+                cursor: 'pointer',
+                boxShadow: '0 2px 8px rgba(0, 122, 255, 0.25)'
+              }}
+            >
+              <span>✨ Заповнити реквізити</span>
+            </button>
+          </div>
           
           {/* Editor Header Bar & Actions */}
           <div className="ios-card" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)', padding: '16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '14px' }}>
