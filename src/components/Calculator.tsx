@@ -1192,6 +1192,8 @@ export const Calculator: React.FC = () => {
   });
   const [templateName, setTemplateName] = useState('');
   const [showTemplateModal, setShowTemplateModal] = useState(false);
+  const [showMaterialPricesModal, setShowMaterialPricesModal] = useState(false);
+  const [materialPricesTab, setMaterialPricesTab] = useState<'paper' | 'postpress' | 'print'>('paper');
 
   const [showNorms, setShowNorms] = useState(false);
   const [showInvoice, setShowInvoice] = useState(false);
@@ -1334,9 +1336,9 @@ export const Calculator: React.FC = () => {
       setLaminationType('none');
       setName('Бланки А4');
       setSubCategory('Бланки');
-      setSelectedMaterials(['80']);
+      setSelectedMaterials(['offset_70']);
       setSelectedCoverings(['0']);
-      setSelectedPrintColors(['1+0', '4+0']);
+      setSelectedPrintColors(['1+0']);
       setActiveOps({
         formMaking: true,
         filmMounting: true,
@@ -1530,9 +1532,9 @@ export const Calculator: React.FC = () => {
       setSelectedFormat('A3');
       setBindingType('none');
       setLaminationType('none');
-      setSelectedMaterials(['80']);
+      setSelectedMaterials(['offset_70']);
       setSelectedCoverings(['0']);
-      setSelectedPrintColors(['1+0', '4+0']);
+      setSelectedPrintColors(['1+0']);
       setActiveOps({
         formMaking: true,
         filmMounting: true,
@@ -3385,22 +3387,7 @@ export const Calculator: React.FC = () => {
                 })}
               </div>
 
-              {/* Star / Favorites Button */}
-              <button
-                type="button"
-                onClick={() => setMainCategoryTab('products')}
-                style={{
-                  padding: '8px 12px',
-                  borderRadius: 'var(--radius-md)',
-                  backgroundColor: 'var(--bg-system)',
-                  border: '0.5px solid var(--border-light)',
-                  color: 'var(--text-medium)',
-                  cursor: 'pointer'
-                }}
-                title="Обрані вироби"
-              >
-                <Sparkles size={16} />
-              </button>
+
             </div>
 
             {/* INTERACTIVE MEGA MENU DROPDOWN PANEL (3 COLUMNS LIST + 4TH COLUMN LIVE PREVIEW ON THE RIGHT) */}
@@ -5334,6 +5321,19 @@ export const Calculator: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => {
+                          setTempNorms(norms);
+                          setShowMaterialPricesModal(true);
+                        }}
+                        className="px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 font-bold text-xs flex items-center gap-1.5 hover:bg-slate-100 transition-colors shadow-2xs"
+                        title="Прайс та тарифи на папери і післядрукарські роботи"
+                      >
+                        <Layers size={14} className="text-blue-600" />
+                        <span>Ціни на матеріали</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
                           document.getElementById('detailed-sheet-calculation')?.scrollIntoView({ behavior: 'smooth' });
                         }}
                         className="px-3 py-2 rounded-xl bg-blue-50 border border-blue-200 text-blue-700 font-bold text-xs flex items-center gap-1.5 hover:bg-blue-100 transition-colors shadow-2xs"
@@ -5908,6 +5908,9 @@ export const Calculator: React.FC = () => {
                               setSheetCustomWidth(sheetCustomHeight);
                               setSheetCustomHeight(temp);
                               setSheetSizePreset('custom');
+                              const newW = Number(sheetCustomHeight) || 0;
+                              const newH = Number(temp) || 0;
+                              setSheetOrientation(newW >= newH ? 'horiz' : 'vert');
                             }}
                             className="w-7 h-7 rounded-lg bg-slate-100 hover:bg-blue-50 hover:text-blue-600 hover:border-blue-300 border border-slate-200 flex items-center justify-center text-slate-500 font-bold transition-all shadow-2xs cursor-pointer active:scale-95 shrink-0"
                             title="Поміняти ширину та висоту місцями (⇄)"
@@ -6006,7 +6009,7 @@ export const Calculator: React.FC = () => {
                           ВІЗУАЛІЗАЦІЯ & РОЗГОРТКА
                         </span>
                         <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">
-                          {sheetOrientation === 'horiz' ? 'Горизонтальний' : 'Вертикальний'}
+                          {(Number(sheetCustomWidth) || 0) >= (Number(sheetCustomHeight) || 0) ? 'Горизонтальний' : 'Вертикальний'}
                         </span>
                       </div>
 
@@ -6017,8 +6020,16 @@ export const Calculator: React.FC = () => {
                             sheetCustomWidth || '297',
                             sheetCustomHeight || '210',
                             sheetUnit || 'мм',
-                            sheetOrientation,
-                            () => setSheetOrientation(prev => prev === 'horiz' ? 'vert' : 'horiz')
+                            (Number(sheetCustomWidth) || 0) >= (Number(sheetCustomHeight) || 0) ? 'horiz' : 'vert',
+                            () => {
+                              const temp = sheetCustomWidth;
+                              setSheetCustomWidth(sheetCustomHeight);
+                              setSheetCustomHeight(temp);
+                              setSheetSizePreset('custom');
+                              const newW = Number(sheetCustomHeight) || 0;
+                              const newH = Number(temp) || 0;
+                              setSheetOrientation(newW >= newH ? 'horiz' : 'vert');
+                            }
                           )}
                         </div>
                       ) : (
@@ -6026,8 +6037,8 @@ export const Calculator: React.FC = () => {
                           {/* Visual scaled representation rectangle */}
                           <div
                             style={{
-                              width: sheetOrientation === 'horiz' ? '190px' : '130px',
-                              height: sheetOrientation === 'horiz' ? '115px' : '170px',
+                              width: (Number(sheetCustomWidth) || 0) >= (Number(sheetCustomHeight) || 0) ? '185px' : '125px',
+                              height: (Number(sheetCustomWidth) || 0) >= (Number(sheetCustomHeight) || 0) ? '120px' : '175px',
                               borderRadius: cardKind === '7' || cardKind === '8' ? '50%' : cardKind === '9' ? '16px' : '6px'
                             }}
                             className="border-2 border-dashed border-blue-500 bg-white flex flex-col items-center justify-center shadow-sm transition-all relative"
@@ -6043,7 +6054,15 @@ export const Calculator: React.FC = () => {
                           <div className="flex items-center gap-2 mt-3 text-xs font-semibold">
                             <button
                               type="button"
-                              onClick={() => setSheetOrientation(prev => prev === 'horiz' ? 'vert' : 'horiz')}
+                              onClick={() => {
+                                const temp = sheetCustomWidth;
+                                setSheetCustomWidth(sheetCustomHeight);
+                                setSheetCustomHeight(temp);
+                                setSheetSizePreset('custom');
+                                const newW = Number(sheetCustomHeight) || 0;
+                                const newH = Number(temp) || 0;
+                                setSheetOrientation(newW >= newH ? 'horiz' : 'vert');
+                              }}
                               className="px-2.5 py-1 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-bold shadow-2xs flex items-center gap-1.5 transition-colors"
                             >
                               <RotateCcw size={13} />
@@ -6152,7 +6171,9 @@ export const Calculator: React.FC = () => {
                                     type="button"
                                     onClick={() => {
                                       setSelectedCoverings(prev => 
-                                        prev.includes(cov.id) ? [] : [cov.id]
+                                        prev.includes(cov.id)
+                                          ? (prev.length > 1 ? prev.filter(c => c !== cov.id) : prev)
+                                          : [...prev, cov.id]
                                       );
                                     }}
                                     className={`px-3 py-1.5 text-xs font-bold rounded-xl border transition-all ${
@@ -6185,7 +6206,9 @@ export const Calculator: React.FC = () => {
                                     type="button"
                                     onClick={() => {
                                       setSelectedPrintColors(prev => 
-                                        prev.includes(col.id) ? [] : [col.id]
+                                        prev.includes(col.id)
+                                          ? (prev.length > 1 ? prev.filter(c => c !== col.id) : prev)
+                                          : [...prev, col.id]
                                       );
                                     }}
                                     className={`px-3 py-1.5 text-xs font-bold rounded-xl border transition-all ${
@@ -15368,6 +15391,224 @@ export const Calculator: React.FC = () => {
               </div>
             </div>
           </form>
+        </div>
+      )}
+
+            {/* Material & Postpress Prices Modal */}
+      {showMaterialPricesModal && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-2xl w-full shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
+            {/* Modal Header */}
+            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
+                  <Layers size={18} />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-slate-900 m-0">Прайс-лист: Ціни на матеріали та послуги</h3>
+                  <p className="text-xs text-slate-500 m-0">Базові тарифи підприємства на папір, друк та післядрукарські операції</p>
+                </div>
+              </div>
+              <button 
+                type="button" 
+                onClick={() => setShowMaterialPricesModal(false)} 
+                className="text-slate-400 hover:text-slate-700 w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center transition-colors text-base font-bold"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Modal Tabs Switcher */}
+            <div className="px-6 pt-3 pb-0 bg-slate-50/80 border-b border-slate-200/80 flex gap-2 overflow-x-auto">
+              {[
+                { id: 'paper', label: '📄 Папір та матеріали' },
+                { id: 'postpress', label: '✂️ Післядрукарська обробка' },
+                { id: 'print', label: '🖨️ Друк та CTP-форми' }
+              ].map(tab => (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setMaterialPricesTab(tab.id as any)}
+                  className={`px-4 py-2 text-xs font-bold border-b-2 transition-all whitespace-nowrap ${
+                    materialPricesTab === tab.id
+                      ? 'border-blue-600 text-blue-600 bg-white rounded-t-lg'
+                      : 'border-transparent text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Modal Form Content */}
+            <form 
+              onSubmit={(e) => { 
+                e.preventDefault(); 
+                updateNorms(tempNorms); 
+                setShowMaterialPricesModal(false); 
+                alert('Ціни та тарифи успішно збережено!'); 
+              }} 
+              className="flex flex-col flex-1 overflow-hidden"
+            >
+              <div className="p-6 overflow-y-auto flex flex-col gap-4">
+                {materialPricesTab === 'paper' && (
+                  <div className="flex flex-col gap-4">
+                    <span className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
+                      Базова вартість паперу (за еквівалент А1 / розрахунковий лист):
+                    </span>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                      <div>
+                        <label className="text-xs font-semibold text-slate-600 block mb-1">Офсетний 70г (грн)</label>
+                        <input type="number" step="any" value={tempNorms.paperOffsetPrice} onChange={(e) => setTempNorms({ ...tempNorms, paperOffsetPrice: Number(e.target.value) })} className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold" />
+                      </div>
+                      <div>
+                        <label className="text-xs font-semibold text-slate-600 block mb-1">Газетний 45г (грн)</label>
+                        <input type="number" step="any" value={tempNorms.paperGazetkaPrice} onChange={(e) => setTempNorms({ ...tempNorms, paperGazetkaPrice: Number(e.target.value) })} className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold" />
+                      </div>
+                      <div>
+                        <label className="text-xs font-semibold text-slate-600 block mb-1">Крейдований 130г (грн)</label>
+                        <input type="number" step="any" value={tempNorms.paperCoatedPrice} onChange={(e) => setTempNorms({ ...tempNorms, paperCoatedPrice: Number(e.target.value) })} className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold" />
+                      </div>
+                    </div>
+
+                    <span className="text-xs font-bold text-slate-700 uppercase tracking-wider block pt-2 border-t border-slate-100">
+                      Довідкові розцінки на асортимент паперів у калькуляторі:
+                    </span>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                      {[
+                        { name: 'Офсет 65г', price: '0.95×' },
+                        { name: 'Офсет 70г', price: '1.00×' },
+                        { name: 'Офсет 80г', price: '1.05×' },
+                        { name: 'Офсет 100г', price: '1.18×' },
+                        { name: 'Офсет 120г', price: '1.30×' },
+                        { name: 'Офсет 160г', price: '1.50×' },
+                        { name: 'Газетка 45г', price: '0.90×' },
+                        { name: 'Самокопірка 55г', price: '1.60×' },
+                        { name: 'Крейда МАТ 90г', price: '1.10×' },
+                        { name: 'Крейда МАТ 115г', price: '1.15×' },
+                        { name: 'Крейда МАТ 130г', price: '1.20×' },
+                        { name: 'Крейда МАТ 150г', price: '1.30×' },
+                        { name: 'Крейда МАТ 250г', price: '1.60×' },
+                        { name: 'Крейда МАТ 350г', price: '1.95×' },
+                        { name: 'Крафт 70г', price: '1.25×' },
+                        { name: 'Льон 300г', price: '3.20×' }
+                      ].map(p => (
+                        <div key={p.name} className="p-2 rounded-lg bg-slate-50 border border-slate-200 flex justify-between items-center">
+                          <span className="text-slate-600 font-medium">{p.name}:</span>
+                          <strong className="text-slate-900 font-mono font-bold">{p.price}</strong>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {materialPricesTab === 'postpress' && (
+                  <div className="flex flex-col gap-4">
+                    <span className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
+                      Тарифи на післядрукарські операції (грн / виріб або операцію):
+                    </span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="text-xs font-semibold text-slate-600 block mb-1">Мат ламінація (грн / м²)</label>
+                        <input type="number" step="any" value={tempNorms.laminationMattePrice} onChange={(e) => setTempNorms({ ...tempNorms, laminationMattePrice: Number(e.target.value) })} className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold" />
+                      </div>
+                      <div>
+                        <label className="text-xs font-semibold text-slate-600 block mb-1">Глянець ламінація (грн / м²)</label>
+                        <input type="number" step="any" value={tempNorms.laminationGlossyPrice} onChange={(e) => setTempNorms({ ...tempNorms, laminationGlossyPrice: Number(e.target.value) })} className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold" />
+                      </div>
+                      <div>
+                        <label className="text-xs font-semibold text-slate-600 block mb-1">Біговка (згин) (грн)</label>
+                        <input type="number" step="any" value={tempNorms.foldingPrice} onChange={(e) => setTempNorms({ ...tempNorms, foldingPrice: Number(e.target.value) })} className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold" />
+                      </div>
+                      <div>
+                        <label className="text-xs font-semibold text-slate-600 block mb-1">Висічка штампом (грн)</label>
+                        <input type="number" step="any" value={tempNorms.dieCuttingPrice} onChange={(e) => setTempNorms({ ...tempNorms, dieCuttingPrice: Number(e.target.value) })} className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold" />
+                      </div>
+                      <div>
+                        <label className="text-xs font-semibold text-slate-600 block mb-1">Складне тиснення (грн)</label>
+                        <input type="number" step="any" value={tempNorms.embossingPrice} onChange={(e) => setTempNorms({ ...tempNorms, embossingPrice: Number(e.target.value) })} className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold" />
+                      </div>
+                      <div>
+                        <label className="text-xs font-semibold text-slate-600 block mb-1">Вставка блока / шиття (грн)</label>
+                        <input type="number" step="any" value={tempNorms.blockInsertionPrice} onChange={(e) => setTempNorms({ ...tempNorms, blockInsertionPrice: Number(e.target.value) })} className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold" />
+                      </div>
+                      <div>
+                        <label className="text-xs font-semibold text-slate-600 block mb-1">Виготовлення кришки (грн)</label>
+                        <input type="number" step="any" value={tempNorms.coverMakingPrice} onChange={(e) => setTempNorms({ ...tempNorms, coverMakingPrice: Number(e.target.value) })} className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold" />
+                      </div>
+                      <div>
+                        <label className="text-xs font-semibold text-slate-600 block mb-1">Порізка на пачку (грн)</label>
+                        <input type="number" step="any" value={tempNorms.cuttingRate} onChange={(e) => setTempNorms({ ...tempNorms, cuttingRate: Number(e.target.value) })} className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold" />
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {materialPricesTab === 'print' && (
+                  <div className="flex flex-col gap-4">
+                    <span className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
+                      Вартість форм та друкарських приладок:
+                    </span>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <label className="text-xs font-semibold text-slate-600 block mb-1">Виготовлення форм CTP (грн / шт)</label>
+                        <input type="number" step="any" value={tempNorms.formMakingPrice} onChange={(e) => setTempNorms({ ...tempNorms, formMakingPrice: Number(e.target.value) })} className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold" />
+                      </div>
+                      <div>
+                        <label className="text-xs font-semibold text-slate-600 block mb-1">Монтаж та приладка плівок (грн)</label>
+                        <input type="number" step="any" value={tempNorms.filmMountingPrice} onChange={(e) => setTempNorms({ ...tempNorms, filmMountingPrice: Number(e.target.value) })} className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold" />
+                      </div>
+                    </div>
+
+                    <span className="text-xs font-bold text-slate-700 uppercase tracking-wider block pt-2 border-t border-slate-100">
+                      Вартість фарбовідбитків за машино-прогін:
+                    </span>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+                      <div className="p-2 rounded-lg bg-slate-50 border border-slate-200 flex justify-between items-center">
+                        <span className="text-slate-600 font-medium">1+0 (однокол.):</span>
+                        <strong className="text-slate-900 font-mono font-bold">0.20 ₴/відб</strong>
+                      </div>
+                      <div className="p-2 rounded-lg bg-slate-50 border border-slate-200 flex justify-between items-center">
+                        <span className="text-slate-600 font-medium">1+1 (двокол.):</span>
+                        <strong className="text-slate-900 font-mono font-bold">0.35 ₴/відб</strong>
+                      </div>
+                      <div className="p-2 rounded-lg bg-slate-50 border border-slate-200 flex justify-between items-center">
+                        <span className="text-slate-600 font-medium">4+0 (повнокол.):</span>
+                        <strong className="text-slate-900 font-mono font-bold">0.35 ₴/відб</strong>
+                      </div>
+                      <div className="p-2 rounded-lg bg-slate-50 border border-slate-200 flex justify-between items-center">
+                        <span className="text-slate-600 font-medium">4+4 (двостор.):</span>
+                        <strong className="text-slate-900 font-mono font-bold">0.70 ₴/відб</strong>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Modal Footer */}
+              <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-3">
+                <span className="text-xs text-slate-400">
+                  Зміни будуть автоматично застосовані у всіх калькуляторах
+                </span>
+                <div className="flex items-center gap-2.5">
+                  <button 
+                    type="button" 
+                    onClick={() => setShowMaterialPricesModal(false)} 
+                    className="px-4 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 text-xs font-semibold shadow-xs transition-colors"
+                  >
+                    Скасувати
+                  </button>
+                  <button 
+                    type="submit" 
+                    className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-sm transition-all flex items-center gap-1.5"
+                  >
+                    <Save size={14} />
+                    <span>Зберегти ціни</span>
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
         </div>
       )}
 
