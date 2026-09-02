@@ -3334,7 +3334,7 @@ export const Calculator: React.FC = () => {
   };
 
   return (
-    <div className="main-content" style={{ backgroundColor: 'var(--bg-system)', width: '100%', minHeight: '100%', padding: '0 0 40px 0', overflowY: 'visible' }}>
+    <div className="main-content" style={{ backgroundColor: 'var(--bg-system)', width: '100%', minHeight: '100%', padding: '24px 28px 48px 28px', overflowY: 'visible' }}>
       {step === 'catalog' ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           {/* Header Row: Title on Left, Search Bar on Right */}
@@ -3343,15 +3343,16 @@ export const Calculator: React.FC = () => {
             alignItems: 'center',
             justifyContent: 'space-between',
             gap: '16px',
+            paddingTop: '6px',
             marginBottom: '16px',
-            paddingBottom: '12px',
+            paddingBottom: '14px',
             borderBottom: '0.5px solid var(--border-light)',
             width: '100%',
             flexWrap: 'wrap'
           }}>
             <div>
               <h2 className="page-title" style={{ margin: 0 }}>Поліграфічний калькулятор</h2>
-              <p className="subtitle" style={{ margin: '3px 0 0 0' }}>Оберіть категорію продукції для детального прорахунку</p>
+              <p className="subtitle" style={{ margin: '4px 0 0 0' }}>Оберіть категорію продукції для детального прорахунку</p>
             </div>
 
             {/* Action Buttons & Prominent Live Search Bar */}
