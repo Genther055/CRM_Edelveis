@@ -15394,7 +15394,7 @@ export const Calculator: React.FC = () => {
         </div>
       )}
 
-            {/* Material & Postpress Prices Modal */}
+                  {/* Material & Postpress Prices Modal - Clean CRM Design, No Emojis, 100% Editable List */}
       {showMaterialPricesModal && (
         <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-2xl max-w-2xl w-full shadow-2xl border border-slate-200 overflow-hidden flex flex-col max-h-[90vh]">
@@ -15406,7 +15406,7 @@ export const Calculator: React.FC = () => {
                 </div>
                 <div>
                   <h3 className="text-base font-bold text-slate-900 m-0">Прайс-лист: Ціни на матеріали та послуги</h3>
-                  <p className="text-xs text-slate-500 m-0">Базові тарифи підприємства на папір, друк та післядрукарські операції</p>
+                  <p className="text-xs text-slate-500 m-0">Редагування базових тарифів підприємства на матеріали, друк та післядрук</p>
                 </div>
               </div>
               <button 
@@ -15418,24 +15418,25 @@ export const Calculator: React.FC = () => {
               </button>
             </div>
 
-            {/* Modal Tabs Switcher */}
-            <div className="px-6 pt-3 pb-0 bg-slate-50/80 border-b border-slate-200/80 flex gap-2 overflow-x-auto">
+            {/* Modal Tabs Switcher - Clean Cupertino Tabs Without Emojis */}
+            <div className="px-6 pt-3 pb-0 bg-slate-50 border-b border-slate-200 flex gap-2 overflow-x-auto">
               {[
-                { id: 'paper', label: '📄 Папір та матеріали' },
-                { id: 'postpress', label: '✂️ Післядрукарська обробка' },
-                { id: 'print', label: '🖨️ Друк та CTP-форми' }
+                { id: 'paper', label: 'Папір та листові матеріали', icon: <FileText size={14} /> },
+                { id: 'postpress', label: 'Післядрукарська обробка', icon: <Scissors size={14} /> },
+                { id: 'print', label: 'Друк та CTP-форми', icon: <Printer size={14} /> }
               ].map(tab => (
                 <button
                   key={tab.id}
                   type="button"
                   onClick={() => setMaterialPricesTab(tab.id as any)}
-                  className={`px-4 py-2 text-xs font-bold border-b-2 transition-all whitespace-nowrap ${
+                  className={`px-4 py-2.5 text-xs font-bold border-b-2 transition-all whitespace-nowrap flex items-center gap-2 ${
                     materialPricesTab === tab.id
-                      ? 'border-blue-600 text-blue-600 bg-white rounded-t-lg'
+                      ? 'border-blue-600 text-blue-600 bg-white rounded-t-lg shadow-2xs'
                       : 'border-transparent text-slate-600 hover:text-slate-900'
                   }`}
                 >
-                  {tab.label}
+                  {tab.icon}
+                  <span>{tab.label}</span>
                 </button>
               ))}
             </div>
@@ -15444,58 +15445,57 @@ export const Calculator: React.FC = () => {
             <form 
               onSubmit={(e) => { 
                 e.preventDefault(); 
-                updateNorms(tempNorms); 
+                localStorage.setItem('crm_custom_materials_pricing', JSON.stringify(materialPrices));
+                const off80 = materialPrices.find(m => m.id === 'off_80' || m.id === 'off_70')?.price || tempNorms.paperOffsetPrice;
+                const c130 = materialPrices.find(m => m.id === 'c_130')?.price || tempNorms.paperCoatedPrice;
+                const gaz45 = materialPrices.find(m => m.id === 'gaz_45')?.price || tempNorms.paperGazetkaPrice;
+                
+                updateNorms({
+                  ...tempNorms,
+                  paperOffsetPrice: off80,
+                  paperCoatedPrice: c130,
+                  paperGazetkaPrice: gaz45
+                }); 
                 setShowMaterialPricesModal(false); 
-                alert('Ціни та тарифи успішно збережено!'); 
+                alert('Ціни на матеріали та тарифи успішно збережено!'); 
               }} 
               className="flex flex-col flex-1 overflow-hidden"
             >
-              <div className="p-6 overflow-y-auto flex flex-col gap-4">
+              <div className="p-6 overflow-y-auto flex flex-col gap-3 max-h-[58vh]">
                 {materialPricesTab === 'paper' && (
-                  <div className="flex flex-col gap-4">
-                    <span className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
-                      Базова вартість паперу (за еквівалент А1 / розрахунковий лист):
-                    </span>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                      <div>
-                        <label className="text-xs font-semibold text-slate-600 block mb-1">Офсетний 70г (грн)</label>
-                        <input type="number" step="any" value={tempNorms.paperOffsetPrice} onChange={(e) => setTempNorms({ ...tempNorms, paperOffsetPrice: Number(e.target.value) })} className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold" />
-                      </div>
-                      <div>
-                        <label className="text-xs font-semibold text-slate-600 block mb-1">Газетний 45г (грн)</label>
-                        <input type="number" step="any" value={tempNorms.paperGazetkaPrice} onChange={(e) => setTempNorms({ ...tempNorms, paperGazetkaPrice: Number(e.target.value) })} className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold" />
-                      </div>
-                      <div>
-                        <label className="text-xs font-semibold text-slate-600 block mb-1">Крейдований 130г (грн)</label>
-                        <input type="number" step="any" value={tempNorms.paperCoatedPrice} onChange={(e) => setTempNorms({ ...tempNorms, paperCoatedPrice: Number(e.target.value) })} className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold" />
-                      </div>
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center justify-between pb-1 mb-1 border-b border-slate-100">
+                      <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                        Найменування матеріалу
+                      </span>
+                      <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                        Ціна за одиницю
+                      </span>
                     </div>
 
-                    <span className="text-xs font-bold text-slate-700 uppercase tracking-wider block pt-2 border-t border-slate-100">
-                      Довідкові розцінки на асортимент паперів у калькуляторі:
-                    </span>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-                      {[
-                        { name: 'Офсет 65г', price: '0.95×' },
-                        { name: 'Офсет 70г', price: '1.00×' },
-                        { name: 'Офсет 80г', price: '1.05×' },
-                        { name: 'Офсет 100г', price: '1.18×' },
-                        { name: 'Офсет 120г', price: '1.30×' },
-                        { name: 'Офсет 160г', price: '1.50×' },
-                        { name: 'Газетка 45г', price: '0.90×' },
-                        { name: 'Самокопірка 55г', price: '1.60×' },
-                        { name: 'Крейда МАТ 90г', price: '1.10×' },
-                        { name: 'Крейда МАТ 115г', price: '1.15×' },
-                        { name: 'Крейда МАТ 130г', price: '1.20×' },
-                        { name: 'Крейда МАТ 150г', price: '1.30×' },
-                        { name: 'Крейда МАТ 250г', price: '1.60×' },
-                        { name: 'Крейда МАТ 350г', price: '1.95×' },
-                        { name: 'Крафт 70г', price: '1.25×' },
-                        { name: 'Льон 300г', price: '3.20×' }
-                      ].map(p => (
-                        <div key={p.name} className="p-2 rounded-lg bg-slate-50 border border-slate-200 flex justify-between items-center">
-                          <span className="text-slate-600 font-medium">{p.name}:</span>
-                          <strong className="text-slate-900 font-mono font-bold">{p.price}</strong>
+                    <div className="flex flex-col gap-2">
+                      {materialPrices.map(item => (
+                        <div 
+                          key={item.id} 
+                          className="p-3 rounded-xl bg-slate-50 hover:bg-white border border-slate-200/80 hover:border-slate-300 transition-all flex items-center justify-between gap-4 shadow-2xs"
+                        >
+                          <div className="flex flex-col">
+                            <span className="text-xs font-bold text-slate-800">{item.name}</span>
+                            <span className="text-[11px] text-slate-400 font-medium">{item.unit}</span>
+                          </div>
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            <input
+                              type="number"
+                              step="any"
+                              value={item.price}
+                              onChange={(e) => {
+                                const val = Number(e.target.value) || 0;
+                                setMaterialPrices(prev => prev.map(m => m.id === item.id ? { ...m, price: val } : m));
+                              }}
+                              className="w-28 px-3 py-1.5 rounded-lg border border-slate-200 bg-white font-mono font-bold text-xs text-right text-slate-800 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                            />
+                            <span className="text-xs font-semibold text-slate-500 w-4">₴</span>
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -15503,83 +15503,173 @@ export const Calculator: React.FC = () => {
                 )}
 
                 {materialPricesTab === 'postpress' && (
-                  <div className="flex flex-col gap-4">
-                    <span className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
-                      Тарифи на післядрукарські операції (грн / виріб або операцію):
-                    </span>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <div>
-                        <label className="text-xs font-semibold text-slate-600 block mb-1">Мат ламінація (грн / м²)</label>
-                        <input type="number" step="any" value={tempNorms.laminationMattePrice} onChange={(e) => setTempNorms({ ...tempNorms, laminationMattePrice: Number(e.target.value) })} className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold" />
-                      </div>
-                      <div>
-                        <label className="text-xs font-semibold text-slate-600 block mb-1">Глянець ламінація (грн / м²)</label>
-                        <input type="number" step="any" value={tempNorms.laminationGlossyPrice} onChange={(e) => setTempNorms({ ...tempNorms, laminationGlossyPrice: Number(e.target.value) })} className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold" />
-                      </div>
-                      <div>
-                        <label className="text-xs font-semibold text-slate-600 block mb-1">Біговка (згин) (грн)</label>
-                        <input type="number" step="any" value={tempNorms.foldingPrice} onChange={(e) => setTempNorms({ ...tempNorms, foldingPrice: Number(e.target.value) })} className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold" />
-                      </div>
-                      <div>
-                        <label className="text-xs font-semibold text-slate-600 block mb-1">Висічка штампом (грн)</label>
-                        <input type="number" step="any" value={tempNorms.dieCuttingPrice} onChange={(e) => setTempNorms({ ...tempNorms, dieCuttingPrice: Number(e.target.value) })} className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold" />
-                      </div>
-                      <div>
-                        <label className="text-xs font-semibold text-slate-600 block mb-1">Складне тиснення (грн)</label>
-                        <input type="number" step="any" value={tempNorms.embossingPrice} onChange={(e) => setTempNorms({ ...tempNorms, embossingPrice: Number(e.target.value) })} className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold" />
-                      </div>
-                      <div>
-                        <label className="text-xs font-semibold text-slate-600 block mb-1">Вставка блока / шиття (грн)</label>
-                        <input type="number" step="any" value={tempNorms.blockInsertionPrice} onChange={(e) => setTempNorms({ ...tempNorms, blockInsertionPrice: Number(e.target.value) })} className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold" />
-                      </div>
-                      <div>
-                        <label className="text-xs font-semibold text-slate-600 block mb-1">Виготовлення кришки (грн)</label>
-                        <input type="number" step="any" value={tempNorms.coverMakingPrice} onChange={(e) => setTempNorms({ ...tempNorms, coverMakingPrice: Number(e.target.value) })} className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold" />
-                      </div>
-                      <div>
-                        <label className="text-xs font-semibold text-slate-600 block mb-1">Порізка на пачку (грн)</label>
-                        <input type="number" step="any" value={tempNorms.cuttingRate} onChange={(e) => setTempNorms({ ...tempNorms, cuttingRate: Number(e.target.value) })} className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold" />
-                      </div>
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center justify-between pb-1 mb-1 border-b border-slate-100">
+                      <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                        Післядрукарська операція
+                      </span>
+                      <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                        Тариф (грн)
+                      </span>
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                      {[
+                        { 
+                          label: 'Матова ламінація 1+0', 
+                          unit: 'грн / м²', 
+                          val: tempNorms.laminationMattePrice, 
+                          set: (v: number) => setTempNorms({ ...tempNorms, laminationMattePrice: v }) 
+                        },
+                        { 
+                          label: 'Глянцева ламінація 1+0', 
+                          unit: 'грн / м²', 
+                          val: tempNorms.laminationGlossyPrice, 
+                          set: (v: number) => setTempNorms({ ...tempNorms, laminationGlossyPrice: v }) 
+                        },
+                        { 
+                          label: 'Фальцювання (згинання)', 
+                          unit: 'грн / згин', 
+                          val: tempNorms.foldingPrice, 
+                          set: (v: number) => setTempNorms({ ...tempNorms, foldingPrice: v }) 
+                        },
+                        { 
+                          label: 'Висічка штампом', 
+                          unit: 'грн / удар (операція)', 
+                          val: tempNorms.dieCuttingPrice, 
+                          set: (v: number) => setTempNorms({ ...tempNorms, dieCuttingPrice: v }) 
+                        },
+                        { 
+                          label: 'Складне тиснення фольгою / сліпе', 
+                          unit: 'грн / відбиток', 
+                          val: tempNorms.embossingPrice, 
+                          set: (v: number) => setTempNorms({ ...tempNorms, embossingPrice: v }) 
+                        },
+                        { 
+                          label: 'Вставка блока / шиття на скобу', 
+                          unit: 'грн / екземпляр', 
+                          val: tempNorms.blockInsertionPrice, 
+                          set: (v: number) => setTempNorms({ ...tempNorms, blockInsertionPrice: v }) 
+                        },
+                        { 
+                          label: 'Виготовлення твердої кришки', 
+                          unit: 'грн / кришка', 
+                          val: tempNorms.coverMakingPrice, 
+                          set: (v: number) => setTempNorms({ ...tempNorms, coverMakingPrice: v }) 
+                        },
+                        { 
+                          label: 'Обробка книжкового блока (PUR / клей)', 
+                          unit: 'грн / блок', 
+                          val: tempNorms.blockProcessingPrice, 
+                          set: (v: number) => setTempNorms({ ...tempNorms, blockProcessingPrice: v }) 
+                        },
+                        { 
+                          label: 'Порізка продукції на гільйотині', 
+                          unit: 'грн / різ (пачка)', 
+                          val: tempNorms.cuttingRate, 
+                          set: (v: number) => setTempNorms({ ...tempNorms, cuttingRate: v }) 
+                        },
+                        { 
+                          label: 'Пакування в папір / коробки', 
+                          unit: 'грн / пачка', 
+                          val: tempNorms.packingRate, 
+                          set: (v: number) => setTempNorms({ ...tempNorms, packingRate: v }) 
+                        }
+                      ].map((op, idx) => (
+                        <div 
+                          key={idx} 
+                          className="p-3 rounded-xl bg-slate-50 hover:bg-white border border-slate-200/80 hover:border-slate-300 transition-all flex items-center justify-between gap-4 shadow-2xs"
+                        >
+                          <div className="flex flex-col">
+                            <span className="text-xs font-bold text-slate-800">{op.label}</span>
+                            <span className="text-[11px] text-slate-400 font-medium">{op.unit}</span>
+                          </div>
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            <input
+                              type="number"
+                              step="any"
+                              value={op.val}
+                              onChange={(e) => op.set(Number(e.target.value) || 0)}
+                              className="w-28 px-3 py-1.5 rounded-lg border border-slate-200 bg-white font-mono font-bold text-xs text-right text-slate-800 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                            />
+                            <span className="text-xs font-semibold text-slate-500 w-4">₴</span>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 )}
 
                 {materialPricesTab === 'print' && (
-                  <div className="flex flex-col gap-4">
-                    <span className="text-xs font-bold text-slate-700 uppercase tracking-wider block">
-                      Вартість форм та друкарських приладок:
-                    </span>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      <div>
-                        <label className="text-xs font-semibold text-slate-600 block mb-1">Виготовлення форм CTP (грн / шт)</label>
-                        <input type="number" step="any" value={tempNorms.formMakingPrice} onChange={(e) => setTempNorms({ ...tempNorms, formMakingPrice: Number(e.target.value) })} className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold" />
-                      </div>
-                      <div>
-                        <label className="text-xs font-semibold text-slate-600 block mb-1">Монтаж та приладка плівок (грн)</label>
-                        <input type="number" step="any" value={tempNorms.filmMountingPrice} onChange={(e) => setTempNorms({ ...tempNorms, filmMountingPrice: Number(e.target.value) })} className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold" />
-                      </div>
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center justify-between pb-1 mb-1 border-b border-slate-100">
+                      <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                        Параметри друку та CTP
+                      </span>
+                      <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">
+                        Вартість (грн)
+                      </span>
                     </div>
 
-                    <span className="text-xs font-bold text-slate-700 uppercase tracking-wider block pt-2 border-t border-slate-100">
-                      Вартість фарбовідбитків за машино-прогін:
-                    </span>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
-                      <div className="p-2 rounded-lg bg-slate-50 border border-slate-200 flex justify-between items-center">
-                        <span className="text-slate-600 font-medium">1+0 (однокол.):</span>
-                        <strong className="text-slate-900 font-mono font-bold">0.20 ₴/відб</strong>
-                      </div>
-                      <div className="p-2 rounded-lg bg-slate-50 border border-slate-200 flex justify-between items-center">
-                        <span className="text-slate-600 font-medium">1+1 (двокол.):</span>
-                        <strong className="text-slate-900 font-mono font-bold">0.35 ₴/відб</strong>
-                      </div>
-                      <div className="p-2 rounded-lg bg-slate-50 border border-slate-200 flex justify-between items-center">
-                        <span className="text-slate-600 font-medium">4+0 (повнокол.):</span>
-                        <strong className="text-slate-900 font-mono font-bold">0.35 ₴/відб</strong>
-                      </div>
-                      <div className="p-2 rounded-lg bg-slate-50 border border-slate-200 flex justify-between items-center">
-                        <span className="text-slate-600 font-medium">4+4 (двостор.):</span>
-                        <strong className="text-slate-900 font-mono font-bold">0.70 ₴/відб</strong>
-                      </div>
+                    <div className="flex flex-col gap-2">
+                      {[
+                        { 
+                          label: 'Виготовлення CTP пластин (форм)', 
+                          unit: 'грн / 1 форма', 
+                          val: tempNorms.formMakingPrice, 
+                          set: (v: number) => setTempNorms({ ...tempNorms, formMakingPrice: v }) 
+                        },
+                        { 
+                          label: 'Монтаж та приладка плівок / форм', 
+                          unit: 'грн / приладка', 
+                          val: tempNorms.filmMountingPrice, 
+                          set: (v: number) => setTempNorms({ ...tempNorms, filmMountingPrice: v }) 
+                        },
+                        { 
+                          label: 'Різограф (тис. відбитків А3)', 
+                          unit: 'грн / 1000 відб.', 
+                          val: tempNorms.printRates.rizograph, 
+                          set: (v: number) => setTempNorms({ ...tempNorms, printRates: { ...tempNorms.printRates, rizograph: v } }) 
+                        },
+                        { 
+                          label: 'Офсетна машина А3 (формат)', 
+                          unit: 'грн / листопрогін', 
+                          val: tempNorms.printRates.option1, 
+                          set: (v: number) => setTempNorms({ ...tempNorms, printRates: { ...tempNorms.printRates, option1: v } }) 
+                        },
+                        { 
+                          label: 'Офсетна машина А2 (формат)', 
+                          unit: 'грн / листопрогін', 
+                          val: tempNorms.printRates.option2, 
+                          set: (v: number) => setTempNorms({ ...tempNorms, printRates: { ...tempNorms.printRates, option2: v } }) 
+                        },
+                        { 
+                          label: 'Офсетна машина Planeta (формат А1)', 
+                          unit: 'грн / листопрогін', 
+                          val: tempNorms.printRates.planeta, 
+                          set: (v: number) => setTempNorms({ ...tempNorms, printRates: { ...tempNorms.printRates, planeta: v } }) 
+                        }
+                      ].map((pr, idx) => (
+                        <div 
+                          key={idx} 
+                          className="p-3 rounded-xl bg-slate-50 hover:bg-white border border-slate-200/80 hover:border-slate-300 transition-all flex items-center justify-between gap-4 shadow-2xs"
+                        >
+                          <div className="flex flex-col">
+                            <span className="text-xs font-bold text-slate-800">{pr.label}</span>
+                            <span className="text-[11px] text-slate-400 font-medium">{pr.unit}</span>
+                          </div>
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            <input
+                              type="number"
+                              step="any"
+                              value={pr.val}
+                              onChange={(e) => pr.set(Number(e.target.value) || 0)}
+                              className="w-28 px-3 py-1.5 rounded-lg border border-slate-200 bg-white font-mono font-bold text-xs text-right text-slate-800 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                            />
+                            <span className="text-xs font-semibold text-slate-500 w-4">₴</span>
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 )}
@@ -15588,7 +15678,7 @@ export const Calculator: React.FC = () => {
               {/* Modal Footer */}
               <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-3">
                 <span className="text-xs text-slate-400">
-                  Зміни будуть автоматично застосовані у всіх калькуляторах
+                  Зміни будуть автоматично збережені та застосовані в калькуляторі
                 </span>
                 <div className="flex items-center gap-2.5">
                   <button 
