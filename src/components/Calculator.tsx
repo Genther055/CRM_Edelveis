@@ -3244,9 +3244,23 @@ export const Calculator: React.FC = () => {
               <p className="subtitle" style={{ margin: '3px 0 0 0' }}>Оберіть категорію продукції для детального прорахунку</p>
             </div>
 
-            {/* Prominent Live Search Bar on the Right side */}
-            <div style={{ position: 'relative', width: '380px', flexShrink: 0 }}>
-              <Search size={16} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#007AFF', pointerEvents: 'none' }} />
+            {/* Action Buttons & Prominent Live Search Bar */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <button
+                type="button"
+                onClick={() => {
+                  setTempNorms(norms);
+                  setShowMaterialPricesModal(true);
+                }}
+                className="px-3.5 py-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-200/90 text-slate-700 font-bold text-xs flex items-center gap-2 transition-all shadow-2xs shrink-0 cursor-pointer"
+                title="Прайс-лист матеріалів та послуг підприємства"
+              >
+                <Layers size={15} className="text-blue-600" />
+                <span>Ціни на матеріали</span>
+              </button>
+
+                <div style={{ position: 'relative', width: '360px', flexShrink: 0 }}>
+                <Search size={16} style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', color: '#007AFF', pointerEvents: 'none' }} />
               <input
                 type="text"
                 value={productSearchQuery}
@@ -3295,6 +3309,7 @@ export const Calculator: React.FC = () => {
               )}
             </div>
           </div>
+        </div>
 
           {/* Top Category Tabs Navigation - Cupertino iOS Switcher with Mega Menu Trigger */}
           <div style={{ position: 'relative', zIndex: 40 }}>
@@ -8628,6 +8643,29 @@ export const Calculator: React.FC = () => {
                           <span className="text-xs text-slate-500">Цифровий оперативний друк від 1 примірника</span>
                         </div>
                       </div>
+
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setTempNorms(norms);
+                            setShowMaterialPricesModal(true);
+                          }}
+                          className="px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 font-bold text-xs flex items-center gap-1.5 hover:bg-slate-100 transition-colors shadow-2xs"
+                          title="Прайс та тарифи на папери і післядрукарські роботи"
+                        >
+                          <Layers size={14} className="text-blue-600" />
+                          <span>Ціни на матеріали</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setDigitalSubTab('overview')}
+                          className="w-8 h-8 rounded-xl border border-slate-200 bg-slate-50 hover:bg-red-50 hover:border-red-200 hover:text-red-600 text-slate-500 font-bold text-sm flex items-center justify-center transition-colors shadow-2xs"
+                          title="Закрити"
+                        >
+                          ✕
+                        </button>
+                      </div>
                     </div>
                   </div>
 
@@ -11729,6 +11767,19 @@ export const Calculator: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => {
+                          setTempNorms(norms);
+                          setShowMaterialPricesModal(true);
+                        }}
+                        className="px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold transition-all flex items-center gap-1.5"
+                        title="Прайс та тарифи"
+                      >
+                        <Layers size={14} className="text-blue-600" />
+                        <span>Ціни на матеріали</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
                           const el = document.getElementById('detailed-wide-calculation');
                           if (el) el.scrollIntoView({ behavior: 'smooth' });
                         }}
@@ -12941,9 +12992,23 @@ export const Calculator: React.FC = () => {
 
                   {/* Right: Title & Description */}
                   <div className="md:col-span-8 flex flex-col justify-center">
-                    <h2 style={{ fontSize: '26px', fontWeight: '900', color: 'var(--text-dark)', marginBottom: '8px', letterSpacing: '-0.5px' }}>
-                      Рулонна етикетка
-                    </h2>
+                    <div className="flex items-center justify-between mb-2">
+                      <h2 style={{ fontSize: '26px', fontWeight: '900', color: 'var(--text-dark)', margin: 0, letterSpacing: '-0.5px' }}>
+                        Рулонна етикетка
+                      </h2>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setTempNorms(norms);
+                          setShowMaterialPricesModal(true);
+                        }}
+                        className="px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 font-bold text-xs flex items-center gap-1.5 hover:bg-slate-100 transition-colors shadow-2xs"
+                        title="Прайс та тарифи на рулонні матеріали"
+                      >
+                        <Layers size={14} className="text-blue-600" />
+                        <span>Ціни на матеріали</span>
+                      </button>
+                    </div>
                     <p style={{ fontSize: '15px', fontWeight: '600', color: 'var(--text-medium)', marginBottom: '14px' }}>
                       Друк самоклеючихся <strong style={{ color: 'var(--text-dark)' }}>етикеток і наліпок</strong> в рулонах
                     </p>
@@ -15415,33 +15480,36 @@ export const Calculator: React.FC = () => {
               <button 
                 type="button" 
                 onClick={() => setShowMaterialPricesModal(false)} 
-                className="text-slate-400 hover:text-slate-700 w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center transition-colors text-base font-bold"
+                className="text-slate-400 hover:text-slate-700 w-8 h-8 rounded-xl hover:bg-slate-100 flex items-center justify-center transition-colors text-base font-bold cursor-pointer"
               >
                 ✕
               </button>
             </div>
 
-            {/* Modal Tabs Switcher - Clean Cupertino Tabs Without Emojis */}
-            <div className="px-6 pt-3 pb-0 bg-slate-50 border-b border-slate-200 flex gap-2 overflow-x-auto shrink-0">
+            {/* Modal Tabs Switcher - Clean Segmented CRM Tabs */}
+            <div className="px-6 py-2.5 bg-slate-100/80 border-b border-slate-200/90 flex gap-2 shrink-0 overflow-x-auto">
               {[
                 { id: 'paper', label: 'Папір та листові матеріали', icon: <FileText size={14} /> },
                 { id: 'postpress', label: 'Післядрукарська обробка', icon: <Scissors size={14} /> },
                 { id: 'print', label: 'Друк та CTP-форми', icon: <Printer size={14} /> }
-              ].map(tab => (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => setMaterialPricesTab(tab.id as any)}
-                  className={`px-4 py-2.5 text-xs font-bold border-b-2 transition-all whitespace-nowrap flex items-center gap-2 ${
-                    materialPricesTab === tab.id
-                      ? 'border-blue-600 text-blue-600 bg-white rounded-t-lg shadow-2xs'
-                      : 'border-transparent text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  {tab.icon}
-                  <span>{tab.label}</span>
-                </button>
-              ))}
+              ].map(tab => {
+                const isCurrent = materialPricesTab === tab.id;
+                return (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setMaterialPricesTab(tab.id as any)}
+                    className={`px-4 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-2 border cursor-pointer ${
+                      isCurrent
+                        ? 'bg-white text-blue-600 border-slate-200/90 shadow-2xs font-extrabold'
+                        : 'bg-transparent hover:bg-white/60 text-slate-600 border-transparent'
+                    }`}
+                  >
+                    {tab.icon}
+                    <span>{tab.label}</span>
+                  </button>
+                );
+              })}
             </div>
 
             {/* Modal Form Content */}
@@ -15464,10 +15532,10 @@ export const Calculator: React.FC = () => {
               }} 
               className="flex flex-col flex-1 min-h-0 overflow-hidden"
             >
-              <div className="p-6 overflow-y-auto flex-1 min-h-0 flex flex-col gap-3">
+              <div className="p-6 overflow-y-auto flex-1 min-h-0 flex flex-col gap-3 bg-white">
                 {materialPricesTab === 'paper' && (
                   <div className="flex flex-col gap-2">
-                    <div className="flex items-center justify-between pb-1 mb-1 border-b border-slate-100">
+                    <div className="flex items-center justify-between pb-2 mb-1 border-b border-slate-100">
                       <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">
                         Найменування матеріалу
                       </span>
@@ -15495,7 +15563,7 @@ export const Calculator: React.FC = () => {
                                 const val = Number(e.target.value) || 0;
                                 setMaterialPrices(prev => prev.map(m => m.id === item.id ? { ...m, price: val } : m));
                               }}
-                              className="w-28 px-3 py-1.5 rounded-lg border border-slate-200 bg-white font-mono font-bold text-xs text-right text-slate-800 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                              className="w-28 px-3 py-1.5 rounded-xl border border-slate-200 bg-white font-mono font-bold text-xs text-right text-slate-800 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                             />
                             <span className="text-xs font-semibold text-slate-500 w-4">₴</span>
                           </div>
@@ -15507,7 +15575,7 @@ export const Calculator: React.FC = () => {
 
                 {materialPricesTab === 'postpress' && (
                   <div className="flex flex-col gap-2">
-                    <div className="flex items-center justify-between pb-1 mb-1 border-b border-slate-100">
+                    <div className="flex items-center justify-between pb-2 mb-1 border-b border-slate-100">
                       <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">
                         Післядрукарська операція
                       </span>
@@ -15593,7 +15661,7 @@ export const Calculator: React.FC = () => {
                               step="any"
                               value={op.val}
                               onChange={(e) => op.set(Number(e.target.value) || 0)}
-                              className="w-28 px-3 py-1.5 rounded-lg border border-slate-200 bg-white font-mono font-bold text-xs text-right text-slate-800 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                              className="w-28 px-3 py-1.5 rounded-xl border border-slate-200 bg-white font-mono font-bold text-xs text-right text-slate-800 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                             />
                             <span className="text-xs font-semibold text-slate-500 w-4">₴</span>
                           </div>
@@ -15605,7 +15673,7 @@ export const Calculator: React.FC = () => {
 
                 {materialPricesTab === 'print' && (
                   <div className="flex flex-col gap-2">
-                    <div className="flex items-center justify-between pb-1 mb-1 border-b border-slate-100">
+                    <div className="flex items-center justify-between pb-2 mb-1 border-b border-slate-100">
                       <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">
                         Параметри друку та CTP
                       </span>
@@ -15667,7 +15735,7 @@ export const Calculator: React.FC = () => {
                               step="any"
                               value={pr.val}
                               onChange={(e) => pr.set(Number(e.target.value) || 0)}
-                              className="w-28 px-3 py-1.5 rounded-lg border border-slate-200 bg-white font-mono font-bold text-xs text-right text-slate-800 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                              className="w-28 px-3 py-1.5 rounded-xl border border-slate-200 bg-white font-mono font-bold text-xs text-right text-slate-800 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500/20"
                             />
                             <span className="text-xs font-semibold text-slate-500 w-4">₴</span>
                           </div>
@@ -15679,7 +15747,7 @@ export const Calculator: React.FC = () => {
               </div>
 
               {/* Modal Footer */}
-              <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-3 shrink-0">
+              <div className="px-6 py-4 bg-slate-50 border-t border-slate-200/80 flex items-center justify-between gap-3 shrink-0">
                 <span className="text-xs text-slate-400">
                   Зміни будуть автоматично збережені та застосовані в калькуляторі
                 </span>
@@ -15687,13 +15755,13 @@ export const Calculator: React.FC = () => {
                   <button 
                     type="button" 
                     onClick={() => setShowMaterialPricesModal(false)} 
-                    className="px-4 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 text-xs font-semibold shadow-xs transition-colors"
+                    className="px-5 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 text-xs font-bold shadow-2xs transition-colors cursor-pointer"
                   >
                     Скасувати
                   </button>
                   <button 
                     type="submit" 
-                    className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-sm transition-all flex items-center gap-1.5"
+                    className="px-6 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-sm shadow-blue-500/20 transition-all flex items-center gap-2 cursor-pointer active:scale-95"
                   >
                     <Save size={14} />
                     <span>Зберегти ціни</span>
