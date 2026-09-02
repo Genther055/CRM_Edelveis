@@ -6966,7 +6966,10 @@ export const Calculator: React.FC = () => {
                             <div className="grid grid-cols-4 gap-3 pt-3 border-t border-slate-100">
                               <button
                                 type="button"
-                                onClick={() => setShowTemplateModal(true)}
+                                onClick={() => {
+                                  setTemplateName(customTitleMap['digital'] ?? fullComposedName);
+                                  setShowTemplateModal(true);
+                                }}
                                 className="py-2.5 px-2 rounded-xl border border-slate-200/80 bg-slate-50/80 hover:bg-slate-100 text-slate-700 font-bold text-xs shadow-2xs transition-all text-center flex items-center justify-center gap-1.5"
                               >
                                 <LayoutTemplate size={14} className="text-slate-500" />
@@ -9462,7 +9465,10 @@ export const Calculator: React.FC = () => {
                             <div className="grid grid-cols-4 gap-3 pt-3 border-t border-slate-100">
                               <button
                                 type="button"
-                                onClick={() => setShowTemplateModal(true)}
+                                onClick={() => {
+                                  setTemplateName(customTitleMap['digital'] ?? fullComposedName);
+                                  setShowTemplateModal(true);
+                                }}
                                 className="py-2.5 px-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-2xs transition-colors text-center"
                               >
                                 Шаблон
@@ -12677,7 +12683,10 @@ export const Calculator: React.FC = () => {
                             <div className="grid grid-cols-4 gap-3 pt-3 border-t border-slate-100">
                               <button
                                 type="button"
-                                onClick={() => setShowTemplateModal(true)}
+                                onClick={() => {
+                                  setTemplateName(customTitleMap['digital'] ?? fullComposedName);
+                                  setShowTemplateModal(true);
+                                }}
                                 className="py-2.5 px-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-2xs transition-colors text-center"
                               >
                                 Шаблон
@@ -13623,7 +13632,10 @@ export const Calculator: React.FC = () => {
                           <div className="grid grid-cols-4 gap-3 pt-3 border-t border-slate-100">
                             <button
                               type="button"
-                              onClick={() => setShowTemplateModal(true)}
+                              onClick={() => {
+                                setTemplateName(customTitleMap['roll_print'] ?? fullComposedName);
+                                setShowTemplateModal(true);
+                              }}
                               className="py-2.5 px-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-2xs transition-colors text-center"
                             >
                               Шаблон
@@ -13891,7 +13903,10 @@ export const Calculator: React.FC = () => {
             </div>
 
             <button 
-              onClick={() => setShowTemplateModal(true)}
+              onClick={() => {
+                setTemplateName(name || `${category === 'Бланки' ? subCategory : category} ${quantity} шт`);
+                setShowTemplateModal(true);
+              }}
               className="ios-badge ios-badge-blue"
               style={{ padding: '8px 16px', borderRadius: 'var(--radius-md)', fontSize: '12px', fontWeight: '700', cursor: 'pointer', border: 'none', display: 'flex', alignItems: 'center', gap: '6px' }}
             >
@@ -15162,23 +15177,88 @@ export const Calculator: React.FC = () => {
         );
       })()}
 
-      {/* Save Template Modal */}
+      {/* Save Template Modal - Polished Cupertino iOS Modal */}
       {showTemplateModal && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <form onSubmit={handleSaveAsTemplate} className="bg-white rounded-2xl max-w-md w-full shadow-2xl border border-slate-200 overflow-hidden">
-            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
-              <h3 className="text-base font-bold text-slate-900 m-0">Зберегти розрахунок як шаблон</h3>
-              <button type="button" onClick={() => setShowTemplateModal(false)} className="text-slate-400 hover:text-slate-700 w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center transition-colors">✕</button>
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4">
+          <form 
+            onSubmit={handleSaveAsTemplate} 
+            className="bg-white rounded-3xl max-w-lg w-full shadow-2xl border border-slate-200/80 overflow-hidden flex flex-col"
+          >
+            {/* Modal Header */}
+            <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-slate-50 to-white">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-blue-50 border border-blue-100/80 flex items-center justify-center text-blue-600 shadow-2xs">
+                  <LayoutTemplate size={20} />
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-slate-900 m-0">Зберегти розрахунок як шаблон</h3>
+                  <p className="text-xs text-slate-500 font-medium m-0 mt-0.5">Збережіть параметри замовлення для швидкого повторного розрахунку</p>
+                </div>
+              </div>
+              <button 
+                type="button" 
+                onClick={() => setShowTemplateModal(false)} 
+                className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 text-sm font-bold flex items-center justify-center transition-all"
+              >
+                ✕
+              </button>
             </div>
-            <div className="p-6">
+
+            {/* Modal Body */}
+            <div className="p-6 flex flex-col gap-4">
               <div>
-                <label className="text-xs font-semibold text-slate-600 block mb-1.5">Назва шаблону *</label>
-                <input required placeholder="напр. Євробуклет 130г 500шт" value={templateName} onChange={(e) => setTemplateName(e.target.value)} className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-semibold text-slate-800" />
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="text-xs font-extrabold text-slate-700 uppercase tracking-wider">
+                    НАЗВА ШАБЛОНУ *
+                  </label>
+                  <span className="text-[11px] text-blue-600 font-semibold">Синхронізовано з розрахунком</span>
+                </div>
+                <input 
+                  required 
+                  placeholder="Введіть назву шаблону..." 
+                  value={templateName} 
+                  onChange={(e) => setTemplateName(e.target.value)} 
+                  className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50/80 hover:bg-white focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 font-bold text-xs text-slate-900 transition-all outline-none shadow-inner" 
+                />
+              </div>
+
+              {/* Order Specs Preview Badge */}
+              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/70 flex flex-col gap-2">
+                <span className="text-[11px] font-extrabold text-slate-500 uppercase tracking-wider">Параметри, що зберігаються:</span>
+                <div className="grid grid-cols-2 gap-2 text-xs">
+                  <div className="flex items-center justify-between bg-white px-2.5 py-1.5 rounded-lg border border-slate-100">
+                    <span className="text-slate-500 font-medium">Категорія:</span>
+                    <strong className="text-slate-800 font-bold">{category === 'Бланки' ? subCategory : (category as string)}</strong>
+                  </div>
+                  <div className="flex items-center justify-between bg-white px-2.5 py-1.5 rounded-lg border border-slate-100">
+                    <span className="text-slate-500 font-medium">Тираж:</span>
+                    <strong className="text-slate-800 font-bold font-mono">{quantity} шт.</strong>
+                  </div>
+                </div>
               </div>
             </div>
-            <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-3">
-              <button type="button" onClick={() => setShowTemplateModal(false)} className="px-4 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-sm transition-colors">Скасувати</button>
-              <button type="submit" className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-sm transition-all">Зберегти шаблон</button>
+
+            {/* Modal Footer */}
+            <div className="px-6 py-4 bg-slate-50/80 border-t border-slate-100 flex items-center justify-between gap-3">
+              <span className="text-[11px] font-medium text-slate-400 hidden sm:inline">
+                Шаблон буде доступний у базі CRM
+              </span>
+              <div className="flex items-center gap-2.5 ml-auto">
+                <button 
+                  type="button" 
+                  onClick={() => setShowTemplateModal(false)} 
+                  className="px-4 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 text-xs font-bold shadow-2xs transition-all"
+                >
+                  Скасувати
+                </button>
+                <button 
+                  type="submit" 
+                  className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-xs font-black shadow-md shadow-blue-500/20 transition-all flex items-center gap-1.5"
+                >
+                  <Save size={14} />
+                  <span>Зберегти шаблон</span>
+                </button>
+              </div>
             </div>
           </form>
         </div>
