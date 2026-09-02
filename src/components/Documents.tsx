@@ -23,7 +23,8 @@ import {
   List,
   ListOrdered,
   Printer,
-  Save
+  Save,
+  FileSpreadsheet
 } from 'lucide-react';
 import html2pdf from 'html2pdf.js';
 
@@ -317,7 +318,7 @@ export const Documents: React.FC = () => {
     alert(`✨ Документ успішно згенеровано та заповнено реальними реквізитами замовлення №${orderToUse?.id || '64841'}!`);
   };
 
-  const [activeSubTab, setActiveSubTab] = useState<'registry' | 'templates' | 'editor' | 'autonumber'>('registry');
+  const [activeSubTab, setActiveSubTab] = useState<'registry' | 'templates' | 'editor' | 'spreadsheet' | 'autonumber'>('registry');
   const [searchQuery, setSearchQuery] = useState('');
 
   const [templates, setTemplates] = useState<DocTemplate[]>([
@@ -675,7 +676,16 @@ export const Documents: React.FC = () => {
           style={{ display: 'flex', alignItems: 'center', gap: '6px', height: '34px', backgroundColor: activeSubTab === 'editor' ? '#10b981' : undefined, borderColor: activeSubTab === 'editor' ? '#10b981' : undefined }}
         >
           <Edit3 size={15} />
-          ✏️ Редактор документів & Конструктор таблиць
+          Редактор документів (Договори)
+        </button>
+
+        <button
+          onClick={() => setActiveSubTab('spreadsheet')}
+          className={`ios-btn ${activeSubTab === 'spreadsheet' ? 'ios-btn-primary' : 'ios-btn-secondary'}`}
+          style={{ display: 'flex', alignItems: 'center', gap: '6px', height: '34px', backgroundColor: activeSubTab === 'spreadsheet' ? '#2563eb' : undefined, borderColor: activeSubTab === 'spreadsheet' ? '#2563eb' : undefined }}
+        >
+          <FileSpreadsheet size={15} />
+          📊 Чистий аркуш (Excel Таблиця)
         </button>
 
         <button

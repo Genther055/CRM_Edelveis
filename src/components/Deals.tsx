@@ -16,6 +16,7 @@ import {
   Info
 } from 'lucide-react';
 import type { Order } from '../types';
+import { PIPELINE_STAGES } from '../data/pipelineStages';
 
 export const Deals: React.FC = () => {
   const { 
@@ -34,6 +35,7 @@ export const Deals: React.FC = () => {
   const [activePipeline, setActivePipeline] = useState<'b2b' | 'pos'>('b2b');
   const [search, setSearch] = useState('');
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [showFunnelGuideModal, setShowFunnelGuideModal] = useState(false);
 
   // Filters state
   const [importantFilter, setImportantFilter] = useState<'all' | 'important'>('all');
@@ -497,12 +499,130 @@ export const Deals: React.FC = () => {
                   </div>
 
                   {/* Calculated Margin display */}
-                  <div style={{ backgroundColor: 'rgba(16, 185, 129, 0.12)', padding: '10px', borderRadius: '8px', border: '1px solid var(--border-light)', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <Info size={14} style={{ color: 'var(--success)' }} />
-                    <span style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-dark)' }}>
-                      Системна маржа угоди: <strong style={{ color: 'var(--success)', fontSize: '12px' }}>{selectedOrder.margin || 100}%</strong>
-                    </span>
+                  <div style={{ backgroundColor: 'rgba(16, 185, 129, 0.12)', padding: '10px', borderRadius: '8px', border: '1px solid var(--border-light)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                      <Info size={14} style={{ color: 'var(--success)' }} />
+                      <span style={{ fontSize: '11px', fontWeight: '700', color: 'var(--text-dark)' }}>
+                        Системна маржа угоди: <strong style={{ color: 'var(--success)', fontSize: '12px' }}>{selectedOrder.margin || 100}%</strong>
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setShowFunnelGuideModal(true)}
+                      className="text-[10px] font-bold text-blue-600 hover:text-blue-800 underline bg-transparent border-0 cursor-pointer p-0"
+                    >
+                      Довідник воронки
+                    </button>
                   </div>
+
+                  {/* 🚀 DETAILED PIPELINE STAGE DESCRIPTION BOX */}
+                  {(() => {
+                    const stageInfo = PIPELINE_STAGES[selectedOrder.status] || PIPELINE_STAGES['design'];
+                    return (
+                      <div style={{
+                        backgroundColor: stageInfo.bgColor,
+                        borderColor: stageInfo.borderColor,
+                        borderWidth: '1px',
+                        borderStyle: 'solid',
+                        borderRadius: '12px',
+                        padding: '12px',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '8px'
+                      }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <span style={{
+                            fontSize: '10px',
+                            fontWeight: '800',
+                            textTransform: 'uppercase',
+                            padding: '2px 8px',
+                            borderRadius: '6px',
+                            backgroundColor: stageInfo.color,
+                            color: '#ffffff'
+                          }}>
+                            {stageInfo.badgeLabel}
+                          </span>
+                          <span style={{ fontSize: '10.5px', fontWeight: '700', color: '#475569', display: 'flex', alignItems: 'center', gap: '3px' }}>
+                            <Clock size={12} /> SLA: {stageInfo.slaHours} год
+                          </span>
+                        </div>
+
+                        <h4 style={{ fontSize: '12.5px', fontWeight: '900', color: '#0f172a', margin: '2px 0 0 0' }}>
+                          {stageInfo.label}
+                        </h4>
+
+                        <p style={{ fontSize: '11px', color: '#334155', lineHeight: '1.45', margin: 0 }}>
+                          {stageInfo.fullDesc}
+                        </p>
+
+                        <div style={{ padding: '8px 10px', backgroundColor: 'rgba(255, 255, 255, 0.85)', borderRadius: '8px', border: '1px solid rgba(203, 213, 225, 0.7)' }}>
+                          <span style={{ fontSize: '10px', fontWeight: '800', color: '#0f172a', display: 'block', marginBottom: '2px' }}>
+                            🎯 Необхідна дія для переходу:
+                          </span>
+                          <p style={{ fontSize: '10.5px', color: '#334155', margin: 0, lineHeight: '1.35' }}>
+                            {stageInfo.actionRequired}
+                          </p>
+                        </div>
+
+                        {/* Checklist */}
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', marginTop: '2px' }}>
+                          <span style={{ fontSize: '10px', fontWeight: '800', color: '#1e293b', textTransform: 'uppercase' }}>
+                            Чекліст етапу:
+                          </span>
+                          {stageInfo.checklist.map((item, idx) => (
+                            <div key={idx} style={{ display: 'flex', alignItems: 'flex-start', gap: '5px', fontSize: '10.5px', color: '#334155' }}>
+                              <span style={{ color: '#16a34a', fontWeight: 'bold' }}>✓</span>
+                              <span>{item}</span>
+                            </div>
+                          ))}
+                        </div>
+
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid rgba(203, 213, 225, 0.7)', paddingTop: '6px', marginTop: '2px', fontSize: '10px', color: '#64748b' }}>
+                          <span>Відповідальний: <strong style={{ color: '#0f172a' }}>{stageInfo.responsible}</strong></span>
+                        </div>
+
+                        {/* Quick Step Switcher */}
+                        <div style={{ marginTop: '4px' }}>
+                          <span style={{ fontSize: '10px', fontWeight: '800', color: '#475569', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>
+                            Перевести на інший етап:
+                          </span>
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '4px' }}>
+                            {(['design', 'print_queue', 'printing', 'post_press', 'ready'] as Order['status'][]).map((stKey, idx) => {
+                              const isCur = selectedOrder.status === stKey;
+                              const stObj = PIPELINE_STAGES[stKey];
+                              return (
+                                <button
+                                  key={stKey}
+                                  type="button"
+                                  onClick={() => {
+                                    updateOrderStatus(selectedOrder.id, stKey);
+                                    const updated = { ...selectedOrder, status: stKey };
+                                    setSelectedOrder(updated);
+                                    addSystemNotification(`🔄 Угода ${selectedOrder.id}: переведено на етап "${stObj.label}"`);
+                                  }}
+                                  style={{
+                                    padding: '5px 2px',
+                                    borderRadius: '6px',
+                                    fontSize: '10px',
+                                    fontWeight: '800',
+                                    cursor: 'pointer',
+                                    border: isCur ? 'none' : '1px solid #cbd5e1',
+                                    backgroundColor: isCur ? '#0f172a' : '#ffffff',
+                                    color: isCur ? '#ffffff' : '#334155',
+                                    textAlign: 'center'
+                                  }}
+                                  title={stObj.label}
+                                >
+                                  {idx + 1}. {stKey === 'design' ? 'Макет' : stKey === 'print_queue' ? 'Черга' : stKey === 'printing' ? 'Друк' : stKey === 'post_press' ? 'Пост' : 'Готово'}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+
+                      </div>
+                    );
+                  })()}
 
                   <div>
                     <span style={{ color: 'var(--text-medium)', fontSize: '9px', fontWeight: '700', textTransform: 'uppercase' }}>Назва замовлення</span>
@@ -740,6 +860,142 @@ export const Deals: React.FC = () => {
             >
               Провести оплату
             </button>
+          </div>
+        </div>
+      )}
+    
+      {/* 📖 FULL SALES & PRODUCTION PIPELINE GUIDE MODAL */}
+      {showFunnelGuideModal && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          backgroundColor: 'rgba(15, 23, 42, 0.65)',
+          backdropFilter: 'blur(4px)',
+          zIndex: 9999,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '20px'
+        }}>
+          <div style={{
+            backgroundColor: '#ffffff',
+            borderRadius: '20px',
+            maxWidth: '850px',
+            width: '100%',
+            maxHeight: '90vh',
+            overflowY: 'auto',
+            padding: '28px',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '20px'
+          }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid #e2e8f0', paddingBottom: '14px' }}>
+              <div>
+                <h2 style={{ fontSize: '18px', fontWeight: '900', color: '#0f172a', margin: 0 }}>
+                  📊 Довідник усіх етапів воронки продажів та виробництва
+                </h2>
+                <p style={{ fontSize: '12px', color: '#64748b', margin: '4px 0 0 0' }}>
+                  Стандартні операційні процедури (SOP) друкарні «Едельвейс і К»
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowFunnelGuideModal(false)}
+                style={{
+                  width: '32px',
+                  height: '32px',
+                  borderRadius: '50%',
+                  backgroundColor: '#f1f5f9',
+                  border: 'none',
+                  fontSize: '14px',
+                  fontWeight: 'bold',
+                  cursor: 'pointer',
+                  color: '#475569'
+                }}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              {(['design', 'print_queue', 'printing', 'post_press', 'ready'] as Order['status'][]).map(stKey => {
+                const st = PIPELINE_STAGES[stKey];
+                return (
+                  <div
+                    key={stKey}
+                    style={{
+                      backgroundColor: st.bgColor,
+                      border: `1px solid ${st.borderColor}`,
+                      borderRadius: '14px',
+                      padding: '16px',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '8px'
+                    }}
+                  >
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{
+                          backgroundColor: st.color,
+                          color: '#ffffff',
+                          fontSize: '11px',
+                          fontWeight: '900',
+                          padding: '3px 10px',
+                          borderRadius: '6px'
+                        }}>
+                          Етап {st.stepNumber}: {st.label}
+                        </span>
+                      </div>
+                      <span style={{ fontSize: '11px', fontWeight: '700', color: '#475569', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                        <Clock size={13} /> Нормативний SLA: {st.slaHours} год
+                      </span>
+                    </div>
+
+                    <p style={{ fontSize: '12px', color: '#1e293b', lineHeight: '1.5', margin: 0 }}>
+                      {st.fullDesc}
+                    </p>
+
+                    <div style={{ padding: '8px 12px', backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid rgba(203, 213, 225, 0.6)' }}>
+                      <span style={{ fontSize: '11px', fontWeight: '800', color: '#0f172a', display: 'block', marginBottom: '2px' }}>
+                        🎯 Необхідна дія для переходу:
+                      </span>
+                      <span style={{ fontSize: '11.5px', color: '#334155' }}>
+                        {st.actionRequired}
+                      </span>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '6px', marginTop: '4px' }}>
+                      {st.checklist.map((c, i) => (
+                        <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: '#334155' }}>
+                          <span style={{ color: '#16a34a', fontWeight: '900' }}>✓</span>
+                          <span>{c}</span>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div style={{ borderTop: '1px solid rgba(203, 213, 225, 0.6)', paddingTop: '6px', marginTop: '4px', fontSize: '11px', color: '#64748b' }}>
+                      Відповідальна посада: <strong style={{ color: '#0f172a' }}>{st.responsible}</strong>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div style={{ display: 'flex', justifyContent: 'flex-end', borderTop: '1px solid #e2e8f0', paddingTop: '14px' }}>
+              <button
+                type="button"
+                onClick={() => setShowFunnelGuideModal(false)}
+                className="ios-btn ios-btn-primary"
+                style={{ padding: '0 20px', height: '36px', fontSize: '12px', fontWeight: '800' }}
+              >
+                Зрозуміло
+              </button>
+            </div>
+
           </div>
         </div>
       )}

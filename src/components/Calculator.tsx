@@ -1216,6 +1216,7 @@ export const Calculator: React.FC = () => {
   const [turnType, setTurnType] = useState<'sam_na_sebe' | 'bez_oborotu' | 'chuzhyi_oborut'>('sam_na_sebe');
   const [selectedClientId, setSelectedClientId] = useState(clients[0]?.id || '');
   const [customClientName, setCustomClientName] = useState<string>('');
+  const [customClientPhone, setCustomClientPhone] = useState<string>('');
   const [isNewClientMode, setIsNewClientMode] = useState<boolean>(false);
   const [marginPercent, setMarginPercent] = useState<number>(100);
 
@@ -6935,10 +6936,14 @@ export const Calculator: React.FC = () => {
                             </div>
                             <div>
                               <h4 className="text-base font-black text-slate-900 m-0">
-                                Оформлення та кошторис замовлення: {category === 'Бланки' ? subCategory : (category as string)}
+                                {currentUser?.role === 'client'
+                                  ? `Розрахунок вартості: ${category === 'Бланки' ? subCategory : (category as string)}`
+                                  : `Оформлення та кошторис замовлення: ${category === 'Бланки' ? subCategory : (category as string)}`}
                               </h4>
                               <span className="text-xs text-slate-500 font-medium">
-                                Параметри розрахунку, розцінки 1С та формування документів
+                                {currentUser?.role === 'client'
+                                  ? 'Детальний прорахунок та швидке оформлення замовлення'
+                                  : 'Параметри розрахунку, розцінки 1С та формування документів'}
                               </span>
                             </div>
                           </div>
@@ -6952,69 +6957,93 @@ export const Calculator: React.FC = () => {
                           </div>
                         </div>
 
-                        {/* Top 3-Field Strip: [ № ] [ ЗАМОВНИК ] [ ПРОДУКЦІЯ (авто) ] */}
-                        <div className="grid grid-cols-1 md:grid-cols-12 gap-3 p-4 rounded-xl bg-slate-50 border border-slate-200">
-                          {/* 1. Номер замовлення (Фіксований ID рахунку) */}
-                          <div className="md:col-span-3 flex flex-col gap-1">
-                            <label className="text-[11px] font-extrabold text-slate-700 uppercase">№ Замовлення (ID):</label>
-                            <div className="w-full px-3 py-2 rounded-xl bg-slate-100/90 border border-slate-200 text-xs font-black text-blue-700 font-mono flex items-center select-none cursor-default shadow-2xs">
-                              № {orderNumber}
-                            </div>
-                          </div>
-
-                          {/* 2. Замовник */}
-                          <div className="md:col-span-4 flex flex-col gap-1">
-                            <div className="flex items-center justify-between">
-                              <label className="text-[11px] font-extrabold text-slate-700 uppercase">Замовник:</label>
-                              <button
-                                type="button"
-                                onClick={() => setIsNewClientMode(!isNewClientMode)}
-                                className="text-[10px] font-bold text-blue-600 hover:text-blue-800 underline"
-                              >
-                                {isNewClientMode ? 'Вибрати з бази' : '+ Вписати нового'}
-                              </button>
-                            </div>
-
-                            {isNewClientMode ? (
+                        {/* Top Strip: Client Contacts vs Staff CRM fields */}
+                        {currentUser?.role === 'client' ? (
+                          <div className="grid grid-cols-1 md:grid-cols-12 gap-3 p-4 rounded-xl bg-blue-50/60 border border-blue-100">
+                            <div className="md:col-span-6 flex flex-col gap-1">
+                              <label className="text-[11px] font-extrabold text-slate-700 uppercase">Ваше ім'я або компанія:</label>
                               <input
                                 type="text"
-                                placeholder="Введіть назву клієнта"
-                                value={customClientName}
+                                placeholder="Введіть ваше ім'я або назву компанії"
+                                value={customClientName || (currentUser?.name && currentUser.name !== 'Клієнт друкарні' ? currentUser.name : '')}
                                 onChange={(e) => setCustomClientName(e.target.value)}
-                                className="w-full px-3 py-1.5 rounded-lg border border-blue-400 bg-white text-xs font-bold text-slate-900 focus:outline-none"
-                                autoFocus
+                                className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-900 focus:border-blue-600 focus:outline-none"
                               />
-                            ) : (
-                              <select
-                                value={selectedClientId}
-                                onChange={(e) => setSelectedClientId(e.target.value)}
-                                className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-bold text-slate-800 focus:outline-none"
-                              >
-                                <option value="">-- Оберіть замовника з бази --</option>
-                                {clients.map(c => (
-                                  <option key={c.id} value={c.id}>{c.name}</option>
-                                ))}
-                              </select>
-                            )}
-                          </div>
-
-                          {/* 3. Продукція (авто) */}
-                          <div className="md:col-span-5 flex flex-col gap-1">
-                            <div className="flex items-center justify-between">
-                              <label className="text-[11px] font-extrabold text-slate-700 uppercase">Продукція:</label>
-                              
                             </div>
-                            <input
-                              type="text"
-                              value={customTitleMap['digital'] ?? fullComposedName}
-                              onChange={(e) => {
-                                setCustomTitleMap(prev => ({ ...prev, digital: e.target.value }));
-                                setName(e.target.value);
-                              }}
-                              className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold text-slate-800"
-                            />
+                            <div className="md:col-span-6 flex flex-col gap-1">
+                              <label className="text-[11px] font-extrabold text-slate-700 uppercase">Номер телефону для зв'язку:</label>
+                              <input
+                                type="text"
+                                placeholder="+38 (0__) ___-__-__"
+                                value={customClientPhone}
+                                onChange={(e) => setCustomClientPhone(e.target.value)}
+                                className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-900 focus:border-blue-600 focus:outline-none"
+                              />
+                            </div>
                           </div>
-                        </div>
+                        ) : (
+                          <div className="grid grid-cols-1 md:grid-cols-12 gap-3 p-4 rounded-xl bg-slate-50 border border-slate-200">
+                            {/* 1. Номер замовлення (Фіксований ID рахунку) */}
+                            <div className="md:col-span-3 flex flex-col gap-1">
+                              <label className="text-[11px] font-extrabold text-slate-700 uppercase">№ Замовлення (ID):</label>
+                              <div className="w-full px-3 py-2 rounded-xl bg-slate-100/90 border border-slate-200 text-xs font-black text-blue-700 font-mono flex items-center select-none cursor-default shadow-2xs">
+                                № {orderNumber}
+                              </div>
+                            </div>
+
+                            {/* 2. Замовник */}
+                            <div className="md:col-span-4 flex flex-col gap-1">
+                              <div className="flex items-center justify-between">
+                                <label className="text-[11px] font-extrabold text-slate-700 uppercase">Замовник:</label>
+                                <button
+                                  type="button"
+                                  onClick={() => setIsNewClientMode(!isNewClientMode)}
+                                  className="text-[10px] font-bold text-blue-600 hover:text-blue-800 underline"
+                                >
+                                  {isNewClientMode ? 'Вибрати з бази' : '+ Вписати нового'}
+                                </button>
+                              </div>
+
+                              {isNewClientMode ? (
+                                <input
+                                  type="text"
+                                  placeholder="Введіть назву клієнта"
+                                  value={customClientName}
+                                  onChange={(e) => setCustomClientName(e.target.value)}
+                                  className="w-full px-3 py-1.5 rounded-lg border border-blue-400 bg-white text-xs font-bold text-slate-900 focus:outline-none"
+                                  autoFocus
+                                />
+                              ) : (
+                                <select
+                                  value={selectedClientId}
+                                  onChange={(e) => setSelectedClientId(e.target.value)}
+                                  className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-bold text-slate-800 focus:outline-none"
+                                >
+                                  <option value="">-- Оберіть замовника з бази --</option>
+                                  {clients.map(c => (
+                                    <option key={c.id} value={c.id}>{c.name}</option>
+                                  ))}
+                                </select>
+                              )}
+                            </div>
+
+                            {/* 3. Продукція (авто) */}
+                            <div className="md:col-span-5 flex flex-col gap-1">
+                              <div className="flex items-center justify-between">
+                                <label className="text-[11px] font-extrabold text-slate-700 uppercase">Продукція:</label>
+                              </div>
+                              <input
+                                type="text"
+                                value={customTitleMap['digital'] ?? fullComposedName}
+                                onChange={(e) => {
+                                  setCustomTitleMap(prev => ({ ...prev, digital: e.target.value }));
+                                  setName(e.target.value);
+                                }}
+                                className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold text-slate-800"
+                              />
+                            </div>
+                          </div>
+                        )}
 
                         {/* 2-Column Main Section: Left = ОБОРОТ (СПУСК) | Right = РОЗРАХУНОК + Горизонтальні кнопки */}
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-7 items-stretch">
@@ -8404,50 +8433,6 @@ export const Calculator: React.FC = () => {
           {/* TAB 3: DIGITAL PRINTING */}
           {mainCategoryTab === 'digital' && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              {/* Universal Digital Sub-Navigation Bar */}
-              <div className="flex items-center justify-between gap-2 p-2 bg-slate-100/80 rounded-xl border border-slate-200 overflow-x-auto shrink-0 scrollbar-none">
-                <div className="flex items-center gap-1.5 overflow-x-auto">
-                  <button
-                    type="button"
-                    onClick={() => setDigitalSubTab('overview')}
-                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer ${
-                      digitalSubTab === 'overview'
-                        ? 'bg-blue-600 text-white shadow-xs'
-                        : 'text-slate-700 hover:bg-white'
-                    }`}
-                  >
-                    <BookOpen size={13} />
-                    <span>Каталог послуг</span>
-                  </button>
-                  <div className="w-[1px] h-4 bg-slate-300 mx-1 shrink-0" />
-                  {[
-                    { id: 'sheets', label: 'Листовий друк' },
-                    { id: 'felling', label: 'Висічка' },
-                    { id: 'multipage', label: 'Багатосторінкова' },
-                    { id: 'notebooks', label: 'Блокноти' },
-                    { id: 'pouch_lam', label: 'Конвертна ламінація' },
-                    { id: 'plotter_cut', label: 'Плоттерна порізка' },
-                    { id: 'in_sheets', label: 'Друк у листах' },
-                    { id: 'custom', label: 'Конструктор' }
-                  ].map(sub => {
-                    const isSubActive = digitalSubTab === sub.id;
-                    return (
-                      <button
-                        key={sub.id}
-                        type="button"
-                        onClick={() => setDigitalSubTab(sub.id as any)}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-bold shrink-0 transition-all cursor-pointer ${
-                          isSubActive
-                            ? 'bg-blue-600 text-white shadow-xs'
-                            : 'text-slate-600 hover:bg-white'
-                        }`}
-                      >
-                        {sub.label}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
               {digitalSubTab === 'overview' && (
                 /* 10 CATEGORIES OVERVIEW */
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
@@ -9569,69 +9554,93 @@ export const Calculator: React.FC = () => {
                           </div>
                         </div>
 
-                        {/* Top 3-Field Strip: [ № ] [ ЗАМОВНИК ] [ ПРОДУКЦІЯ (авто) ] */}
-                        <div className="grid grid-cols-1 md:grid-cols-12 gap-3 p-4 rounded-xl bg-slate-50 border border-slate-200">
-                          {/* 1. Номер замовлення (Фіксований ID рахунку) */}
-                          <div className="md:col-span-3 flex flex-col gap-1">
-                            <label className="text-[11px] font-extrabold text-slate-700 uppercase">№ Замовлення (ID):</label>
-                            <div className="w-full px-3 py-2 rounded-xl bg-slate-100/90 border border-slate-200 text-xs font-black text-blue-700 font-mono flex items-center select-none cursor-default shadow-2xs">
-                              № {orderNumber}
-                            </div>
-                          </div>
-
-                          {/* 2. Замовник */}
-                          <div className="md:col-span-4 flex flex-col gap-1">
-                            <div className="flex items-center justify-between">
-                              <label className="text-[11px] font-extrabold text-slate-700 uppercase">Замовник:</label>
-                              <button
-                                type="button"
-                                onClick={() => setIsNewClientMode(!isNewClientMode)}
-                                className="text-[10px] font-bold text-blue-600 hover:text-blue-800 underline"
-                              >
-                                {isNewClientMode ? 'Вибрати з бази' : '+ Вписати нового'}
-                              </button>
-                            </div>
-
-                            {isNewClientMode ? (
+                        {/* Top Strip: Client Contacts vs Staff CRM fields */}
+                        {currentUser?.role === 'client' ? (
+                          <div className="grid grid-cols-1 md:grid-cols-12 gap-3 p-4 rounded-xl bg-blue-50/60 border border-blue-100">
+                            <div className="md:col-span-6 flex flex-col gap-1">
+                              <label className="text-[11px] font-extrabold text-slate-700 uppercase">Ваше ім'я або компанія:</label>
                               <input
                                 type="text"
-                                placeholder="Введіть назву клієнта"
-                                value={customClientName}
+                                placeholder="Введіть ваше ім'я або назву компанії"
+                                value={customClientName || (currentUser?.name && currentUser.name !== 'Клієнт друкарні' ? currentUser.name : '')}
                                 onChange={(e) => setCustomClientName(e.target.value)}
-                                className="w-full px-3 py-1.5 rounded-lg border border-blue-400 bg-white text-xs font-bold text-slate-900 focus:outline-none"
-                                autoFocus
+                                className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-900 focus:border-blue-600 focus:outline-none"
                               />
-                            ) : (
-                              <select
-                                value={selectedClientId}
-                                onChange={(e) => setSelectedClientId(e.target.value)}
-                                className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-bold text-slate-800 focus:outline-none"
-                              >
-                                <option value="">-- Оберіть замовника з бази --</option>
-                                {clients.map(c => (
-                                  <option key={c.id} value={c.id}>{c.name}</option>
-                                ))}
-                              </select>
-                            )}
-                          </div>
-
-                          {/* 3. Продукція (авто) */}
-                          <div className="md:col-span-5 flex flex-col gap-1">
-                            <div className="flex items-center justify-between">
-                              <label className="text-[11px] font-extrabold text-slate-700 uppercase">Продукція:</label>
-                              
                             </div>
-                            <input
-                              type="text"
-                              value={customTitleMap['digital'] ?? fullComposedName}
-                              onChange={(e) => {
-                                setCustomTitleMap(prev => ({ ...prev, digital: e.target.value }));
-                                setName(e.target.value);
-                              }}
-                              className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold text-slate-800"
-                            />
+                            <div className="md:col-span-6 flex flex-col gap-1">
+                              <label className="text-[11px] font-extrabold text-slate-700 uppercase">Номер телефону для зв'язку:</label>
+                              <input
+                                type="text"
+                                placeholder="+38 (0__) ___-__-__"
+                                value={customClientPhone}
+                                onChange={(e) => setCustomClientPhone(e.target.value)}
+                                className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-900 focus:border-blue-600 focus:outline-none"
+                              />
+                            </div>
                           </div>
-                        </div>
+                        ) : (
+                          <div className="grid grid-cols-1 md:grid-cols-12 gap-3 p-4 rounded-xl bg-slate-50 border border-slate-200">
+                            {/* 1. Номер замовлення (Фіксований ID рахунку) */}
+                            <div className="md:col-span-3 flex flex-col gap-1">
+                              <label className="text-[11px] font-extrabold text-slate-700 uppercase">№ Замовлення (ID):</label>
+                              <div className="w-full px-3 py-2 rounded-xl bg-slate-100/90 border border-slate-200 text-xs font-black text-blue-700 font-mono flex items-center select-none cursor-default shadow-2xs">
+                                № {orderNumber}
+                              </div>
+                            </div>
+
+                            {/* 2. Замовник */}
+                            <div className="md:col-span-4 flex flex-col gap-1">
+                              <div className="flex items-center justify-between">
+                                <label className="text-[11px] font-extrabold text-slate-700 uppercase">Замовник:</label>
+                                <button
+                                  type="button"
+                                  onClick={() => setIsNewClientMode(!isNewClientMode)}
+                                  className="text-[10px] font-bold text-blue-600 hover:text-blue-800 underline"
+                                >
+                                  {isNewClientMode ? 'Вибрати з бази' : '+ Вписати нового'}
+                                </button>
+                              </div>
+
+                              {isNewClientMode ? (
+                                <input
+                                  type="text"
+                                  placeholder="Введіть назву клієнта"
+                                  value={customClientName}
+                                  onChange={(e) => setCustomClientName(e.target.value)}
+                                  className="w-full px-3 py-1.5 rounded-lg border border-blue-400 bg-white text-xs font-bold text-slate-900 focus:outline-none"
+                                  autoFocus
+                                />
+                              ) : (
+                                <select
+                                  value={selectedClientId}
+                                  onChange={(e) => setSelectedClientId(e.target.value)}
+                                  className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-bold text-slate-800 focus:outline-none"
+                                >
+                                  <option value="">-- Оберіть замовника з бази --</option>
+                                  {clients.map(c => (
+                                    <option key={c.id} value={c.id}>{c.name}</option>
+                                  ))}
+                                </select>
+                              )}
+                            </div>
+
+                            {/* 3. Продукція (авто) */}
+                            <div className="md:col-span-5 flex flex-col gap-1">
+                              <div className="flex items-center justify-between">
+                                <label className="text-[11px] font-extrabold text-slate-700 uppercase">Продукція:</label>
+                              </div>
+                              <input
+                                type="text"
+                                value={customTitleMap['digital'] ?? fullComposedName}
+                                onChange={(e) => {
+                                  setCustomTitleMap(prev => ({ ...prev, digital: e.target.value }));
+                                  setName(e.target.value);
+                                }}
+                                className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold text-slate-800"
+                              />
+                            </div>
+                          </div>
+                        )}
 
                         {/* 2-Column Main Section: Left = ОБОРОТ (СПУСК) | Right = РОЗРАХУНОК + Горизонтальні кнопки */}
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-7 items-stretch">
@@ -12850,69 +12859,93 @@ export const Calculator: React.FC = () => {
                           </div>
                         </div>
 
-                        {/* Top 3-Field Strip: [ № ] [ ЗАМОВНИК ] [ ПРОДУКЦІЯ (авто) ] */}
-                        <div className="grid grid-cols-1 md:grid-cols-12 gap-3 p-4 rounded-xl bg-slate-50 border border-slate-200">
-                          {/* 1. Номер замовлення (Фіксований ID рахунку) */}
-                          <div className="md:col-span-3 flex flex-col gap-1">
-                            <label className="text-[11px] font-extrabold text-slate-700 uppercase">№ Замовлення (ID):</label>
-                            <div className="w-full px-3 py-2 rounded-xl bg-slate-100/90 border border-slate-200 text-xs font-black text-blue-700 font-mono flex items-center select-none cursor-default shadow-2xs">
-                              № {orderNumber}
-                            </div>
-                          </div>
-
-                          {/* 2. Замовник */}
-                          <div className="md:col-span-4 flex flex-col gap-1">
-                            <div className="flex items-center justify-between">
-                              <label className="text-[11px] font-extrabold text-slate-700 uppercase">Замовник:</label>
-                              <button
-                                type="button"
-                                onClick={() => setIsNewClientMode(!isNewClientMode)}
-                                className="text-[10px] font-bold text-blue-600 hover:text-blue-800 underline"
-                              >
-                                {isNewClientMode ? 'Вибрати з бази' : '+ Вписати нового'}
-                              </button>
-                            </div>
-
-                            {isNewClientMode ? (
+                        {/* Top Strip: Client Contacts vs Staff CRM fields */}
+                        {currentUser?.role === 'client' ? (
+                          <div className="grid grid-cols-1 md:grid-cols-12 gap-3 p-4 rounded-xl bg-blue-50/60 border border-blue-100">
+                            <div className="md:col-span-6 flex flex-col gap-1">
+                              <label className="text-[11px] font-extrabold text-slate-700 uppercase">Ваше ім'я або компанія:</label>
                               <input
                                 type="text"
-                                placeholder="Введіть назву клієнта"
-                                value={customClientName}
+                                placeholder="Введіть ваше ім'я або назву компанії"
+                                value={customClientName || (currentUser?.name && currentUser.name !== 'Клієнт друкарні' ? currentUser.name : '')}
                                 onChange={(e) => setCustomClientName(e.target.value)}
-                                className="w-full px-3 py-1.5 rounded-lg border border-blue-400 bg-white text-xs font-bold text-slate-900 focus:outline-none"
-                                autoFocus
+                                className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-900 focus:border-blue-600 focus:outline-none"
                               />
-                            ) : (
-                              <select
-                                value={selectedClientId}
-                                onChange={(e) => setSelectedClientId(e.target.value)}
-                                className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-bold text-slate-800 focus:outline-none"
-                              >
-                                <option value="">-- Оберіть замовника з бази --</option>
-                                {clients.map(c => (
-                                  <option key={c.id} value={c.id}>{c.name}</option>
-                                ))}
-                              </select>
-                            )}
-                          </div>
-
-                          {/* 3. Продукція (авто) */}
-                          <div className="md:col-span-5 flex flex-col gap-1">
-                            <div className="flex items-center justify-between">
-                              <label className="text-[11px] font-extrabold text-slate-700 uppercase">Продукція:</label>
-                              
                             </div>
-                            <input
-                              type="text"
-                              value={customTitleMap['digital'] ?? fullComposedName}
-                              onChange={(e) => {
-                                setCustomTitleMap(prev => ({ ...prev, digital: e.target.value }));
-                                setName(e.target.value);
-                              }}
-                              className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold text-slate-800"
-                            />
+                            <div className="md:col-span-6 flex flex-col gap-1">
+                              <label className="text-[11px] font-extrabold text-slate-700 uppercase">Номер телефону для зв'язку:</label>
+                              <input
+                                type="text"
+                                placeholder="+38 (0__) ___-__-__"
+                                value={customClientPhone}
+                                onChange={(e) => setCustomClientPhone(e.target.value)}
+                                className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-900 focus:border-blue-600 focus:outline-none"
+                              />
+                            </div>
                           </div>
-                        </div>
+                        ) : (
+                          <div className="grid grid-cols-1 md:grid-cols-12 gap-3 p-4 rounded-xl bg-slate-50 border border-slate-200">
+                            {/* 1. Номер замовлення (Фіксований ID рахунку) */}
+                            <div className="md:col-span-3 flex flex-col gap-1">
+                              <label className="text-[11px] font-extrabold text-slate-700 uppercase">№ Замовлення (ID):</label>
+                              <div className="w-full px-3 py-2 rounded-xl bg-slate-100/90 border border-slate-200 text-xs font-black text-blue-700 font-mono flex items-center select-none cursor-default shadow-2xs">
+                                № {orderNumber}
+                              </div>
+                            </div>
+
+                            {/* 2. Замовник */}
+                            <div className="md:col-span-4 flex flex-col gap-1">
+                              <div className="flex items-center justify-between">
+                                <label className="text-[11px] font-extrabold text-slate-700 uppercase">Замовник:</label>
+                                <button
+                                  type="button"
+                                  onClick={() => setIsNewClientMode(!isNewClientMode)}
+                                  className="text-[10px] font-bold text-blue-600 hover:text-blue-800 underline"
+                                >
+                                  {isNewClientMode ? 'Вибрати з бази' : '+ Вписати нового'}
+                                </button>
+                              </div>
+
+                              {isNewClientMode ? (
+                                <input
+                                  type="text"
+                                  placeholder="Введіть назву клієнта"
+                                  value={customClientName}
+                                  onChange={(e) => setCustomClientName(e.target.value)}
+                                  className="w-full px-3 py-1.5 rounded-lg border border-blue-400 bg-white text-xs font-bold text-slate-900 focus:outline-none"
+                                  autoFocus
+                                />
+                              ) : (
+                                <select
+                                  value={selectedClientId}
+                                  onChange={(e) => setSelectedClientId(e.target.value)}
+                                  className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-bold text-slate-800 focus:outline-none"
+                                >
+                                  <option value="">-- Оберіть замовника з бази --</option>
+                                  {clients.map(c => (
+                                    <option key={c.id} value={c.id}>{c.name}</option>
+                                  ))}
+                                </select>
+                              )}
+                            </div>
+
+                            {/* 3. Продукція (авто) */}
+                            <div className="md:col-span-5 flex flex-col gap-1">
+                              <div className="flex items-center justify-between">
+                                <label className="text-[11px] font-extrabold text-slate-700 uppercase">Продукція:</label>
+                              </div>
+                              <input
+                                type="text"
+                                value={customTitleMap['digital'] ?? fullComposedName}
+                                onChange={(e) => {
+                                  setCustomTitleMap(prev => ({ ...prev, digital: e.target.value }));
+                                  setName(e.target.value);
+                                }}
+                                className="w-full px-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold text-slate-800"
+                              />
+                            </div>
+                          </div>
+                        )}
 
                         {/* 2-Column Main Section: Left = НАКЛАД ТА НАЦІНКА | Right = РОЗРАХУНОК + Горизонтальні кнопки */}
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-7 items-stretch">
