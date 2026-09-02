@@ -19,7 +19,8 @@ import {
   LogOut,
   Moon,
   Sun,
-  X
+  X,
+  Palette
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -44,6 +45,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
     { id: 'leads', name: 'Запити', icon: Sliders, visible: ['admin', 'manager'].includes(role) },
     { id: 'clients', name: 'Замовники', icon: Users, visible: ['admin', 'manager'].includes(role) },
     { id: 'employees', name: 'Співробітники', icon: UserIcon, visible: ['admin', 'manager'].includes(role) },
+    { id: 'designer', name: 'Дизайнерська', icon: Palette, visible: true },
     { id: 'pm', name: 'Дизайн макетів', icon: Briefcase, visible: ['admin', 'manager'].includes(role) },
     { id: 'deals', name: 'Угоди', icon: FolderKanban, visible: ['admin', 'manager'].includes(role) },
     { id: 'delivery', name: 'Доставка', icon: Truck, visible: ['admin', 'manager'].includes(role) },

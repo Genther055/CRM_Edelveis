@@ -20,6 +20,7 @@ import { Settings } from './components/Settings';
 import { Profile } from './components/Profile';
 import { Employees } from './components/Employees';
 import { PM } from './components/PM';
+import { Designer } from './components/Designer';
 import './App.css';
 import './mobile.css';
 
@@ -283,6 +284,10 @@ function AppContent() {
 
       {activeTab === 'employees' && ['admin', 'manager'].includes(role) && (
         <Employees />
+      )}
+
+      {activeTab === 'designer' && (
+        <Designer />
       )}
 
       {activeTab === 'pm' && ['admin', 'manager'].includes(role) && (
