@@ -15177,28 +15177,28 @@ export const Calculator: React.FC = () => {
         );
       })()}
 
-      {/* Save Template Modal - Polished Cupertino iOS Modal */}
+      {/* Save Template Modal - Native CRM Design Style */}
       {showTemplateModal && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <form 
             onSubmit={handleSaveAsTemplate} 
-            className="bg-white rounded-3xl max-w-lg w-full shadow-2xl border border-slate-200/80 overflow-hidden flex flex-col"
+            className="bg-white rounded-2xl max-w-xl w-full shadow-2xl border border-slate-200 overflow-hidden flex flex-col"
           >
             {/* Modal Header */}
-            <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-gradient-to-r from-slate-50 to-white">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-blue-50 border border-blue-100/80 flex items-center justify-center text-blue-600 shadow-2xs">
-                  <LayoutTemplate size={20} />
+            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
+                  <LayoutTemplate size={18} />
                 </div>
                 <div>
-                  <h3 className="text-base font-black text-slate-900 m-0">Зберегти розрахунок як шаблон</h3>
-                  <p className="text-xs text-slate-500 font-medium m-0 mt-0.5">Збережіть параметри замовлення для швидкого повторного розрахунку</p>
+                  <h3 className="text-base font-bold text-slate-900 m-0">Зберегти розрахунок як шаблон</h3>
+                  <p className="text-xs text-slate-500 m-0">Збережіть параметри замовлення для швидкого повторного розрахунку</p>
                 </div>
               </div>
               <button 
                 type="button" 
                 onClick={() => setShowTemplateModal(false)} 
-                className="w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-800 text-sm font-bold flex items-center justify-center transition-all"
+                className="text-slate-400 hover:text-slate-700 w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center transition-colors text-base font-bold"
               >
                 ✕
               </button>
@@ -15208,52 +15208,49 @@ export const Calculator: React.FC = () => {
             <div className="p-6 flex flex-col gap-4">
               <div>
                 <div className="flex items-center justify-between mb-1.5">
-                  <label className="text-xs font-extrabold text-slate-700 uppercase tracking-wider">
-                    НАЗВА ШАБЛОНУ *
+                  <label className="text-xs font-semibold text-slate-700">
+                    Назва шаблону <span className="text-red-500">*</span>
                   </label>
-                  <span className="text-[11px] text-blue-600 font-semibold">Синхронізовано з розрахунком</span>
+                  <span className="text-[11px] text-blue-600 font-medium">Синхронізовано з розрахунком</span>
                 </div>
                 <input 
                   required 
                   placeholder="Введіть назву шаблону..." 
                   value={templateName} 
                   onChange={(e) => setTemplateName(e.target.value)} 
-                  className="w-full px-4 py-3 rounded-xl border border-slate-200 bg-slate-50/80 hover:bg-white focus:bg-white focus:border-blue-600 focus:ring-4 focus:ring-blue-500/10 font-bold text-xs text-slate-900 transition-all outline-none shadow-inner" 
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-white text-xs font-semibold text-slate-800 focus:border-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500/20 transition-all shadow-xs" 
                 />
               </div>
 
-              {/* Order Specs Preview Badge */}
-              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/70 flex flex-col gap-2">
-                <span className="text-[11px] font-extrabold text-slate-500 uppercase tracking-wider">Параметри, що зберігаються:</span>
-                <div className="grid grid-cols-2 gap-2 text-xs">
-                  <div className="flex items-center justify-between bg-white px-2.5 py-1.5 rounded-lg border border-slate-100">
-                    <span className="text-slate-500 font-medium">Категорія:</span>
-                    <strong className="text-slate-800 font-bold">{category === 'Бланки' ? subCategory : (category as string)}</strong>
-                  </div>
-                  <div className="flex items-center justify-between bg-white px-2.5 py-1.5 rounded-lg border border-slate-100">
-                    <span className="text-slate-500 font-medium">Тираж:</span>
-                    <strong className="text-slate-800 font-bold font-mono">{quantity} шт.</strong>
-                  </div>
+              {/* Order Specs Preview Box */}
+              <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200/60 flex items-center justify-between text-xs">
+                <div className="flex items-center gap-2">
+                  <span className="text-slate-500">Виріб:</span>
+                  <strong className="text-slate-800 font-bold">{category === 'Бланки' ? subCategory : (category as string)}</strong>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-slate-500">Тираж:</span>
+                  <strong className="text-slate-800 font-bold font-mono">{quantity} шт.</strong>
                 </div>
               </div>
             </div>
 
             {/* Modal Footer */}
-            <div className="px-6 py-4 bg-slate-50/80 border-t border-slate-100 flex items-center justify-between gap-3">
-              <span className="text-[11px] font-medium text-slate-400 hidden sm:inline">
-                Шаблон буде доступний у базі CRM
+            <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-3">
+              <span className="text-xs text-slate-400">
+                Шаблон буде збережено в базі CRM
               </span>
-              <div className="flex items-center gap-2.5 ml-auto">
+              <div className="flex items-center gap-2.5">
                 <button 
                   type="button" 
                   onClick={() => setShowTemplateModal(false)} 
-                  className="px-4 py-2.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 text-xs font-bold shadow-2xs transition-all"
+                  className="px-4 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 text-xs font-semibold shadow-xs transition-colors"
                 >
                   Скасувати
                 </button>
                 <button 
                   type="submit" 
-                  className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-95 text-white text-xs font-black shadow-md shadow-blue-500/20 transition-all flex items-center gap-1.5"
+                  className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-sm transition-all flex items-center gap-1.5 whitespace-nowrap"
                 >
                   <Save size={14} />
                   <span>Зберегти шаблон</span>
