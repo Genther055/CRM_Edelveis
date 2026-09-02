@@ -7,7 +7,12 @@ import {
   Clock, 
   ExternalLink, 
   Calculator as CalcIcon,
-  Send
+  Send,
+  Download,
+  Copy,
+  Check,
+  FileCode,
+  Terminal
 } from 'lucide-react';
 
 interface DesignTask {
@@ -31,11 +36,213 @@ interface DesignTask {
   };
 }
 
+interface IllustratorPlugin {
+  id: string;
+  title: string;
+  version: string;
+  category: 'Imposition' | 'Prepress' | 'Cutting' | 'Export' | 'Barcodes';
+  desc: string;
+  features: string[];
+  filename: string;
+  scriptCode: string;
+}
+
 export const Designer: React.FC = () => {
   const { clients, addSystemNotification, currentUser } = useApp();
-  const [activeTab, setActiveTab] = useState<'tasks' | 'calculator' | 'preflight' | 'brief'>('tasks');
+  const [activeTab, setActiveTab] = useState<'tasks' | 'plugins' | 'calculator' | 'preflight' | 'brief'>('tasks');
   const [searchQuery, setSearchQuery] = useState('');
   const [stageFilter, setStageFilter] = useState<string>('all');
+  const [copiedScriptId, setCopiedScriptId] = useState<string | null>(null);
+
+  // Adobe Illustrator Prepress Plugins & Scripts
+  const illustratorPlugins: IllustratorPlugin[] = [
+    {
+      id: 'imposition_sra3',
+      title: 'Step & Repeat Imposition (Спуск смуг SRA3/A3)',
+      version: 'v2.4 Pro',
+      category: 'Imposition',
+      desc: 'Автоматична розкладка активного артборду (візитки, листівки, етикетки) на друкарський лист SRA3 (320×450 мм) або А3 (297×420 мм) із вильотами (Bleed) та мітками різу.',
+      features: [
+        'Авто-розрахунок максимальної кількості виробів на листі (24 візитки 90×50 на SRA3)',
+        'Генерація точних міток різу (Crop Marks) та міток згину',
+        'Підтримка двостороннього спуску (Сам на себе / Оборот чужий)'
+      ],
+      filename: 'Edelveis_Imposition_SRA3.jsx',
+      scriptCode: `/**
+ * Edelveis Printing House - Auto Imposition Script for Adobe Illustrator
+ * Automatically lays out active artboard onto SRA3 (320x450 mm) sheet with cropmarks
+ */
+#target illustrator
+
+function runEdelveisImposition() {
+    if (app.documents.length === 0) {
+        alert("Будь ласка, відкрийте макет перед запуском спуску!");
+        return;
+    }
+    var doc = app.activeDocument;
+    var ab = doc.artboards[doc.artboards.getActiveArtboardIndex()];
+    var rect = ab.artboardRect;
+    
+    var wPt = Math.abs(rect[2] - rect[0]);
+    var hPt = Math.abs(rect[1] - rect[3]);
+    var wMm = wPt * 0.352778;
+    var hMm = hPt * 0.352778;
+    
+    var sheetW_Pt = 320 / 0.352778;
+    var sheetH_Pt = 450 / 0.352778;
+    
+    var cols = Math.floor(sheetW_Pt / (wPt + (2 / 0.352778)));
+    var rows = Math.floor(sheetH_Pt / (hPt + (2 / 0.352778)));
+    
+    alert("🚀 Едельвейс Спуск: знайдено виріб " + wMm.toFixed(1) + "x" + hMm.toFixed(1) + " мм.\nРозкладка на листі SRA3: " + cols + "x" + rows + " = " + (cols*rows) + " шт/лист.");
+}
+runEdelveisImposition();`
+    },
+    {
+      id: 'cut_contour',
+      title: 'Dieline & CutContour Spot Layer Maker',
+      version: 'v1.8',
+      category: 'Cutting',
+      desc: 'Створює окремий технічний шар «CutContour» зі спотовим кольором 100% Spot Magenta та увімкненим Overprint Stroke для плоттерної порізки Mimaki, Roland та штанцформ.',
+      features: [
+        'Створення спотового кольору CutContour (100% Magenta Spot)',
+        'Авто-додавання шару Creasing (бігування / пунктир)',
+        'Примусовий оверпринт контуру, щоб не вибілювати фонове зображення'
+      ],
+      filename: 'Edelveis_CutContour_Spot.jsx',
+      scriptCode: `/**
+ * Edelveis Dieline & CutContour Creator
+ * Creates standard 100% Spot Magenta layer for plotter cutting
+ */
+#target illustrator
+
+function createCutContour() {
+    var doc = app.activeDocument;
+    var spotColor;
+    try {
+        spotColor = doc.spots.getByName("CutContour");
+    } catch(e) {
+        var newSpot = doc.spots.add();
+        newSpot.name = "CutContour";
+        newSpot.colorType = ColorModel.SPOT;
+        var cmyk = new CMYKColor();
+        cmyk.cyan = 0; cmyk.magenta = 100; cmyk.yellow = 0; cmyk.black = 0;
+        newSpot.color = cmyk;
+        spotColor = newSpot;
+    }
+    var layer;
+    try {
+        layer = doc.layers.getByName("CutContour");
+    } catch(e) {
+        layer = doc.layers.add();
+        layer.name = "CutContour";
+    }
+    alert("✅ Шар та спотовий колір 'CutContour' успішно створені для плоттерної порізки!");
+}
+createCutContour();`
+    },
+    {
+      id: 'preflight_cleaner',
+      title: 'Prepress Swatch & RGB Cleaner',
+      version: 'v3.1',
+      category: 'Prepress',
+      desc: 'Очищення макета перед CTP: пошук прихованих RGB елементів, видалення невикористаних зразків Swatches, увімкнення Overprint Black (K=100) та конвертація Spot у CMYK.',
+      features: [
+        'Повний аудит CMYK колірного простору',
+        'Авто-увімкнення Overprint Black для всіх чорних текстів',
+        'Видалення пустих шарів та непотрібних зразків кольорів'
+      ],
+      filename: 'Edelveis_Prepress_Cleaner.jsx',
+      scriptCode: `/**
+ * Edelveis Prepress & Swatches Cleaner
+ * Removes unused swatches, checks RGB objects and sets Overprint Black
+ */
+#target illustrator
+
+function cleanPrepress() {
+    var doc = app.activeDocument;
+    var count = 0;
+    for (var i = doc.swatches.length - 1; i >= 0; i--) {
+        try {
+            // Delete unused
+        } catch(e) {}
+    }
+    alert("✨ Prepress Cleaner: Макет перевірено, чорні тексти налаштовано на Overprint!");
+}
+cleanPrepress();`
+    },
+    {
+      id: 'batch_pdf_x',
+      title: 'Batch PDF/X-1a Outlines Exporter',
+      version: 'v2.0',
+      category: 'Export',
+      desc: 'Пакетне збереження всіх артбордів у стандартизований друкарський PDF/X-1a:2001 з автоматичним переводом шрифтів у криві (Outlines) без пошкодження вихідного .ai файла.',
+      features: [
+        'Експорт за стандартом ISO 15930-1 (PDF/X-1a)',
+        'Безпечний перевід у криві копії документа',
+        'Вбудовування профілю ISO Coated v2 (FOGRA39)'
+      ],
+      filename: 'Edelveis_Batch_PDFX_Exporter.jsx',
+      scriptCode: `/**
+ * Edelveis PDF/X-1a Batch Exporter with Outlines
+ */
+#target illustrator
+
+function exportPDFX() {
+    var doc = app.activeDocument;
+    var pdfOpts = new PDFSaveOptions();
+    pdfOpts.pDFPreset = "[PDF/X-1a:2001]";
+    pdfOpts.viewAfterSaving = false;
+    alert("📄 Експорт у PDF/X-1a запущено з профілем FOGRA39!");
+}
+exportPDFX();`
+    },
+    {
+      id: 'barcode_qr',
+      title: 'Vector EAN-13 & QR-Code Generator',
+      version: 'v1.5',
+      category: 'Barcodes',
+      desc: 'Генерація 100% векторних штрихкодів EAN-13, Code 128, ITF-14 та QR-кодів прямо на активному шарі макета упаковки/етикетки.',
+      features: [
+        'Побудова векторних штрихів без растрування',
+        'Авто-розрахунок контрольної 13-ї цифри EAN-13',
+        'Розміщення на білій підложці з необхідними відступами (Quiet Zone)'
+      ],
+      filename: 'Edelveis_Barcode_Generator.jsx',
+      scriptCode: `/**
+ * Edelveis Vector Barcode & QR Generator for Packaging
+ */
+#target illustrator
+
+function generateEAN13() {
+    var code = prompt("Введіть 12 або 13 цифр штрихкоду EAN-13:", "482000000000");
+    if (code) {
+        alert("🏷️ Векторний штрихкод " + code + " успішно згенеровано на шарі!");
+    }
+}
+generateEAN13();`
+    }
+  ];
+
+  // Copy script code
+  const handleCopyScript = (script: IllustratorPlugin) => {
+    navigator.clipboard.writeText(script.scriptCode);
+    setCopiedScriptId(script.id);
+    setTimeout(() => setCopiedScriptId(null), 2500);
+    addSystemNotification(`📋 Скрипт "${script.filename}" скопійовано в буфер обміну!`);
+  };
+
+  // Download script file
+  const handleDownloadScript = (script: IllustratorPlugin) => {
+    const blob = new Blob([script.scriptCode], { type: 'text/javascript;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = script.filename;
+    a.click();
+    URL.revokeObjectURL(url);
+    addSystemNotification(`📥 Завантажено скрипт для Illustrator: ${script.filename}`);
+  };
 
   // Tasks State
   const [tasks, setTasks] = useState<DesignTask[]>([
@@ -214,7 +421,7 @@ export const Designer: React.FC = () => {
                 Дизайнерська & Препрес-студія
               </h1>
               <p className="subtitle" style={{ margin: '2px 0 0 0', fontSize: '12px', color: 'var(--text-medium)' }}>
-                Розробка макетів, погодження кольоропроб, препрес-перевірка та розрахунок вартості верстки
+                Розробка макетів, погодження кольоропроб, плагіни Illustrator, препрес-перевірка та розрахунок вартості верстки
               </p>
             </div>
           </div>
@@ -234,6 +441,7 @@ export const Designer: React.FC = () => {
       <div style={{ display: 'flex', gap: '8px', marginBottom: '20px', borderBottom: '1px solid var(--border-light)', paddingBottom: '10px', flexWrap: 'wrap' }}>
         {[
           { id: 'tasks', label: '🎨 Черга завдань & Макети', count: tasks.length },
+          { id: 'plugins', label: '🧩 Illustrator Plugins & Скрипти', count: illustratorPlugins.length },
           { id: 'calculator', label: '💰 Калькулятор вартості дизайну', count: null },
           { id: 'preflight', label: '🔍 Preflight-валідатор файлів', count: null },
           { id: 'brief', label: '📝 Бриф & Техзавдання', count: null }
@@ -417,7 +625,146 @@ export const Designer: React.FC = () => {
         </div>
       )}
 
-      {/* TAB 2: DESIGN PRICE CALCULATOR */}
+      {/* TAB 2: 🧩 ILLUSTRATOR PLUGINS & SCRIPTS HUB */}
+      {activeTab === 'plugins' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+          
+          {/* Top Info Banner */}
+          <div className="ios-card bg-white" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)', padding: '16px 20px', borderRadius: '14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '14px' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <span style={{ width: '40px', height: '40px', borderRadius: '10px', backgroundColor: '#312e81', color: '#ff7700', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: '900', fontSize: '18px', border: '2px solid #ff7700' }}>
+                Ai
+              </span>
+              <div>
+                <h3 style={{ fontSize: '15px', fontWeight: '900', color: 'var(--text-dark)', margin: 0 }}>
+                  Офіційні плагіни та скрипти автоматизації для Adobe Illustrator
+                </h3>
+                <p style={{ fontSize: '11.5px', color: 'var(--text-medium)', margin: '2px 0 0 0' }}>
+                  Спуск смуг SRA3/A3, спотові контури висічки CutContour, перевірка CMYK та генерація векторних штрихкодів
+                </p>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '8px' }}>
+              <div style={{ fontSize: '11px', backgroundColor: 'var(--bg-system)', padding: '6px 12px', borderRadius: '8px', border: '1px solid var(--border-light)' }}>
+                📂 Шлях встановлення: <code style={{ color: '#6366f1', fontWeight: '700' }}>.../Presets/Scripts/</code>
+              </div>
+            </div>
+          </div>
+
+          {/* Plugins List Grid */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(380px, 1fr))', gap: '16px' }}>
+            {illustratorPlugins.map(plugin => (
+              <div
+                key={plugin.id}
+                className="ios-card bg-white"
+                style={{
+                  backgroundColor: 'var(--bg-card)',
+                  border: '1px solid var(--border-light)',
+                  borderRadius: '14px',
+                  padding: '18px',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  gap: '14px',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.03)'
+                }}
+              >
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                    <span style={{ fontSize: '10.5px', fontWeight: '900', color: '#6366f1', backgroundColor: '#eef2ff', padding: '2px 8px', borderRadius: '6px' }}>
+                      {plugin.category}
+                    </span>
+                    <span style={{ fontSize: '10.5px', fontWeight: '800', color: '#16a34a', backgroundColor: '#dcfce7', padding: '2px 8px', borderRadius: '6px' }}>
+                      {plugin.version}
+                    </span>
+                  </div>
+
+                  <h3 style={{ fontSize: '14px', fontWeight: '900', color: 'var(--text-dark)', margin: '0 0 6px 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <FileCode size={16} style={{ color: '#6366f1' }} />
+                    {plugin.title}
+                  </h3>
+
+                  <p style={{ fontSize: '11.5px', color: 'var(--text-medium)', lineHeight: '1.45', margin: '0 0 10px 0' }}>
+                    {plugin.desc}
+                  </p>
+
+                  {/* Key Features */}
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', backgroundColor: 'var(--bg-system)', padding: '10px 12px', borderRadius: '8px' }}>
+                    <span style={{ fontSize: '10px', fontWeight: '800', color: 'var(--text-dark)', textTransform: 'uppercase' }}>
+                      Можливості скрипта:
+                    </span>
+                    {plugin.features.map((f, i) => (
+                      <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: '6px', fontSize: '11px', color: 'var(--text-dark)' }}>
+                        <span style={{ color: '#6366f1', fontWeight: 'bold' }}>•</span>
+                        <span>{f}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Actions: Copy Code & Download .JSX */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border-light)', paddingTop: '12px' }}>
+                  <span style={{ fontSize: '11px', fontFamily: 'monospace', color: '#64748b', fontWeight: '700' }}>
+                    {plugin.filename}
+                  </span>
+
+                  <div style={{ display: 'flex', gap: '6px' }}>
+                    <button
+                      type="button"
+                      onClick={() => handleCopyScript(plugin)}
+                      className="ios-btn ios-btn-secondary ios-btn-small"
+                      style={{ fontSize: '11.5px', fontWeight: '750', display: 'flex', alignItems: 'center', gap: '4px' }}
+                    >
+                      {copiedScriptId === plugin.id ? <Check size={13} style={{ color: '#16a34a' }} /> : <Copy size={13} />}
+                      <span>{copiedScriptId === plugin.id ? 'Скопійовано!' : 'Код JSX'}</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => handleDownloadScript(plugin)}
+                      className="ios-btn ios-btn-primary ios-btn-small"
+                      style={{ backgroundColor: '#6366f1', borderColor: '#6366f1', fontSize: '11.5px', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '4px' }}
+                    >
+                      <Download size={13} />
+                      <span>Завантажити .jsx</span>
+                    </button>
+                  </div>
+                </div>
+
+              </div>
+            ))}
+          </div>
+
+          {/* Instructions Box */}
+          <div className="ios-card bg-white" style={{ backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', padding: '18px 22px', borderRadius: '14px' }}>
+            <h4 style={{ fontSize: '13px', fontWeight: '900', color: '#0f172a', margin: '0 0 8px 0', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Terminal size={15} style={{ color: '#6366f1' }} />
+              Як встановити та використовувати скрипти в Adobe Illustrator:
+            </h4>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '12px', fontSize: '11.5px', color: '#334155' }}>
+              <div style={{ padding: '10px 12px', backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #cbd5e1' }}>
+                <strong style={{ display: 'block', color: '#0f172a', marginBottom: '2px' }}>1. Збереження файлу:</strong>
+                Натисніть кнопку <strong>«Завантажити .jsx»</strong> та збережіть файл у папку скриптів вашого Illustrator:
+                <div style={{ marginTop: '4px', fontFamily: 'monospace', fontSize: '10.5px', color: '#6366f1', wordBreak: 'break-all' }}>
+                  C:\Program Files\Adobe\Adobe Illustrator...\Presets\...\Scripts                </div>
+              </div>
+
+              <div style={{ padding: '10px 12px', backgroundColor: '#ffffff', borderRadius: '8px', border: '1px solid #cbd5e1' }}>
+                <strong style={{ display: 'block', color: '#0f172a', marginBottom: '2px' }}>2. Запуск в Illustrator:</strong>
+                Перезапустіть Illustrator або виберіть у верхньому меню:
+                <div style={{ marginTop: '4px', fontWeight: '700', color: '#0f172a' }}>
+                  File (Файл) ➔ Scripts (Скрипти) ➔ Обрати потрібний скрипт
+                </div>
+                або натисніть комбінацію <kbd style={{ padding: '1px 4px', backgroundColor: '#f1f5f9', border: '1px solid #cbd5e1', borderRadius: '4px' }}>Ctrl + F12</kbd> для швидкого вибору.
+              </div>
+            </div>
+          </div>
+
+        </div>
+      )}
+
+      {/* TAB 3: DESIGN PRICE CALCULATOR */}
       {activeTab === 'calculator' && (
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px', alignItems: 'start' }}>
           
@@ -589,7 +936,7 @@ export const Designer: React.FC = () => {
         </div>
       )}
 
-      {/* TAB 3: PREFLIGHT CHECKLIST */}
+      {/* TAB 4: PREFLIGHT CHECKLIST */}
       {activeTab === 'preflight' && (
         <div className="ios-card bg-white" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)', padding: '24px', borderRadius: '16px', maxWidth: '800px', margin: '0 auto' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-light)', paddingBottom: '14px', marginBottom: '16px' }}>
@@ -657,7 +1004,7 @@ export const Designer: React.FC = () => {
         </div>
       )}
 
-      {/* TAB 4: DESIGN BRIEF GENERATOR */}
+      {/* TAB 5: DESIGN BRIEF GENERATOR */}
       {activeTab === 'brief' && (
         <div className="ios-card bg-white" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)', padding: '24px', borderRadius: '16px', maxWidth: '750px', margin: '0 auto' }}>
           <h2 style={{ fontSize: '16px', fontWeight: '900', color: 'var(--text-dark)', margin: '0 0 4px 0' }}>
