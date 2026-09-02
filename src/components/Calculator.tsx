@@ -6635,7 +6635,7 @@ export const Calculator: React.FC = () => {
                                         const isSelectedCell = selectedSheetCalc && 
                                           selectedSheetCalc.matId === matId && 
                                           selectedSheetCalc.covId === covId && 
-                                          selectedSheetCalc.colStr === colStr && 
+                          selectedSheetCalc.colStr === colStr && 
                                           selectedSheetCalc.tirazh === tir;
 
                                         return (
@@ -6953,9 +6953,25 @@ export const Calculator: React.FC = () => {
                                 <label className="text-xs font-extrabold text-slate-700 uppercase">ТИРАЖ (ШТ):</label>
                                 <input
                                   type="number"
-                                  value={activeCalc.tirazh}
+                                  min="1"
+                                  placeholder="Введіть тираж (наприклад: 500)"
+                                  value={activeCalc.tirazh === 0 ? '' : activeCalc.tirazh}
+                                  onFocus={(e) => e.target.select()}
+                                  onBlur={() => {
+                                    if (!activeCalc.tirazh || activeCalc.tirazh < 1) {
+                                      setQuantity(100);
+                                      setSelectedSheetCalc(prev => prev ? { ...prev, tirazh: 100 } : null);
+                                    }
+                                  }}
                                   onChange={(e) => {
-                                    const val = Math.max(1, parseInt(e.target.value) || 0);
+                                    const raw = e.target.value;
+                                    if (raw === '') {
+                                      setQuantity(0);
+                                      setSelectedSheetCalc(prev => prev ? { ...prev, tirazh: 0, finalPrice: 0, unitPrice: 0 } : null);
+                                      return;
+                                    }
+                                    const val = parseInt(raw);
+                                    if (isNaN(val)) return;
                                     setQuantity(val);
                                     setSelectedSheetCalc(prev => {
                                       const base = prev || activeCalc;
@@ -6976,7 +6992,7 @@ export const Calculator: React.FC = () => {
                                           }
                                           unitP = l === u ? bMap[l] : bMap[l] + ((val - l) / (u - l)) * (bMap[u] - bMap[l]);
                                         }
-                                        const finP = Math.round(unitP * val);
+                                        const finP = Math.round((unitP || 1) * val);
                                         const cBasis = finP / (marginPercent / 100 || 1);
                                         return {
                                           ...base,
@@ -6985,7 +7001,7 @@ export const Calculator: React.FC = () => {
                                           printCost: cBasis * 0.52,
                                           rawCost: cBasis,
                                           finalPrice: finP,
-                                          unitPrice: unitP
+                                          unitPrice: unitP || 1
                                         };
                                       }
                                       const oldTir = base.tirazh || 1;
@@ -9554,9 +9570,18 @@ export const Calculator: React.FC = () => {
                                 <label className="text-xs font-extrabold text-slate-700 uppercase">ТИРАЖ (ШТ):</label>
                                 <input
                                   type="number"
-                                  value={digTir}
+                                  min="1"
+                                  placeholder="Введіть тираж"
+                                  value={digTir === 0 ? '' : digTir}
+                                  onFocus={(e) => e.target.select()}
+                                  onBlur={() => {
+                                    if (!digTir || digTir < 1) {
+                                      setSelectedSheetCalc(prev => prev ? { ...prev, tirazh: 100 } : null);
+                                    }
+                                  }}
                                   onChange={(e) => {
-                                    const val = parseInt(e.target.value) || 100;
+                                    const raw = e.target.value;
+                                    const val = raw === '' ? 0 : (parseInt(raw) || 0);
                                     setSelectedSheetCalc(prev => prev ? { ...prev, tirazh: val } : {
                                       matId: digMatId,
                                       covId: digCovId,
