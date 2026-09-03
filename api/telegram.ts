@@ -86,6 +86,57 @@ export default async function handler(req: any, res: any) {
       return res.status(200).json({ ok: true });
     }
 
+        if (data === 'reg_choice') {
+      const text = `👤 <b>Оберіть статус вашого облікового запису:</b>\n\n1. <b>Покупець (Фізична особа)</b> — швидкий онлайн-прорахунок цін, роздрібні замовлення, оплата карткою.\n2. <b>Бізнес (ФОП / ТОВ / Компанія)</b> — рахунки-фактури з ПДВ 20%, партнерські оптові ціни, договори та безготівковий розрахунок.`;
+      const keyboard = {
+        inline_keyboard: [
+          [
+            { text: '👤 Покупець (Фіз. особа)', callback_data: 'auth_buyer' },
+            { text: '🏢 Бізнес (ФОП / ТОВ)', callback_data: 'auth_business' }
+          ],
+          [
+            { text: '⬅️ Назад до меню', callback_data: 'menu_main' }
+          ]
+        ]
+      };
+      await sendMessage(chatId, text, keyboard);
+      return res.status(200).json({ ok: true });
+    }
+
+    if (data === 'auth_buyer') {
+      const text = `✅ <b>Профіль «Покупець» підтверджено!</b>\n\nВам відкрито доступ до розрахунку поліграфії та онлайн-замовлення.\n\nНатисніть кнопку нижче, щоб відкрити персональний калькулятор:`;
+      const keyboard = {
+        inline_keyboard: [
+          [
+            { text: '🌐 Відкрити онлайн-калькулятор', url: 'https://crm-edelveis.vercel.app/?mode=client&type=buyer' }
+          ],
+          [
+            { text: '🏷️ Швидкий розрахунок у боті', callback_data: 'calc_menu' },
+            { text: '🏠 Головне меню', callback_data: 'menu_main' }
+          ]
+        ]
+      };
+      await sendMessage(chatId, text, keyboard);
+      return res.status(200).json({ ok: true });
+    }
+
+    if (data === 'auth_business') {
+      const text = `🏢 <b>Профіль «Бізнес» активовано!</b>\n\nДля вашої організації увімкнено оптові ціни, генерацію рахунків-фактур (з ПДВ/без ПДВ) та договори.\n\nНатисніть кнопку нижче для переходу в корпоративний кабінет:`;
+      const keyboard = {
+        inline_keyboard: [
+          [
+            { text: '💼 Відкрити корпоративний кабінет', url: 'https://crm-edelveis.vercel.app/?mode=client&type=business' }
+          ],
+          [
+            { text: '💬 Зв\'язатися з менеджером B2B', callback_data: 'contacts_info' },
+            { text: '🏠 Головне меню', callback_data: 'menu_main' }
+          ]
+        ]
+      };
+      await sendMessage(chatId, text, keyboard);
+      return res.status(200).json({ ok: true });
+    }
+
     if (data === 'calc_menu') {
       const text = `📇 <b>Оберіть вид поліграфічної продукції для прорахунку:</b>`;
       const keyboard = {
