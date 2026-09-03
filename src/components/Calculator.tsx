@@ -1220,6 +1220,31 @@ export const Calculator: React.FC = () => {
   const [isNewClientMode, setIsNewClientMode] = useState<boolean>(false);
   const [marginPercent, setMarginPercent] = useState<number>(100);
 
+  // Auto-fill client contacts from logged-in session / localStorage profile
+  useEffect(() => {
+    try {
+      const savedProfile = localStorage.getItem('crm_client_profile');
+      if (savedProfile) {
+        const parsed = JSON.parse(savedProfile);
+        if (parsed.name && !customClientName) {
+          setCustomClientName(parsed.name);
+        }
+        if (parsed.phone && !customClientPhone) {
+          setCustomClientPhone(parsed.phone);
+        }
+      } else if (currentUser?.role === 'client') {
+        if (currentUser.name && currentUser.name !== 'Клієнт друкарні' && !customClientName) {
+          setCustomClientName(currentUser.name);
+        }
+        if ((currentUser as any).phone && !customClientPhone) {
+          setCustomClientPhone((currentUser as any).phone);
+        }
+      }
+    } catch (err) {
+      console.error('Error loading client profile for calculator:', err);
+    }
+  }, [currentUser]);
+
   // EXPANDED PREMIUM IDRUK OPTIONS
   const [selectedFormat, setSelectedFormat] = useState<string>('A4');
   const [orientation, setOrientation] = useState<'portrait' | 'landscape'>('portrait');
