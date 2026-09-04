@@ -5494,20 +5494,18 @@ export const Calculator: React.FC = () => {
 
                     <div className="flex items-center gap-2">
                       {currentUser?.role !== 'client' && (
-                        {currentUser?.role !== 'client' && (
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setTempNorms(norms);
-                              setShowMaterialPricesModal(true);
-                            }}
-                            className="px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 font-bold text-xs flex items-center gap-1.5 hover:bg-slate-100 transition-colors shadow-2xs"
-                            title="Прайс та тарифи на папери і післядрукарські роботи"
-                          >
-                            <Layers size={14} className="text-blue-600" />
-                            <span>Ціни на матеріали</span>
-                          </button>
-                        )}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setTempNorms(norms);
+                            setShowMaterialPricesModal(true);
+                          }}
+                          className="px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 font-bold text-xs flex items-center gap-1.5 hover:bg-slate-100 transition-colors shadow-2xs"
+                          title="Прайс та тарифи на папери і післядрукарські роботи"
+                        >
+                          <Layers size={14} className="text-blue-600" />
+                          <span>Ціни на матеріали</span>
+                        </button>
                       )}
 
                       <button

@@ -2,10 +2,8 @@ import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import { 
   Search, 
-  UserPlus, 
   Phone, 
   Mail, 
-  Calendar, 
   Briefcase, 
   Filter, 
   ShieldAlert, 
@@ -13,9 +11,7 @@ import {
   UserX, 
   ArrowRightLeft, 
   Lock, 
-  Unlock,
-  CheckCircle2,
-  AlertTriangle
+  Unlock
 } from 'lucide-react';
 import { blockUser, unblockUser, isUserBlocked } from '../utils/security';
 
@@ -34,7 +30,7 @@ interface Employee {
 }
 
 export const Employees: React.FC = () => {
-  const { clients, orders, currentUser, addSystemNotification } = useApp();
+  const { currentUser, addSystemNotification } = useApp();
   const [search, setSearch] = useState('');
   const [filterRole, setFilterRole] = useState<string>('all');
   const [filterStatus, setFilterStatus] = useState<string>('all');

@@ -3,14 +3,17 @@
  * Implements AES-256-GCM data encryption, PBKDF2 password hashing, and session revocation.
  */
 
+// Helper: Convert string to Uint8Array
 function strToBuffer(str: string): Uint8Array {
   return new TextEncoder().encode(str);
 }
 
+// Helper: Convert ArrayBuffer to string
 function bufferToStr(buf: ArrayBuffer): string {
   return new TextDecoder().decode(buf);
 }
 
+// Helper: Convert Uint8Array to base64
 function bufToBase64(buf: ArrayBuffer | Uint8Array): string {
   const bytes = new Uint8Array(buf);
   let binary = '';
@@ -20,6 +23,7 @@ function bufToBase64(buf: ArrayBuffer | Uint8Array): string {
   return btoa(binary);
 }
 
+// Helper: Convert base64 to Uint8Array
 function base64ToBuf(b64: string): Uint8Array {
   const binary = atob(b64);
   const bytes = new Uint8Array(binary.length);
@@ -39,7 +43,7 @@ export async function hashPassword(password: string, saltStr?: string): Promise<
 
     const baseKey = await crypto.subtle.importKey(
       'raw',
-      passBuffer,
+      passBuffer as unknown as BufferSource,
       'PBKDF2',
       false,
       ['deriveBits']
@@ -48,7 +52,7 @@ export async function hashPassword(password: string, saltStr?: string): Promise<
     const derivedBits = await crypto.subtle.deriveBits(
       {
         name: 'PBKDF2',
-        salt: salt as any,
+        salt: salt as unknown as BufferSource,
         iterations: 100000,
         hash: 'SHA-256'
       },
@@ -87,7 +91,7 @@ export async function encryptData(plainText: string, secretKeyStr: string = 'EDE
 
     const keyMaterial = await crypto.subtle.importKey(
       'raw',
-      strToBuffer(secretKeyStr),
+      strToBuffer(secretKeyStr) as unknown as BufferSource,
       'PBKDF2',
       false,
       ['deriveKey']
@@ -96,7 +100,7 @@ export async function encryptData(plainText: string, secretKeyStr: string = 'EDE
     const aesKey = await crypto.subtle.deriveKey(
       {
         name: 'PBKDF2',
-        salt: salt as any,
+        salt: salt as unknown as BufferSource,
         iterations: 50000,
         hash: 'SHA-256'
       },
@@ -107,9 +111,9 @@ export async function encryptData(plainText: string, secretKeyStr: string = 'EDE
     );
 
     const encrypted = await crypto.subtle.encrypt(
-      { name: 'AES-GCM', iv: iv as any },
+      { name: 'AES-GCM', iv: iv as unknown as BufferSource },
       aesKey,
-      strToBuffer(plainText)
+      strToBuffer(plainText) as unknown as BufferSource
     );
 
     return JSON.stringify({
@@ -140,7 +144,7 @@ export async function decryptData(payloadStr: string, secretKeyStr: string = 'ED
 
     const keyMaterial = await crypto.subtle.importKey(
       'raw',
-      strToBuffer(secretKeyStr),
+      strToBuffer(secretKeyStr) as unknown as BufferSource,
       'PBKDF2',
       false,
       ['deriveKey']
@@ -149,7 +153,7 @@ export async function decryptData(payloadStr: string, secretKeyStr: string = 'ED
     const aesKey = await crypto.subtle.deriveKey(
       {
         name: 'PBKDF2',
-        salt: salt as any,
+        salt: salt as unknown as BufferSource,
         iterations: 50000,
         hash: 'SHA-256'
       },
@@ -160,9 +164,9 @@ export async function decryptData(payloadStr: string, secretKeyStr: string = 'ED
     );
 
     const decrypted = await crypto.subtle.decrypt(
-      { name: 'AES-GCM', iv: iv as any },
+      { name: 'AES-GCM', iv: iv as unknown as BufferSource },
       aesKey,
-      cipher as any
+      cipher as unknown as BufferSource
     );
 
     return bufferToStr(decrypted);
@@ -186,7 +190,7 @@ export function getBlockedUsers(): string[] {
   }
 }
 
-export function blockUser(usernameOrId: string, reason: string = 'Звільнення співробітника'): void {
+export function blockUser(usernameOrId: string, _reason: string = 'Звільнення співробітника'): void {
   const list = getBlockedUsers();
   const normalized = usernameOrId.toLowerCase().trim();
   if (!list.includes(normalized)) {
