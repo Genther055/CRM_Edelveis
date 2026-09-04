@@ -4,8 +4,7 @@ import {
   Printer, 
   ArrowRight, 
   Send,
-  CheckCircle2,
-  Zap
+  CheckCircle2
 } from 'lucide-react';
 
 export const Login: React.FC = () => {
@@ -20,11 +19,6 @@ export const Login: React.FC = () => {
   const [role, setRole] = useState<'manager' | 'operator'>('manager');
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
-
-  // Fast direct client access
-  const handleDirectClientAccess = () => {
-    login('client', 'client');
-  };
 
   // Handle Staff Login
   const handleStaffSubmit = (e: React.FormEvent) => {
@@ -267,31 +261,6 @@ export const Login: React.FC = () => {
                 <Send size={16} />
                 <span>Увійти через @edelveis_polygraphy_bot</span>
               </a>
-            </div>
-
-            {/* Quick Online Calculator Direct Button */}
-            <div style={{ textAlign: 'center' }}>
-              <button
-                type="button"
-                onClick={handleDirectClientAccess}
-                className="ios-btn ios-btn-secondary"
-                style={{
-                  width: '100%',
-                  height: '38px',
-                  fontSize: '12.5px',
-                  fontWeight: '750',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '6px',
-                  backgroundColor: 'var(--bg-system)',
-                  border: '1px solid var(--border-light)'
-                }}
-              >
-                <Zap size={14} style={{ color: '#007aff' }} />
-                <span>Розрахувати ціни онлайн (Без авторизації)</span>
-                <ArrowRight size={14} />
-              </button>
             </div>
 
           </div>
