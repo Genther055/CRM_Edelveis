@@ -6,6 +6,7 @@ import {
   Send,
   CheckCircle2
 } from 'lucide-react';
+import { isUserBlocked } from '../utils/security';
 
 export const Login: React.FC = () => {
   const { login } = useApp();
@@ -28,6 +29,11 @@ export const Login: React.FC = () => {
     
     if (!username || !password) {
       setError('Будь ласка, заповніть усі поля');
+      return;
+    }
+
+    if (isUserBlocked(username)) {
+      setError('⛔ Доступ заблоковано: Цей обліковий запис деактивовано адміністратором. Зверніться до керівництва.');
       return;
     }
 

@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import type { User, Client, Material, Order, Norms, DeliveryItem, CustomField, AutoPaymentTrigger, ClientSection } from '../types';
+import { isUserBlocked } from '../utils/security';
 
 interface AppContextType {
   currentUser: User | null;
@@ -627,10 +628,30 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     localStorage.setItem('crm_np_vol_calc', JSON.stringify(npVolumeCalcEnabled));
   }, [npVolumeCalcEnabled]);
 
+  // Security Real-Time Session Kill-Switch Guard
+  useEffect(() => {
+    const checkSecuritySession = () => {
+      if (currentUser && isUserBlocked(currentUser.username)) {
+        setCurrentUser(null);
+        localStorage.removeItem('crm_user');
+        alert('⛔ Ваш доступ до системи було призупинено адміністратором.');
+      }
+    };
+    
+    // Check on mount and listen to window storage events across tabs
+    checkSecuritySession();
+    window.addEventListener('storage', checkSecuritySession);
+    return () => window.removeEventListener('storage', checkSecuritySession);
+  }, [currentUser]);
+
   const login = (username: string, password: string): boolean => {
+    if (isUserBlocked(username)) {
+      return false;
+    }
     const user = users.find(u => u.username === username.toLowerCase() && password === username);
     if (user) {
       setCurrentUser(user);
+      localStorage.setItem('crm_user', JSON.stringify(user));
       return true;
     }
     return false;
@@ -638,6 +659,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const logout = () => {
     setCurrentUser(null);
+    localStorage.removeItem('crm_user');
   };
 
   const addClient = (clientData: Omit<Client, 'id'>) => {
