@@ -1361,9 +1361,11 @@ export const Calculator: React.FC = () => {
     return clients.find(c => c.id === selectedClientId) || null;
   }, [clients, selectedClientId]);
 
-  const effectiveClientName = isNewClientMode && customClientName.trim() 
-    ? customClientName.trim() 
-    : (activeClient?.name || 'Замовник');
+  const effectiveClientName = currentUser?.role === 'client'
+    ? (customClientName.trim() || (currentUser.name && currentUser.name !== 'Клієнт друкарні' ? currentUser.name : '') || 'Клієнт друкарні')
+    : (isNewClientMode && customClientName.trim() 
+      ? customClientName.trim() 
+      : (activeClient?.name || 'Замовник'));
 
   const [customDesignPrice, setCustomDesignPrice] = useState<string>('34');
 
@@ -6428,7 +6430,7 @@ export const Calculator: React.FC = () => {
                           <label className="text-[11px] font-bold text-slate-700 block mb-1">Персоналізація</label>
                           <select value={postPersonalization} onChange={(e) => setPostPersonalization(e.target.value)} className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold">
                             <option value="0">Ні</option>
-                            <option value="1">Є — змінні дані (+0.35 ₴/шт)</option>
+                            <option value="1">{currentUser?.role === 'client' ? 'Є — змінні дані' : 'Є — змінні дані (+0.35 ₴/шт)'}</option>
                           </select>
                         </div>
 
@@ -6438,8 +6440,8 @@ export const Calculator: React.FC = () => {
                           <div className="flex gap-1.5">
                             <select value={postLuvers} onChange={(e) => setPostLuvers(e.target.value)} className="flex-1 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold">
                               <option value="0">Ні</option>
-                              <option value="93">Золотий (+1.20 ₴/шт)</option>
-                              <option value="92">Срібний (+1.20 ₴/шт)</option>
+                              <option value="93">{currentUser?.role === 'client' ? 'Золотий' : 'Золотий (+1.20 ₴/шт)'}</option>
+                              <option value="92">{currentUser?.role === 'client' ? 'Срібний' : 'Срібний (+1.20 ₴/шт)'}</option>
                             </select>
                             {postLuvers !== '0' && (
                               <input type="number" value={postLuversCount} onChange={(e) => setPostLuversCount(parseInt(e.target.value) || 1)} min={1} className="w-14 px-1.5 py-1.5 rounded-lg border border-slate-200 text-xs font-semibold text-center" />
@@ -6452,10 +6454,10 @@ export const Calculator: React.FC = () => {
                           <label className="text-[11px] font-bold text-slate-700 block mb-1">Закруглення кутів</label>
                           <select value={postCorners} onChange={(e) => setPostCorners(e.target.value)} className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold">
                             <option value="0">Ні</option>
-                            <option value="4">4 кути (+0.15 ₴/шт)</option>
-                            <option value="1">1 кут (+0.15 ₴/шт)</option>
-                            <option value="2">2 кути (+0.15 ₴/шт)</option>
-                            <option value="3">3 кути (+0.15 ₴/шт)</option>
+                            <option value="4">{currentUser?.role === 'client' ? '4 кути' : '4 кути (+0.15 ₴/шт)'}</option>
+                            <option value="1">{currentUser?.role === 'client' ? '1 кут' : '1 кут (+0.15 ₴/шт)'}</option>
+                            <option value="2">{currentUser?.role === 'client' ? '2 кути' : '2 кути (+0.15 ₴/шт)'}</option>
+                            <option value="3">{currentUser?.role === 'client' ? '3 кути' : '3 кути (+0.15 ₴/шт)'}</option>
                           </select>
                         </div>
 
@@ -6465,9 +6467,9 @@ export const Calculator: React.FC = () => {
                           <div className="flex gap-1.5">
                             <select value={postGluing} onChange={(e) => setPostGluing(e.target.value)} className="flex-1 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold">
                               <option value="0">Ні</option>
-                              <option value="25">25 листів (+0.20 ₴)</option>
-                              <option value="50">50 листів (+0.20 ₴)</option>
-                              <option value="100">100 листів (+0.20 ₴)</option>
+                              <option value="25">{currentUser?.role === 'client' ? '25 листів' : '25 листів (+0.20 ₴)'}</option>
+                              <option value="50">{currentUser?.role === 'client' ? '50 листів' : '50 листів (+0.20 ₴)'}</option>
+                              <option value="100">{currentUser?.role === 'client' ? '100 листів' : '100 листів (+0.20 ₴)'}</option>
                             </select>
                             {postGluing !== '0' && (
                               <select value={postGluingSide} onChange={(e) => setPostGluingSide(e.target.value)} className="w-24 px-1.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold">
@@ -6484,10 +6486,10 @@ export const Calculator: React.FC = () => {
                           <div className="flex gap-1.5">
                             <select value={postDrilling} onChange={(e) => setPostDrilling(e.target.value)} className="flex-1 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold">
                               <option value="0">Ні</option>
-                              <option value="1">1 отвір (+0.15 ₴)</option>
-                              <option value="2">2 отвори (+0.30 ₴)</option>
-                              <option value="3">3 отвори (+0.45 ₴)</option>
-                              <option value="4">4 отвори (+0.60 ₴)</option>
+                              <option value="1">{currentUser?.role === 'client' ? '1 отвір' : '1 отвір (+0.15 ₴)'}</option>
+                              <option value="2">{currentUser?.role === 'client' ? '2 отвори' : '2 отвори (+0.30 ₴)'}</option>
+                              <option value="3">{currentUser?.role === 'client' ? '3 отвори' : '3 отвори (+0.45 ₴)'}</option>
+                              <option value="4">{currentUser?.role === 'client' ? '4 отвори' : '4 отвори (+0.60 ₴)'}</option>
                             </select>
                             {postDrilling !== '0' && (
                               <select value={postDrillingDia} onChange={(e) => setPostDrillingDia(e.target.value)} className="w-20 px-1.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold">
@@ -6505,15 +6507,15 @@ export const Calculator: React.FC = () => {
                           <div className="flex gap-1.5">
                             <select value={postFolding} onChange={(e) => setPostFolding(e.target.value)} className="flex-1 px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold">
                               <option value="0">Ні</option>
-                              <option value="1">1 Згинання навпіл ({norms.foldingPrice} ₴)</option>
-                              <option value="121">1 Згинання асиметрія ({norms.foldingPrice} ₴)</option>
-                              <option value="21">2 Згинання намотка ({norms.foldingPrice * 2} ₴)</option>
-                              <option value="22">2 Згинання гармошка ({norms.foldingPrice * 2} ₴)</option>
-                              <option value="23">2 Згинання вікно ({norms.foldingPrice * 2} ₴)</option>
-                              <option value="31">3 Згинання намотка ({norms.foldingPrice * 3} ₴)</option>
-                              <option value="32">3 Згинання гармошка ({norms.foldingPrice * 3} ₴)</option>
-                              <option value="41">4 Згинання ({norms.foldingPrice * 4} ₴)</option>
-                              <option value="52">5 Згинань ({norms.foldingPrice * 5} ₴)</option>
+                              <option value="1">{currentUser?.role === 'client' ? '1 Згинання навпіл' : `1 Згинання навпіл (${norms.foldingPrice} ₴)`}</option>
+                              <option value="121">{currentUser?.role === 'client' ? '1 Згинання асиметрія' : `1 Згинання асиметрія (${norms.foldingPrice} ₴)`}</option>
+                              <option value="21">{currentUser?.role === 'client' ? '2 Згинання намотка' : `2 Згинання намотка (${norms.foldingPrice * 2} ₴)`}</option>
+                              <option value="22">{currentUser?.role === 'client' ? '2 Згинання гармошка' : `2 Згинання гармошка (${norms.foldingPrice * 2} ₴)`}</option>
+                              <option value="23">{currentUser?.role === 'client' ? '2 Згинання вікно' : `2 Згинання вікно (${norms.foldingPrice * 2} ₴)`}</option>
+                              <option value="31">{currentUser?.role === 'client' ? '3 Згинання намотка' : `3 Згинання намотка (${norms.foldingPrice * 3} ₴)`}</option>
+                              <option value="32">{currentUser?.role === 'client' ? '3 Згинання гармошка' : `3 Згинання гармошка (${norms.foldingPrice * 3} ₴)`}</option>
+                              <option value="41">{currentUser?.role === 'client' ? '4 Згинання' : `4 Згинання (${norms.foldingPrice * 4} ₴)`}</option>
+                              <option value="52">{currentUser?.role === 'client' ? '5 Згинань' : `5 Згинань (${norms.foldingPrice * 5} ₴)`}</option>
                             </select>
                             {postFolding === '121' && (
                               <input
@@ -6533,7 +6535,7 @@ export const Calculator: React.FC = () => {
                           <select value={postCreasing} onChange={(e) => setPostCreasing(e.target.value)} className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold">
                             <option value="0">Ні</option>
                             {[1,2,3,4,5,6].map(n => (
-                              <option key={n} value={n.toString()}>{n} {n === 1 ? 'біг' : 'біги'} ({n * norms.foldingPrice} ₴)</option>
+                              <option key={n} value={n.toString()}>{currentUser?.role === 'client' ? `${n} ${n === 1 ? 'біг' : 'біги'}` : `${n} ${n === 1 ? 'біг' : 'біги'} (${n * norms.foldingPrice} ₴)`}</option>
                             ))}
                           </select>
                         </div>
@@ -6544,7 +6546,7 @@ export const Calculator: React.FC = () => {
                           <select value={postPerforation} onChange={(e) => setPostPerforation(e.target.value)} className="w-full px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-semibold">
                             <option value="0">Ні</option>
                             {[1,2,3,4].map(n => (
-                              <option key={n} value={n.toString()}>{n} {n === 1 ? 'прохід' : 'проходи'} ({n * 0.15} ₴)</option>
+                              <option key={n} value={n.toString()}>{currentUser?.role === 'client' ? `${n} ${n === 1 ? 'прохід' : 'проходи'}` : `${n} ${n === 1 ? 'прохід' : 'проходи'} (${n * 0.15} ₴)`}</option>
                             ))}
                           </select>
                         </div>
@@ -7003,7 +7005,13 @@ export const Calculator: React.FC = () => {
                                 type="text"
                                 placeholder="Введіть ваше ім'я або назву компанії"
                                 value={customClientName || (currentUser?.name && currentUser.name !== 'Клієнт друкарні' ? currentUser.name : '')}
-                                onChange={(e) => setCustomClientName(e.target.value)}
+                                onChange={(e) => {
+                                  setCustomClientName(e.target.value);
+                                  try {
+                                    const prev = JSON.parse(localStorage.getItem('crm_client_profile') || '{}');
+                                    localStorage.setItem('crm_client_profile', JSON.stringify({ ...prev, name: e.target.value, companyName: e.target.value }));
+                                  } catch {}
+                                }}
                                 className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-900 focus:border-blue-600 focus:outline-none"
                               />
                             </div>
@@ -7013,7 +7021,13 @@ export const Calculator: React.FC = () => {
                                 type="text"
                                 placeholder="+38 (0__) ___-__-__"
                                 value={customClientPhone}
-                                onChange={(e) => setCustomClientPhone(e.target.value)}
+                                onChange={(e) => {
+                                  setCustomClientPhone(e.target.value);
+                                  try {
+                                    const prev = JSON.parse(localStorage.getItem('crm_client_profile') || '{}');
+                                    localStorage.setItem('crm_client_profile', JSON.stringify({ ...prev, phone: e.target.value }));
+                                  } catch {}
+                                }}
                                 className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-900 focus:border-blue-600 focus:outline-none"
                               />
                             </div>
@@ -9633,7 +9647,13 @@ export const Calculator: React.FC = () => {
                                 type="text"
                                 placeholder="Введіть ваше ім'я або назву компанії"
                                 value={customClientName || (currentUser?.name && currentUser.name !== 'Клієнт друкарні' ? currentUser.name : '')}
-                                onChange={(e) => setCustomClientName(e.target.value)}
+                                onChange={(e) => {
+                                  setCustomClientName(e.target.value);
+                                  try {
+                                    const prev = JSON.parse(localStorage.getItem('crm_client_profile') || '{}');
+                                    localStorage.setItem('crm_client_profile', JSON.stringify({ ...prev, name: e.target.value, companyName: e.target.value }));
+                                  } catch {}
+                                }}
                                 className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-900 focus:border-blue-600 focus:outline-none"
                               />
                             </div>
@@ -9643,7 +9663,13 @@ export const Calculator: React.FC = () => {
                                 type="text"
                                 placeholder="+38 (0__) ___-__-__"
                                 value={customClientPhone}
-                                onChange={(e) => setCustomClientPhone(e.target.value)}
+                                onChange={(e) => {
+                                  setCustomClientPhone(e.target.value);
+                                  try {
+                                    const prev = JSON.parse(localStorage.getItem('crm_client_profile') || '{}');
+                                    localStorage.setItem('crm_client_profile', JSON.stringify({ ...prev, phone: e.target.value }));
+                                  } catch {}
+                                }}
                                 className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-900 focus:border-blue-600 focus:outline-none"
                               />
                             </div>
@@ -12942,7 +12968,13 @@ export const Calculator: React.FC = () => {
                                 type="text"
                                 placeholder="Введіть ваше ім'я або назву компанії"
                                 value={customClientName || (currentUser?.name && currentUser.name !== 'Клієнт друкарні' ? currentUser.name : '')}
-                                onChange={(e) => setCustomClientName(e.target.value)}
+                                onChange={(e) => {
+                                  setCustomClientName(e.target.value);
+                                  try {
+                                    const prev = JSON.parse(localStorage.getItem('crm_client_profile') || '{}');
+                                    localStorage.setItem('crm_client_profile', JSON.stringify({ ...prev, name: e.target.value, companyName: e.target.value }));
+                                  } catch {}
+                                }}
                                 className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-900 focus:border-blue-600 focus:outline-none"
                               />
                             </div>
@@ -12952,7 +12984,13 @@ export const Calculator: React.FC = () => {
                                 type="text"
                                 placeholder="+38 (0__) ___-__-__"
                                 value={customClientPhone}
-                                onChange={(e) => setCustomClientPhone(e.target.value)}
+                                onChange={(e) => {
+                                  setCustomClientPhone(e.target.value);
+                                  try {
+                                    const prev = JSON.parse(localStorage.getItem('crm_client_profile') || '{}');
+                                    localStorage.setItem('crm_client_profile', JSON.stringify({ ...prev, phone: e.target.value }));
+                                  } catch {}
+                                }}
                                 className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-900 focus:border-blue-600 focus:outline-none"
                               />
                             </div>

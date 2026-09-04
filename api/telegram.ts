@@ -61,12 +61,18 @@ export default async function handler(req: any, res: any) {
   // Extract user info and chat ID safely
   const userFrom = update.callback_query?.from || update.message?.from;
   const chatId = update.callback_query?.message?.chat?.id || update.message?.chat?.id;
-  const userFullName = [userFrom?.first_name, userFrom?.last_name].filter(Boolean).join(' ') || userFrom?.username || '';
-  const encodedName = encodeURIComponent(userFullName);
+  const userFullName = [userFrom?.first_name, userFrom?.last_name].filter(Boolean).join(' ') || userFrom?.username || 'Клієнт';
 
-  const calcUrl = `https://crm-edelveis.vercel.app/?mode=client&name=${encodedName}&tg_id=${chatId}`;
-  const buyerUrl = `https://crm-edelveis.vercel.app/?mode=client&type=buyer&name=${encodedName}&tg_id=${chatId}`;
-  const businessUrl = `https://crm-edelveis.vercel.app/?mode=client&type=business&name=${encodedName}&tg_id=${chatId}`;
+  const makeCalcUrl = (name: string, phone: string = '', type: string = '') => {
+    const encName = encodeURIComponent(name || userFullName);
+    const encPhone = phone ? `&phone=${encodeURIComponent(phone)}` : '';
+    const encType = type ? `&type=${encodeURIComponent(type)}` : '';
+    return `https://crm-edelveis.vercel.app/?mode=client&name=${encName}${encPhone}${encType}&tg_id=${chatId}`;
+  };
+
+  const calcUrl = makeCalcUrl(userFullName);
+  const buyerUrl = makeCalcUrl(userFullName, '', 'buyer');
+  const businessUrl = makeCalcUrl(userFullName, '', 'business');
 
   // 1. Handle Callback Queries (Inline button clicks)
   if (update.callback_query) {
@@ -75,14 +81,19 @@ export default async function handler(req: any, res: any) {
     await answerCallback(cb.id);
 
     if (data === 'menu_main') {
-      const text = `👋 <b>Вітаємо у поліграфії «Едельвейс і К»!</b>\n\n🏢 <b>м. Вінниця, вул. 600-річчя, 17</b>\n📞 <b>+38 (067) 840-97-81</b>\n\nОберіть потрібну дію в меню нижче:`;
+      const text = `👋 <b>Вітаємо у поліграфії «Едельвейс і К»!</b>
+
+🏢 <b>м. Вінниця, вул. 600-річчя, 17</b>
+📞 <b>+38 (067) 840-97-81</b>
+
+Оберіть потрібну дію в меню нижче:`;
       const keyboard = {
         inline_keyboard: [
           [
             { text: '🌐 Відкрити онлайн-калькулятор', url: calcUrl }
           ],
           [
-            { text: '👤 Реєстрація (Покупець / Бізнес)', callback_data: 'reg_choice' }
+            { text: '👤 Мій профіль / Реєстрація', callback_data: 'reg_choice' }
           ],
           [
             { text: '🏷️ Швидкий прорахунок цін', callback_data: 'calc_menu' },
@@ -99,7 +110,14 @@ export default async function handler(req: any, res: any) {
     }
 
     if (data === 'reg_choice') {
-      const text = `👤 <b>Оберіть статус вашого облікового запису:</b>\n\n1. <b>Покупець (Фізична особа)</b> — швидкий онлайн-прорахунок цін, роздрібні замовлення, оплата карткою.\n2. <b>Бізнес (ФОП / ТОВ / Компанія)</b> — рахунки-фактури з ПДВ 20%, партнерські оптові ціни, договори та безготівковий розрахунок.`;
+      const text = `👤 <b>Налаштування профілю клієнта:</b>
+
+Поточне ім'я: <b>${userFullName}</b>
+
+Ви можете надіслати номер телефону для автозаповнення або обрати статус облікового запису:
+
+1. <b>Покупець (Фізична особа)</b> — роздрібні замовлення, оплата карткою.
+2. <b>Бізнес (ФОП / ТОВ)</b> — рахунки-фактури з ПДВ, гуртові ціни та договори.`;
       const keyboard = {
         inline_keyboard: [
           [
@@ -107,7 +125,11 @@ export default async function handler(req: any, res: any) {
             { text: '🏢 Бізнес (ФОП / ТОВ)', callback_data: 'auth_business' }
           ],
           [
-            { text: '⬅️ Назад до меню', callback_data: 'menu_main' }
+            { text: '📱 Вказати номер телефону', callback_data: 'prompt_phone' },
+            { text: '✏️ Вказати інше ім'я / компанію', callback_data: 'prompt_name' }
+          ],
+          [
+            { text: '⬅️ Головне меню', callback_data: 'menu_main' }
           ]
         ]
       };
@@ -115,8 +137,42 @@ export default async function handler(req: any, res: any) {
       return res.status(200).json({ ok: true });
     }
 
+    if (data === 'prompt_phone') {
+      const text = `📱 <b>Вкажіть ваш номер телефону:</b>
+
+Натисніть кнопку <b>«📱 Поділитися контактом»</b> внизу екрана або просто напишіть ваш номер повідомленням у чат (наприклад: <code>+380671234567</code>).`;
+      const replyKeyboard = {
+        keyboard: [
+          [
+            { text: '📱 Поділитися контактом (Мій телефон)', request_contact: true }
+          ],
+          [
+            { text: '⬅️ Головне меню' }
+          ]
+        ],
+        resize_keyboard: true,
+        one_time_keyboard: true
+      };
+      await sendMessage(chatId, text, replyKeyboard);
+      return res.status(200).json({ ok: true });
+    }
+
+    if (data === 'prompt_name') {
+      const text = `✍️ <b>Введіть ваше Ім'я та Прізвище або назву Компанії / ФОП:</b>
+
+Надішліть текстом у чат ваше ім'я або назву (наприклад: <code>Олександр Шевченко</code> або <code>ТОВ «Прінт Груп»</code>):`;
+      await sendMessage(chatId, text, {
+        inline_keyboard: [[{ text: '⬅️ Назад до профілю', callback_data: 'reg_choice' }]]
+      });
+      return res.status(200).json({ ok: true });
+    }
+
     if (data === 'auth_buyer') {
-      const text = `✅ <b>Профіль «Покупець» підтверджено!</b>\n\nВам відкрито доступ до розрахунку поліграфії та онлайн-замовлення.\n\nНатисніть кнопку нижче, щоб відкрити персональний калькулятор:`;
+      const text = `✅ <b>Профіль «Покупець» підтверджено!</b>
+
+Вам відкрито доступ до розрахунку поліграфії та онлайн-замовлення.
+
+Натисніть кнопку нижче, щоб відкрити персональний калькулятор:`;
       const keyboard = {
         inline_keyboard: [
           [
@@ -133,14 +189,18 @@ export default async function handler(req: any, res: any) {
     }
 
     if (data === 'auth_business') {
-      const text = `🏢 <b>Профіль «Бізнес» активовано!</b>\n\nДля вашої організації увімкнено оптові ціни, генерацію рахунків-фактур (з ПДВ/без ПДВ) та договори.\n\nНатисніть кнопку нижче для переходу в корпоративний кабінет:`;
+      const text = `🏢 <b>Профіль «Бізнес» активовано!</b>
+
+Для вашої організації увімкнено оптові ціни, генерацію рахунків-фактур (з ПДВ/без ПДВ) та договори.
+
+Натисніть кнопку нижче для переходу в корпоративний кабінет:`;
       const keyboard = {
         inline_keyboard: [
           [
             { text: '💼 Відкрити корпоративний кабінет', url: businessUrl }
           ],
           [
-            { text: '💬 Зв\'язатися з менеджером B2B', callback_data: 'contacts_info' },
+            { text: '💬 Зв'язатися з менеджером B2B', callback_data: 'contacts_info' },
             { text: '🏠 Головне меню', callback_data: 'menu_main' }
           ]
         ]
@@ -174,7 +234,13 @@ export default async function handler(req: any, res: any) {
     }
 
     if (data === 'calc_item_vizitki') {
-      const text = `💳 <b>Візитки стандартні (90×50 мм, 350г/м²):</b>\n\n• <b>100 шт:</b> 220 ₴ (2.20 ₴/шт)\n• <b>500 шт:</b> 420 ₴ (0.84 ₴/шт)\n• <b>1000 шт:</b> 640 ₴ (0.64 ₴/шт)\n\n<i>Опції: матова/глянцева ламінація, заокруглення кутів.</i>`;
+      const text = `💳 <b>Візитки стандартні (90×50 мм, 350г/м²):</b>
+
+• <b>100 шт:</b> 220 ₴ (2.20 ₴/шт)
+• <b>500 шт:</b> 420 ₴ (0.84 ₴/шт)
+• <b>1000 шт:</b> 640 ₴ (0.64 ₴/шт)
+
+<i>Опції: матова/глянцева ламінація, заокруглення кутів.</i>`;
       const keyboard = {
         inline_keyboard: [
           [
@@ -191,7 +257,14 @@ export default async function handler(req: any, res: any) {
     }
 
     if (data === 'calc_item_flyers') {
-      const text = `📄 <b>Єврофлаєри (210×100 мм, крейдований 130г/м²):</b>\n\n• <b>500 шт:</b> 650 ₴ (1.30 ₴/шт)\n• <b>1000 шт:</b> 890 ₴ (0.89 ₴/шт)\n• <b>2500 шт:</b> 1 650 ₴ (0.66 ₴/шт)\n• <b>5000 шт:</b> 2 450 ₴ (0.49 ₴/шт)\n\n<i>Двосторонній повноколірний друк (4+4).</i>`;
+      const text = `📄 <b>Єврофлаєри (210×100 мм, крейдований 130г/м²):</b>
+
+• <b>500 шт:</b> 650 ₴ (1.30 ₴/шт)
+• <b>1000 шт:</b> 890 ₴ (0.89 ₴/шт)
+• <b>2500 шт:</b> 1 650 ₴ (0.66 ₴/шт)
+• <b>5000 шт:</b> 2 450 ₴ (0.49 ₴/шт)
+
+<i>Двосторонній повноколірний друк (4+4).</i>`;
       const keyboard = {
         inline_keyboard: [
           [
@@ -208,7 +281,13 @@ export default async function handler(req: any, res: any) {
     }
 
     if (data === 'calc_item_booklets') {
-      const text = `📖 <b>Буклети А4 (2 згини / євробуклет, 150г/м²):</b>\n\n• <b>100 шт:</b> 580 ₴ (5.80 ₴/шт)\n• <b>500 шт:</b> 1 450 ₴ (2.90 ₴/шт)\n• <b>1000 шт:</b> 2 100 ₴ (2.10 ₴/шт)\n\n<i>Повноколірний друк + 2 біговки.</i>`;
+      const text = `📖 <b>Буклети А4 (2 згини / євробуклет, 150г/м²):</b>
+
+• <b>100 шт:</b> 580 ₴ (5.80 ₴/шт)
+• <b>500 шт:</b> 1 450 ₴ (2.90 ₴/шт)
+• <b>1000 шт:</b> 2 100 ₴ (2.10 ₴/шт)
+
+<i>Повноколірний друк + 2 біговки.</i>`;
       const keyboard = {
         inline_keyboard: [
           [
@@ -224,7 +303,13 @@ export default async function handler(req: any, res: any) {
     }
 
     if (data === 'calc_item_stickers') {
-      const text = `🏷️ <b>Самоклеючі наліпки (Папір Рафлатак / Плівка Oracal):</b>\n\n• <b>Прямокутні наліпки:</b> від 0.25 ₴/шт\n• <b>Фігурна плотерна порізка:</b> від 0.45 ₴/шт\n• <b>Рулонні етикетки:</b> від 1000 шт за оптовими цінами\n\n<i>Можлива ламінація та висічка довільної форми.</i>`;
+      const text = `🏷️ <b>Самоклеючі наліпки (Папір Рафлатак / Плівка Oracal):</b>
+
+• <b>Прямокутні наліпки:</b> від 0.25 ₴/шт
+• <b>Фігурна плотерна порізка:</b> від 0.45 ₴/шт
+• <b>Рулонні етикетки:</b> від 1000 шт за оптовими цінами
+
+<i>Можлива ламінація та висічка довільної форми.</i>`;
       const keyboard = {
         inline_keyboard: [
           [
@@ -240,7 +325,12 @@ export default async function handler(req: any, res: any) {
     }
 
     if (data === 'calc_item_banner') {
-      const text = `🖼️ <b>Широкоформатний друк (Банери, Плівка, Постери):</b>\n\n• <b>Литий банер 440г (вуличний):</b> від 185 ₴/м²\n• <b>Ламінований банер:</b> від 145 ₴/м²\n• <b>Самоклейка Oracal + друк 1440 DPI:</b> від 210 ₴/м²\n• <b>Люверси по периметру (кожні 30 см):</b> 8 ₴/шт`;
+      const text = `🖼️ <b>Широкоформатний друк (Банери, Плівка, Постери):</b>
+
+• <b>Литий банер 440г (вуличний):</b> від 185 ₴/м²
+• <b>Ламінований банер:</b> від 145 ₴/м²
+• <b>Самоклейка Oracal + друк 1440 DPI:</b> від 210 ₴/м²
+• <b>Люверси по периметру (кожні 30 см):</b> 8 ₴/шт`;
       const keyboard = {
         inline_keyboard: [
           [
@@ -256,7 +346,9 @@ export default async function handler(req: any, res: any) {
     }
 
     if (data === 'status_info') {
-      const text = `📦 <b>Перевірка статусу вашого замовлення:</b>\n\nВведіть у поле повідомлення <b>номер вашого замовлення</b> (наприклад: <code>64841</code>), і бот миттєво повідомить поточний етап виробництва.`;
+      const text = `📦 <b>Перевірка статусу вашого замовлення:</b>
+
+Введіть у поле повідомлення <b>номер вашого замовлення</b> (наприклад: <code>64841</code>), і бот миттєво повідомить поточний етап виробництва.`;
       const keyboard = {
         inline_keyboard: [
           [
@@ -270,42 +362,95 @@ export default async function handler(req: any, res: any) {
     }
 
     if (data === 'send_macro') {
-      const text = `📎 <b>Надіслати макет на перевірку:</b>\n\nВи можете просто прикріпити та надіслати сюди файл макета (PDF, TIFF, CDR, AI, PSD або ZIP-архів).\n\nНаші препрес-інженери безкоштовно перевірять його на відповідність технічним нормам друку.`;
+      const text = `📎 <b>Надіслати макет на перевірку:</b>
+
+Ви можете просто прикріпити та надіслати сюди файл макета (PDF, TIFF, CDR, AI, PSD або ZIP-архів).
+
+Наші препрес-інженери безкоштовно перевірять його на відповідність технічним нормам друку.`;
       await sendMessage(chatId, text, { inline_keyboard: [[{ text: '⬅️ Назад', callback_data: 'menu_main' }]] });
       return res.status(200).json({ ok: true });
     }
 
     if (data === 'contacts_info') {
-      const text = `🏢 <b>Поліграфічна компанія «Едельвейс і К»</b>\n\n📍 <b>Адреса:</b> м. Вінниця, вул. 600-річчя, 17\n📞 <b>Телефон:</b> +38 (067) 840-97-81\n✉️ <b>Email:</b> info@edelveis.vn.ua\n⏰ <b>Графік роботи:</b> Пн-Пт: 09:00 - 18:00\n\n🚚 Доставка по Україні: Нова Пошта, кур\'єр або самовивіз.`;
+      const text = `🏢 <b>Поліграфічна компанія «Едельвейс і К»</b>
+
+📍 <b>Адреса:</b> м. Вінниця, вул. 600-річчя, 17
+📞 <b>Телефон:</b> +38 (067) 840-97-81
+✉️ <b>Email:</b> info@edelveis.vn.ua
+⏰ <b>Графік роботи:</b> Пн-Пт: 09:00 - 18:00
+
+🚚 Доставка по Україні: Нова Пошта, кур'єр або самовивіз.`;
       await sendMessage(chatId, text, { inline_keyboard: [[{ text: '⬅️ Назад', callback_data: 'menu_main' }]] });
       return res.status(200).json({ ok: true });
     }
   }
 
-  // 2. Handle Text Messages & Commands
+  // 2. Handle Text Messages, Contacts & Commands
   if (update.message) {
     const msg = update.message;
-    const text = msg.text || '';
+    const text = (msg.text || '').trim();
 
-    // Handle document / photo uploads
+    // 2.1 Handle Shared Contact (Native Telegram contact button)
+    if (msg.contact) {
+      let phone = msg.contact.phone_number || '';
+      if (phone && !phone.startsWith('+')) {
+        phone = `+${phone}`;
+      }
+      const contactName = [msg.contact.first_name, msg.contact.last_name].filter(Boolean).join(' ') || userFullName;
+      const directUrl = makeCalcUrl(contactName, phone);
+
+      const reply = `✅ <b>Контактні дані збережено!</b>
+
+👤 <b>Клієнт:</b> ${contactName}
+📱 <b>Телефон:</b> <code>${phone}</code>
+
+Тепер при вході в онлайн-калькулятор ваші контакти будуть підтягнуті автоматично.`;
+      const keyboard = {
+        inline_keyboard: [
+          [
+            { text: '🌐 Відкрити онлайн-калькулятор', url: directUrl }
+          ],
+          [
+            { text: '🏷️ Швидкий прорахунок цін', callback_data: 'calc_menu' },
+            { text: '🏠 Головне меню', callback_data: 'menu_main' }
+          ]
+        ]
+      };
+      await sendMessage(chatId, reply, keyboard);
+      return res.status(200).json({ ok: true });
+    }
+
+    // 2.2 Handle document / photo uploads
     if (msg.document || msg.photo) {
       const fileName = msg.document?.file_name || 'файл макета';
-      const reply = `✅ <b>Дякуємо! Ваш макет (${fileName}) успішно отримано.</b>\n\nПрепрес-інженер розпочав перевірку розмірів, вильотів під обріз (bleed) та кольорового профілю CMYK.\n\nМенеджер зв\'яжеться з вами найближчим часом!`;
+      const reply = `✅ <b>Дякуємо! Ваш макет (${fileName}) успішно отримано.</b>
+
+Препрес-інженер розпочав перевірку розмірів, вильотів під обріз (bleed) та кольорового профілю CMYK.
+
+Менеджер зв'яжеться з вами найближчим часом!`;
       await sendMessage(chatId, reply, {
         inline_keyboard: [[{ text: '🏠 Головне меню', callback_data: 'menu_main' }]]
       });
       return res.status(200).json({ ok: true });
     }
 
-    if (text === '/start' || text.toLowerCase() === 'меню' || text.toLowerCase() === 'start') {
-      const welcomeText = `👋 <b>Вітаємо у друкарні «Едельвейс і К»!</b>\n\n🏢 <b>м. Вінниця, вул. 600-річчя, 17</b>\n📞 <b>+38 (067) 840-97-81</b>\n\nМи виготовляємо весь спектр поліграфії: візитки, буклети, каталоги, упаковку, банери та наліпки.\n\nОберіть потрібну дію нижче:`;
+    // 2.3 Handle /start and navigation commands
+    if (text === '/start' || text.toLowerCase() === 'меню' || text.toLowerCase() === 'start' || text.toLowerCase() === 'головне меню' || text.toLowerCase() === '⬅️ головне меню') {
+      const welcomeText = `👋 <b>Вітаємо у друкарні «Едельвейс і К»!</b>
+
+🏢 <b>м. Вінниця, вул. 600-річчя, 17</b>
+📞 <b>+38 (067) 840-97-81</b>
+
+Ми виготовляємо весь спектр поліграфії: візитки, буклети, каталоги, упаковку, банери та наліпки.
+
+Оберіть потрібну дію нижче:`;
       const keyboard = {
         inline_keyboard: [
           [
             { text: '🌐 Відкрити онлайн-калькулятор', url: calcUrl }
           ],
           [
-            { text: '👤 Реєстрація (Покупець / Бізнес)', callback_data: 'reg_choice' }
+            { text: '👤 Мій профіль / Реєстрація', callback_data: 'reg_choice' }
           ],
           [
             { text: '🏷️ Швидкий прорахунок цін', callback_data: 'calc_menu' },
@@ -318,6 +463,30 @@ export default async function handler(req: any, res: any) {
         ]
       };
       await sendMessage(chatId, welcomeText, keyboard);
+      return res.status(200).json({ ok: true });
+    }
+
+    if (text === '/register' || text === '/profile' || text.toLowerCase() === 'профіль' || text.toLowerCase() === 'реєстрація') {
+      const regText = `👤 <b>Мій профіль та контакти:</b>
+
+Поточне ім'я: <b>${userFullName}</b>
+
+Ви можете надіслати номер телефону або змінити дані для калькулятора:`;
+      const keyboard = {
+        inline_keyboard: [
+          [
+            { text: '📱 Поділитися номером телефону', callback_data: 'prompt_phone' }
+          ],
+          [
+            { text: '✏️ Вказати ім'я або компанію', callback_data: 'prompt_name' }
+          ],
+          [
+            { text: '🌐 Відкрити онлайн-калькулятор', url: calcUrl },
+            { text: '🏠 Меню', callback_data: 'menu_main' }
+          ]
+        ]
+      };
+      await sendMessage(chatId, regText, keyboard);
       return res.status(200).json({ ok: true });
     }
 
@@ -347,15 +516,95 @@ export default async function handler(req: any, res: any) {
     }
 
     if (text === '/contacts') {
-      const contactsText = `🏢 <b>Поліграфічна компанія «Едельвейс і К»</b>\n\n📍 м. Вінниця, вул. 600-річчя, 17\n📞 +38 (067) 840-97-81\n✉️ info@edelveis.vn.ua\n⏰ Пн-Пт: 09:00 - 18:00`;
+      const contactsText = `🏢 <b>Поліграфічна компанія «Едельвейс і К»</b>
+
+📍 м. Вінниця, вул. 600-річчя, 17
+📞 +38 (067) 840-97-81
+✉️ info@edelveis.vn.ua
+⏰ Пн-Пт: 09:00 - 18:00`;
       await sendMessage(chatId, contactsText, { inline_keyboard: [[{ text: '🏠 Головне меню', callback_data: 'menu_main' }]] });
       return res.status(200).json({ ok: true });
     }
 
-    // If user entered a number (order number or phone)
-    if (/^\d{3,8}$/.test(text.trim())) {
-      const orderNum = text.trim();
-      const statusText = `📦 <b>Замовлення №${orderNum}:</b>\n\n🟢 <b>Статус:</b> У виробництві (Друкарський цех)\n📅 <b>Орієнтовна готовність:</b> Сьогодні до 17:00\n📍 <b>Пункт видачі:</b> м. Вінниця, вул. 600-річчя, 17\n\n<i>Як тільки замовлення буде упаковане, бот надішле вам сповіщення!</i>`;
+    // 2.4 Explicit /name or /phone commands
+    if (text.startsWith('/name ')) {
+      const customName = text.replace('/name ', '').trim();
+      if (customName) {
+        const directUrl = makeCalcUrl(customName);
+        const reply = `✅ <b>Ім'я оновлено:</b> <b>${customName}</b>
+
+Тепер у калькуляторі автоматично зазначатиметься це ім'я:`;
+        await sendMessage(chatId, reply, {
+          inline_keyboard: [
+            [{ text: '🌐 Відкрити калькулятор', url: directUrl }],
+            [{ text: '📱 Додати телефон', callback_data: 'prompt_phone' }],
+            [{ text: '🏠 Головне меню', callback_data: 'menu_main' }]
+          ]
+        });
+        return res.status(200).json({ ok: true });
+      }
+    }
+
+    if (text.startsWith('/phone ')) {
+      const customPhone = text.replace('/phone ', '').trim();
+      if (customPhone) {
+        let phoneFormatted = customPhone.replace(/[\s\(\)\-]/g, '');
+        if (phoneFormatted.startsWith('0')) phoneFormatted = `+38${phoneFormatted}`;
+        else if (phoneFormatted.startsWith('380')) phoneFormatted = `+${phoneFormatted}`;
+        else if (!phoneFormatted.startsWith('+')) phoneFormatted = `+${phoneFormatted}`;
+
+        const directUrl = makeCalcUrl(userFullName, phoneFormatted);
+        const reply = `✅ <b>Телефон збережено:</b> <code>${phoneFormatted}</code>
+
+Тепер контакти автоматично підтягнуться до калькулятора:`;
+        await sendMessage(chatId, reply, {
+          inline_keyboard: [
+            [{ text: '🌐 Відкрити онлайн-калькулятор', url: directUrl }],
+            [{ text: '🏠 Головне меню', callback_data: 'menu_main' }]
+          ]
+        });
+        return res.status(200).json({ ok: true });
+      }
+    }
+
+    // 2.5 Check if user entered a phone number
+    const phoneClean = text.replace(/[\s\(\)\-\.]/g, '');
+    const isPhonePattern = /^(\+?380\d{9}|0\d{9}|\+?\d{10,13})$/.test(phoneClean);
+    if (isPhonePattern) {
+      let formatted = phoneClean;
+      if (formatted.startsWith('0')) formatted = `+38${formatted}`;
+      else if (formatted.startsWith('380')) formatted = `+${formatted}`;
+      else if (!formatted.startsWith('+')) formatted = `+${formatted}`;
+
+      const directUrl = makeCalcUrl(userFullName, formatted);
+      const reply = `✅ <b>Номер телефону збережено:</b> <code>${formatted}</code>
+👤 <b>Клієнт:</b> ${userFullName}
+
+Дані автоматично будуть внесені у розрахунок калькулятора:`;
+      await sendMessage(chatId, reply, {
+        inline_keyboard: [
+          [
+            { text: '🌐 Відкрити онлайн-калькулятор', url: directUrl }
+          ],
+          [
+            { text: '✏️ Змінити ім'я / компанію', callback_data: 'prompt_name' },
+            { text: '🏠 Головне меню', callback_data: 'menu_main' }
+          ]
+        ]
+      });
+      return res.status(200).json({ ok: true });
+    }
+
+    // 2.6 If user entered order tracking number (digits only, e.g. 64841)
+    if (/^\d{3,8}$/.test(text)) {
+      const orderNum = text;
+      const statusText = `📦 <b>Замовлення №${orderNum}:</b>
+
+🟢 <b>Статус:</b> У виробництві (Друкарський цех)
+📅 <b>Орієнтовна готовність:</b> Сьогодні до 17:00
+📍 <b>Пункт видачі:</b> м. Вінниця, вул. 600-річчя, 17
+
+<i>Як тільки замовлення буде упаковане, бот надішле вам сповіщення!</i>`;
       await sendMessage(chatId, statusText, {
         inline_keyboard: [
           [
@@ -367,12 +616,40 @@ export default async function handler(req: any, res: any) {
       return res.status(200).json({ ok: true });
     }
 
-    // Generic fallback text
-    const fallbackText = `Дякуємо за ваше повідомлення! Менеджер отримав ваш запит і відповість найближчим часом.\n\nТакож ви можете скористатися швидким меню:`;
+    // 2.7 If user entered their full name / company name (e.g. 2-5 words, text format)
+    const words = text.split(/\s+/).filter(Boolean);
+    const looksLikeName = words.length >= 1 && words.length <= 6 && !text.includes('http') && text.length >= 3 && text.length <= 60 && !text.startsWith('/');
+    if (looksLikeName) {
+      const clientName = text;
+      const directUrl = makeCalcUrl(clientName);
+      const reply = `✅ <b>Ім'я / Компанію зафіксовано:</b> <b>${clientName}</b>
+
+Тепер ви можете перейти до онлайн-калькулятора або вказати номер телефону:`;
+      await sendMessage(chatId, reply, {
+        inline_keyboard: [
+          [
+            { text: '🌐 Відкрити онлайн-калькулятор', url: directUrl }
+          ],
+          [
+            { text: '📱 Вказати номер телефону', callback_data: 'prompt_phone' },
+            { text: '🏠 Головне меню', callback_data: 'menu_main' }
+          ]
+        ]
+      });
+      return res.status(200).json({ ok: true });
+    }
+
+    // 2.8 Generic fallback text
+    const fallbackText = `Дякуємо за ваше повідомлення! Менеджер отримав ваш запит і відповість найближчим часом.
+
+Також ви можете скористатися швидким меню:`;
     await sendMessage(chatId, fallbackText, {
       inline_keyboard: [
         [
           { text: '🌐 Відкрити онлайн-калькулятор', url: calcUrl }
+        ],
+        [
+          { text: '👤 Мій профіль / Реєстрація', callback_data: 'reg_choice' }
         ],
         [
           { text: '🏷️ Прорахувати ціну', callback_data: 'calc_menu' },
