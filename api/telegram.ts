@@ -58,10 +58,19 @@ export default async function handler(req: any, res: any) {
   const update = req.body;
   if (!update) return res.status(200).json({ ok: true });
 
+  // Extract user info and chat ID safely
+  const userFrom = update.callback_query?.from || update.message?.from;
+  const chatId = update.callback_query?.message?.chat?.id || update.message?.chat?.id;
+  const userFullName = [userFrom?.first_name, userFrom?.last_name].filter(Boolean).join(' ') || userFrom?.username || '';
+  const encodedName = encodeURIComponent(userFullName);
+
+  const calcUrl = `https://crm-edelveis.vercel.app/?mode=client&name=${encodedName}&tg_id=${chatId}`;
+  const buyerUrl = `https://crm-edelveis.vercel.app/?mode=client&type=buyer&name=${encodedName}&tg_id=${chatId}`;
+  const businessUrl = `https://crm-edelveis.vercel.app/?mode=client&type=business&name=${encodedName}&tg_id=${chatId}`;
+
   // 1. Handle Callback Queries (Inline button clicks)
   if (update.callback_query) {
     const cb = update.callback_query;
-    const chatId = cb.message.chat.id;
     const data = cb.data;
     await answerCallback(cb.id);
 
@@ -70,7 +79,10 @@ export default async function handler(req: any, res: any) {
       const keyboard = {
         inline_keyboard: [
           [
-            { text: '🌐 Відкрити онлайн-калькулятор', url: `https://crm-edelveis.vercel.app/?mode=client&name=${encodeURIComponent([cb?.from?.first_name, cb?.from?.last_name].filter(Boolean).join(' ') || cb?.from?.username || '')}&tg_id=${chatId}` }
+            { text: '🌐 Відкрити онлайн-калькулятор', url: calcUrl }
+          ],
+          [
+            { text: '👤 Реєстрація (Покупець / Бізнес)', callback_data: 'reg_choice' }
           ],
           [
             { text: '🏷️ Швидкий прорахунок цін', callback_data: 'calc_menu' },
@@ -78,7 +90,7 @@ export default async function handler(req: any, res: any) {
           ],
           [
             { text: '📎 Надіслати макет', callback_data: 'send_macro' },
-            { text: '💬 Зв\'язатися з менеджером', callback_data: 'contacts_info' }
+            { text: '💬 Контакти друкарні', callback_data: 'contacts_info' }
           ]
         ]
       };
@@ -86,7 +98,7 @@ export default async function handler(req: any, res: any) {
       return res.status(200).json({ ok: true });
     }
 
-        if (data === 'reg_choice') {
+    if (data === 'reg_choice') {
       const text = `👤 <b>Оберіть статус вашого облікового запису:</b>\n\n1. <b>Покупець (Фізична особа)</b> — швидкий онлайн-прорахунок цін, роздрібні замовлення, оплата карткою.\n2. <b>Бізнес (ФОП / ТОВ / Компанія)</b> — рахунки-фактури з ПДВ 20%, партнерські оптові ціни, договори та безготівковий розрахунок.`;
       const keyboard = {
         inline_keyboard: [
@@ -108,7 +120,7 @@ export default async function handler(req: any, res: any) {
       const keyboard = {
         inline_keyboard: [
           [
-            { text: '🌐 Відкрити онлайн-калькулятор', url: `https://crm-edelveis.vercel.app/?mode=client&type=buyer&name=${encodeURIComponent([cb?.from?.first_name, cb?.from?.last_name].filter(Boolean).join(' ') || cb?.from?.username || '')}&tg_id=${chatId}` }
+            { text: '🌐 Відкрити онлайн-калькулятор', url: buyerUrl }
           ],
           [
             { text: '🏷️ Швидкий розрахунок у боті', callback_data: 'calc_menu' },
@@ -125,7 +137,7 @@ export default async function handler(req: any, res: any) {
       const keyboard = {
         inline_keyboard: [
           [
-            { text: '💼 Відкрити корпоративний кабінет', url: `https://crm-edelveis.vercel.app/?mode=client&type=business&name=${encodeURIComponent([cb?.from?.first_name, cb?.from?.last_name].filter(Boolean).join(' ') || cb?.from?.username || '')}&tg_id=${chatId}` }
+            { text: '💼 Відкрити корпоративний кабінет', url: businessUrl }
           ],
           [
             { text: '💬 Зв\'язатися з менеджером B2B', callback_data: 'contacts_info' },
@@ -161,32 +173,16 @@ export default async function handler(req: any, res: any) {
       return res.status(200).json({ ok: true });
     }
 
-    // Product selections -> Quantities
-    if (data.startsWith('calc_item_')) {
-      const item = data.replace('calc_item_', '');
-      const itemNames: Record<string, string> = {
-        vizitki: 'Візитки (90×50 мм, 350г)',
-        flyers: 'Флаєри Євро (99×210 мм, 130г)',
-        booklets: 'Буклети (А4 2 згини, 130г)',
-        stickers: 'Наліпки прямокутні (папір)',
-        banner: 'Банер литий 440г з люверсами'
-      };
-      const title = itemNames[item] || 'Продукція';
-
-      const text = `📊 <b>${title}</b>\n\nОберіть потрібний тираж:`;
+    if (data === 'calc_item_vizitki') {
+      const text = `💳 <b>Візитки стандартні (90×50 мм, 350г/м²):</b>\n\n• <b>100 шт:</b> 220 ₴ (2.20 ₴/шт)\n• <b>500 шт:</b> 420 ₴ (0.84 ₴/шт)\n• <b>1000 шт:</b> 640 ₴ (0.64 ₴/шт)\n\n<i>Опції: матова/глянцева ламінація, заокруглення кутів.</i>`;
       const keyboard = {
         inline_keyboard: [
           [
-            { text: '100 шт', callback_data: `calc_res_${item}_100` },
-            { text: '500 шт', callback_data: `calc_res_${item}_500` },
-            { text: '1000 шт', callback_data: `calc_res_${item}_1000` }
+            { text: '🌐 Розрахувати точний тираж', url: calcUrl }
           ],
           [
-            { text: '2500 шт', callback_data: `calc_res_${item}_2500` },
-            { text: '5000 шт', callback_data: `calc_res_${item}_5000` }
-          ],
-          [
-            { text: '⬅️ До вибору продукції', callback_data: 'calc_menu' }
+            { text: '📎 Надіслати макет', callback_data: 'send_macro' },
+            { text: '⬅️ До списку продукції', callback_data: 'calc_menu' }
           ]
         ]
       };
@@ -194,32 +190,16 @@ export default async function handler(req: any, res: any) {
       return res.status(200).json({ ok: true });
     }
 
-    // Calculation result
-    if (data.startsWith('calc_res_')) {
-      const parts = data.replace('calc_res_', '').split('_');
-      const item = parts[0];
-      const qty = parseInt(parts[1]) || 1000;
-
-      const pricing: Record<string, { name: string; unitPrice: number; days: string }> = {
-        vizitki: { name: 'Візитки крейда 350г 4+4', unitPrice: qty >= 1000 ? 0.45 : 0.65, days: '1-2 дні' },
-        flyers: { name: 'Флаєри Євро 130г 4+4', unitPrice: qty >= 1000 ? 0.68 : 0.95, days: '1-2 дні' },
-        booklets: { name: 'Буклети А4 (2 згини) 130г 4+4', unitPrice: qty >= 1000 ? 1.57 : 2.20, days: '2-3 дні' },
-        stickers: { name: 'Наліпки прямокутні', unitPrice: qty >= 1000 ? 0.52 : 0.80, days: '1-2 дні' },
-        banner: { name: 'Банер литий (1 м²)', unitPrice: 280, days: '1 день' }
-      };
-
-      const info = pricing[item] || { name: 'Поліграфія', unitPrice: 1.0, days: '1-2 дні' };
-      const total = Math.round(info.unitPrice * qty);
-
-      const text = `💰 <b>Розрахунок вартості:</b>\n\n📌 <b>Виріб:</b> ${info.name}\n🔢 <b>Тираж:</b> ${qty} шт.\n⏱️ <b>Термін виготовлення:</b> ${info.days}\n\n💵 <b>Загальна вартість:</b> <b>${total} ₴</b> (ціна за шт: ${info.unitPrice.toFixed(2)} ₴)\n\n<i>Бажаєте оформити замовлення за цим розрахунком?</i>`;
+    if (data === 'calc_item_flyers') {
+      const text = `📄 <b>Єврофлаєри (210×100 мм, крейдований 130г/м²):</b>\n\n• <b>500 шт:</b> 650 ₴ (1.30 ₴/шт)\n• <b>1000 шт:</b> 890 ₴ (0.89 ₴/шт)\n• <b>2500 шт:</b> 1 650 ₴ (0.66 ₴/шт)\n• <b>5000 шт:</b> 2 450 ₴ (0.49 ₴/шт)\n\n<i>Двосторонній повноколірний друк (4+4).</i>`;
       const keyboard = {
         inline_keyboard: [
           [
-            { text: '✅ Оформити замовлення', callback_data: `order_now_${item}_${qty}_${total}` }
+            { text: '🌐 Розрахувати свій тираж', url: calcUrl }
           ],
           [
-            { text: '🔄 Інший прорахунок', callback_data: 'calc_menu' },
-            { text: '🏠 Головне меню', callback_data: 'menu_main' }
+            { text: '📎 Надіслати макет', callback_data: 'send_macro' },
+            { text: '⬅️ До списку продукції', callback_data: 'calc_menu' }
           ]
         ]
       };
@@ -227,15 +207,47 @@ export default async function handler(req: any, res: any) {
       return res.status(200).json({ ok: true });
     }
 
-    if (data.startsWith('order_now_')) {
-      const text = `🎉 <b>Чудово! Ваше замовлення прийнято у чергу обробки.</b>\n\nБудь ласка, напишіть у цей чат:\n1️⃣ <b>Ваш номер телефону та ім\'я</b>\n2️⃣ <b>Коментар або надішліть файл макета</b> (PDF, TIFF, AI, PNG)\n\nМенеджер перевірить макет і зв\'яжеться з вами протягом 10 хвилин!`;
+    if (data === 'calc_item_booklets') {
+      const text = `📖 <b>Буклети А4 (2 згини / євробуклет, 150г/м²):</b>\n\n• <b>100 шт:</b> 580 ₴ (5.80 ₴/шт)\n• <b>500 шт:</b> 1 450 ₴ (2.90 ₴/шт)\n• <b>1000 шт:</b> 2 100 ₴ (2.10 ₴/шт)\n\n<i>Повноколірний друк + 2 біговки.</i>`;
       const keyboard = {
         inline_keyboard: [
           [
-            { text: '💬 Написати менеджеру', url: 'https://t.me/edelveis_manager' }
+            { text: '🌐 Відкрити онлайн-калькулятор', url: calcUrl }
           ],
           [
-            { text: '🏠 Головне меню', callback_data: 'menu_main' }
+            { text: '⬅️ До списку продукції', callback_data: 'calc_menu' }
+          ]
+        ]
+      };
+      await sendMessage(chatId, text, keyboard);
+      return res.status(200).json({ ok: true });
+    }
+
+    if (data === 'calc_item_stickers') {
+      const text = `🏷️ <b>Самоклеючі наліпки (Папір Рафлатак / Плівка Oracal):</b>\n\n• <b>Прямокутні наліпки:</b> від 0.25 ₴/шт\n• <b>Фігурна плотерна порізка:</b> від 0.45 ₴/шт\n• <b>Рулонні етикетки:</b> від 1000 шт за оптовими цінами\n\n<i>Можлива ламінація та висічка довільної форми.</i>`;
+      const keyboard = {
+        inline_keyboard: [
+          [
+            { text: '🌐 Розрахувати наліпки онлайн', url: calcUrl }
+          ],
+          [
+            { text: '⬅️ До списку продукції', callback_data: 'calc_menu' }
+          ]
+        ]
+      };
+      await sendMessage(chatId, text, keyboard);
+      return res.status(200).json({ ok: true });
+    }
+
+    if (data === 'calc_item_banner') {
+      const text = `🖼️ <b>Широкоформатний друк (Банери, Плівка, Постери):</b>\n\n• <b>Литий банер 440г (вуличний):</b> від 185 ₴/м²\n• <b>Ламінований банер:</b> від 145 ₴/м²\n• <b>Самоклейка Oracal + друк 1440 DPI:</b> від 210 ₴/м²\n• <b>Люверси по периметру (кожні 30 см):</b> 8 ₴/шт`;
+      const keyboard = {
+        inline_keyboard: [
+          [
+            { text: '🌐 Калькулятор широкоформату', url: calcUrl }
+          ],
+          [
+            { text: '⬅️ До списку продукції', callback_data: 'calc_menu' }
           ]
         ]
       };
@@ -244,8 +256,16 @@ export default async function handler(req: any, res: any) {
     }
 
     if (data === 'status_info') {
-      const text = `📦 <b>Перевірка статусу замовлення:</b>\n\nВведіть у чат <b>номер вашого замовлення</b> (наприклад: <code>64841</code>) або ваш номер телефону, і бот миттєво знайде статус у системі.`;
-      await sendMessage(chatId, text, { inline_keyboard: [[{ text: '⬅️ Назад', callback_data: 'menu_main' }]] });
+      const text = `📦 <b>Перевірка статусу вашого замовлення:</b>\n\nВведіть у поле повідомлення <b>номер вашого замовлення</b> (наприклад: <code>64841</code>), і бот миттєво повідомить поточний етап виробництва.`;
+      const keyboard = {
+        inline_keyboard: [
+          [
+            { text: '💬 Запитати у менеджера', callback_data: 'contacts_info' },
+            { text: '🏠 Головне меню', callback_data: 'menu_main' }
+          ]
+        ]
+      };
+      await sendMessage(chatId, text, keyboard);
       return res.status(200).json({ ok: true });
     }
 
@@ -265,7 +285,6 @@ export default async function handler(req: any, res: any) {
   // 2. Handle Text Messages & Commands
   if (update.message) {
     const msg = update.message;
-    const chatId = msg.chat.id;
     const text = msg.text || '';
 
     // Handle document / photo uploads
@@ -283,7 +302,10 @@ export default async function handler(req: any, res: any) {
       const keyboard = {
         inline_keyboard: [
           [
-            { text: '🌐 Відкрити онлайн-калькулятор', url: `https://crm-edelveis.vercel.app/?mode=client&name=${encodeURIComponent([cb?.from?.first_name, cb?.from?.last_name].filter(Boolean).join(' ') || cb?.from?.username || '')}&tg_id=${chatId}` }
+            { text: '🌐 Відкрити онлайн-калькулятор', url: calcUrl }
+          ],
+          [
+            { text: '👤 Реєстрація (Покупець / Бізнес)', callback_data: 'reg_choice' }
           ],
           [
             { text: '🏷️ Швидкий прорахунок цін', callback_data: 'calc_menu' },
@@ -311,7 +333,7 @@ export default async function handler(req: any, res: any) {
             { text: '🏷️ Наліпки', callback_data: 'calc_item_stickers' }
           ],
           [
-            { text: '🌐 Відкрити онлайн-калькулятор', url: `https://crm-edelveis.vercel.app/?mode=client&name=${encodeURIComponent([cb?.from?.first_name, cb?.from?.last_name].filter(Boolean).join(' ') || cb?.from?.username || '')}&tg_id=${chatId}` }
+            { text: '🌐 Відкрити онлайн-калькулятор', url: calcUrl }
           ]
         ]
       };
@@ -350,7 +372,7 @@ export default async function handler(req: any, res: any) {
     await sendMessage(chatId, fallbackText, {
       inline_keyboard: [
         [
-          { text: '🌐 Відкрити онлайн-калькулятор', url: `https://crm-edelveis.vercel.app/?mode=client&name=${encodeURIComponent([cb?.from?.first_name, cb?.from?.last_name].filter(Boolean).join(' ') || cb?.from?.username || '')}&tg_id=${chatId}` }
+          { text: '🌐 Відкрити онлайн-калькулятор', url: calcUrl }
         ],
         [
           { text: '🏷️ Прорахувати ціну', callback_data: 'calc_menu' },
