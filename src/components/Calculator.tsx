@@ -5493,18 +5493,22 @@ export const Calculator: React.FC = () => {
                     </div>
 
                     <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setTempNorms(norms);
-                          setShowMaterialPricesModal(true);
-                        }}
-                        className="px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 font-bold text-xs flex items-center gap-1.5 hover:bg-slate-100 transition-colors shadow-2xs"
-                        title="Прайс та тарифи на папери і післядрукарські роботи"
-                      >
-                        <Layers size={14} className="text-blue-600" />
-                        <span>Ціни на матеріали</span>
-                      </button>
+                      {currentUser?.role !== 'client' && (
+                        {currentUser?.role !== 'client' && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setTempNorms(norms);
+                              setShowMaterialPricesModal(true);
+                            }}
+                            className="px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 font-bold text-xs flex items-center gap-1.5 hover:bg-slate-100 transition-colors shadow-2xs"
+                            title="Прайс та тарифи на папери і післядрукарські роботи"
+                          >
+                            <Layers size={14} className="text-blue-600" />
+                            <span>Ціни на матеріали</span>
+                          </button>
+                        )}
+                      )}
 
                       <button
                         type="button"
@@ -8875,18 +8879,20 @@ export const Calculator: React.FC = () => {
                       </div>
 
                       <div className="flex items-center gap-2">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setTempNorms(norms);
-                            setShowMaterialPricesModal(true);
-                          }}
-                          className="px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 font-bold text-xs flex items-center gap-1.5 hover:bg-slate-100 transition-colors shadow-2xs"
-                          title="Прайс та тарифи на папери і післядрукарські роботи"
-                        >
-                          <Layers size={14} className="text-blue-600" />
-                          <span>Ціни на матеріали</span>
-                        </button>
+                        {currentUser?.role !== 'client' && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setTempNorms(norms);
+                              setShowMaterialPricesModal(true);
+                            }}
+                            className="px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 font-bold text-xs flex items-center gap-1.5 hover:bg-slate-100 transition-colors shadow-2xs"
+                            title="Прайс та тарифи на папери і післядрукарські роботи"
+                          >
+                            <Layers size={14} className="text-blue-600" />
+                            <span>Ціни на матеріали</span>
+                          </button>
+                        )}
                         <button
                           type="button"
                           onClick={() => setDigitalSubTab('overview')}
@@ -12039,18 +12045,20 @@ export const Calculator: React.FC = () => {
                     </div>
 
                     <div className="flex items-center gap-2">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setTempNorms(norms);
-                          setShowMaterialPricesModal(true);
-                        }}
-                        className="px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold transition-all flex items-center gap-1.5"
-                        title="Прайс та тарифи"
-                      >
-                        <Layers size={14} className="text-blue-600" />
-                        <span>Ціни на матеріали</span>
-                      </button>
+                      {currentUser?.role !== 'client' && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setTempNorms(norms);
+                            setShowMaterialPricesModal(true);
+                          }}
+                          className="px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold transition-all flex items-center gap-1.5"
+                          title="Прайс та тарифи"
+                        >
+                          <Layers size={14} className="text-blue-600" />
+                          <span>Ціни на матеріали</span>
+                        </button>
+                      )}
 
                       <button
                         type="button"
@@ -13326,18 +13334,20 @@ export const Calculator: React.FC = () => {
                       <h2 style={{ fontSize: '26px', fontWeight: '900', color: 'var(--text-dark)', margin: 0, letterSpacing: '-0.5px' }}>
                         Рулонна етикетка
                       </h2>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setTempNorms(norms);
-                          setShowMaterialPricesModal(true);
-                        }}
-                        className="px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 font-bold text-xs flex items-center gap-1.5 hover:bg-slate-100 transition-colors shadow-2xs"
-                        title="Прайс та тарифи на рулонні матеріали"
-                      >
-                        <Layers size={14} className="text-blue-600" />
-                        <span>Ціни на матеріали</span>
-                      </button>
+                      {currentUser?.role !== 'client' && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setTempNorms(norms);
+                            setShowMaterialPricesModal(true);
+                          }}
+                          className="px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-slate-700 font-bold text-xs flex items-center gap-1.5 hover:bg-slate-100 transition-colors shadow-2xs"
+                          title="Прайс та тарифи на рулонні матеріали"
+                        >
+                          <Layers size={14} className="text-blue-600" />
+                          <span>Ціни на матеріали</span>
+                        </button>
+                      )}
                     </div>
                     <p style={{ fontSize: '15px', fontWeight: '600', color: 'var(--text-medium)', marginBottom: '14px' }}>
                       Друк самоклеючихся <strong style={{ color: 'var(--text-dark)' }}>етикеток і наліпок</strong> в рулонах
@@ -15792,7 +15802,7 @@ export const Calculator: React.FC = () => {
       )}
 
                   {/* Material & Postpress Prices Modal - Clean CRM Design, No Emojis, 100% Editable List */}
-      {showMaterialPricesModal && (
+      {showMaterialPricesModal && currentUser?.role !== 'client' && (
         <div 
           style={{
             position: 'fixed',
