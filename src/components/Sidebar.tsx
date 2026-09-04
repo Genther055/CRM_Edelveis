@@ -19,7 +19,8 @@ import {
   Moon,
   Sun,
   X,
-  Palette
+  Palette,
+  Database
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -223,6 +224,24 @@ export const Sidebar: React.FC<SidebarProps> = ({
               width: '100%',
               flexShrink: 0
             }}>
+              {/* Neon Cloud Database Status Indicator */}
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '6px 10px',
+                backgroundColor: isDark ? 'rgba(16, 185, 129, 0.1)' : '#ecfdf5',
+                border: isDark ? '1px solid rgba(16, 185, 129, 0.25)' : '1px solid #a7f3d0',
+                borderRadius: '8px',
+                marginBottom: '4px'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <Database size={13} className="text-emerald-500" style={{ flexShrink: 0 }} />
+                  <span style={{ fontSize: '10.5px', fontWeight: '800', color: isDark ? '#34d399' : '#065f46' }}>Neon PostgreSQL</span>
+                </div>
+                <span style={{ fontSize: '9.5px', fontWeight: '700', color: isDark ? '#6ee7b7' : '#047857' }}>Хмара 24/7</span>
+              </div>
+
               <button
                 onClick={toggleTheme}
                 type="button"
@@ -419,6 +438,24 @@ export const Sidebar: React.FC<SidebarProps> = ({
           width: '100%',
           flexShrink: 0
         }}>
+          {/* Neon Cloud Database Status Indicator */}
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '6px 10px',
+            backgroundColor: isDark ? 'rgba(16, 185, 129, 0.1)' : '#ecfdf5',
+            border: isDark ? '1px solid rgba(16, 185, 129, 0.25)' : '1px solid #a7f3d0',
+            borderRadius: '8px',
+            marginBottom: '4px'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <span style={{ width: '7px', height: '7px', borderRadius: '50%', backgroundColor: '#10b981', display: 'inline-block' }}></span>
+              <span style={{ fontSize: '10.5px', fontWeight: '800', color: isDark ? '#34d399' : '#065f46' }}>Neon PostgreSQL</span>
+            </div>
+            <span style={{ fontSize: '9.5px', fontWeight: '700', color: isDark ? '#6ee7b7' : '#047857' }}>Хмара 24/7</span>
+          </div>
+
           <button
             onClick={toggleTheme}
             type="button"

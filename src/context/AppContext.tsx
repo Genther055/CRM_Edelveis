@@ -50,6 +50,9 @@ interface AppContextType {
   setNpVolumeCalcEnabled: (val: boolean) => void;
   theme: 'light' | 'dark';
   toggleTheme: () => void;
+  isDbConnected: boolean;
+  lastSyncedAt: Date | null;
+  refreshSync: () => Promise<void>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -586,6 +589,70 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       return next;
     });
   };
+  const [isDbConnected, setIsDbConnected] = useState<boolean>(true);
+  const [lastSyncedAt, setLastSyncedAt] = useState<Date | null>(new Date());
+
+  const syncServer = async (action: string, payload: any) => {
+    try {
+      await fetch('/api/sync', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action, payload })
+      });
+      setLastSyncedAt(new Date());
+    } catch (err) {
+      console.warn('Neon database background sync notice:', err);
+    }
+  };
+
+  const fetchServerSync = async () => {
+    try {
+      const res = await fetch('/api/sync');
+      if (!res.ok) return;
+      const data = await res.json();
+      if (data.ok) {
+        if (Array.isArray(data.clients) && data.clients.length > 0) {
+          setClients(data.clients);
+        }
+        if (Array.isArray(data.orders) && data.orders.length > 0) {
+          setOrders(data.orders);
+        }
+        if (Array.isArray(data.materials) && data.materials.length > 0) {
+          setMaterials(data.materials);
+        }
+        if (Array.isArray(data.employees) && data.employees.length > 0) {
+          setUsers(prev => {
+            const clientUsers = prev.filter(u => u.role === 'client');
+            return [...data.employees, ...clientUsers];
+          });
+        }
+        if (Array.isArray(data.deliveries) && data.deliveries.length > 0) {
+          setDeliveries(data.deliveries);
+        }
+        if (data.norms) {
+          setNorms(prev => ({ ...prev, ...data.norms }));
+        }
+        setIsDbConnected(true);
+        setLastSyncedAt(new Date());
+      }
+    } catch (err) {
+      console.warn('Neon sync poll skipped:', err);
+    }
+  };
+
+  useEffect(() => {
+    fetchServerSync();
+    const interval = setInterval(fetchServerSync, 6000);
+    const handleFocus = () => fetchServerSync();
+    window.addEventListener('focus', handleFocus);
+    document.addEventListener('visibilitychange', handleFocus);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('focus', handleFocus);
+      document.removeEventListener('visibilitychange', handleFocus);
+    };
+  }, []);
+
 
   useEffect(() => {
     if (theme === 'dark') {
@@ -692,10 +759,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       type: clientData.type || 'client'
     };
     setClients(prev => [...prev, newClient]);
+    syncServer('save_client', newClient);
   };
 
   const updateClient = (updatedClient: Client) => {
     setClients(prev => prev.map(c => c.id === updatedClient.id ? updatedClient : c));
+    syncServer('save_client', updatedClient);
   };
 
   const addSystemNotification = (message: string) => {
@@ -766,10 +835,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     });
 
     handleBotPaymentCheck(newOrder, 'design');
+    syncServer('save_order', newOrder);
   };
 
   const updateOrder = (updatedOrder: Order) => {
     setOrders(prev => prev.map(o => o.id === updatedOrder.id ? updatedOrder : o));
+    syncServer('save_order', updatedOrder);
   };
 
   const updateOrderStatus = (orderId: string, status: Order['status']) => {
@@ -796,6 +867,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         const stageChangedAt = { ...(o.stageChangedAt || {}), [status]: now };
         const updated = { ...o, status, stageChangedAt };
         handleBotPaymentCheck(updated, status);
+        syncServer('save_order', updated);
         return updated;
       }
       return o;
@@ -821,6 +893,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const updateMaterialStock = (materialId: string, quantity: number) => {
     setMaterials(prev => prev.map(m => m.id === materialId ? { ...m, quantity } : m));
+    syncServer('update_material_stock', { materialId, quantity });
   };
 
   const updateMaterialSalesLog = (materialId: string, salesLog: any[]) => {
@@ -952,7 +1025,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         npVolumeCalcEnabled,
         setNpVolumeCalcEnabled,
         theme,
-        toggleTheme
+        toggleTheme,
+        isDbConnected,
+        lastSyncedAt,
+        refreshSync: fetchServerSync
       }}
     >
       {children}
