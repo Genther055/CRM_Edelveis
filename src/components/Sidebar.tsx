@@ -36,26 +36,29 @@ export const Sidebar: React.FC<SidebarProps> = ({
   isOpenOnMobile = false,
   onCloseMobile
 }) => {
-  const { currentUser, logout, theme, toggleTheme } = useApp();
-  const role = currentUser?.role || 'operator';
+  const { currentUser, theme, toggleTheme, logout } = useApp();
+  const rawRole = (currentUser?.role as string) || 'operator';
+  const isAdmin = rawRole === 'admin' || rawRole === 'Директор' || currentUser?.username === 'admin';
+  const isManager = isAdmin || rawRole === 'manager' || rawRole === 'Технолог' || rawRole.toLowerCase().includes('менеджер') || currentUser?.username === 'manager' || currentUser?.username === 'technolog';
+  const roleLabel = isAdmin ? 'Адміністратор' : (isManager ? 'Менеджер' : (rawRole === 'client' ? 'Клієнт' : 'Оператор'));
 
   // KeepinCRM Modules List with role visibility guards
   const menuItems = [
     { id: 'dashboard', name: 'Робочий стіл', icon: LayoutGrid, visible: true },
-    { id: 'leads', name: 'Запити', icon: Sliders, visible: ['admin', 'manager'].includes(role) },
-    { id: 'clients', name: 'Замовники', icon: Users, visible: ['admin', 'manager'].includes(role) },
-    { id: 'employees', name: 'Співробітники', icon: UserIcon, visible: ['admin', 'manager'].includes(role) },
-    { id: 'designer', name: 'Дизайнерська', icon: Palette, visible: true },
-    { id: 'deals', name: 'Угоди', icon: FolderKanban, visible: ['admin', 'manager'].includes(role) },
-    { id: 'delivery', name: 'Доставка', icon: Truck, visible: ['admin', 'manager'].includes(role) },
+    { id: 'leads', name: 'Запити', icon: Sliders, visible: isManager },
+    { id: 'clients', name: 'Замовники', icon: Users, visible: isManager },
+    { id: 'employees', name: 'Співробітники', icon: UserIcon, visible: isManager },
+    { id: 'designer', name: 'Дизайн макетів', icon: Palette, visible: true },
+    { id: 'deals', name: 'Угоди', icon: FolderKanban, visible: isManager },
+    { id: 'delivery', name: 'Доставка', icon: Truck, visible: isManager },
     { id: 'calculator', name: 'Калькулятор', icon: Calculator, visible: true },
     { id: 'warehouse', name: 'Склад', icon: Archive, visible: true },
     { id: 'production', name: 'Виробництво', icon: Layers, visible: true },
     { id: 'tasks', name: 'Завдання', icon: CheckSquare, visible: true },
     { id: 'documents', name: 'Документи', icon: FileSignature, visible: true },
     { id: 'finance', name: 'BAS Бухгалтерія', icon: Coins, visible: true },
-    { id: 'triggers', name: 'Автоматизація', icon: Zap, visible: ['admin', 'manager'].includes(role) },
-    { id: 'settings', name: 'Налаштування', icon: SettingsIcon, visible: ['admin'].includes(role) }
+    { id: 'triggers', name: 'Автоматизація', icon: Zap, visible: isManager },
+    { id: 'settings', name: 'Налаштування', icon: SettingsIcon, visible: isAdmin }
   ];
 
   const isDark = theme === 'dark';
@@ -168,7 +171,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     {currentUser?.name || 'Гість'}
                   </span>
                   <span style={{ fontSize: '10px', color: isDark ? '#9ca3af' : 'var(--text-medium)', fontWeight: '500' }}>
-                    {role === 'admin' ? 'Адміністратор' : role === 'manager' ? 'Менеджер' : 'Оператор'}
+                    {roleLabel}
                   </span>
                 </div>
               </div>
@@ -361,7 +364,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 {currentUser?.name || 'Гість'}
               </span>
               <span style={{ fontSize: '10px', color: isDark ? '#9ca3af' : 'var(--text-medium)', fontWeight: '500' }}>
-                {role === 'admin' ? 'Адміністратор' : role === 'manager' ? 'Менеджер' : 'Оператор'}
+                {roleLabel}
               </span>
             </div>
           </div>

@@ -28,8 +28,11 @@ interface DashboardProps {
 export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab }) => {
   const { currentUser, orders, clients, materials } = useApp();
 
+  const rawRole = (currentUser?.role as string) || 'operator';
   const role = currentUser?.role || 'operator';
   const name = currentUser?.name || 'Гість';
+  const isAdmin = rawRole === 'admin' || rawRole === 'Директор' || currentUser?.username === 'admin';
+  const isManager = isAdmin || rawRole === 'manager' || rawRole === 'Технолог' || rawRole.toLowerCase().includes('менеджер') || currentUser?.username === 'manager' || currentUser?.username === 'technolog';
 
   // Statistics
   const activeOrdersCount = orders.filter(o => o.status !== 'ready').length;
@@ -37,11 +40,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab }) => {
   const lowStockMaterials = materials.filter(m => (m.quantity - m.reserved) < 1000).length;
   const totalClients = clients.length;
 
-  const roleLabels: Record<string, string> = {
-    admin: 'Адміністратор системи',
-    manager: 'Менеджер замовлень',
-    operator: 'Друкар / Оператор виробництва'
-  };
+  const roleTitle = isAdmin ? 'Директор • Панель управління ТОВ Едельвейс і К' : (isManager ? 'Менеджер замовлень • ТОВ Едельвейс і К' : 'Друкар / Оператор виробництва • ТОВ Едельвейс і К');
 
   // Staff performance based on orders count (without revenue figures, excluding Director)
   const staffPerformance = [
@@ -205,7 +204,11 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab }) => {
     }
   ];
 
-  const allowedTools = tools.filter(t => t.allowedRoles.includes(role));
+  const allowedTools = tools.filter(t => {
+    if (isAdmin) return true;
+    if (isManager && t.allowedRoles.includes('manager')) return true;
+    return t.allowedRoles.includes(role);
+  });
 
   return (
     <div className="main-content" style={{ display: 'flex', flexDirection: 'column', gap: '24px', overflowY: 'auto', height: '100vh', paddingBottom: '40px', backgroundColor: 'var(--bg-system)' }}>
@@ -240,7 +243,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ setActiveTab }) => {
               Вітаємо, {name}!
             </h2>
             <p style={{ fontSize: '13px', color: 'var(--text-medium)', marginTop: '2px' }}>
-              {roleLabels[role] || role} • Панель управління ТОВ Едельвейс і К
+              {roleTitle}
             </p>
           </div>
         </div>

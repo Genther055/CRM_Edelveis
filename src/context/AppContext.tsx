@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import type { User, Client, Material, Order, Norms, DeliveryItem, CustomField, AutoPaymentTrigger, ClientSection } from '../types';
+import type { User, UserRole, Client, Material, Order, Norms, DeliveryItem, CustomField, AutoPaymentTrigger, ClientSection } from '../types';
 import { isUserBlocked } from '../utils/security';
 
 interface AppContextType {
@@ -473,7 +473,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       const savedUser = localStorage.getItem('crm_user');
       if (savedUser) {
         try {
-          return JSON.parse(savedUser);
+          const parsed = JSON.parse(savedUser);
+          if (parsed.username === 'admin') {
+            parsed.role = 'admin';
+          } else if (parsed.username === 'manager' || parsed.username === 'technolog') {
+            parsed.role = 'manager';
+          }
+          return parsed;
         } catch (e) {}
       }
     }
@@ -736,10 +742,21 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     if (isUserBlocked(username)) {
       return false;
     }
-    const user = users.find(u => u.username === username.toLowerCase() && password === username);
+    const uname = username.trim().toLowerCase();
+    const user = users.find(u => u.username.toLowerCase() === uname && password.trim() === username.trim());
     if (user) {
-      setCurrentUser(user);
-      localStorage.setItem('crm_user', JSON.stringify(user));
+      const normalizedRole: UserRole = uname === 'admin' 
+        ? 'admin' 
+        : (uname === 'manager' || uname === 'technolog' 
+          ? 'manager' 
+          : (['admin', 'manager', 'operator', 'client'].includes(user.role) ? user.role : 'operator'));
+      
+      const loggedUser: User = {
+        ...user,
+        role: normalizedRole
+      };
+      setCurrentUser(loggedUser);
+      localStorage.setItem('crm_user', JSON.stringify(loggedUser));
       return true;
     }
     return false;

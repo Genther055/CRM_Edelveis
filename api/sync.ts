@@ -118,7 +118,7 @@ export default async function handler(req: any, res: any) {
         id: e.id,
         name: e.name,
         username: e.username,
-        role: e.role,
+        role: e.username === 'admin' ? 'admin' : (e.username === 'manager' || e.username === 'technolog' ? 'manager' : (['admin', 'manager', 'operator', 'client'].includes(e.role) ? e.role : 'operator')),
         phone: e.phone || '',
         email: e.email || '',
         birthday: e.birthday || '',
