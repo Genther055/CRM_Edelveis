@@ -70,7 +70,7 @@ export default async function handler(req: any, res: any) {
       const keyboard = {
         inline_keyboard: [
           [
-            { text: '🌐 Відкрити онлайн-калькулятор', url: 'https://crm-edelveis.vercel.app/?mode=client' }
+            { text: '🌐 Відкрити онлайн-калькулятор', url: `https://crm-edelveis.vercel.app/?mode=client&name=${encodeURIComponent([cb?.from?.first_name, cb?.from?.last_name].filter(Boolean).join(' ') || cb?.from?.username || '')}&tg_id=${chatId}` }
           ],
           [
             { text: '🏷️ Швидкий прорахунок цін', callback_data: 'calc_menu' },
@@ -108,7 +108,7 @@ export default async function handler(req: any, res: any) {
       const keyboard = {
         inline_keyboard: [
           [
-            { text: '🌐 Відкрити онлайн-калькулятор', url: 'https://crm-edelveis.vercel.app/?mode=client&type=buyer' }
+            { text: '🌐 Відкрити онлайн-калькулятор', url: `https://crm-edelveis.vercel.app/?mode=client&type=buyer&name=${encodeURIComponent([cb?.from?.first_name, cb?.from?.last_name].filter(Boolean).join(' ') || cb?.from?.username || '')}&tg_id=${chatId}` }
           ],
           [
             { text: '🏷️ Швидкий розрахунок у боті', callback_data: 'calc_menu' },
@@ -125,7 +125,7 @@ export default async function handler(req: any, res: any) {
       const keyboard = {
         inline_keyboard: [
           [
-            { text: '💼 Відкрити корпоративний кабінет', url: 'https://crm-edelveis.vercel.app/?mode=client&type=business' }
+            { text: '💼 Відкрити корпоративний кабінет', url: `https://crm-edelveis.vercel.app/?mode=client&type=business&name=${encodeURIComponent([cb?.from?.first_name, cb?.from?.last_name].filter(Boolean).join(' ') || cb?.from?.username || '')}&tg_id=${chatId}` }
           ],
           [
             { text: '💬 Зв\'язатися з менеджером B2B', callback_data: 'contacts_info' },
@@ -283,7 +283,7 @@ export default async function handler(req: any, res: any) {
       const keyboard = {
         inline_keyboard: [
           [
-            { text: '🌐 Відкрити онлайн-калькулятор', url: 'https://crm-edelveis.vercel.app/?mode=client' }
+            { text: '🌐 Відкрити онлайн-калькулятор', url: `https://crm-edelveis.vercel.app/?mode=client&name=${encodeURIComponent([cb?.from?.first_name, cb?.from?.last_name].filter(Boolean).join(' ') || cb?.from?.username || '')}&tg_id=${chatId}` }
           ],
           [
             { text: '🏷️ Швидкий прорахунок цін', callback_data: 'calc_menu' },
@@ -311,7 +311,7 @@ export default async function handler(req: any, res: any) {
             { text: '🏷️ Наліпки', callback_data: 'calc_item_stickers' }
           ],
           [
-            { text: '🌐 Відкрити онлайн-калькулятор', url: 'https://crm-edelveis.vercel.app/?mode=client' }
+            { text: '🌐 Відкрити онлайн-калькулятор', url: `https://crm-edelveis.vercel.app/?mode=client&name=${encodeURIComponent([cb?.from?.first_name, cb?.from?.last_name].filter(Boolean).join(' ') || cb?.from?.username || '')}&tg_id=${chatId}` }
           ]
         ]
       };
@@ -350,7 +350,7 @@ export default async function handler(req: any, res: any) {
     await sendMessage(chatId, fallbackText, {
       inline_keyboard: [
         [
-          { text: '🌐 Відкрити онлайн-калькулятор', url: 'https://crm-edelveis.vercel.app/?mode=client' }
+          { text: '🌐 Відкрити онлайн-калькулятор', url: `https://crm-edelveis.vercel.app/?mode=client&name=${encodeURIComponent([cb?.from?.first_name, cb?.from?.last_name].filter(Boolean).join(' ') || cb?.from?.username || '')}&tg_id=${chatId}` }
         ],
         [
           { text: '🏷️ Прорахувати ціну', callback_data: 'calc_menu' },

@@ -1220,14 +1220,23 @@ export const Calculator: React.FC = () => {
   const [isNewClientMode, setIsNewClientMode] = useState<boolean>(false);
   const [marginPercent, setMarginPercent] = useState<number>(100);
 
-  // Auto-fill client contacts from logged-in session / localStorage profile
+  // Auto-fill client contacts from URL, Telegram Bot session or localStorage profile
   useEffect(() => {
     try {
+      if (typeof window !== 'undefined') {
+        const params = new URLSearchParams(window.location.search);
+        const urlName = params.get('name') || params.get('company') || params.get('client') || params.get('user');
+        const urlPhone = params.get('phone') || params.get('tel');
+        if (urlName && !customClientName) setCustomClientName(decodeURIComponent(urlName));
+        if (urlPhone && !customClientPhone) setCustomClientPhone(decodeURIComponent(urlPhone));
+      }
+
       const savedProfile = localStorage.getItem('crm_client_profile');
       if (savedProfile) {
         const parsed = JSON.parse(savedProfile);
-        if (parsed.name && !customClientName) {
-          setCustomClientName(parsed.name);
+        const effectiveName = parsed.name || parsed.companyName || parsed.contactPerson;
+        if (effectiveName && !customClientName) {
+          setCustomClientName(effectiveName);
         }
         if (parsed.phone && !customClientPhone) {
           setCustomClientPhone(parsed.phone);
@@ -6395,7 +6404,7 @@ export const Calculator: React.FC = () => {
                       <div className="px-5 py-3.5 bg-slate-50/90 flex items-center justify-between border-b border-slate-200">
                         <div className="flex items-center gap-2.5">
                           <SlidersHorizontal size={18} className="text-blue-600" />
-                          <h4 className="text-sm font-bold text-slate-900 m-0">Післядрукарська обробка (Нормативи 1С)</h4>
+                          <h4 className="text-sm font-bold text-slate-900 m-0">Післядрукарська обробка</h4>
                         </div>
                         <button
                           type="button"
@@ -7188,117 +7197,148 @@ export const Calculator: React.FC = () => {
                                 />
                               </div>
 
-                              {/* Margin slider & presets */}
-                              <div className="flex flex-col gap-2">
-                                <div className="flex items-center justify-between text-xs">
-                                  <label className="text-xs font-extrabold text-slate-700 uppercase">НАЦІНКА (МАРЖА):</label>
-                                  <div className="flex items-center gap-1">
-                                    <input
-                                      type="number"
-                                      min="0"
-                                      max="500"
-                                      value={marginPercent}
-                                      onChange={(e) => setMarginPercent(Math.max(0, parseInt(e.target.value) || 0))}
-                                      className="w-16 px-2 py-0.5 rounded-lg border border-blue-300 bg-white font-black text-blue-600 text-xs text-center focus:outline-none focus:border-blue-600 shadow-2xs"
-                                    />
-                                    <span className="font-extrabold text-blue-600">%</span>
+                              {/* Margin slider & presets (Hidden for clients) */}
+                              {currentUser?.role !== 'client' && (
+                                <div className="flex flex-col gap-2">
+                                  <div className="flex items-center justify-between text-xs">
+                                    <label className="text-xs font-extrabold text-slate-700 uppercase">НАЦІНКА (МАРЖА):</label>
+                                    <div className="flex items-center gap-1">
+                                      <input
+                                        type="number"
+                                        min="0"
+                                        max="500"
+                                        value={marginPercent}
+                                        onChange={(e) => setMarginPercent(Math.max(0, parseInt(e.target.value) || 0))}
+                                        className="w-16 px-2 py-0.5 rounded-lg border border-blue-300 bg-white font-black text-blue-600 text-xs text-center focus:outline-none focus:border-blue-600 shadow-2xs"
+                                      />
+                                      <span className="font-extrabold text-blue-600">%</span>
+                                    </div>
+                                  </div>
+                                  <input
+                                    type="range"
+                                    min="0"
+                                    max="300"
+                                    step="5"
+                                    value={marginPercent}
+                                    onChange={(e) => setMarginPercent(Number(e.target.value) || 0)}
+                                    className="w-full cursor-pointer accent-blue-600 h-2 bg-slate-200 rounded-lg"
+                                  />
+                                  <div className="grid grid-cols-5 gap-2">
+                                    {[20, 35, 50, 100, 150].map(m => {
+                                      const isSel = marginPercent === m;
+                                      return (
+                                        <button
+                                          key={m}
+                                          type="button"
+                                          onClick={() => setMarginPercent(m)}
+                                          className={`py-2 text-xs font-bold rounded-xl transition-all text-center flex items-center justify-center border ${
+                                            isSel
+                                              ? 'bg-blue-50 text-blue-700 border-blue-400 ring-2 ring-blue-500/20 shadow-2xs font-extrabold'
+                                              : 'bg-slate-50/80 hover:bg-slate-100 text-slate-700 border-slate-200/80'
+                                          }`}
+                                        >
+                                          {m}%
+                                        </button>
+                                      );
+                                    })}
                                   </div>
                                 </div>
-                                <input
-                                  type="range"
-                                  min="0"
-                                  max="300"
-                                  step="5"
-                                  value={marginPercent}
-                                  onChange={(e) => setMarginPercent(Number(e.target.value) || 0)}
-                                  className="w-full cursor-pointer accent-blue-600 h-2 bg-slate-200 rounded-lg"
-                                />
-                                <div className="grid grid-cols-5 gap-2">
-                                  {[20, 35, 50, 100, 150].map(m => {
-                                    const isSel = marginPercent === m;
-                                    return (
-                                      <button
-                                        key={m}
-                                        type="button"
-                                        onClick={() => setMarginPercent(m)}
-                                        className={`py-2 text-xs font-bold rounded-xl transition-all text-center flex items-center justify-center border ${
-                                          isSel
-                                            ? 'bg-blue-50 text-blue-700 border-blue-400 ring-2 ring-blue-500/20 shadow-2xs font-extrabold'
-                                            : 'bg-slate-50/80 hover:bg-slate-100 text-slate-700 border-slate-200/80'
-                                        }`}
-                                      >
-                                        {m}%
-                                      </button>
-                                    );
-                                  })}
-                                </div>
-                              </div>
+                              )}
                             </div>
                           </div>
 
                           {/* 2. Right Column (50%): РОЗРАХУНОК + ГОРИЗОНТАЛЬНІ КНОПКИ СПРАВА */}
                           <div className="ios-card bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-6 h-full">
-                            <div className="flex flex-col gap-3">
-                              <div className="flex justify-between items-center pb-2 border-b border-slate-100">
-                                <span className="text-xs font-black text-slate-800 uppercase tracking-wide">
-                                  РОЗРАХУНОК (СОБІВАРТІСТЬ & НОРМИ 1С):
-                                </span>
-                                <strong className="text-sm font-black text-slate-900 font-mono">
-                                  {activeCalc.rawCost.toFixed(2)} ₴
-                                </strong>
-                              </div>
-
-                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                                <div className="flex justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/60">
-                                  <span className="text-slate-600 font-medium">Матеріали / Папір:</span>
-                                  <strong className="font-mono text-slate-900">{activeCalc.basePaperCost.toFixed(2)} ₴</strong>
-                                </div>
-                                <div className="flex justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/60">
-                                  <span className="text-slate-600 font-medium">Друк & CTP-форми:</span>
-                                  <strong className="font-mono text-slate-900">{activeCalc.printCost.toFixed(2)} ₴</strong>
-                                </div>
-                                <div className="flex justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/60">
-                                  <span className="text-slate-600 font-medium">Ламінація / Покриття:</span>
-                                  <strong className="font-mono text-slate-900">{activeCalc.lamCost.toFixed(2)} ₴</strong>
-                                </div>
-                                <div className="flex justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/60">
-                                  <span className="text-slate-600 font-medium">Післядрукарські роботи:</span>
-                                  <strong className="font-mono text-slate-900">{activeCalc.postpressSum.toFixed(2)} ₴</strong>
-                                </div>
-                                {activeCalc.deliveryCost > 0 && (
-                                  <div className="flex justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/60 col-span-2">
-                                    <span className="text-slate-600 font-medium">Доставка:</span>
-                                    <strong className="font-mono text-slate-900">{activeCalc.deliveryCost.toFixed(2)} ₴</strong>
-                                  </div>
-                                )}
-                              </div>
-
-                              <div className="flex justify-between text-[11px] font-semibold text-slate-500 px-1">
-                                <span>Собівартість 1 екземпляра:</span>
-                                <strong className="font-mono text-slate-800">
-                                  {(activeCalc.rawCost / activeCalc.tirazh).toFixed(4)} ₴ / шт
-                                </strong>
-                              </div>
-
-                              {/* Total Final Price Box */}
-                              <div className="p-4 rounded-2xl bg-slate-50/90 border border-slate-200 flex flex-col gap-2">
-                                <div className="flex justify-between items-center">
-                                  <span className="text-xs font-black text-slate-800 uppercase tracking-wider">РАЗОМ ДО СПЛАТИ:</span>
-                                  <span className="text-xs font-extrabold text-emerald-700 font-mono bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-200/60">
-                                    +{liveMarginAmount.toFixed(2)} ₴ маржа
+                            {currentUser?.role === 'client' ? (
+                              <div className="flex flex-col gap-3">
+                                <div className="flex justify-between items-center pb-2 border-b border-blue-100">
+                                  <span className="text-xs font-black text-blue-900 uppercase tracking-wide">
+                                    Підсумок вартості замовлення:
+                                  </span>
+                                  <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+                                    {activeCalc.tirazh} шт
                                   </span>
                                 </div>
-                                <div className="flex items-baseline justify-between pt-1">
-                                  <p className="text-3xl font-black text-blue-600 my-0 font-mono tracking-tight leading-none">
-                                    {liveFinalPrice} <span className="text-base font-bold text-slate-600">₴</span>
-                                  </p>
-                                  <div className="text-right">
-                                    <span className="text-[11px] text-slate-500 font-medium block">Ціна за 1 шт:</span>
-                                    <strong className="text-sm font-black text-slate-900 font-mono">{liveUnitPrice.toFixed(2)} ₴ / шт</strong>
+
+                                {/* Total Final Price Box for Client */}
+                                <div className="p-5 rounded-2xl bg-gradient-to-br from-blue-50/70 to-white border border-blue-200 shadow-sm flex flex-col gap-2">
+                                  <div className="flex justify-between items-center">
+                                    <span className="text-xs font-black text-slate-800 uppercase tracking-wider">РАЗОМ ДО СПЛАТИ:</span>
+                                  </div>
+                                  <div className="flex items-baseline justify-between pt-1">
+                                    <p className="text-3xl font-black text-blue-600 my-0 font-mono tracking-tight leading-none">
+                                      {liveFinalPrice} <span className="text-base font-bold text-slate-600">₴</span>
+                                    </p>
+                                    <div className="text-right">
+                                      <span className="text-[11px] text-slate-500 font-medium block">Ціна за 1 шт:</span>
+                                      <strong className="text-sm font-black text-slate-900 font-mono">{liveUnitPrice.toFixed(2)} ₴ / шт</strong>
+                                    </div>
                                   </div>
                                 </div>
                               </div>
-                            </div>
+                            ) : (
+                              <div className="flex flex-col gap-3">
+                                <div className="flex justify-between items-center pb-2 border-b border-slate-100">
+                                  <span className="text-xs font-black text-slate-800 uppercase tracking-wide">
+                                    РОЗРАХУНОК (СОБІВАРТІСТЬ & НОРМИ 1С):
+                                  </span>
+                                  <strong className="text-sm font-black text-slate-900 font-mono">
+                                    {activeCalc.rawCost.toFixed(2)} ₴
+                                  </strong>
+                                </div>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                                  <div className="flex justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/60">
+                                    <span className="text-slate-600 font-medium">Матеріали / Папір:</span>
+                                    <strong className="font-mono text-slate-900">{activeCalc.basePaperCost.toFixed(2)} ₴</strong>
+                                  </div>
+                                  <div className="flex justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/60">
+                                    <span className="text-slate-600 font-medium">Друк & CTP-форми:</span>
+                                    <strong className="font-mono text-slate-900">{activeCalc.printCost.toFixed(2)} ₴</strong>
+                                  </div>
+                                  <div className="flex justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/60">
+                                    <span className="text-slate-600 font-medium">Ламінація / Покриття:</span>
+                                    <strong className="font-mono text-slate-900">{activeCalc.lamCost.toFixed(2)} ₴</strong>
+                                  </div>
+                                  <div className="flex justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/60">
+                                    <span className="text-slate-600 font-medium">Післядрукарські роботи:</span>
+                                    <strong className="font-mono text-slate-900">{activeCalc.postpressSum.toFixed(2)} ₴</strong>
+                                  </div>
+                                  {activeCalc.deliveryCost > 0 && (
+                                    <div className="flex justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/60 col-span-2">
+                                      <span className="text-slate-600 font-medium">Доставка:</span>
+                                      <strong className="font-mono text-slate-900">{activeCalc.deliveryCost.toFixed(2)} ₴</strong>
+                                    </div>
+                                  )}
+                                </div>
+
+                                <div className="flex justify-between text-[11px] font-semibold text-slate-500 px-1">
+                                  <span>Собівартість 1 екземпляра:</span>
+                                  <strong className="font-mono text-slate-800">
+                                    {(activeCalc.rawCost / activeCalc.tirazh).toFixed(4)} ₴ / шт
+                                  </strong>
+                                </div>
+
+                                {/* Total Final Price Box */}
+                                <div className="p-4 rounded-2xl bg-slate-50/90 border border-slate-200 flex flex-col gap-2">
+                                  <div className="flex justify-between items-center">
+                                    <span className="text-xs font-black text-slate-800 uppercase tracking-wider">РАЗОМ ДО СПЛАТИ:</span>
+                                    <span className="text-xs font-extrabold text-emerald-700 font-mono bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-200/60">
+                                      +{liveMarginAmount.toFixed(2)} ₴ маржа
+                                    </span>
+                                  </div>
+                                  <div className="flex items-baseline justify-between pt-1">
+                                    <p className="text-3xl font-black text-blue-600 my-0 font-mono tracking-tight leading-none">
+                                      {liveFinalPrice} <span className="text-base font-bold text-slate-600">₴</span>
+                                    </p>
+                                    <div className="text-right">
+                                      <span className="text-[11px] text-slate-500 font-medium block">Ціна за 1 шт:</span>
+                                      <strong className="text-sm font-black text-slate-900 font-mono">{liveUnitPrice.toFixed(2)} ₴ / шт</strong>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
 
                             {/* Horizontal Action Buttons Right: [ ШАБЛОН ] [ PDF ] [ КП ] [ ВИРОБНИЦТВО ] */}
                             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 pt-3 border-t border-slate-100">
@@ -9213,7 +9253,7 @@ export const Calculator: React.FC = () => {
                       <div className="w-full px-5 py-3.5 flex items-center justify-between bg-slate-50/90 border-b border-slate-200">
                         <div className="flex items-center gap-2">
                           <SlidersHorizontal size={16} className="text-blue-600" />
-                          <span className="text-xs font-extrabold uppercase tracking-wider text-slate-800">Післядрукарська обробка (Нормативи)</span>
+                          <span className="text-xs font-extrabold uppercase tracking-wider text-slate-800">Післядрукарська обробка</span>
                           {(digitalSheetCornerCurve !== '0' || digitalSheetDrilling !== '0' || digitalSheetLuvers !== '0' || digitalSheetPersonalization !== '0' || digitalSheetFolding !== '0' || digitalSheetGluingBlock !== '0') && (
                             <span className="ios-badge-blue text-[10px] px-2 py-0.5 rounded-full font-bold">Опції обрано</span>
                           )}
@@ -9743,51 +9783,53 @@ export const Calculator: React.FC = () => {
                                 />
                               </div>
 
-                              {/* Margin slider & presets */}
-                              <div className="flex flex-col gap-2">
-                                <div className="flex items-center justify-between text-xs">
-                                  <label className="text-xs font-extrabold text-slate-700 uppercase">НАЦІНКА (МАРЖА):</label>
-                                  <div className="flex items-center gap-1">
-                                    <input
-                                      type="number"
-                                      min="0"
-                                      max="500"
-                                      value={marginPercent}
-                                      onChange={(e) => setMarginPercent(Math.max(0, parseInt(e.target.value) || 0))}
-                                      className="w-16 px-2 py-0.5 rounded-lg border border-blue-300 bg-white font-black text-blue-600 text-xs text-center focus:outline-none focus:border-blue-600 shadow-2xs"
-                                    />
-                                    <span className="font-extrabold text-blue-600">%</span>
+                              {/* Margin slider & presets (Hidden for clients) */}
+                              {currentUser?.role !== 'client' && (
+                                <div className="flex flex-col gap-2">
+                                  <div className="flex items-center justify-between text-xs">
+                                    <label className="text-xs font-extrabold text-slate-700 uppercase">НАЦІНКА (МАРЖА):</label>
+                                    <div className="flex items-center gap-1">
+                                      <input
+                                        type="number"
+                                        min="0"
+                                        max="500"
+                                        value={marginPercent}
+                                        onChange={(e) => setMarginPercent(Math.max(0, parseInt(e.target.value) || 0))}
+                                        className="w-16 px-2 py-0.5 rounded-lg border border-blue-300 bg-white font-black text-blue-600 text-xs text-center focus:outline-none focus:border-blue-600 shadow-2xs"
+                                      />
+                                      <span className="font-extrabold text-blue-600">%</span>
+                                    </div>
+                                  </div>
+                                  <input
+                                    type="range"
+                                    min="0"
+                                    max="300"
+                                    step="5"
+                                    value={marginPercent}
+                                    onChange={(e) => setMarginPercent(Number(e.target.value) || 0)}
+                                    className="w-full cursor-pointer accent-blue-600 h-2 bg-slate-200 rounded-lg"
+                                  />
+                                  <div className="grid grid-cols-5 gap-2">
+                                    {[20, 35, 50, 100, 150].map(m => {
+                                      const isSel = marginPercent === m;
+                                      return (
+                                        <button
+                                          key={m}
+                                          type="button"
+                                          onClick={() => setMarginPercent(m)}
+                                          className={`py-2 text-xs font-bold rounded-xl transition-all text-center flex items-center justify-center border ${
+                                            isSel
+                                              ? 'bg-blue-50 text-blue-700 border-blue-400 ring-2 ring-blue-500/20 shadow-2xs font-extrabold'
+                                              : 'bg-slate-50/80 hover:bg-slate-100 text-slate-700 border-slate-200/80'
+                                          }`}
+                                        >
+                                          {m}%
+                                        </button>
+                                      );
+                                    })}
                                   </div>
                                 </div>
-                                <input
-                                  type="range"
-                                  min="0"
-                                  max="300"
-                                  step="5"
-                                  value={marginPercent}
-                                  onChange={(e) => setMarginPercent(Number(e.target.value) || 0)}
-                                  className="w-full cursor-pointer accent-blue-600 h-2 bg-slate-200 rounded-lg"
-                                />
-                                <div className="grid grid-cols-5 gap-2">
-                                  {[20, 35, 50, 100, 150].map(m => {
-                                    const isSel = marginPercent === m;
-                                    return (
-                                      <button
-                                        key={m}
-                                        type="button"
-                                        onClick={() => setMarginPercent(m)}
-                                        className={`py-2 text-xs font-bold rounded-xl transition-all text-center flex items-center justify-center border ${
-                                          isSel
-                                            ? 'bg-blue-50 text-blue-700 border-blue-400 ring-2 ring-blue-500/20 shadow-2xs font-extrabold'
-                                            : 'bg-slate-50/80 hover:bg-slate-100 text-slate-700 border-slate-200/80'
-                                        }`}
-                                      >
-                                        {m}%
-                                      </button>
-                                    );
-                                  })}
-                                </div>
-                              </div>
+                              )}
                             </div>
                           </div>
 
@@ -13012,113 +13054,144 @@ export const Calculator: React.FC = () => {
                                 />
                               </div>
 
-                              {/* Margin slider & presets */}
-                              <div className="flex flex-col gap-2">
-                                <div className="flex items-center justify-between text-xs">
-                                  <label className="text-xs font-extrabold text-slate-700 uppercase">НАЦІНКА (МАРЖА):</label>
-                                  <div className="flex items-center gap-1">
-                                    <input
-                                      type="number"
-                                      min="0"
-                                      max="500"
-                                      value={marginPercent}
-                                      onChange={(e) => setMarginPercent(Math.max(0, parseInt(e.target.value) || 0))}
-                                      className="w-16 px-2 py-0.5 rounded-lg border border-blue-300 bg-white font-black text-blue-600 text-xs text-center focus:outline-none focus:border-blue-600 shadow-2xs"
-                                    />
-                                    <span className="font-extrabold text-blue-600">%</span>
+                              {/* Margin slider & presets (Hidden for clients) */}
+                              {currentUser?.role !== 'client' && (
+                                <div className="flex flex-col gap-2">
+                                  <div className="flex items-center justify-between text-xs">
+                                    <label className="text-xs font-extrabold text-slate-700 uppercase">НАЦІНКА (МАРЖА):</label>
+                                    <div className="flex items-center gap-1">
+                                      <input
+                                        type="number"
+                                        min="0"
+                                        max="500"
+                                        value={marginPercent}
+                                        onChange={(e) => setMarginPercent(Math.max(0, parseInt(e.target.value) || 0))}
+                                        className="w-16 px-2 py-0.5 rounded-lg border border-blue-300 bg-white font-black text-blue-600 text-xs text-center focus:outline-none focus:border-blue-600 shadow-2xs"
+                                      />
+                                      <span className="font-extrabold text-blue-600">%</span>
+                                    </div>
+                                  </div>
+                                  <input
+                                    type="range"
+                                    min="0"
+                                    max="300"
+                                    step="5"
+                                    value={marginPercent}
+                                    onChange={(e) => setMarginPercent(Number(e.target.value) || 0)}
+                                    className="w-full cursor-pointer accent-blue-600 h-2 bg-slate-200 rounded-lg"
+                                  />
+                                  <div className="grid grid-cols-5 gap-2">
+                                    {[20, 35, 50, 100, 150].map(m => {
+                                      const isSel = marginPercent === m;
+                                      return (
+                                        <button
+                                          key={m}
+                                          type="button"
+                                          onClick={() => setMarginPercent(m)}
+                                          className={`py-2 text-xs font-bold rounded-xl transition-all text-center flex items-center justify-center border ${
+                                            isSel
+                                              ? 'bg-blue-50 text-blue-700 border-blue-400 ring-2 ring-blue-500/20 shadow-2xs font-extrabold'
+                                              : 'bg-slate-50/80 hover:bg-slate-100 text-slate-700 border-slate-200/80'
+                                          }`}
+                                        >
+                                          {m}%
+                                        </button>
+                                      );
+                                    })}
                                   </div>
                                 </div>
-                                <input
-                                  type="range"
-                                  min="0"
-                                  max="300"
-                                  step="5"
-                                  value={marginPercent}
-                                  onChange={(e) => setMarginPercent(Number(e.target.value) || 0)}
-                                  className="w-full cursor-pointer accent-blue-600 h-2 bg-slate-200 rounded-lg"
-                                />
-                                <div className="grid grid-cols-5 gap-2">
-                                  {[20, 35, 50, 100, 150].map(m => {
-                                    const isSel = marginPercent === m;
-                                    return (
-                                      <button
-                                        key={m}
-                                        type="button"
-                                        onClick={() => setMarginPercent(m)}
-                                        className={`py-2 text-xs font-bold rounded-xl transition-all text-center flex items-center justify-center border ${
-                                          isSel
-                                            ? 'bg-blue-50 text-blue-700 border-blue-400 ring-2 ring-blue-500/20 shadow-2xs font-extrabold'
-                                            : 'bg-slate-50/80 hover:bg-slate-100 text-slate-700 border-slate-200/80'
-                                        }`}
-                                      >
-                                        {m}%
-                                      </button>
-                                    );
-                                  })}
-                                </div>
-                              </div>
+                              )}
                             </div>
                           </div>
 
                           {/* 2. Right Column (50%): РОЗРАХУНОК + ГОРИЗОНТАЛЬНІ КНОПКИ СПРАВА */}
                           <div className="ios-card bg-white p-6 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col justify-between gap-6 h-full">
-                            <div className="flex flex-col gap-3">
-                              <div className="flex justify-between items-center pb-2 border-b border-slate-100">
-                                <span className="text-xs font-black text-slate-800 uppercase tracking-wide">
-                                  РОЗРАХУНОК (СОБІВАРТІСТЬ & НОРМИ 1С):
-                                </span>
-                                <strong className="text-sm font-black text-slate-900 font-mono">
-                                  {wideRawCost.toFixed(2)} ₴
-                                </strong>
-                              </div>
-
-                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-                                <div className="flex justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/60">
-                                  <span className="text-slate-600 font-medium">Основа / Матеріал:</span>
-                                  <strong className="font-mono text-slate-900">{widePaperCost.toFixed(2)} ₴</strong>
-                                </div>
-                                <div className="flex justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/60">
-                                  <span className="text-slate-600 font-medium">Широкоформатний друк:</span>
-                                  <strong className="font-mono text-slate-900">{widePrintCost.toFixed(2)} ₴</strong>
-                                </div>
-                                <div className="flex justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/60">
-                                  <span className="text-slate-600 font-medium">Фурнітура / Обробка:</span>
-                                  <strong className="font-mono text-slate-900">{widePostSum.toFixed(2)} ₴</strong>
-                                </div>
-                                {wideDelivery > 0 && (
-                                  <div className="flex justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/60">
-                                    <span className="text-slate-600 font-medium">Доставка:</span>
-                                    <strong className="font-mono text-slate-900">{wideDelivery.toFixed(2)} ₴</strong>
-                                  </div>
-                                )}
-                              </div>
-
-                              <div className="flex justify-between text-[11px] font-semibold text-slate-500 px-1">
-                                <span>Собівартість 1 м²:</span>
-                                <strong className="font-mono text-slate-800">
-                                  {(wideRawCost / (wideTir * areaM2)).toFixed(2)} ₴ / м²
-                                </strong>
-                              </div>
-
-                              {/* Total Final Price Box */}
-                              <div className="p-4 rounded-2xl bg-slate-50/90 border border-slate-200 flex flex-col gap-2">
-                                <div className="flex justify-between items-center">
-                                  <span className="text-xs font-black text-slate-800 uppercase tracking-wider">РАЗОМ ДО СПЛАТИ:</span>
-                                  <span className="text-xs font-extrabold text-emerald-700 font-mono bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-200/60">
-                                    +{wideMarginAmount.toFixed(2)} ₴ маржа
+                            {currentUser?.role === 'client' ? (
+                              <div className="flex flex-col gap-3">
+                                <div className="flex justify-between items-center pb-2 border-b border-blue-100">
+                                  <span className="text-xs font-black text-blue-900 uppercase tracking-wide">
+                                    Підсумок вартості замовлення:
+                                  </span>
+                                  <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
+                                    {wideTir} шт
                                   </span>
                                 </div>
-                                <div className="flex items-baseline justify-between pt-1">
-                                  <p className="text-3xl font-black text-blue-600 my-0 font-mono tracking-tight leading-none">
-                                    {wideFinalPrice} <span className="text-base font-bold text-slate-600">₴</span>
-                                  </p>
-                                  <div className="text-right">
-                                    <span className="text-[11px] text-slate-500 font-medium block">Ціна за 1 шт:</span>
-                                    <strong className="text-sm font-black text-slate-900 font-mono">{wideUnitPrice.toFixed(2)} ₴ / шт</strong>
+
+                                {/* Total Final Price Box for Client */}
+                                <div className="p-5 rounded-2xl bg-gradient-to-br from-blue-50/70 to-white border border-blue-200 shadow-sm flex flex-col gap-2">
+                                  <div className="flex justify-between items-center">
+                                    <span className="text-xs font-black text-slate-800 uppercase tracking-wider">РАЗОМ ДО СПЛАТИ:</span>
+                                  </div>
+                                  <div className="flex items-baseline justify-between pt-1">
+                                    <p className="text-3xl font-black text-blue-600 my-0 font-mono tracking-tight leading-none">
+                                      {wideFinalPrice} <span className="text-base font-bold text-slate-600">₴</span>
+                                    </p>
+                                    <div className="text-right">
+                                      <span className="text-[11px] text-slate-500 font-medium block">Ціна за 1 шт:</span>
+                                      <strong className="text-sm font-black text-slate-900 font-mono">{wideUnitPrice.toFixed(2)} ₴ / шт</strong>
+                                    </div>
                                   </div>
                                 </div>
                               </div>
-                            </div>
+                            ) : (
+                              <div className="flex flex-col gap-3">
+                                <div className="flex justify-between items-center pb-2 border-b border-slate-100">
+                                  <span className="text-xs font-black text-slate-800 uppercase tracking-wide">
+                                    РОЗРАХУНОК (СОБІВАРТІСТЬ & НОРМИ 1С):
+                                  </span>
+                                  <strong className="text-sm font-black text-slate-900 font-mono">
+                                    {wideRawCost.toFixed(2)} ₴
+                                  </strong>
+                                </div>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                                  <div className="flex justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/60">
+                                    <span className="text-slate-600 font-medium">Основа / Матеріал:</span>
+                                    <strong className="font-mono text-slate-900">{widePaperCost.toFixed(2)} ₴</strong>
+                                  </div>
+                                  <div className="flex justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/60">
+                                    <span className="text-slate-600 font-medium">Широкоформатний друк:</span>
+                                    <strong className="font-mono text-slate-900">{widePrintCost.toFixed(2)} ₴</strong>
+                                  </div>
+                                  <div className="flex justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/60">
+                                    <span className="text-slate-600 font-medium">Фурнітура / Обробка:</span>
+                                    <strong className="font-mono text-slate-900">{widePostSum.toFixed(2)} ₴</strong>
+                                  </div>
+                                  {wideDelivery > 0 && (
+                                    <div className="flex justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/60">
+                                      <span className="text-slate-600 font-medium">Доставка:</span>
+                                      <strong className="font-mono text-slate-900">{wideDelivery.toFixed(2)} ₴</strong>
+                                    </div>
+                                  )}
+                                </div>
+
+                                <div className="flex justify-between text-[11px] font-semibold text-slate-500 px-1">
+                                  <span>Собівартість 1 м²:</span>
+                                  <strong className="font-mono text-slate-800">
+                                    {(wideRawCost / (wideTir * areaM2)).toFixed(2)} ₴ / м²
+                                  </strong>
+                                </div>
+
+                                {/* Total Final Price Box */}
+                                <div className="p-4 rounded-2xl bg-slate-50/90 border border-slate-200 flex flex-col gap-2">
+                                  <div className="flex justify-between items-center">
+                                    <span className="text-xs font-black text-slate-800 uppercase tracking-wider">РАЗОМ ДО СПЛАТИ:</span>
+                                    <span className="text-xs font-extrabold text-emerald-700 font-mono bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-200/60">
+                                      +{wideMarginAmount.toFixed(2)} ₴ маржа
+                                    </span>
+                                  </div>
+                                  <div className="flex items-baseline justify-between pt-1">
+                                    <p className="text-3xl font-black text-blue-600 my-0 font-mono tracking-tight leading-none">
+                                      {wideFinalPrice} <span className="text-base font-bold text-slate-600">₴</span>
+                                    </p>
+                                    <div className="text-right">
+                                      <span className="text-[11px] text-slate-500 font-medium block">Ціна за 1 шт:</span>
+                                      <strong className="text-sm font-black text-slate-900 font-mono">{wideUnitPrice.toFixed(2)} ₴ / шт</strong>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            )}
 
                             {/* Horizontal Action Buttons Right: [ ШАБЛОН ] [ PDF ] [ КП ] [ ВИРОБНИЦТВО ] */}
                             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 pt-3 border-t border-slate-100">
@@ -13984,38 +14057,40 @@ export const Calculator: React.FC = () => {
                               </div>
                             </div>
 
-                            {/* Margin slider & presets */}
-                            <div className="flex flex-col gap-2 pt-1">
-                              <div className="flex items-center justify-between text-xs">
-                                <label className="text-xs font-extrabold text-slate-700 uppercase">НАЦІНКА (МАРЖА):</label>
-                                <span className="font-extrabold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-lg border border-blue-200">{marginPercent}%</span>
+                            {/* Margin slider & presets (Hidden for clients) */}
+                            {currentUser?.role !== 'client' && (
+                              <div className="flex flex-col gap-2 pt-1">
+                                <div className="flex items-center justify-between text-xs">
+                                  <label className="text-xs font-extrabold text-slate-700 uppercase">НАЦІНКА (МАРЖА):</label>
+                                  <span className="font-extrabold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-lg border border-blue-200">{marginPercent}%</span>
+                                </div>
+                                <input
+                                  type="range"
+                                  min="0"
+                                  max="300"
+                                  step="5"
+                                  value={marginPercent}
+                                  onChange={(e) => setMarginPercent(Number(e.target.value) || 0)}
+                                  className="w-full cursor-pointer accent-blue-600 h-2 bg-slate-200 rounded-lg"
+                                />
+                                <div className="grid grid-cols-5 gap-2 p-1.5 bg-slate-100/90 rounded-xl border border-slate-200/60">
+                                  {[20, 35, 50, 100, 150].map(m => (
+                                    <button
+                                      key={m}
+                                      type="button"
+                                      onClick={() => setMarginPercent(m)}
+                                      className={`py-2 text-xs font-bold rounded-lg transition-all text-center flex items-center justify-center ${
+                                        marginPercent === m
+                                          ? 'bg-blue-600 text-white shadow-2xs'
+                                          : 'text-slate-600 hover:bg-white'
+                                      }`}
+                                    >
+                                      {m}%
+                                    </button>
+                                  ))}
+                                </div>
                               </div>
-                              <input
-                                type="range"
-                                min="0"
-                                max="300"
-                                step="5"
-                                value={marginPercent}
-                                onChange={(e) => setMarginPercent(Number(e.target.value) || 0)}
-                                className="w-full cursor-pointer accent-blue-600 h-2 bg-slate-200 rounded-lg"
-                              />
-                              <div className="grid grid-cols-5 gap-2 p-1.5 bg-slate-100/90 rounded-xl border border-slate-200/60">
-                                {[20, 35, 50, 100, 150].map(m => (
-                                  <button
-                                    key={m}
-                                    type="button"
-                                    onClick={() => setMarginPercent(m)}
-                                    className={`py-2 text-xs font-bold rounded-lg transition-all text-center flex items-center justify-center ${
-                                      marginPercent === m
-                                        ? 'bg-blue-600 text-white shadow-2xs'
-                                        : 'text-slate-600 hover:bg-white'
-                                    }`}
-                                  >
-                                    {m}%
-                                  </button>
-                                ))}
-                              </div>
-                            </div>
+                            )}
                           </div>
                         </div>
 

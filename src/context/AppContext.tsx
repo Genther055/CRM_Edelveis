@@ -439,10 +439,31 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [currentUser, setCurrentUser] = useState<User | null>(() => {
     if (typeof window !== 'undefined') {
       const params = new URLSearchParams(window.location.search);
-      if (params.get('mode') === 'client' || params.get('role') === 'client' || params.get('tg') === '1') {
-        const clientUser: User = { id: 'client-guest', username: 'client', role: 'client', name: 'Клієнт друкарні' };
+      if (params.get('mode') === 'client' || params.get('role') === 'client' || params.get('tg') === '1' || params.get('tg_id')) {
+        const rawName = params.get('name') || params.get('company') || params.get('user') || params.get('client');
+        const rawPhone = params.get('phone') || params.get('tel') || '';
+        const clientName = rawName ? decodeURIComponent(rawName) : 'Клієнт друкарні';
+        const clientPhone = rawPhone ? decodeURIComponent(rawPhone) : '';
+        const clientType = params.get('type') === 'business' ? 'business' : 'buyer';
+        
+        const clientUser: User = { 
+          id: `client_${Date.now()}`, 
+          username: 'client', 
+          role: 'client', 
+          name: clientName 
+        };
         try {
           localStorage.setItem('crm_user', JSON.stringify(clientUser));
+          if (clientName !== 'Клієнт друкарні' || clientPhone) {
+            localStorage.setItem('crm_client_profile', JSON.stringify({
+              name: clientName,
+              companyName: clientName,
+              contactPerson: clientName,
+              phone: clientPhone,
+              clientType: clientType,
+              role: 'client'
+            }));
+          }
         } catch (e) {}
         return clientUser;
       }
