@@ -3,22 +3,15 @@ import { useApp } from '../context/AppContext';
 import { 
   Printer, 
   ArrowRight, 
-  Building2, 
-  ShoppingBag, 
-  Send 
+  Send,
+  CheckCircle2,
+  Zap
 } from 'lucide-react';
 
 export const Login: React.FC = () => {
   const { login } = useApp();
   const [activePortalTab, setActivePortalTab] = useState<'client' | 'staff'>('client');
   
-  // Client mode state: 'buyer' vs 'business'
-  const [clientType, setClientType] = useState<'buyer' | 'business'>('buyer');
-  const [clientName, setClientName] = useState('');
-  const [clientPhone, setClientPhone] = useState('');
-  const [companyName, setCompanyName] = useState('');
-  const [edrpou, setEdrpou] = useState('');
-
   // Staff mode state
   const [isRegisterMode, setIsRegisterMode] = useState(false);
   const [username, setUsername] = useState('');
@@ -28,36 +21,8 @@ export const Login: React.FC = () => {
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
 
-  // Handle Client Fast Login / Registration
-  const handleClientSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-    
-    if (clientType === 'buyer') {
-      if (!clientName.trim() || !clientPhone.trim()) {
-        setError("Будь ласка, вкажіть ваше ім'я та контактний номер телефону");
-        return;
-      }
-    } else {
-      if (!companyName.trim() || !clientPhone.trim()) {
-        setError("Будь ласка, вкажіть назву компанії/ФОП та контактний номер телефону");
-        return;
-      }
-    }
-
-    // Save client info to localStorage session
-    const clientUser = {
-      id: `client_${Date.now()}`,
-      name: clientType === 'buyer' ? clientName : companyName,
-      contactPerson: clientName || companyName,
-      phone: clientPhone,
-      edrpou: clientType === 'business' ? edrpou : '',
-      clientType: clientType,
-      role: 'client'
-    };
-    localStorage.setItem('crm_client_profile', JSON.stringify(clientUser));
-    
-    // Perform login with client role
+  // Fast direct client access
+  const handleDirectClientAccess = () => {
     login('client', 'client');
   };
 
@@ -141,7 +106,7 @@ export const Login: React.FC = () => {
         borderRadius: '18px'
       }}>
         {/* Brand Header */}
-        <div style={{ textAlign: 'center', marginBottom: '24px' }}>
+        <div style={{ textAlign: 'center', marginBottom: '22px' }}>
           <div style={{
             display: 'inline-flex',
             alignItems: 'center',
@@ -212,225 +177,159 @@ export const Login: React.FC = () => {
           </button>
         </div>
 
-        {/* Error / Success Messages */}
-        {error && (
-          <div style={{
-            backgroundColor: 'rgba(239, 68, 68, 0.12)',
-            border: '1px solid rgba(239, 68, 68, 0.3)',
-            borderRadius: '8px',
-            padding: '10px 14px',
-            fontSize: '12px',
-            color: 'var(--danger)',
-            marginBottom: '16px',
-            fontWeight: '600',
-            textAlign: 'center'
-          }}>
-            {error}
-          </div>
-        )}
-
-        {successMsg && (
-          <div style={{
-            backgroundColor: 'rgba(16, 185, 129, 0.12)',
-            border: '1px solid rgba(16, 185, 129, 0.3)',
-            borderRadius: '8px',
-            padding: '10px 14px',
-            fontSize: '12px',
-            color: 'var(--accent)',
-            marginBottom: '16px',
-            fontWeight: '600',
-            textAlign: 'center'
-          }}>
-            {successMsg}
-          </div>
-        )}
-
-        {/* 1. CLIENT PORTAL FORM (BUYER VS BUSINESS) */}
+        {/* 1. CLIENT PORTAL - TELEGRAM BOT ONLY LOGIN */}
         {activePortalTab === 'client' && (
-          <form onSubmit={handleClientSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             
-            {/* Simple Buyer vs Business Choice */}
-            <div>
-              <label style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-medium)', textTransform: 'uppercase', display: 'block', marginBottom: '8px' }}>
-                Оберіть статус замовника:
-              </label>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
-                <button
-                  type="button"
-                  onClick={() => setClientType('buyer')}
-                  style={{
-                    padding: '12px 10px',
-                    borderRadius: '10px',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: '4px',
-                    border: clientType === 'buyer' ? '2px solid #007aff' : '1px solid var(--border-light)',
-                    backgroundColor: clientType === 'buyer' ? '#eff6ff' : 'var(--bg-system)',
-                    color: clientType === 'buyer' ? '#007aff' : 'var(--text-dark)',
-                    transition: 'all 0.15s ease'
-                  }}
-                >
-                  <ShoppingBag size={20} />
-                  <strong style={{ fontSize: '13px' }}>Покупець</strong>
-                  <span style={{ fontSize: '10.5px', color: 'var(--text-medium)' }}>Фізична особа</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setClientType('business')}
-                  style={{
-                    padding: '12px 10px',
-                    borderRadius: '10px',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    alignItems: 'center',
-                    gap: '4px',
-                    border: clientType === 'business' ? '2px solid #007aff' : '1px solid var(--border-light)',
-                    backgroundColor: clientType === 'business' ? '#eff6ff' : 'var(--bg-system)',
-                    color: clientType === 'business' ? '#007aff' : 'var(--text-dark)',
-                    transition: 'all 0.15s ease'
-                  }}
-                >
-                  <Building2 size={20} />
-                  <strong style={{ fontSize: '13px' }}>Бізнес</strong>
-                  <span style={{ fontSize: '10.5px', color: 'var(--text-medium)' }}>ФОП / ТОВ / Компанія</span>
-                </button>
-              </div>
-            </div>
-
-            {/* Dynamic Inputs Based on Choice */}
-            {clientType === 'buyer' ? (
-              <>
-                <div className="ios-input-group" style={{ marginBottom: 0 }}>
-                  <label className="ios-label">Ваше ім'я</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="Наприклад: Олена або Михайло"
-                    value={clientName}
-                    onChange={(e) => setClientName(e.target.value)}
-                    style={{ width: '100%', height: '38px' }}
-                  />
-                </div>
-
-                <div className="ios-input-group" style={{ marginBottom: 0 }}>
-                  <label className="ios-label">Номер телефону</label>
-                  <input
-                    type="tel"
-                    required
-                    placeholder="+38 (0__) ___-__-__"
-                    value={clientPhone}
-                    onChange={(e) => setClientPhone(e.target.value)}
-                    style={{ width: '100%', height: '38px' }}
-                  />
-                </div>
-              </>
-            ) : (
-              <>
-                <div className="ios-input-group" style={{ marginBottom: 0 }}>
-                  <label className="ios-label">Назва компанії або ФОП</label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="ТОВ «ФармаТрейд» або ФОП Шевченко"
-                    value={companyName}
-                    onChange={(e) => setCompanyName(e.target.value)}
-                    style={{ width: '100%', height: '38px' }}
-                  />
-                </div>
-
-                <div className="ios-input-group" style={{ marginBottom: 0 }}>
-                  <label className="ios-label">Контактна особа</label>
-                  <input
-                    type="text"
-                    placeholder="Ім'я менеджера / замовника"
-                    value={clientName}
-                    onChange={(e) => setClientName(e.target.value)}
-                    style={{ width: '100%', height: '38px' }}
-                  />
-                </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '8px' }}>
-                  <div className="ios-input-group" style={{ marginBottom: 0 }}>
-                    <label className="ios-label">Телефон</label>
-                    <input
-                      type="tel"
-                      required
-                      placeholder="+380..."
-                      value={clientPhone}
-                      onChange={(e) => setClientPhone(e.target.value)}
-                      style={{ width: '100%', height: '38px' }}
-                    />
-                  </div>
-
-                  <div className="ios-input-group" style={{ marginBottom: 0 }}>
-                    <label className="ios-label">ЄДРПОУ / ІПН</label>
-                    <input
-                      type="text"
-                      placeholder="8 або 10 цифр"
-                      value={edrpou}
-                      onChange={(e) => setEdrpou(e.target.value)}
-                      style={{ width: '100%', height: '38px' }}
-                    />
-                  </div>
-                </div>
-              </>
-            )}
-
-            <button
-              type="submit"
-              className="ios-btn ios-btn-primary"
-              style={{
-                height: '42px',
-                fontSize: '14px',
-                fontWeight: '800',
+            {/* Telegram Card */}
+            <div style={{
+              backgroundColor: '#f0f9ff',
+              border: '1.5px solid #bae6fd',
+              borderRadius: '14px',
+              padding: '20px 18px',
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              textAlign: 'center',
+              gap: '12px'
+            }}>
+              <div style={{
+                width: '48px',
+                height: '48px',
+                borderRadius: '50%',
+                backgroundColor: '#0284c7',
+                color: '#ffffff',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                gap: '8px',
-                backgroundColor: '#007aff',
-                marginTop: '6px',
-                borderRadius: '10px'
-              }}
-            >
-              <span>{clientType === 'buyer' ? 'Розрахувати замовлення' : 'Увійти в кабінет бізнесу'}</span>
-              <ArrowRight size={16} />
-            </button>
+                boxShadow: '0 4px 12px rgba(2,132,199,0.3)'
+              }}>
+                <Send size={22} style={{ marginLeft: '-2px' }} />
+              </div>
 
-            {/* Telegram Bot Link Button */}
-            <div style={{ borderTop: '1px solid var(--border-light)', paddingTop: '12px', textAlign: 'center' }}>
+              <div>
+                <h3 style={{ fontSize: '15px', fontWeight: '900', color: '#0369a1', margin: '0 0 4px 0' }}>
+                  Вхід через Telegram-бота
+                </h3>
+                <p style={{ fontSize: '11.5px', color: '#475569', margin: 0, lineHeight: '1.45' }}>
+                  Авторизація для покупців та бізнес-партнерів здійснюється через наш офіційний бот друкарні
+                </p>
+              </div>
+
+              {/* Benefits */}
+              <div style={{
+                width: '100%',
+                backgroundColor: '#ffffff',
+                border: '1px solid #e0f2fe',
+                borderRadius: '10px',
+                padding: '10px 12px',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '6px',
+                textAlign: 'left'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: '#334155' }}>
+                  <CheckCircle2 size={13} style={{ color: '#0284c7', flexShrink: 0 }} />
+                  <span>Миттєва реєстрація без логінів та паролів</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: '#334155' }}>
+                  <CheckCircle2 size={13} style={{ color: '#0284c7', flexShrink: 0 }} />
+                  <span>Вибір статусу: <strong>Покупець</strong> або <strong>Бізнес (ФОП/ТОВ)</strong></span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: '#334155' }}>
+                  <CheckCircle2 size={13} style={{ color: '#0284c7', flexShrink: 0 }} />
+                  <span>Авто-сповіщення про готовність друку та ТТН</span>
+                </div>
+              </div>
+
+              {/* Main CTA: Open Telegram Bot */}
               <a
                 href="https://t.me/edelveis_polygraphy_bot"
                 target="_blank"
                 rel="noreferrer"
                 style={{
+                  width: '100%',
+                  height: '42px',
+                  backgroundColor: '#0284c7',
+                  color: '#ffffff',
+                  fontWeight: '800',
+                  fontSize: '13.5px',
+                  borderRadius: '10px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  textDecoration: 'none',
+                  boxShadow: '0 4px 12px rgba(2,132,199,0.25)',
+                  marginTop: '4px'
+                }}
+              >
+                <Send size={16} />
+                <span>Увійти через @edelveis_polygraphy_bot</span>
+              </a>
+            </div>
+
+            {/* Quick Online Calculator Direct Button */}
+            <div style={{ textAlign: 'center' }}>
+              <button
+                type="button"
+                onClick={handleDirectClientAccess}
+                className="ios-btn ios-btn-secondary"
+                style={{
+                  width: '100%',
+                  height: '38px',
+                  fontSize: '12.5px',
+                  fontWeight: '750',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
                   gap: '6px',
-                  fontSize: '12px',
-                  fontWeight: '700',
-                  color: '#0284c7',
-                  textDecoration: 'none',
-                  padding: '8px 12px',
-                  borderRadius: '8px',
-                  backgroundColor: '#f0f9ff',
-                  border: '1px solid #bae6fd'
+                  backgroundColor: 'var(--bg-system)',
+                  border: '1px solid var(--border-light)'
                 }}
               >
-                <Send size={14} />
-                <span>Увійти через Telegram-бота @edelveis_polygraphy_bot</span>
-              </a>
+                <Zap size={14} style={{ color: '#007aff' }} />
+                <span>Розрахувати ціни онлайн (Без авторизації)</span>
+                <ArrowRight size={14} />
+              </button>
             </div>
-          </form>
+
+          </div>
         )}
 
         {/* 2. STAFF LOGIN FORM */}
         {activePortalTab === 'staff' && (
           <form onSubmit={handleStaffSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            {error && (
+              <div style={{
+                backgroundColor: 'rgba(239, 68, 68, 0.12)',
+                border: '1px solid rgba(239, 68, 68, 0.3)',
+                borderRadius: '8px',
+                padding: '10px 14px',
+                fontSize: '12px',
+                color: 'var(--danger)',
+                fontWeight: '600',
+                textAlign: 'center'
+              }}>
+                {error}
+              </div>
+            )}
+
+            {successMsg && (
+              <div style={{
+                backgroundColor: 'rgba(16, 185, 129, 0.12)',
+                border: '1px solid rgba(16, 185, 129, 0.3)',
+                borderRadius: '8px',
+                padding: '10px 14px',
+                fontSize: '12px',
+                color: 'var(--accent)',
+                fontWeight: '600',
+                textAlign: 'center'
+              }}>
+                {successMsg}
+              </div>
+            )}
+
             {isRegisterMode && (
               <div className="ios-input-group" style={{ marginBottom: 0 }}>
                 <label className="ios-label">Ім'я співробітника</label>
