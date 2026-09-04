@@ -238,7 +238,7 @@ export const Login: React.FC = () => {
 
               {/* Main CTA: Open Telegram Bot */}
               <a
-                href="https://t.me/edelveis_polygraphy_bot"
+                href="https://t.me/edelveis_i_k_bot"
                 target="_blank"
                 rel="noreferrer"
                 style={{
@@ -259,7 +259,7 @@ export const Login: React.FC = () => {
                 }}
               >
                 <Send size={16} />
-                <span>Увійти через @edelveis_polygraphy_bot</span>
+                <span>Увійти через @edelveis_i_k_bot</span>
               </a>
             </div>
 
