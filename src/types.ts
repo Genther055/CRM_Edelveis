@@ -207,6 +207,7 @@ export interface Lead {
   contactPerson: string;
   phone: string;
   email: string;
+  telegram?: string;
   budget: number;
   source: 'Site' | 'Phone' | 'Instagram' | 'Facebook' | 'Recommendation' | 'Calculator';
   status: 'new' | 'contact' | 'negotiation' | 'review' | 'converted';

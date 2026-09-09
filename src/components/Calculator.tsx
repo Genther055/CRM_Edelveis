@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import { formatPhoneNumber, isPhoneComplete } from '../utils/phoneFormatter';
 import { useApp } from '../context/AppContext';
 import { 
   Settings, 
@@ -865,6 +866,9 @@ const renderBookletFoldBlueprint = (
           <span>{orientation === 'horiz' ? 'Горизонтальний' : 'Вертикальний'}</span>
         </button>
       </div>
+
+
+
     </div>
   );
 };
@@ -1216,9 +1220,116 @@ export const Calculator: React.FC = () => {
   const [isSamNaSebe, setIsSamNaSebe] = useState(true);
   const [turnType, setTurnType] = useState<'sam_na_sebe' | 'bez_oborotu' | 'chuzhyi_oborut'>('sam_na_sebe');
   const [selectedClientId, setSelectedClientId] = useState(clients[0]?.id || '');
-  const [customClientName, setCustomClientName] = useState<string>('');
-  const [customClientPhone, setCustomClientPhone] = useState<string>('');
+  const [customClientName, setCustomClientName] = useState<string>(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem('crm_client_profile') || '{}');
+      return saved.name || saved.contactPerson || '';
+    } catch {
+      return '';
+    }
+  });
+  const [customClientPhone, setCustomClientPhone] = useState<string>(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem('crm_client_profile') || '{}');
+      return saved.phone ? formatPhoneNumber(saved.phone) : '';
+    } catch {
+      return '';
+    }
+  });
+  const [customClientTelegram, setCustomClientTelegram] = useState<string>(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem('crm_client_profile') || '{}');
+      return saved.telegram || '';
+    } catch {
+      return '';
+    }
+  });
   const [isNewClientMode, setIsNewClientMode] = useState<boolean>(false);
+  const [showClientContactModal, setShowClientContactModal] = useState<boolean>(false);
+  const [pendingLeadPayload, setPendingLeadPayload] = useState<any | null>(null);
+
+  const requestClientSubmission = (payload: {
+    category: string;
+    format: string;
+    quantity: number;
+    material: string;
+    colors: string;
+    totalPrice: number;
+    unitPrice: number;
+    options: string;
+    composedName: string;
+  }) => {
+    if (customClientName.trim() && isPhoneComplete(customClientPhone)) {
+      submitClientLead({
+        ...payload,
+        name: customClientName.trim(),
+        phone: customClientPhone.trim(),
+        telegram: customClientTelegram.trim()
+      });
+    } else {
+      setPendingLeadPayload(payload);
+      setShowClientContactModal(true);
+    }
+  };
+
+  const submitClientLead = (data: {
+    category: string;
+    format: string;
+    quantity: number;
+    material: string;
+    colors: string;
+    totalPrice: number;
+    unitPrice: number;
+    options: string;
+    composedName: string;
+    name: string;
+    phone: string;
+    telegram?: string;
+  }) => {
+    try {
+      const prev = JSON.parse(localStorage.getItem('crm_client_profile') || '{}');
+      localStorage.setItem('crm_client_profile', JSON.stringify({
+        ...prev,
+        name: data.name,
+        contactPerson: data.name,
+        phone: data.phone,
+        telegram: data.telegram
+      }));
+    } catch {}
+
+    const leadName = `Калькуляція: ${data.category} ${data.format} (${data.quantity} шт)`;
+    const tgNote = data.telegram ? ` | Telegram: ${data.telegram}` : '';
+    const noteText = `Специфікація: ${data.composedName}. Матеріал: ${data.material}, Друк: ${data.colors}, Опції: ${data.options}${tgNote}`;
+
+    addLead({
+      name: leadName,
+      contactPerson: data.name,
+      phone: data.phone,
+      telegram: data.telegram,
+      email: '',
+      budget: data.totalPrice,
+      source: 'Calculator',
+      status: 'new',
+      date: new Date().toISOString().split('T')[0],
+      notes: noteText,
+      tags: ['Онлайн-калькулятор', data.category, ...(data.telegram ? ['Telegram'] : [])],
+      calcSpecs: {
+        category: data.category,
+        format: data.format,
+        quantity: data.quantity,
+        material: data.material,
+        colors: data.colors,
+        totalPrice: data.totalPrice,
+        unitPrice: data.unitPrice,
+        options: data.options
+      }
+    });
+
+    setShowClientContactModal(false);
+    setPendingLeadPayload(null);
+    alert(`🎉 Дякуємо, ${data.name}!\nВаш запит на суму ${data.totalPrice.toLocaleString()} ₴ успішно надіслано менеджерам друкарні у розділ Запити.\nМи перевіримо параметри та зв'яжемося з вами найближчим часом (Телефон: ${data.phone}${data.telegram ? `, TG: ${data.telegram}` : ''})!`);
+    setOrderNumber(Math.floor(10000 + Math.random() * 90000));
+  };
   const [marginPercent, setMarginPercent] = useState<number>(100);
 
   // Auto-fill client contacts from URL, Telegram Bot session or localStorage profile
@@ -2199,31 +2310,17 @@ export const Calculator: React.FC = () => {
     const specNotes = `Формат: ${selectedFormat} (${orientation}), Скріплення: ${bindingType}, Ламінація: ${laminationType}, Бігів: ${creaseCount} ст.`;
     
     if (isClient) {
-      addLead({
-        name: `Калькуляція: ${category === 'Бланки' ? subCategory : category} ${selectedFormat} (${quantity} шт)`,
-        contactPerson: isNewClientMode ? (customClientName || currentUser?.name || 'Клієнт') : (clients.find(c => c.id === selectedClientId)?.name || currentUser?.name || 'Клієнт'),
-        phone: customClientPhone || '',
-        email: '',
-        budget: calculatedOps.finalPrice,
-        source: 'Calculator',
-        status: 'new',
-        date: new Date().toISOString().split('T')[0],
-        notes: `Специфікація: ${specNotes}. Папір: ${paperType}, Колірність: ${colors}. Додатково: —`,
-        tags: ['Онлайн-калькулятор', category],
-        calcSpecs: {
-          category: category === 'Бланки' ? subCategory : category,
-          format: selectedFormat,
-          quantity: Number(quantity) || 1,
-          material: paperType,
-          colors: colors,
-          totalPrice: calculatedOps.finalPrice,
-          unitPrice: calculatedOps.unitPrice,
-          options: specNotes
-        }
+      requestClientSubmission({
+        category: category === 'Бланки' ? subCategory : category,
+        format: selectedFormat,
+        quantity: Number(quantity) || 1,
+        material: paperType,
+        colors: colors,
+        totalPrice: calculatedOps.finalPrice,
+        unitPrice: calculatedOps.unitPrice,
+        options: specNotes,
+        composedName: name || `${category} ${selectedFormat}`
       });
-      alert(`🎉 Дякуємо! Ваш розрахунок № ${orderNumber} на суму ${calculatedOps.finalPrice.toFixed(2)} ₴ успішно надіслано менеджерам друкарні у розділ Запити.\nМи перевіримо деталі та зв'яжемося з вами найближчим часом!`);
-      const nextOrderNum = Math.floor(10000 + Math.random() * 90000);
-      setOrderNumber(nextOrderNum);
       return;
     }
 
@@ -2501,31 +2598,17 @@ export const Calculator: React.FC = () => {
               const specNotes = `Блокнот ${formatTitle} (${wMm}×${hMm} мм), ${notebookBlockPages} аркушів (${notebookBlockMaterial}, ${notebookBlockPrint}), Обкладинка: ${notebookCoverPages} стор (${notebookCoverMaterial}, ламінація: ${notebookCoverCovering}, друк: ${notebookCoverPrint}), Пружина: ${notebookSpringColor} (${notebookBindingSide === 'short' ? 'по короткій' : 'по довгій'}), Підкладка: ${notebookBackMaterial}, Перфорація: ${notebookPerforation === 'yes' ? 'Так' : 'Ні'}, Пакування: ${notebookPackaging === 'yes' ? 'ПЕТ' : 'Ні'}`;
 
               if (isClient) {
-                addLead({
-                  name: `Калькуляція: Блокнот ${formatTitle} (${qty} шт)`,
-                  contactPerson: isNewClientMode ? (customClientName || currentUser?.name || 'Клієнт') : (clients.find(c => c.id === selectedClientId)?.name || currentUser?.name || 'Клієнт'),
-                  phone: customClientPhone || '',
-                  email: '',
-                  budget: price,
-                  source: 'Calculator',
-                  status: 'new',
-                  date: new Date().toISOString().split('T')[0],
-                  notes: specNotes,
-                  tags: ['Онлайн-калькулятор', 'Блокноти'],
-                  calcSpecs: {
-                    category: 'Блокноти',
-                    format: `${formatTitle} (${wMm}×${hMm} мм)`,
-                    quantity: qty,
-                    material: `Блок: ${notebookBlockMaterial}, Обкладинка: ${notebookCoverMaterial}`,
-                    colors: `Блок: ${notebookBlockPrint}, Обкладинка: ${notebookCoverPrint}`,
-                    totalPrice: price,
-                    unitPrice: price / qty,
-                    options: `Обкладинка: ${notebookCoverCovering}, Пружина: ${notebookSpringColor}`
-                  }
+                requestClientSubmission({
+                  category: 'Блокноти',
+                  format: `${formatTitle} (${wMm}×${hMm} мм)`,
+                  quantity: qty,
+                  material: `Блок: ${notebookBlockMaterial}, Обкладинка: ${notebookCoverMaterial}`,
+                  colors: `Блок: ${notebookBlockPrint}, Обкладинка: ${notebookCoverPrint}`,
+                  totalPrice: price,
+                  unitPrice: price / qty,
+                  options: `Обкладинка: ${notebookCoverCovering}, Пружина: ${notebookSpringColor}`,
+                  composedName: `Блокнот ${formatTitle} (${qty} шт)`
                 });
-                alert(`🎉 Дякуємо! Ваш запит на блокноти (${qty} шт, ${price.toFixed(2)} ₴) успішно надіслано менеджерам друкарні у розділ Запити.`);
-                const nextOrderNum = Math.floor(10000 + Math.random() * 90000);
-                setOrderNumber(nextOrderNum);
                 return;
               }
 
@@ -7042,37 +7125,59 @@ export const Calculator: React.FC = () => {
                         {/* Top Strip: Client Contacts vs Staff CRM fields */}
                         {currentUser?.role === 'client' ? (
                           <div className="grid grid-cols-1 md:grid-cols-12 gap-3 p-4 rounded-xl bg-blue-50/60 border border-blue-100">
-                            <div className="md:col-span-6 flex flex-col gap-1">
-                              <label className="text-[11px] font-extrabold text-slate-700 uppercase">Ваше ім'я або компанія:</label>
+                            <div className="md:col-span-4 flex flex-col gap-1">
+                              <label className="text-[11px] font-extrabold text-slate-700 uppercase">ПІБ або компанія *:</label>
                               <input
                                 type="text"
-                                placeholder="Введіть ваше ім'я або назву компанії"
-                                value={customClientName || (currentUser?.name && currentUser.name !== 'Клієнт друкарні' ? currentUser.name : '')}
+                                placeholder="Шевченко Тарас / ТОВ Едельвейс"
+                                value={customClientName}
                                 onChange={(e) => {
                                   setCustomClientName(e.target.value);
                                   try {
                                     const prev = JSON.parse(localStorage.getItem('crm_client_profile') || '{}');
-                                    localStorage.setItem('crm_client_profile', JSON.stringify({ ...prev, name: e.target.value, companyName: e.target.value }));
+                                    localStorage.setItem('crm_client_profile', JSON.stringify({ ...prev, name: e.target.value, contactPerson: e.target.value }));
                                   } catch {}
                                 }}
                                 className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-900 focus:border-blue-600 focus:outline-none"
                               />
                             </div>
-                            <div className="md:col-span-6 flex flex-col gap-1">
-                              <label className="text-[11px] font-extrabold text-slate-700 uppercase">Номер телефону для зв'язку:</label>
+                            <div className="md:col-span-4 flex flex-col gap-1">
+                              <label className="text-[11px] font-extrabold text-slate-700 uppercase">Номер телефону *:</label>
                               <input
                                 type="text"
-                                placeholder="+38 (0__) ___-__-__"
+                                placeholder="+(380)-__-___-__-__"
                                 value={customClientPhone}
                                 onChange={(e) => {
-                                  setCustomClientPhone(e.target.value);
+                                  const formatted = formatPhoneNumber(e.target.value);
+                                  setCustomClientPhone(formatted);
                                   try {
                                     const prev = JSON.parse(localStorage.getItem('crm_client_profile') || '{}');
-                                    localStorage.setItem('crm_client_profile', JSON.stringify({ ...prev, phone: e.target.value }));
+                                    localStorage.setItem('crm_client_profile', JSON.stringify({ ...prev, phone: formatted }));
                                   } catch {}
                                 }}
-                                className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-900 focus:border-blue-600 focus:outline-none"
+                                className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-900 focus:border-blue-600 focus:outline-none font-mono"
                               />
+                            </div>
+                            <div className="md:col-span-4 flex flex-col gap-1">
+                              <label className="text-[11px] font-extrabold text-slate-700 uppercase">Нік у Telegram:</label>
+                              <div className="relative">
+                                <span className="absolute left-3 top-2 text-slate-400 font-bold text-xs">@</span>
+                                <input
+                                  type="text"
+                                  placeholder="username"
+                                  value={customClientTelegram.replace(/^@/, '')}
+                                  onChange={(e) => {
+                                    const raw = e.target.value.replace(/^@/, '').trim();
+                                    const val = raw ? `@${raw}` : '';
+                                    setCustomClientTelegram(val);
+                                    try {
+                                      const prev = JSON.parse(localStorage.getItem('crm_client_profile') || '{}');
+                                      localStorage.setItem('crm_client_profile', JSON.stringify({ ...prev, telegram: val }));
+                                    } catch {}
+                                  }}
+                                  className="w-full pl-7 pr-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-900 focus:border-blue-600 focus:outline-none"
+                                />
+                              </div>
                             </div>
                           </div>
                         ) : (
@@ -7506,30 +7611,17 @@ export const Calculator: React.FC = () => {
                                   }
 
                                   if (isClient) {
-                                    addLead({
-                                      name: name || fullComposedName,
-                                      contactPerson: isNewClientMode ? (customClientName || currentUser?.name || 'Клієнт') : (clients.find(c => c.id === selectedClientId)?.name || currentUser?.name || 'Клієнт'),
-                                      phone: customClientPhone || '',
-                                      email: '',
-                                      budget: liveFinalPrice,
-                                      source: 'Calculator',
-                                      status: 'new',
-                                      date: new Date().toISOString().split('T')[0],
-                                      notes: `Специфікація офсетного друку: ${name || fullComposedName}, ${sheetCustomWidth}×${sheetCustomHeight} ${sheetUnit}, ${activeCalc.matName}, ${activeCalc.colStr}, ${activeCalc.tirazh} шт.`,
-                                      tags: ['Онлайн-калькулятор', category],
-                                      calcSpecs: {
-                                        category: category === 'Бланки' ? subCategory : (category as string),
-                                        format: `${sheetCustomWidth}×${sheetCustomHeight} ${sheetUnit}`,
-                                        quantity: activeCalc.tirazh,
-                                        material: activeCalc.matName,
-                                        colors: activeCalc.colStr,
-                                        totalPrice: liveFinalPrice,
-                                        unitPrice: liveUnitPrice,
-                                        options: `${activeCalc.covName}, ${turnShortLabel}`
-                                      }
+                                    requestClientSubmission({
+                                      category: category === 'Бланки' ? subCategory : (category as string),
+                                      format: `${sheetCustomWidth}×${sheetCustomHeight} ${sheetUnit}`,
+                                      quantity: activeCalc.tirazh,
+                                      material: activeCalc.matName,
+                                      colors: activeCalc.colStr,
+                                      totalPrice: liveFinalPrice,
+                                      unitPrice: liveUnitPrice,
+                                      options: `${activeCalc.covName}, ${turnShortLabel}`,
+                                      composedName: name || fullComposedName
                                     });
-                                    alert(`🎉 Дякуємо! Ваш запит (${activeCalc.tirazh} шт, ${liveFinalPrice.toLocaleString()} ₴) успішно надіслано менеджерам друкарні у розділ Запити.`);
-                                    setOrderNumber(Math.floor(10000 + Math.random() * 90000));
                                     return;
                                   }
 
@@ -9711,37 +9803,59 @@ export const Calculator: React.FC = () => {
                         {/* Top Strip: Client Contacts vs Staff CRM fields */}
                         {currentUser?.role === 'client' ? (
                           <div className="grid grid-cols-1 md:grid-cols-12 gap-3 p-4 rounded-xl bg-blue-50/60 border border-blue-100">
-                            <div className="md:col-span-6 flex flex-col gap-1">
-                              <label className="text-[11px] font-extrabold text-slate-700 uppercase">Ваше ім'я або компанія:</label>
+                            <div className="md:col-span-4 flex flex-col gap-1">
+                              <label className="text-[11px] font-extrabold text-slate-700 uppercase">ПІБ або компанія *:</label>
                               <input
                                 type="text"
-                                placeholder="Введіть ваше ім'я або назву компанії"
-                                value={customClientName || (currentUser?.name && currentUser.name !== 'Клієнт друкарні' ? currentUser.name : '')}
+                                placeholder="Шевченко Тарас / ТОВ Едельвейс"
+                                value={customClientName}
                                 onChange={(e) => {
                                   setCustomClientName(e.target.value);
                                   try {
                                     const prev = JSON.parse(localStorage.getItem('crm_client_profile') || '{}');
-                                    localStorage.setItem('crm_client_profile', JSON.stringify({ ...prev, name: e.target.value, companyName: e.target.value }));
+                                    localStorage.setItem('crm_client_profile', JSON.stringify({ ...prev, name: e.target.value, contactPerson: e.target.value }));
                                   } catch {}
                                 }}
                                 className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-900 focus:border-blue-600 focus:outline-none"
                               />
                             </div>
-                            <div className="md:col-span-6 flex flex-col gap-1">
-                              <label className="text-[11px] font-extrabold text-slate-700 uppercase">Номер телефону для зв'язку:</label>
+                            <div className="md:col-span-4 flex flex-col gap-1">
+                              <label className="text-[11px] font-extrabold text-slate-700 uppercase">Номер телефону *:</label>
                               <input
                                 type="text"
-                                placeholder="+38 (0__) ___-__-__"
+                                placeholder="+(380)-__-___-__-__"
                                 value={customClientPhone}
                                 onChange={(e) => {
-                                  setCustomClientPhone(e.target.value);
+                                  const formatted = formatPhoneNumber(e.target.value);
+                                  setCustomClientPhone(formatted);
                                   try {
                                     const prev = JSON.parse(localStorage.getItem('crm_client_profile') || '{}');
-                                    localStorage.setItem('crm_client_profile', JSON.stringify({ ...prev, phone: e.target.value }));
+                                    localStorage.setItem('crm_client_profile', JSON.stringify({ ...prev, phone: formatted }));
                                   } catch {}
                                 }}
-                                className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-900 focus:border-blue-600 focus:outline-none"
+                                className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-900 focus:border-blue-600 focus:outline-none font-mono"
                               />
+                            </div>
+                            <div className="md:col-span-4 flex flex-col gap-1">
+                              <label className="text-[11px] font-extrabold text-slate-700 uppercase">Нік у Telegram:</label>
+                              <div className="relative">
+                                <span className="absolute left-3 top-2 text-slate-400 font-bold text-xs">@</span>
+                                <input
+                                  type="text"
+                                  placeholder="username"
+                                  value={customClientTelegram.replace(/^@/, '')}
+                                  onChange={(e) => {
+                                    const raw = e.target.value.replace(/^@/, '').trim();
+                                    const val = raw ? `@${raw}` : '';
+                                    setCustomClientTelegram(val);
+                                    try {
+                                      const prev = JSON.parse(localStorage.getItem('crm_client_profile') || '{}');
+                                      localStorage.setItem('crm_client_profile', JSON.stringify({ ...prev, telegram: val }));
+                                    } catch {}
+                                  }}
+                                  className="w-full pl-7 pr-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-900 focus:border-blue-600 focus:outline-none"
+                                />
+                              </div>
                             </div>
                           </div>
                         ) : (
@@ -10057,30 +10171,17 @@ export const Calculator: React.FC = () => {
                                   const techWaste = Math.max(2, Math.ceil(physSheets * 0.02));
 
                                   if (isClient) {
-                                    addLead({
-                                      name: name || fullComposedName,
-                                      contactPerson: isNewClientMode ? (customClientName || currentUser?.name || 'Клієнт') : (clients.find(c => c.id === selectedClientId)?.name || currentUser?.name || 'Клієнт'),
-                                      phone: customClientPhone || '',
-                                      email: '',
-                                      budget: digFinalPrice,
-                                      source: 'Calculator',
-                                      status: 'new',
-                                      date: new Date().toISOString().split('T')[0],
-                                      notes: `Цифровий друк: ${name || fullComposedName}, ${sheetCustomWidth}×${sheetCustomHeight} ${sheetUnit}, ${digMatLabels[digMatId] || '350г'}, ${digColId}, ${digTir} шт.`,
-                                      tags: ['Онлайн-калькулятор', 'Цифровий друк'],
-                                      calcSpecs: {
-                                        category: 'Цифровий друк',
-                                        format: `${sheetCustomWidth}×${sheetCustomHeight} ${sheetUnit}`,
-                                        quantity: digTir,
-                                        material: digMatLabels[digMatId] || 'Крейдований 350 г/м²',
-                                        colors: digColId,
-                                        totalPrice: digFinalPrice,
-                                        unitPrice: digUnitPrice,
-                                        options: digCovLabels[digCovId] || 'Без ламінації'
-                                      }
+                                    requestClientSubmission({
+                                      category: 'Цифровий друк',
+                                      format: `${sheetCustomWidth}×${sheetCustomHeight} ${sheetUnit}`,
+                                      quantity: digTir,
+                                      material: digMatLabels[digMatId] || 'Крейдований 350 г/м²',
+                                      colors: digColId,
+                                      totalPrice: digFinalPrice,
+                                      unitPrice: digUnitPrice,
+                                      options: digCovLabels[digCovId] || 'Без ламінації',
+                                      composedName: name || fullComposedName
                                     });
-                                    alert(`🎉 Дякуємо! Ваш запит (${digTir} шт, ${digFinalPrice.toLocaleString()} ₴) успішно надіслано менеджерам друкарні у розділ Запити.`);
-                                    setOrderNumber(Math.floor(10000 + Math.random() * 90000));
                                     return;
                                   }
 
@@ -13055,37 +13156,59 @@ export const Calculator: React.FC = () => {
                         {/* Top Strip: Client Contacts vs Staff CRM fields */}
                         {currentUser?.role === 'client' ? (
                           <div className="grid grid-cols-1 md:grid-cols-12 gap-3 p-4 rounded-xl bg-blue-50/60 border border-blue-100">
-                            <div className="md:col-span-6 flex flex-col gap-1">
-                              <label className="text-[11px] font-extrabold text-slate-700 uppercase">Ваше ім'я або компанія:</label>
+                            <div className="md:col-span-4 flex flex-col gap-1">
+                              <label className="text-[11px] font-extrabold text-slate-700 uppercase">ПІБ або компанія *:</label>
                               <input
                                 type="text"
-                                placeholder="Введіть ваше ім'я або назву компанії"
-                                value={customClientName || (currentUser?.name && currentUser.name !== 'Клієнт друкарні' ? currentUser.name : '')}
+                                placeholder="Шевченко Тарас / ТОВ Едельвейс"
+                                value={customClientName}
                                 onChange={(e) => {
                                   setCustomClientName(e.target.value);
                                   try {
                                     const prev = JSON.parse(localStorage.getItem('crm_client_profile') || '{}');
-                                    localStorage.setItem('crm_client_profile', JSON.stringify({ ...prev, name: e.target.value, companyName: e.target.value }));
+                                    localStorage.setItem('crm_client_profile', JSON.stringify({ ...prev, name: e.target.value, contactPerson: e.target.value }));
                                   } catch {}
                                 }}
                                 className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-900 focus:border-blue-600 focus:outline-none"
                               />
                             </div>
-                            <div className="md:col-span-6 flex flex-col gap-1">
-                              <label className="text-[11px] font-extrabold text-slate-700 uppercase">Номер телефону для зв'язку:</label>
+                            <div className="md:col-span-4 flex flex-col gap-1">
+                              <label className="text-[11px] font-extrabold text-slate-700 uppercase">Номер телефону *:</label>
                               <input
                                 type="text"
-                                placeholder="+38 (0__) ___-__-__"
+                                placeholder="+(380)-__-___-__-__"
                                 value={customClientPhone}
                                 onChange={(e) => {
-                                  setCustomClientPhone(e.target.value);
+                                  const formatted = formatPhoneNumber(e.target.value);
+                                  setCustomClientPhone(formatted);
                                   try {
                                     const prev = JSON.parse(localStorage.getItem('crm_client_profile') || '{}');
-                                    localStorage.setItem('crm_client_profile', JSON.stringify({ ...prev, phone: e.target.value }));
+                                    localStorage.setItem('crm_client_profile', JSON.stringify({ ...prev, phone: formatted }));
                                   } catch {}
                                 }}
-                                className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-900 focus:border-blue-600 focus:outline-none"
+                                className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-900 focus:border-blue-600 focus:outline-none font-mono"
                               />
+                            </div>
+                            <div className="md:col-span-4 flex flex-col gap-1">
+                              <label className="text-[11px] font-extrabold text-slate-700 uppercase">Нік у Telegram:</label>
+                              <div className="relative">
+                                <span className="absolute left-3 top-2 text-slate-400 font-bold text-xs">@</span>
+                                <input
+                                  type="text"
+                                  placeholder="username"
+                                  value={customClientTelegram.replace(/^@/, '')}
+                                  onChange={(e) => {
+                                    const raw = e.target.value.replace(/^@/, '').trim();
+                                    const val = raw ? `@${raw}` : '';
+                                    setCustomClientTelegram(val);
+                                    try {
+                                      const prev = JSON.parse(localStorage.getItem('crm_client_profile') || '{}');
+                                      localStorage.setItem('crm_client_profile', JSON.stringify({ ...prev, telegram: val }));
+                                    } catch {}
+                                  }}
+                                  className="w-full pl-7 pr-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-900 focus:border-blue-600 focus:outline-none"
+                                />
+                              </div>
                             </div>
                           </div>
                         ) : (
@@ -13378,30 +13501,17 @@ export const Calculator: React.FC = () => {
                                 type="button"
                                 onClick={() => {
                                   if (isClient) {
-                                    addLead({
-                                      name: name || fullComposedName,
-                                      contactPerson: isNewClientMode ? (customClientName || currentUser?.name || 'Клієнт') : (clients.find(c => c.id === selectedClientId)?.name || currentUser?.name || 'Клієнт'),
-                                      phone: customClientPhone || '',
-                                      email: '',
-                                      budget: wideFinalPrice,
-                                      source: 'Calculator',
-                                      status: 'new',
-                                      date: new Date().toISOString().split('T')[0],
-                                      notes: `Широкоформатний друк: ${name || fullComposedName}, ${wideWidth}×${wideHeight} ${wideUnit}, ${matInfo.label}, ${wideResId} dpi, ${wideTir} шт.`,
-                                      tags: ['Онлайн-калькулятор', 'Широкоформат'],
-                                      calcSpecs: {
-                                        category: 'Широкоформатний друк',
-                                        format: `${wideWidth}×${wideHeight} ${wideUnit}`,
-                                        quantity: wideTir,
-                                        material: matInfo.label,
-                                        colors: `${wideResId} dpi`,
-                                        totalPrice: wideFinalPrice,
-                                        unitPrice: wideUnitPrice,
-                                        options: fullComposedName
-                                      }
+                                    requestClientSubmission({
+                                      category: 'Широкоформатний друк',
+                                      format: `${wideWidth}×${wideHeight} ${wideUnit}`,
+                                      quantity: wideTir,
+                                      material: matInfo.label,
+                                      colors: `${wideResId} dpi`,
+                                      totalPrice: wideFinalPrice,
+                                      unitPrice: wideUnitPrice,
+                                      options: fullComposedName,
+                                      composedName: name || fullComposedName
                                     });
-                                    alert(`🎉 Дякуємо! Ваш запит на широкоформатний друк (${wideTir} шт, ${wideFinalPrice.toLocaleString()} ₴) успішно надіслано менеджерам друкарні у розділ Запити.`);
-                                    setOrderNumber(Math.floor(10000 + Math.random() * 90000));
                                     return;
                                   }
 
@@ -14370,30 +14480,17 @@ export const Calculator: React.FC = () => {
                               type="button"
                               onClick={() => {
                                 if (isClient) {
-                                  addLead({
-                                    name: name || fullComposedName,
-                                    contactPerson: isNewClientMode ? (customClientName || currentUser?.name || 'Клієнт') : (clients.find(c => c.id === selectedClientId)?.name || currentUser?.name || 'Клієнт'),
-                                    phone: customClientPhone || '',
-                                    email: '',
-                                    budget: rollFinalPrice,
-                                    source: 'Calculator',
-                                    status: 'new',
-                                    date: new Date().toISOString().split('T')[0],
-                                    notes: `Рулонний друк: ${name || fullComposedName}, ${rollWidth}×${rollHeight} мм, ${matLabels[rollMaterial] || 'Raflatac'}, ${rollQuantity} шт.`,
-                                    tags: ['Онлайн-калькулятор', 'Рулонний друк'],
-                                    calcSpecs: {
-                                      category: 'Рулонний друк',
-                                      format: `${rollWidth}×${rollHeight} мм`,
-                                      quantity: rollQuantity,
-                                      material: matLabels[rollMaterial] || 'Raflatac',
-                                      colors: 'Флексодрук',
-                                      totalPrice: rollFinalPrice,
-                                      unitPrice: rollUnitPrice,
-                                      options: `Втулка Ø${rollCore}мм, орієнтація №${rollOrientation}`
-                                    }
+                                  requestClientSubmission({
+                                    category: 'Рулонний друк',
+                                    format: `${rollWidth}×${rollHeight} мм`,
+                                    quantity: rollQuantity,
+                                    material: matLabels[rollMaterial] || 'Raflatac',
+                                    colors: 'Флексодрук',
+                                    totalPrice: rollFinalPrice,
+                                    unitPrice: rollUnitPrice,
+                                    options: `Втулка Ø${rollCore}мм, орієнтація №${rollOrientation}`,
+                                    composedName: name || fullComposedName
                                   });
-                                  alert(`🎉 Дякуємо! Ваш запит на рулонні етикетки (${rollQuantity} шт, ${rollFinalPrice.toLocaleString()} ₴) успішно надіслано менеджерам друкарні у розділ Запити.`);
-                                  setOrderNumber(Math.floor(10000 + Math.random() * 90000));
                                   return;
                                 }
 
@@ -16552,6 +16649,125 @@ export const Calculator: React.FC = () => {
               <div className="px-6 py-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end gap-3">
                 <button type="button" onClick={() => setShowNorms(false)} className="px-4 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-sm transition-colors">Скасувати</button>
                 <button type="submit" className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold shadow-sm transition-all">Зберегти зміни</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Client Contact Prompt Modal */}
+      {showClientContactModal && pendingLeadPayload && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 relative animate-in fade-in zoom-in duration-150 flex flex-col gap-4">
+            <button
+              type="button"
+              onClick={() => setShowClientContactModal(false)}
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-700 w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center transition-colors"
+            >
+              ✕
+            </button>
+
+            <div>
+              <h3 className="text-base font-extrabold text-slate-900 m-0 flex items-center gap-2">
+                <span>📩</span> Оформлення запиту менеджеру
+              </h3>
+              <p className="text-xs text-slate-500 mt-1 m-0">
+                Вкажіть ваші контакти, щоб ми надіслали прорахунок та зв'язалися для запуску в роботу.
+              </p>
+            </div>
+
+            {/* Product Summary Box */}
+            <div className="p-3 bg-blue-50 rounded-xl border border-blue-100 flex flex-col gap-1 text-xs">
+              <div className="flex justify-between font-bold text-blue-900">
+                <span>{pendingLeadPayload.category} ({pendingLeadPayload.format})</span>
+                <span className="font-extrabold text-blue-700">{pendingLeadPayload.totalPrice.toLocaleString()} ₴</span>
+              </div>
+              <div className="text-[11px] text-blue-800/80">
+                Тираж: {pendingLeadPayload.quantity.toLocaleString()} шт • {pendingLeadPayload.material}
+              </div>
+            </div>
+
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                if (!customClientName.trim()) {
+                  alert('Будь ласка, вкажіть ваше ПІБ або назву компанії');
+                  return;
+                }
+                if (!isPhoneComplete(customClientPhone)) {
+                  alert('Будь ласка, введіть коректний номер телефону (9 цифр після коду +380)');
+                  return;
+                }
+                submitClientLead({
+                  ...pendingLeadPayload,
+                  name: customClientName.trim(),
+                  phone: customClientPhone.trim(),
+                  telegram: customClientTelegram.trim()
+                });
+              }}
+              className="flex flex-col gap-3"
+            >
+              <div className="flex flex-col gap-1">
+                <label className="text-[11px] font-extrabold text-slate-700 uppercase">
+                  Ваше ПІБ або компанія <span className="text-rose-500">*</span>:
+                </label>
+                <input
+                  required
+                  type="text"
+                  placeholder="напр. Шевченко Тарас Григорович"
+                  value={customClientName}
+                  onChange={(e) => setCustomClientName(e.target.value)}
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-white text-xs font-bold text-slate-900 focus:border-blue-600 focus:outline-none"
+                />
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <label className="text-[11px] font-extrabold text-slate-700 uppercase">
+                  Номер телефону для зв'язку <span className="text-rose-500">*</span>:
+                </label>
+                <input
+                  required
+                  type="text"
+                  placeholder="+(380)-__-___-__-__"
+                  value={customClientPhone}
+                  onChange={(e) => setCustomClientPhone(formatPhoneNumber(e.target.value))}
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-white text-xs font-bold text-slate-900 focus:border-blue-600 focus:outline-none font-mono"
+                />
+              </div>
+
+              <div className="flex flex-col gap-1">
+                <label className="text-[11px] font-extrabold text-slate-700 uppercase">
+                  Нік у Telegram (необов'язково):
+                </label>
+                <div className="relative">
+                  <span className="absolute left-3 top-2.5 text-slate-400 font-bold text-xs">@</span>
+                  <input
+                    type="text"
+                    placeholder="username"
+                    value={customClientTelegram.replace(/^@/, '')}
+                    onChange={(e) => {
+                      const raw = e.target.value.replace(/^@/, '').trim();
+                      setCustomClientTelegram(raw ? `@${raw}` : '');
+                    }}
+                    className="w-full pl-7 pr-3 py-2.5 rounded-xl border border-slate-300 bg-white text-xs font-bold text-slate-900 focus:border-blue-600 focus:outline-none"
+                  />
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowClientContactModal(false)}
+                  className="w-1/3 py-2.5 px-4 rounded-xl border border-slate-200 text-slate-700 text-xs font-bold hover:bg-slate-50 transition-colors"
+                >
+                  Скасувати
+                </button>
+                <button
+                  type="submit"
+                  className="w-2/3 py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-extrabold shadow-md shadow-blue-500/20 transition-all flex items-center justify-center gap-1.5"
+                >
+                  <span>🚀 Надіслати запит</span>
+                </button>
               </div>
             </form>
           </div>

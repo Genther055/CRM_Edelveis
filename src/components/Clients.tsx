@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import type { Client } from '../types';
 import { NotesSection } from './NotesSection';
+import { formatPhoneNumber } from '../utils/phoneFormatter';
 
 export const Clients: React.FC = () => {
   const { 
@@ -911,7 +912,7 @@ export const Clients: React.FC = () => {
                 </div>
                 <div className="ios-input-group">
                   <label className="ios-label">Телефон</label>
-                  <input placeholder="+380" value={phone} onChange={(e) => setPhone(e.target.value)} />
+                  <input placeholder="+(380)-__-___-__-__" value={phone} onChange={(e) => setPhone(formatPhoneNumber(e.target.value))} />
                 </div>
               </div>
 

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
 import type { Lead } from '../types';
+import { formatPhoneNumber } from '../utils/phoneFormatter';
 import { 
   Plus, 
   Search, 
@@ -27,6 +28,7 @@ export const Leads: React.FC = () => {
   const [newContact, setNewContact] = useState('');
   const [newPhone, setNewPhone] = useState('');
   const [newEmail, setNewEmail] = useState('');
+  const [newTelegram, setNewTelegram] = useState('');
   const [newBudget, setNewBudget] = useState(0);
   const [newSource, setNewSource] = useState<Lead['source']>('Site');
   const [newNotes, setNewNotes] = useState('');
@@ -68,6 +70,7 @@ export const Leads: React.FC = () => {
       contactPerson: newContact,
       phone: newPhone,
       email: newEmail,
+      telegram: newTelegram ? (newTelegram.startsWith('@') ? newTelegram : `@${newTelegram}`) : undefined,
       budget: Number(newBudget),
       source: newSource,
       status: 'new',
@@ -88,6 +91,7 @@ export const Leads: React.FC = () => {
     setNewContact('');
     setNewPhone('');
     setNewEmail('');
+    setNewTelegram('');
     setNewBudget(0);
     setNewNotes('');
     setFieldValues({});
@@ -474,8 +478,22 @@ export const Leads: React.FC = () => {
               <div>
                 <span style={{ color: 'var(--text-medium)', fontSize: '10px', fontWeight: '700', textTransform: 'uppercase' }}>Контактна інформація</span>
                 <p style={{ color: 'var(--text-dark)', marginTop: '2px' }}><strong>{selectedLead.contactPerson || 'Замовник'}</strong></p>
-                <p style={{ fontFamily: 'var(--font-mono)', marginTop: '2px', color: 'var(--text-dark)' }}>{selectedLead.phone || 'Телефон не вказано'}</p>
-                {selectedLead.email && <p style={{ color: 'var(--text-medium)', fontSize: '11px', marginTop: '1px' }}>{selectedLead.email}</p>}
+                <p style={{ fontFamily: 'var(--font-mono)', marginTop: '2px', color: 'var(--text-dark)', fontWeight: '700' }}>
+                  📱 {selectedLead.phone || 'Телефон не вказано'}
+                </p>
+                {selectedLead.telegram && (
+                  <p style={{ marginTop: '2px' }}>
+                    <a
+                      href={`https://t.me/${selectedLead.telegram.replace('@', '')}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 font-bold hover:underline"
+                    >
+                      💬 Telegram: {selectedLead.telegram}
+                    </a>
+                  </p>
+                )}
+                {selectedLead.email && <p style={{ color: 'var(--text-medium)', fontSize: '11px', marginTop: '1px' }}>✉️ {selectedLead.email}</p>}
               </div>
 
               {/* Calculator Spec Box */}
@@ -705,22 +723,32 @@ export const Leads: React.FC = () => {
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
                 <div className="ios-input-group">
-                  <label className="ios-label">Контактний телефон</label>
+                  <label className="ios-label">Контактний телефон *</label>
                   <input 
-                    placeholder="+380"
+                    required
+                    placeholder="+(380)-__-___-__-__"
                     value={newPhone} 
-                    onChange={(e) => setNewPhone(e.target.value)} 
+                    onChange={(e) => setNewPhone(formatPhoneNumber(e.target.value))} 
                   />
                 </div>
                 <div className="ios-input-group">
-                  <label className="ios-label">Email</label>
+                  <label className="ios-label">Нік у Telegram</label>
                   <input 
-                    type="email"
-                    placeholder="client@mail.com"
-                    value={newEmail} 
-                    onChange={(e) => setNewEmail(e.target.value)} 
+                    placeholder="@username"
+                    value={newTelegram} 
+                    onChange={(e) => setNewTelegram(e.target.value)} 
                   />
                 </div>
+              </div>
+
+              <div className="ios-input-group">
+                <label className="ios-label">Email</label>
+                <input 
+                  type="email"
+                  placeholder="client@mail.com"
+                  value={newEmail} 
+                  onChange={(e) => setNewEmail(e.target.value)} 
+                />
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>

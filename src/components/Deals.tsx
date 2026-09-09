@@ -19,6 +19,7 @@ import type { Order, TaskItem } from '../types';
 import { NotesSection } from './NotesSection';
 import { CheckSquare, UserPlus, FileText } from 'lucide-react';
 import { PIPELINE_STAGES } from '../data/pipelineStages';
+import { formatPhoneNumber } from '../utils/phoneFormatter';
 
 export const Deals: React.FC = () => {
   const { 
@@ -1390,8 +1391,8 @@ export const Deals: React.FC = () => {
                         <input
                           type="tel"
                           value={newClientPhone}
-                          onChange={(e) => setNewClientPhone(e.target.value)}
-                          placeholder="+380..."
+                          onChange={(e) => setNewClientPhone(formatPhoneNumber(e.target.value))}
+                          placeholder="+(380)-__-___-__-__"
                           style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
                         />
                       </div>
