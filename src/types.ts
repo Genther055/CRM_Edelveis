@@ -201,3 +201,29 @@ export interface NoteItem {
   replies?: NoteReply[];
 }
 
+export interface Lead {
+  id: string;
+  name: string;
+  contactPerson: string;
+  phone: string;
+  email: string;
+  budget: number;
+  source: 'Site' | 'Phone' | 'Instagram' | 'Facebook' | 'Recommendation' | 'Calculator';
+  status: 'new' | 'contact' | 'negotiation' | 'review' | 'converted';
+  date: string;
+  notes: string;
+  tags?: string[];
+  files?: string[];
+  customFieldValues?: Record<string, string | number>;
+  calcSpecs?: {
+    category?: string;
+    format?: string;
+    quantity?: number;
+    material?: string;
+    colors?: string;
+    totalPrice?: number;
+    unitPrice?: number;
+    options?: string;
+  };
+}
+

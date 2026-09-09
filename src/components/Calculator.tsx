@@ -871,7 +871,8 @@ const renderBookletFoldBlueprint = (
 
 // Clean restored Calculator version 1.0.5
 export const Calculator: React.FC = () => {
-  const { clients, materials, norms, addOrder, currentUser, updateNorms } = useApp();
+  const { clients, materials, norms, addOrder, addLead, currentUser, updateNorms } = useApp();
+  const isClient = currentUser?.role === 'client';
 
   // Selection step: 'catalog' | 'editor'
   const [step, setStep] = useState<'catalog' | 'editor'>('catalog');
@@ -2197,6 +2198,35 @@ export const Calculator: React.FC = () => {
   const handleSendToProduction = () => {
     const specNotes = `Формат: ${selectedFormat} (${orientation}), Скріплення: ${bindingType}, Ламінація: ${laminationType}, Бігів: ${creaseCount} ст.`;
     
+    if (isClient) {
+      addLead({
+        name: `Калькуляція: ${category === 'Бланки' ? subCategory : category} ${selectedFormat} (${quantity} шт)`,
+        contactPerson: isNewClientMode ? (customClientName || currentUser?.name || 'Клієнт') : (clients.find(c => c.id === selectedClientId)?.name || currentUser?.name || 'Клієнт'),
+        phone: customClientPhone || '',
+        email: '',
+        budget: calculatedOps.finalPrice,
+        source: 'Calculator',
+        status: 'new',
+        date: new Date().toISOString().split('T')[0],
+        notes: `Специфікація: ${specNotes}. Папір: ${paperType}, Колірність: ${colors}. Додатково: —`,
+        tags: ['Онлайн-калькулятор', category],
+        calcSpecs: {
+          category: category === 'Бланки' ? subCategory : category,
+          format: selectedFormat,
+          quantity: Number(quantity) || 1,
+          material: paperType,
+          colors: colors,
+          totalPrice: calculatedOps.finalPrice,
+          unitPrice: calculatedOps.unitPrice,
+          options: specNotes
+        }
+      });
+      alert(`🎉 Дякуємо! Ваш розрахунок № ${orderNumber} на суму ${calculatedOps.finalPrice.toFixed(2)} ₴ успішно надіслано менеджерам друкарні у розділ Запити.\nМи перевіримо деталі та зв'яжемося з вами найближчим часом!`);
+      const nextOrderNum = Math.floor(10000 + Math.random() * 90000);
+      setOrderNumber(nextOrderNum);
+      return;
+    }
+
     addOrder({
       name: `№ ${orderNumber} - ${name} [${category === 'Бланки' ? subCategory : category}]`,
       clientId: selectedClientId,
@@ -2383,15 +2413,7 @@ export const Calculator: React.FC = () => {
             const springFill = notebookSpringColor === 'white' ? '#FFFFFF' : notebookSpringColor === 'black' ? '#1E293B' : '#94A3B8';
             const springStroke = notebookSpringColor === 'white' ? '#CBD5E1' : notebookSpringColor === 'black' ? '#0F172A' : '#64748B';
 
-            const getFormattedFutureDate = (daysToAdd: number) => {
-              const d = new Date();
-              d.setDate(d.getDate() + daysToAdd);
-              const day = String(d.getDate()).padStart(2, '0');
-              const month = String(d.getMonth() + 1).padStart(2, '0');
-              const weekdays = ['нд', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'];
-              const dayName = weekdays[d.getDay()];
-              return `${day}.${month}, ${dayName}`;
-            };
+
 
             const computeNotepadPrice = (qty: number, days: number): number => {
               const areaFactor = Math.max(0.6, (wMm * hMm) / (105 * 148));
@@ -2475,8 +2497,37 @@ export const Calculator: React.FC = () => {
               return Math.round(baseTotal * 100) / 100;
             };
 
-            const handleAddNotepadToOrder = (qty: number, days: number, price: number) => {
-              const specNotes = `Блокнот ${formatTitle} (${wMm}×${hMm} мм), ${notebookBlockPages} аркушів (${notebookBlockMaterial}, ${notebookBlockPrint}), Обкладинка: ${notebookCoverPages} стор (${notebookCoverMaterial}, ламінація: ${notebookCoverCovering}, друк: ${notebookCoverPrint}), Пружина: ${notebookSpringColor} (${notebookBindingSide === 'short' ? 'по короткій' : 'по довгій'}), Підкладка: ${notebookBackMaterial}, Перфорація: ${notebookPerforation === 'yes' ? 'Так' : 'Ні'}, Пакування: ${notebookPackaging === 'yes' ? 'ПЕТ' : 'Ні'}, Термін: ${days} дні`;
+            const handleAddNotepadToOrder = (qty: number, _days: number, price: number) => {
+              const specNotes = `Блокнот ${formatTitle} (${wMm}×${hMm} мм), ${notebookBlockPages} аркушів (${notebookBlockMaterial}, ${notebookBlockPrint}), Обкладинка: ${notebookCoverPages} стор (${notebookCoverMaterial}, ламінація: ${notebookCoverCovering}, друк: ${notebookCoverPrint}), Пружина: ${notebookSpringColor} (${notebookBindingSide === 'short' ? 'по короткій' : 'по довгій'}), Підкладка: ${notebookBackMaterial}, Перфорація: ${notebookPerforation === 'yes' ? 'Так' : 'Ні'}, Пакування: ${notebookPackaging === 'yes' ? 'ПЕТ' : 'Ні'}`;
+
+              if (isClient) {
+                addLead({
+                  name: `Калькуляція: Блокнот ${formatTitle} (${qty} шт)`,
+                  contactPerson: isNewClientMode ? (customClientName || currentUser?.name || 'Клієнт') : (clients.find(c => c.id === selectedClientId)?.name || currentUser?.name || 'Клієнт'),
+                  phone: customClientPhone || '',
+                  email: '',
+                  budget: price,
+                  source: 'Calculator',
+                  status: 'new',
+                  date: new Date().toISOString().split('T')[0],
+                  notes: specNotes,
+                  tags: ['Онлайн-калькулятор', 'Блокноти'],
+                  calcSpecs: {
+                    category: 'Блокноти',
+                    format: `${formatTitle} (${wMm}×${hMm} мм)`,
+                    quantity: qty,
+                    material: `Блок: ${notebookBlockMaterial}, Обкладинка: ${notebookCoverMaterial}`,
+                    colors: `Блок: ${notebookBlockPrint}, Обкладинка: ${notebookCoverPrint}`,
+                    totalPrice: price,
+                    unitPrice: price / qty,
+                    options: `Обкладинка: ${notebookCoverCovering}, Пружина: ${notebookSpringColor}`
+                  }
+                });
+                alert(`🎉 Дякуємо! Ваш запит на блокноти (${qty} шт, ${price.toFixed(2)} ₴) успішно надіслано менеджерам друкарні у розділ Запити.`);
+                const nextOrderNum = Math.floor(10000 + Math.random() * 90000);
+                setOrderNumber(nextOrderNum);
+                return;
+              }
 
               addOrder({
                 name: `№ ${orderNumber} - Блокнот ${formatTitle} (${qty} шт)`,
@@ -2502,7 +2553,7 @@ export const Calculator: React.FC = () => {
                 notes: specNotes
               });
 
-              alert(`Блокноти (${qty} шт, ${formatTitle}) на суму ${price.toFixed(2)} ₴ успішно додано до замовлень!`);
+              alert(`Блокноти (${qty} шт, ${formatTitle}) на суму ${price.toFixed(2)} ₴ успішно надіслано у виробництво!`);
               const nextOrderNum = Math.floor(10000 + Math.random() * 90000);
               setOrderNumber(nextOrderNum);
             };
@@ -3286,7 +3337,7 @@ export const Calculator: React.FC = () => {
                       <thead>
                         <tr style={{ backgroundColor: '#F8FAFC', borderBottom: '1px solid #E2E8F0', color: '#475569', fontWeight: '700' }}>
                           <th style={{ padding: '10px 14px', textAlign: 'left', minWidth: '180px' }}>Розмір / Опис</th>
-                          <th style={{ padding: '10px 14px', minWidth: '130px' }}>Готовність</th>
+                          
                           {[1, 25, 50, 75, 100, 200, 500].map(qty => (
                             <th key={qty} style={{ padding: '10px 12px', minWidth: '95px' }}>
                               <span style={{ fontSize: '13px', fontWeight: '800', color: '#0F172A' }}>{qty}</span>
@@ -3301,11 +3352,7 @@ export const Calculator: React.FC = () => {
                           <td style={{ padding: '12px 14px', textAlign: 'left', fontWeight: '700', color: '#1E293B' }}>
                             {formatTitle} ({wMm} × {hMm}) {totalSheets} листів
                           </td>
-                          <td style={{ padding: '12px 14px' }}>
-                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', backgroundColor: '#FEF3C7', color: '#92400E', padding: '3px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: '700' }}>
-                              2д на {getFormattedFutureDate(2)}
-                            </span>
-                          </td>
+
                           {[1, 25, 50, 75, 100, 200, 500].map(qty => {
                             const price = computeNotepadPrice(qty, 2);
                             return (
@@ -3333,11 +3380,7 @@ export const Calculator: React.FC = () => {
                           <td style={{ padding: '12px 14px', textAlign: 'left', fontWeight: '700', color: '#1E293B' }}>
                             {formatTitle} ({wMm} × {hMm}) {totalSheets} листів
                           </td>
-                          <td style={{ padding: '12px 14px' }}>
-                            <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', backgroundColor: '#DBEAFE', color: '#1E40AF', padding: '3px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: '700' }}>
-                              3д на {getFormattedFutureDate(3)}
-                            </span>
-                          </td>
+
                           {[1, 25, 50, 75, 100, 200, 500].map(qty => {
                             const price = computeNotepadPrice(qty, 3);
                             return (
@@ -6573,7 +6616,7 @@ export const Calculator: React.FC = () => {
                       <div className="flex items-center gap-2">
                         <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
                         <span className="text-xs font-bold uppercase tracking-wider text-slate-200">
-                          ВАРТІСТЬ ТА СТРОКИ ВИГОТОВЛЕННЯ
+                          ТАБЛИЦЯ ВАРТОСТІ ТИРАЖІВ
                         </span>
                       </div>
 
@@ -6621,7 +6664,7 @@ export const Calculator: React.FC = () => {
                           <tr className="text-slate-800 text-xs font-black uppercase tracking-wider">
                             <th className="py-3 px-4 text-left border-r border-slate-300 min-w-[140px] text-slate-900 font-black">Матеріал та покриття</th>
                             <th className="py-3 px-3 border-r border-slate-300 text-slate-900 font-black">Друк</th>
-                            <th className="py-3 px-3 border-r border-slate-300 min-w-[70px] text-slate-900 font-black">Готовність</th>
+                            
                             {(category === 'Бланки'
                               ? [50, 100, 150, 200, 250, 300, 350, 400, 450, 500, 550, 600, 650, 700, 750, 800, 850, 900, 950, 1000]
                               : [100, 250, 500, 1000, 1500, 2500, 5000, 10000]
@@ -7462,6 +7505,34 @@ export const Calculator: React.FC = () => {
                                     postpressList.push({ name: `Фасування та пакування (${postPackingText.trim()})`, qty: pCountOrd > 0 ? `${pCountOrd} пачок` : '1 тираж' });
                                   }
 
+                                  if (isClient) {
+                                    addLead({
+                                      name: name || fullComposedName,
+                                      contactPerson: isNewClientMode ? (customClientName || currentUser?.name || 'Клієнт') : (clients.find(c => c.id === selectedClientId)?.name || currentUser?.name || 'Клієнт'),
+                                      phone: customClientPhone || '',
+                                      email: '',
+                                      budget: liveFinalPrice,
+                                      source: 'Calculator',
+                                      status: 'new',
+                                      date: new Date().toISOString().split('T')[0],
+                                      notes: `Специфікація офсетного друку: ${name || fullComposedName}, ${sheetCustomWidth}×${sheetCustomHeight} ${sheetUnit}, ${activeCalc.matName}, ${activeCalc.colStr}, ${activeCalc.tirazh} шт.`,
+                                      tags: ['Онлайн-калькулятор', category],
+                                      calcSpecs: {
+                                        category: category === 'Бланки' ? subCategory : (category as string),
+                                        format: `${sheetCustomWidth}×${sheetCustomHeight} ${sheetUnit}`,
+                                        quantity: activeCalc.tirazh,
+                                        material: activeCalc.matName,
+                                        colors: activeCalc.colStr,
+                                        totalPrice: liveFinalPrice,
+                                        unitPrice: liveUnitPrice,
+                                        options: `${activeCalc.covName}, ${turnShortLabel}`
+                                      }
+                                    });
+                                    alert(`🎉 Дякуємо! Ваш запит (${activeCalc.tirazh} шт, ${liveFinalPrice.toLocaleString()} ₴) успішно надіслано менеджерам друкарні у розділ Запити.`);
+                                    setOrderNumber(Math.floor(10000 + Math.random() * 90000));
+                                    return;
+                                  }
+
                                   addOrder({
                                     id: orderNumber.toString(),
                                     name: name || fullComposedName,
@@ -7487,7 +7558,6 @@ export const Calculator: React.FC = () => {
                                     platesCount: plates,
                                     postpressOps: postpressList,
                                     packingInfo: packingInfoStr,
-                                    deadline: '1-2 роб. дні',
                                     subtotal: activeCalc.rawCost,
                                     marginAmount: liveMarginAmount,
                                     finalPrice: liveFinalPrice,
@@ -7502,7 +7572,7 @@ export const Calculator: React.FC = () => {
                                 className="py-2.5 px-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs shadow-md shadow-blue-500/25 transition-all text-center flex items-center justify-center gap-1.5"
                               >
                                 <Send size={14} className="text-white" />
-                                <span>Виробництво</span>
+                                <span>{isClient ? 'Оформити запит' : 'Виробництво'}</span>
                               </button>
                             </div>
                           </div>
@@ -7821,7 +7891,7 @@ export const Calculator: React.FC = () => {
                           <tr className="bg-slate-800/95 text-slate-200 text-xs font-semibold uppercase tracking-wider border-b border-slate-700">
                             <th className="py-3 px-4 text-left border-r border-slate-700/50">Матеріал та покриття</th>
                             <th className="py-3 px-3 border-r border-slate-700/50">Друк</th>
-                            <th className="py-3 px-3 border-r border-slate-700/50">Готовність</th>
+                            
                             {[100, 250, 500, 1000, 2500, 5000, 10000].map(tir => (
                               <th key={tir} className="py-3 px-3 border-r border-slate-700/50 last:border-r-0 font-bold">{tir} шт.</th>
                             ))}
@@ -7829,19 +7899,19 @@ export const Calculator: React.FC = () => {
                         </thead>
                         <tbody className="divide-y divide-slate-100">
                           {[
-                            { mat: 'Льон Icelite 300', cov: 'Ні', color: '4+0', time: '1-2 дні' },
-                            { mat: 'Tintoretto crema 300', cov: 'Ні', color: '4+4', time: '1-2 дні' },
-                            { mat: 'Stardream opal 285', cov: 'Ні', color: '4+0', time: '1-2 дні' },
-                            { mat: 'Крейд МАТ 300', cov: 'ГЛ лам 1+0', color: '4+4', time: '1-2 дні' },
-                            { mat: 'Крейд МАТ 350', cov: 'МАТ лам 1+1', color: '4+4', time: '1-2 дні' },
-                            { mat: 'Крейд МАТ 450', cov: 'SOFT лам 1+1', color: '4+4', time: '1-2 дні' },
+                            { mat: 'Льон Icelite 300', cov: 'Ні', color: '4+0' },
+                            { mat: 'Tintoretto crema 300', cov: 'Ні', color: '4+4' },
+                            { mat: 'Stardream opal 285', cov: 'Ні', color: '4+0' },
+                            { mat: 'Крейд МАТ 300', cov: 'ГЛ лам 1+0', color: '4+4' },
+                            { mat: 'Крейд МАТ 350', cov: 'МАТ лам 1+1', color: '4+4' },
+                            { mat: 'Крейд МАТ 450', cov: 'SOFT лам 1+1', color: '4+4' },
                           ].map((row, idx) => (
                             <tr key={idx} className="hover:bg-blue-50/30 transition-colors">
                               <td className="py-2.5 px-4 text-left font-semibold text-slate-800 border-r border-slate-100">
                                 {row.mat} <span className="font-normal text-slate-500">({row.cov})</span>
                               </td>
                               <td className="py-2.5 px-3 font-mono font-bold text-blue-600 border-r border-slate-100">{row.color}</td>
-                              <td className="py-2.5 px-3 text-slate-500 text-[11px] border-r border-slate-100">{row.time}</td>
+                              
                               {[100, 250, 500, 1000, 2500, 5000, 10000].map(tir => {
                                 const baseCost = tir * 2.5 + 250;
                                 const itemVal = priceCostVar === 'per_item' ? (baseCost / tir).toFixed(2) : Math.round(baseCost).toString();
@@ -8210,7 +8280,7 @@ export const Calculator: React.FC = () => {
                           <tr className="bg-slate-800/95 text-slate-200 text-xs font-semibold uppercase tracking-wider border-b border-slate-700">
                             <th className="py-3 px-4 text-left border-r border-slate-700/50">Формат та параметри</th>
                             <th className="py-3 px-3 border-r border-slate-700/50">Зшивання</th>
-                            <th className="py-3 px-3 border-r border-slate-700/50">Готовність</th>
+                            
                             {[100, 250, 500, 1000, 2500, 5000, 10000].map(tir => (
                               <th key={tir} className="py-3 px-3 border-r border-slate-700/50 last:border-r-0 font-bold">{tir} шт.</th>
                             ))}
@@ -8228,7 +8298,7 @@ export const Calculator: React.FC = () => {
                                 {row.fmt}
                               </td>
                               <td className="py-2.5 px-3 font-bold text-blue-600 border-r border-slate-100">{row.st}</td>
-                              <td className="py-2.5 px-3 text-slate-500 text-[11px] border-r border-slate-100">{row.time}</td>
+                              
                               {[100, 250, 500, 1000, 2500, 5000, 10000].map(tir => {
                                 const baseCost = tir * (idx * 5 + 12) + 800;
                                 const itemVal = priceCostVar === 'per_item' ? (baseCost / tir).toFixed(2) : Math.round(baseCost).toString();
@@ -9386,7 +9456,7 @@ export const Calculator: React.FC = () => {
                       <div className="flex items-center gap-2">
                         <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
                         <span className="text-xs font-bold uppercase tracking-wider text-slate-200">
-                          ВАРТІСТЬ ТА СТРОКИ ВИГОТОВЛЕННЯ
+                          ТАБЛИЦЯ ВАРТОСТІ ТИРАЖІВ
                         </span>
                       </div>
 
@@ -9434,7 +9504,7 @@ export const Calculator: React.FC = () => {
                           <tr className="bg-slate-800/95 text-slate-200 text-xs font-semibold uppercase tracking-wider border-b border-slate-700">
                             <th className="py-3 px-4 text-left border-r border-slate-700/50">Матеріал та покриття</th>
                             <th className="py-3 px-3 border-r border-slate-700/50">Друк</th>
-                            <th className="py-3 px-3 border-r border-slate-700/50">Готовність</th>
+                            
                             {[1, 25, 50, 100, 200, 500, 1000].map(tir => (
                               <th key={tir} style={{ padding: '9px 8px', border: '1px solid #a00000' }} className="font-bold text-white bg-slate-800">{tir}</th>
                             ))}
@@ -9986,6 +10056,34 @@ export const Calculator: React.FC = () => {
                                   const priladka = 3;
                                   const techWaste = Math.max(2, Math.ceil(physSheets * 0.02));
 
+                                  if (isClient) {
+                                    addLead({
+                                      name: name || fullComposedName,
+                                      contactPerson: isNewClientMode ? (customClientName || currentUser?.name || 'Клієнт') : (clients.find(c => c.id === selectedClientId)?.name || currentUser?.name || 'Клієнт'),
+                                      phone: customClientPhone || '',
+                                      email: '',
+                                      budget: digFinalPrice,
+                                      source: 'Calculator',
+                                      status: 'new',
+                                      date: new Date().toISOString().split('T')[0],
+                                      notes: `Цифровий друк: ${name || fullComposedName}, ${sheetCustomWidth}×${sheetCustomHeight} ${sheetUnit}, ${digMatLabels[digMatId] || '350г'}, ${digColId}, ${digTir} шт.`,
+                                      tags: ['Онлайн-калькулятор', 'Цифровий друк'],
+                                      calcSpecs: {
+                                        category: 'Цифровий друк',
+                                        format: `${sheetCustomWidth}×${sheetCustomHeight} ${sheetUnit}`,
+                                        quantity: digTir,
+                                        material: digMatLabels[digMatId] || 'Крейдований 350 г/м²',
+                                        colors: digColId,
+                                        totalPrice: digFinalPrice,
+                                        unitPrice: digUnitPrice,
+                                        options: digCovLabels[digCovId] || 'Без ламінації'
+                                      }
+                                    });
+                                    alert(`🎉 Дякуємо! Ваш запит (${digTir} шт, ${digFinalPrice.toLocaleString()} ₴) успішно надіслано менеджерам друкарні у розділ Запити.`);
+                                    setOrderNumber(Math.floor(10000 + Math.random() * 90000));
+                                    return;
+                                  }
+
                                   addOrder({
                                     id: orderNumber.toString(),
                                     name: name || fullComposedName,
@@ -10015,7 +10113,6 @@ export const Calculator: React.FC = () => {
                                       { name: 'Фасування та упаковка продукції', qty: 'Стандартна' }
                                     ],
                                     packingInfo: 'Стандартна упаковка в папір/стрейч',
-                                    deadline: 'Сьогодні / завтра',
                                     subtotal: digRawCost,
                                     marginAmount: digMarginAmount,
                                     finalPrice: digFinalPrice,
@@ -10029,7 +10126,7 @@ export const Calculator: React.FC = () => {
                                 }}
                                 className="py-2.5 px-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs shadow-md shadow-blue-500/20 transition-all text-center"
                               >
-                                Виробництво
+                                {isClient ? 'Оформити запит' : 'Виробництво'}
                               </button>
                             </div>
                           </div>
@@ -10267,7 +10364,7 @@ export const Calculator: React.FC = () => {
                       <div className="flex items-center gap-2">
                         <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
                         <span className="text-xs font-bold uppercase tracking-wider text-slate-200">
-                          ВАРТІСТЬ ТА СТРОКИ ВИГОТОВЛЕННЯ
+                          ТАБЛИЦЯ ВАРТОСТІ ТИРАЖІВ
                         </span>
                       </div>
 
@@ -10315,7 +10412,7 @@ export const Calculator: React.FC = () => {
                           <tr className="bg-slate-800/95 text-slate-200 text-xs font-semibold uppercase tracking-wider border-b border-slate-700">
                             <th className="py-3 px-4 text-left border-r border-slate-700/50">Форма, Матеріал та покриття</th>
                             <th className="py-3 px-3 border-r border-slate-700/50">Друк</th>
-                            <th className="py-3 px-3 border-r border-slate-700/50">Готовність</th>
+                            
                             {[50, 100, 200, 500, 1000].map(tir => (
                               <th key={tir} style={{ padding: '9px 8px', border: '1px solid #a00000' }} className="font-bold text-white bg-slate-800">{tir}</th>
                             ))}
@@ -10934,7 +11031,7 @@ export const Calculator: React.FC = () => {
                         <thead>
                           <tr className="bg-slate-800 text-slate-200 text-xs font-semibold uppercase">
                             <th className="py-3 px-4 text-left border-r border-slate-700/50">Розмір та конфігурація</th>
-                            <th className="py-3 px-3 border-r border-slate-700/50">Готовність</th>
+                            
                             {[1, 25, 50, 75, 100, 200, 500].map(tir => (
                               <th key={tir} className="py-3 px-3 border-r border-slate-700/50 last:border-r-0 font-extrabold text-blue-300">
                                 {tir} шт.
@@ -10960,11 +11057,7 @@ export const Calculator: React.FC = () => {
                                     {pagesCount} сторінок ({multiBlockPages} арк.) | {multiStitching === '1' ? 'Скоба' : multiStitching === '2' ? 'Пружина' : 'Клей'}
                                   </div>
                                 </td>
-                                <td className="py-3 px-3 border-r border-slate-100">
-                                  <span className={`px-2 py-0.5 rounded-md text-[10px] font-extrabold bg-slate-100 ${tierRow.color}`}>
-                                    {tierRow.dayLabel}
-                                  </span>
-                                </td>
+
                                 {[1, 25, 50, 75, 100, 200, 500].map(tir => {
                                   const basePerBook = (pagesCount * 0.95 + 12) * tierRow.coef;
                                   const deliveryFee = multiWithDelivery ? 90 : 0;
@@ -11099,8 +11192,8 @@ export const Calculator: React.FC = () => {
                         </ul>
                       </div>
                       <div className="p-3.5 bg-blue-50 rounded-xl border border-blue-100 flex items-center justify-between">
-                        <span className="text-xs font-bold text-blue-900">Термін виготовлення:</span>
-                        <span className="text-xs font-extrabold text-blue-700">3-4 робочих дні</span>
+                        <span className="text-xs font-bold text-blue-900">Гарантія якості:</span>
+                        <span className="text-xs font-extrabold text-blue-700">Високоточне каширування</span>
                       </div>
                     </div>
                   </div>
@@ -12668,7 +12761,7 @@ export const Calculator: React.FC = () => {
                       <div className="flex items-center gap-2">
                         <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
                         <span className="text-xs font-bold uppercase tracking-wider text-slate-200">
-                          ВАРТІСТЬ ТА СТРОКИ ВИГОТОВЛЕННЯ
+                          ТАБЛИЦЯ ВАРТОСТІ ТИРАЖІВ
                         </span>
                       </div>
 
@@ -12727,7 +12820,7 @@ export const Calculator: React.FC = () => {
                           <tr className="bg-slate-800/95 text-slate-200 text-xs font-semibold uppercase tracking-wider border-b border-slate-700">
                             <th className="py-3 px-4 text-left border-r border-slate-700/50">Матеріал та обробка</th>
                             <th className="py-3 px-3 border-r border-slate-700/50">Якість друку</th>
-                            <th className="py-3 px-3 border-r border-slate-700/50">Готовність</th>
+                            
                             {[1, 2, 3, 5, 10, 20, 50].map(tir => (
                               <th key={tir} style={{ padding: '9px 8px', border: '1px solid #a00000' }} className="font-bold text-white bg-slate-800">
                                 {tir} шт.
@@ -13284,6 +13377,34 @@ export const Calculator: React.FC = () => {
                               <button
                                 type="button"
                                 onClick={() => {
+                                  if (isClient) {
+                                    addLead({
+                                      name: name || fullComposedName,
+                                      contactPerson: isNewClientMode ? (customClientName || currentUser?.name || 'Клієнт') : (clients.find(c => c.id === selectedClientId)?.name || currentUser?.name || 'Клієнт'),
+                                      phone: customClientPhone || '',
+                                      email: '',
+                                      budget: wideFinalPrice,
+                                      source: 'Calculator',
+                                      status: 'new',
+                                      date: new Date().toISOString().split('T')[0],
+                                      notes: `Широкоформатний друк: ${name || fullComposedName}, ${wideWidth}×${wideHeight} ${wideUnit}, ${matInfo.label}, ${wideResId} dpi, ${wideTir} шт.`,
+                                      tags: ['Онлайн-калькулятор', 'Широкоформат'],
+                                      calcSpecs: {
+                                        category: 'Широкоформатний друк',
+                                        format: `${wideWidth}×${wideHeight} ${wideUnit}`,
+                                        quantity: wideTir,
+                                        material: matInfo.label,
+                                        colors: `${wideResId} dpi`,
+                                        totalPrice: wideFinalPrice,
+                                        unitPrice: wideUnitPrice,
+                                        options: fullComposedName
+                                      }
+                                    });
+                                    alert(`🎉 Дякуємо! Ваш запит на широкоформатний друк (${wideTir} шт, ${wideFinalPrice.toLocaleString()} ₴) успішно надіслано менеджерам друкарні у розділ Запити.`);
+                                    setOrderNumber(Math.floor(10000 + Math.random() * 90000));
+                                    return;
+                                  }
+
                                   addOrder({
                                     name: name || fullComposedName,
                                     clientId: isNewClientMode ? (customClientName || 'Новий клієнт') : selectedClientId,
@@ -13312,7 +13433,7 @@ export const Calculator: React.FC = () => {
                                 }}
                                 className="py-2.5 px-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs shadow-md shadow-blue-500/20 transition-all text-center"
                               >
-                                Виробництво
+                                {isClient ? 'Оформити запит' : 'Виробництво'}
                               </button>
                             </div>
                           </div>
@@ -13805,7 +13926,7 @@ export const Calculator: React.FC = () => {
                 </div>
               </div>
 
-              {/* Price Calculation Matrix Table: ВАРТІСТЬ ТА СТРОКИ ВИГОТОВЛЕННЯ */}
+              {/* Price Calculation Matrix Table: ТАБЛИЦЯ ВАРТОСТІ ТИРАЖІВ */}
               <div className="ios-card bg-white" style={{ overflow: 'hidden' }}>
                 <div style={{
                   backgroundColor: '#0f172a',
@@ -13818,7 +13939,7 @@ export const Calculator: React.FC = () => {
                   gap: '12px'
                 }}>
                   <span className="text-xs font-bold uppercase tracking-wider text-slate-100">
-                    ВАРТІСТЬ ТА СТРОКИ ВИГОТОВЛЕННЯ
+                    ТАБЛИЦЯ ВАРТОСТІ ТИРАЖІВ
                   </span>
 
                   <div className="flex items-center gap-4">
@@ -13861,7 +13982,7 @@ export const Calculator: React.FC = () => {
                       <tr className="bg-slate-800 text-slate-200 text-xs font-semibold uppercase tracking-wider border-b border-slate-700">
                         <th className="py-3 px-4 text-left border-r border-slate-700/60">Матеріал та покриття</th>
                         <th className="py-3 px-3 border-r border-slate-700/60">Друк</th>
-                        <th className="py-3 px-3 border-r border-slate-700/60">Готовність</th>
+                        
                         <th className="py-3 px-3 border-r border-slate-700/60 bg-blue-900/40 text-blue-300 font-extrabold">
                           {rollQuantity} шт. (Ваш тираж)
                         </th>
@@ -13907,9 +14028,7 @@ export const Calculator: React.FC = () => {
                             <td className="py-2.5 px-3 font-bold text-red-600 border-r border-slate-100 whitespace-nowrap">
                               {colorName}
                             </td>
-                            <td className="py-2.5 px-3 text-slate-500 text-[11px] border-r border-slate-100 whitespace-nowrap">
-                              2-3 дні
-                            </td>
+
                             {allTiers.map((tir, idx) => {
                               const meters = (tir * (h + gap)) / 1000;
                               const sqM = (w / 1000) * meters;
@@ -14250,6 +14369,34 @@ export const Calculator: React.FC = () => {
                             <button
                               type="button"
                               onClick={() => {
+                                if (isClient) {
+                                  addLead({
+                                    name: name || fullComposedName,
+                                    contactPerson: isNewClientMode ? (customClientName || currentUser?.name || 'Клієнт') : (clients.find(c => c.id === selectedClientId)?.name || currentUser?.name || 'Клієнт'),
+                                    phone: customClientPhone || '',
+                                    email: '',
+                                    budget: rollFinalPrice,
+                                    source: 'Calculator',
+                                    status: 'new',
+                                    date: new Date().toISOString().split('T')[0],
+                                    notes: `Рулонний друк: ${name || fullComposedName}, ${rollWidth}×${rollHeight} мм, ${matLabels[rollMaterial] || 'Raflatac'}, ${rollQuantity} шт.`,
+                                    tags: ['Онлайн-калькулятор', 'Рулонний друк'],
+                                    calcSpecs: {
+                                      category: 'Рулонний друк',
+                                      format: `${rollWidth}×${rollHeight} мм`,
+                                      quantity: rollQuantity,
+                                      material: matLabels[rollMaterial] || 'Raflatac',
+                                      colors: 'Флексодрук',
+                                      totalPrice: rollFinalPrice,
+                                      unitPrice: rollUnitPrice,
+                                      options: `Втулка Ø${rollCore}мм, орієнтація №${rollOrientation}`
+                                    }
+                                  });
+                                  alert(`🎉 Дякуємо! Ваш запит на рулонні етикетки (${rollQuantity} шт, ${rollFinalPrice.toLocaleString()} ₴) успішно надіслано менеджерам друкарні у розділ Запити.`);
+                                  setOrderNumber(Math.floor(10000 + Math.random() * 90000));
+                                  return;
+                                }
+
                                 addOrder({
                                   name: name || fullComposedName,
                                   clientId: isNewClientMode ? (customClientName || 'Новий клієнт') : selectedClientId,
@@ -14278,7 +14425,7 @@ export const Calculator: React.FC = () => {
                               }}
                               className="py-2.5 px-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs shadow-md shadow-blue-500/20 transition-all text-center"
                             >
-                              Виробництво
+                              {isClient ? 'Оформити запит' : 'Виробництво'}
                             </button>
                           </div>
                         </div>
@@ -15512,10 +15659,8 @@ export const Calculator: React.FC = () => {
                         <strong className="font-mono font-black text-black">{tirazhDisplay} шт.</strong>
                       </div>
                       <div className="flex">
-                        <span className="w-32 font-bold text-slate-700">Дата приема:</span>
+                        <span className="w-32 font-bold text-slate-700">Дата прорахунку:</span>
                         <span className="font-semibold text-black">{new Date().toLocaleDateString('uk-UA')}</span>
-                        <span className="ml-4 font-bold text-slate-700">Сдачи:</span>
-                        <span className="ml-2 font-semibold text-black">1-2 дні</span>
                       </div>
                       <div className="flex">
                         <span className="w-32 font-bold text-slate-700">Менеджер:</span>

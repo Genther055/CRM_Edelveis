@@ -1,216 +1,24 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
+import type { Lead } from '../types';
 import { 
   Plus, 
   Search, 
   FileText,
-  X
+  X,
+  Globe,
+  PhoneCall,
+  Tag,
+  PackageCheck
 } from 'lucide-react';
 
-interface Lead {
-  id: string;
-  name: string;
-  contactPerson: string;
-  phone: string;
-  email: string;
-  budget: number;
-  source: 'Site' | 'Phone' | 'Instagram' | 'Facebook' | 'Recommendation';
-  status: 'new' | 'contact' | 'negotiation' | 'review' | 'converted';
-  date: string;
-  notes: string;
-  tags?: string[];
-  files?: string[];
-  customFieldValues?: Record<string, string | number>;
-}
-
 export const Leads: React.FC = () => {
-  const { addClient, customFields } = useApp();
+  const { leads, addLead, updateLead, deleteLead, updateLeadStatus, addClient, clients, addOrder, customFields } = useApp();
 
-  const [leads, setLeads] = useState<Lead[]>([
-    {
-      id: 'L-101',
-      name: 'Друк меню для кафе "Капучино"',
-      contactPerson: 'Олег Петренко',
-      phone: '+380671234567',
-      email: 'oleg.p@gmail.com',
-      budget: 3500,
-      source: 'Site',
-      status: 'new',
-      date: '2026-07-24',
-      notes: 'Потрібно надрукувати 50 меню А4 на щільному крейдованому папері 300г з матовою ламінацією.',
-      tags: ['Важливо', 'Терміново'],
-      files: ['Макет_меню.pdf'],
-      customFieldValues: { 'Ширина': 210, 'Висота': 297 }
-    },
-    {
-      id: 'L-102',
-      name: 'Візитки для автосервісу "Гараж 777"',
-      contactPerson: 'Ігор Шевченко',
-      phone: '+380509876543',
-      email: 'igor.auto@ukr.net',
-      budget: 850,
-      source: 'Instagram',
-      status: 'contact',
-      date: '2026-07-23',
-      notes: 'Дизайн візитки є в наявності. Двостороння матова ламінація 1000 шт.',
-      tags: ['Новий'],
-      files: ['Visytka_Garage.eps'],
-      customFieldValues: { 'Ширина': 90, 'Висота': 50 }
-    },
-    {
-      id: 'L-103',
-      name: 'Друк каталогу продукції А4 (64 стор.)',
-      contactPerson: 'Олена Ковальчук (ТОВ ФармаТрейд)',
-      phone: '+380673214567',
-      email: 'o.koval@pharmatrade.com',
-      budget: 24500,
-      source: 'Phone',
-      status: 'negotiation',
-      date: '2026-07-22',
-      notes: 'Обкладинка 250г + УФ лак, блок 115г крейда. Тираж 500 примірників. Збірка на скобу.',
-      tags: ['B2B', 'Каталоги'],
-      files: ['Catalog_Pharma_v2.pdf'],
-      customFieldValues: { 'Ширина': 210, 'Висота': 297 }
-    },
-    {
-      id: 'L-104',
-      name: 'Самоклеючі етикетки на банки соків 10 000 шт.',
-      contactPerson: 'Василь Гнатюк (ПРАТ ЕкоСок)',
-      phone: '+380934567890',
-      email: 'v.hnatyuk@ecosok.ua',
-      budget: 18200,
-      source: 'Site',
-      status: 'review',
-      date: '2026-07-21',
-      notes: 'Рулонний флексодрук, напівглянцевий самоклей, висічка під овальний штамп.',
-      tags: ['Етикетка', 'Флексодрук'],
-      files: ['Label_Juice_Apple.ai'],
-      customFieldValues: { 'Ширина': 75, 'Висота': 120 }
-    },
-    {
-      id: 'L-105',
-      name: 'Картонні брендовані пакети 1 000 шт.',
-      contactPerson: 'Марія Бойко (Бутік ModaLux)',
-      phone: '+380961112233',
-      email: 'm.boyko@modalux.ua',
-      budget: 32000,
-      source: 'Instagram',
-      status: 'new',
-      date: '2026-07-20',
-      notes: 'Крейдований папір 200г, шовкотрафаретний друк золотом, люверси та шовковий шнур.',
-      tags: ['Упаковка', 'Преміум'],
-      files: ['Bag_ModaLux_print.pdf'],
-      customFieldValues: { 'Ширина': 250, 'Висота': 350 }
-    },
-    {
-      id: 'L-106',
-      name: 'Фірмові настінні календарі ТРІО 500 шт.',
-      contactPerson: 'Віктор Савченко (СК Україна)',
-      phone: '+380503334455',
-      email: 'v.savchenko@sk-ukraine.ua',
-      budget: 45000,
-      source: 'Phone',
-      status: 'contact',
-      date: '2026-07-19',
-      notes: 'Верхній постер 300г з глянцевою ламінацією, 3 курсори, білі металеві пружини.',
-      tags: ['Календарі', 'Новий Рік'],
-      files: ['Calendar_Trio_2027.pdf'],
-      customFieldValues: { 'Ширина': 297, 'Висота': 840 }
-    },
-    {
-      id: 'L-107',
-      name: 'Друк плакатів А1 для рекламної кампанії 200 шт.',
-      contactPerson: 'Оксана Дмитренко (Креатив Агентство)',
-      phone: '+380678889900',
-      email: 'o.dmytrenko@creative.com',
-      budget: 9600,
-      source: 'Facebook',
-      status: 'negotiation',
-      date: '2026-07-18',
-      notes: 'Широкоформатний інтер\'єрний друк на сіті-папері 150г з високою роздільною здатністю.',
-      tags: ['Плакати', 'Широкий формат'],
-      files: ['Poster_A1_Promo.tif'],
-      customFieldValues: { 'Ширина': 594, 'Висота': 841 }
-    },
-    {
-      id: 'L-108',
-      name: 'Блокноти А5 на пружині з логотипом 300 шт.',
-      contactPerson: 'Андрій Кравченко (SoftTech)',
-      phone: '+380937776655',
-      email: 'a.kravchenko@softtech.io',
-      budget: 14400,
-      source: 'Site',
-      status: 'converted',
-      date: '2026-07-17',
-      notes: 'Обкладинка софт-тач, блок 50 аркушів клітинка офсет 80г, навивка на чорну пружину.',
-      tags: ['Сувеніри', 'Блокноти'],
-      files: ['Notebook_Cover_SoftTech.pdf'],
-      customFieldValues: { 'Ширина': 148, 'Висота': 210 }
-    },
-    {
-      id: 'L-109',
-      name: 'Ліфлети А4 2 згини (євробуклети) 5 000 шт.',
-      contactPerson: 'Тетяна Бондар (Мережа "Здоров\'я")',
-      phone: '+380504445566',
-      email: 't.bondar@zdorovya.ua',
-      budget: 7800,
-      source: 'Phone',
-      status: 'new',
-      date: '2026-07-16',
-      notes: 'Крейдований папір 130г, фальцювання у 2 згини (усередину).',
-      tags: ['Буклети', 'Офсет'],
-      files: ['Eurobuklet_Pharm.pdf'],
-      customFieldValues: { 'Ширина': 210, 'Висота': 297 }
-    },
-    {
-      id: 'L-110',
-      name: 'Тиснення золотом на паперових папках 200 шт.',
-      contactPerson: 'Сергій Мороз (Адвокатське бюро)',
-      phone: '+380679998877',
-      email: 's.moroz@lawyer.ua',
-      budget: 11500,
-      source: 'Site',
-      status: 'contact',
-      date: '2026-07-15',
-      notes: 'Дизайнерський картон 350г чорний, тиснення фольгою (гаряче тиснення).',
-      tags: ['Папки', 'Тиснення'],
-      files: ['Folder_Lawyer_Gold.pdf'],
-      customFieldValues: { 'Ширина': 220, 'Висота': 310 }
-    },
-    {
-      id: 'L-111',
-      name: 'Блокноти з пружиною для готелю 1 000 шт.',
-      contactPerson: 'Ольга Яковенко (Готель "Гранд")',
-      phone: '+380962223344',
-      email: 'reception@grandhotel.ua',
-      budget: 5200,
-      source: 'Instagram',
-      status: 'review',
-      date: '2026-07-14',
-      notes: 'Формат А6, 50 аркушів, обкладинка 300г з матовою ламінацією, біла пружина.',
-      tags: ['Блокноти', 'Пружина'],
-      files: ['GrandHotel_Notebook_A6.pdf'],
-      customFieldValues: { 'Ширина': 105, 'Висота': 148 }
-    },
-    {
-      id: 'L-112',
-      name: 'Газетний друк рекламних випусків А3 20 000 прим.',
-      contactPerson: 'Микола Семенов (ГО "Наш Город")',
-      phone: '+380501112233',
-      email: 'n.semenov@nashgorod.org',
-      budget: 38000,
-      source: 'Phone',
-      status: 'negotiation',
-      date: '2026-07-13',
-      notes: 'Газетний папір 45г, ротаційний друк, 8 сторінок, фальцювання в зошит.',
-      tags: ['Газети', 'Ротація'],
-      files: ['Newspaper_Issue_08.pdf'],
-      customFieldValues: { 'Ширина': 297, 'Висота': 420 }
-    }
-  ]);
-
+  const [activeTab, setActiveTab] = useState<'all' | 'calculator' | 'direct'>('all');
   const [search, setSearch] = useState('');
   const [filterSource, setFilterSource] = useState<string>('all');
+  const [filterStatus, setFilterStatus] = useState<string>('all');
   const [showAddModal, setShowAddModal] = useState(false);
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
 
@@ -255,8 +63,7 @@ export const Leads: React.FC = () => {
     e.preventDefault();
     if (!newName.trim()) return;
 
-    const newLead: Lead = {
-      id: `L-${Date.now().toString().slice(-3)}`,
+    const newLead = addLead({
       name: newName,
       contactPerson: newContact,
       phone: newPhone,
@@ -273,9 +80,8 @@ export const Leads: React.FC = () => {
         acc[key] = typeof val === 'string' ? val.replace(',', '.') : val;
         return acc;
       }, {} as Record<string, string | number>)
-    };
+    });
 
-    setLeads([...leads, newLead]);
     setShowAddModal(false);
     // Reset Form
     setNewName('');
@@ -285,35 +91,90 @@ export const Leads: React.FC = () => {
     setNewBudget(0);
     setNewNotes('');
     setFieldValues({});
+    setSelectedLead(newLead);
   };
 
-  const updateLeadStatus = (id: string, newStatus: Lead['status']) => {
-    setLeads(leads.map(lead => lead.id === id ? { ...lead, status: newStatus } : lead));
-    if (selectedLead && selectedLead.id === id) {
-      setSelectedLead({ ...selectedLead, status: newStatus });
-    }
-  };
-
-  const deleteLead = (id: string) => {
+  const handleDeleteLead = (id: string) => {
     if (window.confirm('Ви впевнені, що хочете видалити цей запит?')) {
-      setLeads(leads.filter(lead => lead.id !== id));
+      deleteLead(id);
       if (selectedLead?.id === id) setSelectedLead(null);
     }
   };
 
   const convertToClient = (lead: Lead) => {
-    addClient({
-      name: lead.name,
-      contact: lead.contactPerson,
-      phone: lead.phone,
-      email: lead.email,
+    const existing = clients.find(c => c.phone === lead.phone || c.name.toLowerCase() === lead.name.toLowerCase());
+    if (existing) {
+      alert(`Клієнт "${existing.name}" вже існує в базі контрагентів!`);
+      updateLeadStatus(lead.id, 'converted');
+      return existing;
+    }
+
+    const created = addClient({
+      name: lead.contactPerson ? `${lead.contactPerson} (${lead.name})` : lead.name,
+      contact: lead.contactPerson || 'Замовник',
+      phone: lead.phone || '',
+      email: lead.email || '',
       discount: 0,
       city: 'Вінниця',
-      tags: lead.tags || [],
-      files: lead.files || []
+      tags: [...(lead.tags || []), 'З лідів'],
+      files: lead.files || [],
+      type: 'client'
     });
-    alert(`Лід "${lead.contactPerson}" успішно конвертовано в Клієнта!\nСтворено картку контрагента у місті Вінниця.`);
+    alert(`Лід "${lead.contactPerson || lead.name}" успішно конвертовано в Клієнта!\nСтворено картку контрагента в системі.`);
     updateLeadStatus(lead.id, 'converted');
+    return created;
+  };
+
+  const convertToOrder = (lead: Lead) => {
+    let client = clients.find(c => c.phone === lead.phone || c.name.toLowerCase() === lead.name.toLowerCase());
+    if (!client) {
+      client = addClient({
+        name: lead.contactPerson ? `${lead.contactPerson} (${lead.name})` : lead.name,
+        contact: lead.contactPerson || 'Замовник',
+        phone: lead.phone || '',
+        email: lead.email || '',
+        discount: 0,
+        city: 'Вінниця',
+        tags: [...(lead.tags || []), 'Онлайн-замовлення'],
+        files: lead.files || [],
+        type: 'client'
+      });
+    }
+
+    const qty = lead.calcSpecs?.quantity || 1000;
+    const finalPrice = lead.budget || 1000;
+    const category = lead.calcSpecs?.category || 'Поліграфія';
+    const format = lead.calcSpecs?.format || 'A4';
+    const paperName = lead.calcSpecs?.material || 'Крейдований папір';
+    const colors = lead.calcSpecs?.colors || '4+4';
+
+    addOrder({
+      name: lead.name,
+      clientId: client.id,
+      category,
+      quantity: qty,
+      packingCount: 1,
+      paperType: 'coated',
+      paperName,
+      colors,
+      isSamNaSebe: false,
+      designCost: 0,
+      margin: 20,
+      machine: 'Офсет / Цифра',
+      format,
+      physicalSheets: Math.ceil(qty / 2),
+      itemsPerSheet: 2,
+      subtotal: Math.round(finalPrice * 0.8),
+      marginAmount: Math.round(finalPrice * 0.2),
+      finalPrice: finalPrice,
+      unitPrice: Number((finalPrice / qty).toFixed(2)),
+      paymentStatus: 'unpaid',
+      prepayment: 0,
+      notes: `Замовлення з онлайн-запиту ${lead.id}. ${lead.notes}`
+    });
+
+    updateLeadStatus(lead.id, 'converted');
+    alert(`🚀 Замовлення успішно створено та запущено у виробництво!\nЗапит ${lead.id} переведено у статус "Готово".`);
   };
 
   const handleAddTag = () => {
@@ -321,22 +182,22 @@ export const Leads: React.FC = () => {
     const currentTags = selectedLead.tags || [];
     if (currentTags.includes(newTagsVal.trim())) return;
 
-    const updated = {
+    const updated: Lead = {
       ...selectedLead,
       tags: [...currentTags, newTagsVal.trim()]
     };
-    setLeads(leads.map(l => l.id === selectedLead.id ? updated : l));
+    updateLead(updated);
     setSelectedLead(updated);
     setNewTagsVal('');
   };
 
   const handleDeleteTag = (t: string) => {
     if (!selectedLead) return;
-    const updated = {
+    const updated: Lead = {
       ...selectedLead,
       tags: (selectedLead.tags || []).filter(tag => tag !== t)
     };
-    setLeads(leads.map(l => l.id === selectedLead.id ? updated : l));
+    updateLead(updated);
     setSelectedLead(updated);
   };
 
@@ -344,21 +205,37 @@ export const Leads: React.FC = () => {
     if (!selectedLead || !newFileVal.trim()) return;
     const currentFiles = selectedLead.files || [];
 
-    const updated = {
+    const updated: Lead = {
       ...selectedLead,
       files: [...currentFiles, newFileVal.trim()]
     };
-    setLeads(leads.map(l => l.id === selectedLead.id ? updated : l));
+    updateLead(updated);
     setSelectedLead(updated);
     setNewFileVal('');
   };
 
+  // Counts for tabs
+  const calcLeadsCount = leads.filter(l => l.source === 'Calculator' || (l.tags && l.tags.includes('Онлайн-калькулятор'))).length;
+  const newCalcLeadsCount = leads.filter(l => (l.source === 'Calculator' || (l.tags && l.tags.includes('Онлайн-калькулятор'))) && l.status === 'new').length;
+  const directLeadsCount = leads.filter(l => l.source !== 'Calculator' && !(l.tags && l.tags.includes('Онлайн-калькулятор'))).length;
+
   const filteredLeads = leads.filter(lead => {
+    // Tab filter
+    const isCalc = lead.source === 'Calculator' || (lead.tags && lead.tags.includes('Онлайн-калькулятор'));
+    if (activeTab === 'calculator' && !isCalc) return false;
+    if (activeTab === 'direct' && isCalc) return false;
+
+    // Search filter
     const matchesSearch = lead.name.toLowerCase().includes(search.toLowerCase()) || 
                           lead.contactPerson.toLowerCase().includes(search.toLowerCase()) ||
-                          lead.phone.includes(search);
-    const matchesFilter = filterSource === 'all' || lead.source === filterSource;
-    return matchesSearch && matchesFilter;
+                          lead.phone.includes(search) ||
+                          lead.notes.toLowerCase().includes(search.toLowerCase());
+
+    // Dropdown filters
+    const matchesSource = filterSource === 'all' || lead.source === filterSource;
+    const matchesStatus = filterStatus === 'all' || lead.status === filterStatus;
+
+    return matchesSearch && matchesSource && matchesStatus;
   });
 
   const getStatusBadge = (status: Lead['status']) => {
@@ -366,8 +243,8 @@ export const Leads: React.FC = () => {
       case 'new': return <span className="ios-badge ios-badge-blue">Необроблений</span>;
       case 'contact': return <span className="ios-badge ios-badge-orange">Контакт</span>;
       case 'negotiation': return <span className="ios-badge ios-badge-purple">Узгодження ТЗ</span>;
-      case 'review': return <span className="ios-badge ios-badge-yellow">Думає</span>;
-      case 'converted': return <span className="ios-badge ios-badge-green">Готово</span>;
+      case 'review': return <span className="ios-badge ios-badge-yellow">Думає / КП</span>;
+      case 'converted': return <span className="ios-badge ios-badge-green">Готово / Замовлення</span>;
     }
   };
 
@@ -377,7 +254,7 @@ export const Leads: React.FC = () => {
       <div className="header-title-container">
         <div>
           <h1 className="page-title">Запити та звернення</h1>
-          <p className="subtitle">Журнал вхідних запитів замовників з підключеними формулами</p>
+          <p className="subtitle">Журнал вхідних запитів клієнтів, онлайн-прорахунків з калькулятора та лідів</p>
         </div>
         <button 
           type="button"
@@ -389,15 +266,69 @@ export const Leads: React.FC = () => {
         </button>
       </div>
 
+      {/* Modern Subtabs Filter Bar */}
+      <div className="flex items-center gap-2 mb-3 flex-wrap">
+        <button
+          type="button"
+          onClick={() => setActiveTab('all')}
+          className={`px-4 py-2 rounded-xl font-bold text-xs transition-all flex items-center gap-2 border ${
+            activeTab === 'all'
+              ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
+              : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+          }`}
+        >
+          <FileText size={14} />
+          <span>Всі запити</span>
+          <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-black ${activeTab === 'all' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'}`}>
+            {leads.length}
+          </span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab('calculator')}
+          className={`px-4 py-2 rounded-xl font-bold text-xs transition-all flex items-center gap-2 border ${
+            activeTab === 'calculator'
+              ? 'bg-emerald-600 text-white border-emerald-600 shadow-sm'
+              : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+          }`}
+        >
+          <Globe size={14} className={activeTab === 'calculator' ? 'text-white' : 'text-emerald-600'} />
+          <span>🌐 Онлайн-запити з калькулятора</span>
+          <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${activeTab === 'calculator' ? 'bg-white/20 text-white' : 'bg-emerald-100 text-emerald-800'}`}>
+            {calcLeadsCount}
+          </span>
+          {newCalcLeadsCount > 0 && (
+            <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
+          )}
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab('direct')}
+          className={`px-4 py-2 rounded-xl font-bold text-xs transition-all flex items-center gap-2 border ${
+            activeTab === 'direct'
+              ? 'bg-slate-800 text-white border-slate-800 shadow-sm'
+              : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+          }`}
+        >
+          <PhoneCall size={14} />
+          <span>📞 Дзвінки та інші джерела</span>
+          <span className={`px-1.5 py-0.2 rounded-full text-[10px] font-black ${activeTab === 'direct' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'}`}>
+            {directLeadsCount}
+          </span>
+        </button>
+      </div>
+
       {/* Strict Command Panel / Filter Bar */}
-      <div className="ios-card bg-white" style={{ display: 'flex', gap: '10px', padding: '10px 14px', alignItems: 'center' }}>
+      <div className="ios-card bg-white" style={{ display: 'flex', gap: '10px', padding: '10px 14px', alignItems: 'center', flexWrap: 'wrap' }}>
         <div style={{ position: 'relative', width: '280px' }}>
           <Search style={{ position: 'absolute', left: '8px', top: '10px', color: '#94a3b8' }} size={14} />
           <input 
             placeholder="Шукати за назвою, телефоном..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            style={{ paddingLeft: '28px', height: '32px', fontSize: '12px' }}
+            style={{ paddingLeft: '28px', height: '32px', fontSize: '12px', width: '100%' }}
           />
         </div>
 
@@ -406,29 +337,47 @@ export const Leads: React.FC = () => {
           <select 
             value={filterSource}
             onChange={(e) => setFilterSource(e.target.value)}
-            style={{ height: '34px', minHeight: '34px', fontSize: '12px', width: '130px', padding: '4px 8px' }}
+            style={{ height: '34px', minHeight: '34px', fontSize: '12px', width: '140px', padding: '4px 8px' }}
           >
             <option value="all">Всі джерела</option>
+            <option value="Calculator">🌐 Калькулятор</option>
             <option value="Site">Сайт</option>
             <option value="Phone">Телефон</option>
             <option value="Instagram">Instagram</option>
             <option value="Facebook">Facebook</option>
+            <option value="Recommendation">Рекомендація</option>
+          </select>
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', color: '#475569' }}>
+          <span>Статус:</span>
+          <select 
+            value={filterStatus}
+            onChange={(e) => setFilterStatus(e.target.value)}
+            style={{ height: '34px', minHeight: '34px', fontSize: '12px', width: '140px', padding: '4px 8px' }}
+          >
+            <option value="all">Всі статуси</option>
+            <option value="new">Необроблені</option>
+            <option value="contact">Перший контакт</option>
+            <option value="negotiation">Узгодження ТЗ</option>
+            <option value="review">Думає / КП</option>
+            <option value="converted">Готово / Замовлення</option>
           </select>
         </div>
       </div>
 
       {/* Main Grid View */}
-      <div style={{ display: 'grid', gridTemplateColumns: selectedLead ? '1fr 370px' : '1fr', gap: '16px', alignItems: 'start', marginTop: '16px' }}>
-        {/* Strictly Structured Table */}
+      <div style={{ display: 'grid', gridTemplateColumns: selectedLead ? '1fr 400px' : '1fr', gap: '16px', alignItems: 'start', marginTop: '16px' }}>
+        {/* Table View */}
         <div className="ios-table-container">
           <table className="ios-table">
             <thead>
               <tr>
                 <th style={{ width: '70px' }}>ID</th>
                 <th style={{ width: '90px' }}>Дата</th>
-                <th>Назва запиту / Опис</th>
-                <th style={{ width: '130px' }}>Контактна особа</th>
-                <th style={{ width: '100px' }}>Теги</th>
+                <th>Назва запиту / Калькуляція</th>
+                <th style={{ width: '140px' }}>Контактна особа</th>
+                <th style={{ width: '110px' }}>Джерело</th>
                 <th style={{ width: '100px', textAlign: 'right' }}>Бюджет</th>
                 <th style={{ width: '120px' }}>Статус</th>
               </tr>
@@ -436,45 +385,60 @@ export const Leads: React.FC = () => {
             <tbody>
               {filteredLeads.length === 0 ? (
                 <tr>
-                  <td colSpan={7} style={{ textAlign: 'center', padding: '30px', color: '#94a3b8' }}>
+                  <td colSpan={7} style={{ textAlign: 'center', padding: '36px', color: '#94a3b8' }}>
                     Немає записів у журналі за обраними фільтрами
                   </td>
                 </tr>
               ) : (
-                filteredLeads.map(lead => (
-                  <tr 
-                    key={lead.id}
-                    onClick={() => setSelectedLead(lead)}
-                    style={{ 
-                      cursor: 'pointer',
-                      backgroundColor: selectedLead?.id === lead.id ? 'rgba(0, 122, 255, 0.05)' : 'transparent' 
-                    }}
-                  >
-                    <td style={{ fontWeight: '600', color: 'var(--text-medium)' }}>{lead.id}</td>
-                    <td style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-dark)' }}>{lead.date}</td>
-                    <td>
-                      <div style={{ fontWeight: '700', color: 'var(--text-dark)' }}>{lead.name}</div>
-                      <div style={{ fontSize: '10px', color: 'var(--text-medium)', marginTop: '2px', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', maxWidth: '280px' }}>
-                        {lead.notes}
-                      </div>
-                    </td>
-                    <td>
-                      <div style={{ color: 'var(--text-dark)' }}>{lead.contactPerson}</div>
-                      <div style={{ fontSize: '10px', color: 'var(--text-medium)', fontFamily: 'var(--font-mono)' }}>{lead.phone}</div>
-                    </td>
-                    <td>
-                      <div style={{ display: 'flex', gap: '2px', flexWrap: 'wrap' }}>
-                        {(lead.tags || []).map(t => (
-                          <span key={t} className="ios-badge ios-badge-purple" style={{ fontSize: '8px' }}>{t}</span>
-                        ))}
-                      </div>
-                    </td>
-                    <td style={{ textAlign: 'right', fontWeight: '800', color: 'var(--primary)' }}>
-                      {lead.budget.toLocaleString()} ₴
-                    </td>
-                    <td>{getStatusBadge(lead.status)}</td>
-                  </tr>
-                ))
+                filteredLeads.map(lead => {
+                  const isCalc = lead.source === 'Calculator' || (lead.tags && lead.tags.includes('Онлайн-калькулятор'));
+                  return (
+                    <tr 
+                      key={lead.id}
+                      onClick={() => setSelectedLead(lead)}
+                      style={{ 
+                        cursor: 'pointer',
+                        backgroundColor: selectedLead?.id === lead.id ? 'rgba(0, 122, 255, 0.06)' : 'transparent' 
+                      }}
+                      className="hover:bg-slate-50 transition-colors"
+                    >
+                      <td style={{ fontWeight: '600', color: 'var(--text-medium)' }}>
+                        <span className="font-mono text-xs">{lead.id}</span>
+                      </td>
+                      <td style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-dark)' }}>{lead.date}</td>
+                      <td>
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          {isCalc && (
+                            <span className="ios-badge ios-badge-green text-[9px] font-black px-1.5 py-0.5">
+                              Калькулятор
+                            </span>
+                          )}
+                          <span style={{ fontWeight: '700', color: 'var(--text-dark)' }}>{lead.name}</span>
+                        </div>
+                        <div style={{ fontSize: '11px', color: 'var(--text-medium)', marginTop: '2px', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', maxWidth: '300px' }}>
+                          {lead.notes}
+                        </div>
+                      </td>
+                      <td>
+                        <div style={{ color: 'var(--text-dark)', fontWeight: '600' }}>{lead.contactPerson || '—'}</div>
+                        <div style={{ fontSize: '10px', color: 'var(--text-medium)', fontFamily: 'var(--font-mono)' }}>{lead.phone || '—'}</div>
+                      </td>
+                      <td>
+                        {lead.source === 'Calculator' ? (
+                          <span className="ios-badge ios-badge-blue flex items-center gap-1 text-[10px]">
+                            <Globe size={10} /> Калькулятор
+                          </span>
+                        ) : (
+                          <span className="ios-badge ios-badge-purple text-[10px]">{lead.source}</span>
+                        )}
+                      </td>
+                      <td style={{ textAlign: 'right', fontWeight: '800', color: 'var(--primary)' }}>
+                        {lead.budget.toLocaleString()} ₴
+                      </td>
+                      <td>{getStatusBadge(lead.status)}</td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>
@@ -482,34 +446,87 @@ export const Leads: React.FC = () => {
 
         {/* Selected Lead Side Panel (Detail View) */}
         {selectedLead && (
-          <div className="ios-card" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)', display: 'flex', flexDirection: 'column', gap: '14px', position: 'sticky', top: '20px' }}>
-            <div style={{ display: 'flex', justifySelf: 'stretch', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-light)', paddingBottom: '8px' }}>
-              <h3 style={{ fontSize: '13px', fontWeight: '800', color: 'var(--text-dark)', textTransform: 'uppercase' }}>Картка запиту</h3>
+          <div className="ios-card bg-white" style={{ border: '1px solid var(--border-light)', display: 'flex', flexDirection: 'column', gap: '14px', position: 'sticky', top: '20px' }}>
+            <div style={{ display: 'flex', justifySelf: 'stretch', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-light)', paddingBottom: '10px' }}>
+              <div className="flex items-center gap-2">
+                <h3 style={{ fontSize: '13px', fontWeight: '800', color: 'var(--text-dark)', textTransform: 'uppercase', margin: 0 }}>
+                  Картка запиту {selectedLead.id}
+                </h3>
+                {selectedLead.source === 'Calculator' && (
+                  <span className="ios-badge ios-badge-blue text-[9px] font-black">Онлайн</span>
+                )}
+              </div>
               <button 
                 type="button" 
                 onClick={() => setSelectedLead(null)} 
-                style={{ border: 'none', background: 'transparent', color: 'var(--text-medium)', cursor: 'pointer' }}
+                style={{ border: 'none', background: 'transparent', color: 'var(--text-medium)', cursor: 'pointer', fontSize: '14px' }}
               >
                 ✕
               </button>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', fontSize: '12px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '12px' }}>
               <div>
-                <span style={{ color: 'var(--text-medium)', fontSize: '10px', fontWeight: '700', textTransform: 'uppercase' }}>Тема / Суть</span>
-                <p style={{ fontWeight: '700', fontSize: '13px', color: 'var(--text-dark)' }}>{selectedLead.name}</p>
+                <span style={{ color: 'var(--text-medium)', fontSize: '10px', fontWeight: '700', textTransform: 'uppercase' }}>Тема / Виріб</span>
+                <p style={{ fontWeight: '800', fontSize: '14px', color: 'var(--text-dark)', marginTop: '2px', lineHeight: '1.3' }}>{selectedLead.name}</p>
               </div>
 
               <div>
-                <span style={{ color: 'var(--text-medium)', fontSize: '10px', fontWeight: '700', textTransform: 'uppercase' }}>Контакт</span>
-                <p style={{ color: 'var(--text-dark)' }}><strong>{selectedLead.contactPerson}</strong></p>
-                <p style={{ fontFamily: 'var(--font-mono)', marginTop: '2px', color: 'var(--text-dark)' }}>{selectedLead.phone}</p>
-                <p style={{ color: 'var(--text-medium)', fontSize: '11px', marginTop: '1px' }}>{selectedLead.email}</p>
+                <span style={{ color: 'var(--text-medium)', fontSize: '10px', fontWeight: '700', textTransform: 'uppercase' }}>Контактна інформація</span>
+                <p style={{ color: 'var(--text-dark)', marginTop: '2px' }}><strong>{selectedLead.contactPerson || 'Замовник'}</strong></p>
+                <p style={{ fontFamily: 'var(--font-mono)', marginTop: '2px', color: 'var(--text-dark)' }}>{selectedLead.phone || 'Телефон не вказано'}</p>
+                {selectedLead.email && <p style={{ color: 'var(--text-medium)', fontSize: '11px', marginTop: '1px' }}>{selectedLead.email}</p>}
               </div>
+
+              {/* Calculator Spec Box */}
+              {(selectedLead.source === 'Calculator' || selectedLead.calcSpecs) && (
+                <div className="p-3.5 bg-blue-50/70 rounded-xl border border-blue-100 flex flex-col gap-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-extrabold uppercase tracking-wider text-blue-900 flex items-center gap-1.5">
+                      <Globe size={12} className="text-blue-600" />
+                      Специфікація калькулятора
+                    </span>
+                    <span className="font-mono text-xs font-black text-blue-700">
+                      {selectedLead.budget.toLocaleString()} ₴
+                    </span>
+                  </div>
+
+                  {selectedLead.calcSpecs && (
+                    <div className="grid grid-cols-2 gap-2 text-[11px] pt-1 border-t border-blue-200/50">
+                      {selectedLead.calcSpecs.category && (
+                        <div><span className="text-slate-500">Категорія:</span> <strong>{selectedLead.calcSpecs.category}</strong></div>
+                      )}
+                      {selectedLead.calcSpecs.format && (
+                        <div><span className="text-slate-500">Формат:</span> <strong>{selectedLead.calcSpecs.format}</strong></div>
+                      )}
+                      {selectedLead.calcSpecs.quantity && (
+                        <div><span className="text-slate-500">Тираж:</span> <strong>{selectedLead.calcSpecs.quantity.toLocaleString()} шт</strong></div>
+                      )}
+                      {selectedLead.calcSpecs.material && (
+                        <div><span className="text-slate-500">Матеріал:</span> <strong>{selectedLead.calcSpecs.material}</strong></div>
+                      )}
+                      {selectedLead.calcSpecs.colors && (
+                        <div><span className="text-slate-500">Друк:</span> <strong>{selectedLead.calcSpecs.colors}</strong></div>
+                      )}
+                      {selectedLead.calcSpecs.unitPrice && (
+                        <div><span className="text-slate-500">За одиницю:</span> <strong>{selectedLead.calcSpecs.unitPrice.toFixed(2)} ₴</strong></div>
+                      )}
+                    </div>
+                  )}
+
+                  {selectedLead.calcSpecs?.options && (
+                    <div className="text-[10px] text-blue-900 bg-white/80 p-2 rounded border border-blue-100 mt-1">
+                      {selectedLead.calcSpecs.options}
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Tags Section */}
               <div>
-                <span style={{ color: 'var(--text-medium)', fontSize: '10px', fontWeight: '700', textTransform: 'uppercase' }}>Теги ліду</span>
+                <span style={{ color: 'var(--text-medium)', fontSize: '10px', fontWeight: '700', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <Tag size={10} /> Теги
+                </span>
                 <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginTop: '4px', marginBottom: '8px' }}>
                   {(selectedLead.tags || []).map(t => (
                     <span key={t} className="ios-badge ios-badge-purple flex items-center gap-1">
@@ -523,7 +540,7 @@ export const Leads: React.FC = () => {
                     placeholder="Додати тег..."
                     value={newTagsVal}
                     onChange={(e) => setNewTagsVal(e.target.value)}
-                    style={{ height: '24px', fontSize: '11px', padding: '0 4px' }}
+                    style={{ height: '24px', fontSize: '11px', padding: '0 6px', flex: 1 }}
                   />
                   <button type="button" onClick={handleAddTag} className="ios-btn ios-btn-primary ios-btn-small" style={{ padding: '2px 8px' }}>+</button>
                 </div>
@@ -531,7 +548,7 @@ export const Leads: React.FC = () => {
 
               {/* Files Block */}
               <div style={{ borderTop: '1px solid var(--border-light)', paddingTop: '10px' }}>
-                <span style={{ color: 'var(--text-medium)', fontSize: '10px', fontWeight: '700', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>Файли ліду</span>
+                <span style={{ color: 'var(--text-medium)', fontSize: '10px', fontWeight: '700', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>Файли та макети</span>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', marginBottom: '6px' }}>
                   {(selectedLead.files || []).map(f => (
                     <div key={f} className="flex justify-between items-center p-1.5 rounded" style={{ fontSize: '11px', backgroundColor: 'var(--bg-card-subtle)', border: '1px solid var(--border-light)' }}>
@@ -544,10 +561,10 @@ export const Leads: React.FC = () => {
                 </div>
                 <div style={{ display: 'flex', gap: '4px' }}>
                   <input 
-                    placeholder="Назва файлу..."
+                    placeholder="Назва файлу макета..."
                     value={newFileVal}
                     onChange={(e) => setNewFileVal(e.target.value)}
-                    style={{ height: '24px', fontSize: '11px', padding: '0 4px' }}
+                    style={{ height: '24px', fontSize: '11px', padding: '0 6px', flex: 1 }}
                   />
                   <button type="button" onClick={handleAddFile} className="ios-btn ios-btn-secondary ios-btn-small" style={{ padding: '2px 8px' }}>+</button>
                 </div>
@@ -557,7 +574,7 @@ export const Leads: React.FC = () => {
               {customFields.length > 0 && (
                 <div style={{ borderTop: '1px solid var(--border-light)', paddingTop: '10px' }}>
                   <span style={{ color: 'var(--text-medium)', fontSize: '10px', fontWeight: '700', textTransform: 'uppercase', display: 'block', marginBottom: '6px' }}>Користувацькі поля</span>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                     {customFields.map(cf => {
                       let displayVal = selectedLead.customFieldValues?.[cf.name] || '—';
                       if (cf.type === 'formula' && cf.formulaExpression) {
@@ -577,16 +594,16 @@ export const Leads: React.FC = () => {
               )}
 
               <div>
-                <span style={{ color: 'var(--text-medium)', fontSize: '10px', fontWeight: '700', textTransform: 'uppercase' }}>Примітки</span>
-                <p style={{ backgroundColor: 'var(--bg-card-subtle)', border: '1px solid var(--border-light)', color: 'var(--text-dark)', padding: '8px', borderRadius: '4px', fontSize: '11px', marginTop: '2px', whiteSpace: 'pre-wrap' }}>
-                  {selectedLead.notes}
+                <span style={{ color: 'var(--text-medium)', fontSize: '10px', fontWeight: '700', textTransform: 'uppercase' }}>Примітки та коментарі</span>
+                <p style={{ backgroundColor: 'var(--bg-card-subtle)', border: '1px solid var(--border-light)', color: 'var(--text-dark)', padding: '8px', borderRadius: '6px', fontSize: '11px', marginTop: '2px', whiteSpace: 'pre-wrap', maxHeight: '120px', overflowY: 'auto' }}>
+                  {selectedLead.notes || 'Немає коментарів'}
                 </p>
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', borderTop: '1px solid var(--border-light)', paddingTop: '10px' }}>
                 <div>
                   <span style={{ color: 'var(--text-medium)', fontSize: '9px', fontWeight: '700', textTransform: 'uppercase' }}>Бюджет</span>
-                  <p style={{ fontWeight: '800', fontSize: '14px', color: 'var(--primary)' }}>{selectedLead.budget.toLocaleString()} ₴</p>
+                  <p style={{ fontWeight: '800', fontSize: '15px', color: 'var(--primary)', margin: 0 }}>{selectedLead.budget.toLocaleString()} ₴</p>
                 </div>
                 <div>
                   <span style={{ color: 'var(--text-medium)', fontSize: '9px', fontWeight: '700', textTransform: 'uppercase' }}>Статус</span>
@@ -595,36 +612,44 @@ export const Leads: React.FC = () => {
               </div>
             </div>
 
-            {/* Change Status Command bar */}
-            {selectedLead.status !== 'converted' && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', borderTop: '0.5px solid var(--border-light)', paddingTop: '12px' }}>
-                <span style={{ color: '#64748b', fontSize: '9px', fontWeight: '700', textTransform: 'uppercase' }}>Перевести статус:</span>
-                <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '4px' }}>
-                  <select 
-                    value={selectedLead.status}
-                    onChange={(e) => updateLeadStatus(selectedLead.id, e.target.value as any)}
-                    style={{ fontSize: '11px', height: '28px', padding: '0 4px', border: 'none', backgroundColor: 'rgba(120,120,128,0.08)' }}
-                  >
-                    <option value="new">Необроблений</option>
-                    <option value="contact">Перший контакт</option>
-                    <option value="negotiation">Узгодження ТЗ</option>
-                    <option value="review">Думає / Прорахунок</option>
-                  </select>
-                  <button
-                    type="button"
-                    onClick={() => convertToClient(selectedLead)}
-                    className="ios-btn ios-btn-primary"
-                    style={{ fontSize: '11px' }}
-                  >
-                    В Клієнти
-                  </button>
-                </div>
+            {/* Quick One-Click Action: Launch into Production */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', borderTop: '1px solid var(--border-light)', paddingTop: '12px' }}>
+              <button
+                type="button"
+                onClick={() => convertToOrder(selectedLead)}
+                className="ios-btn ios-btn-primary"
+                style={{ width: '100%', padding: '10px', fontSize: '12px', fontWeight: '800', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
+              >
+                <PackageCheck size={16} />
+                🚀 Створити замовлення у виробництво
+              </button>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '6px' }}>
+                <select 
+                  value={selectedLead.status}
+                  onChange={(e) => updateLeadStatus(selectedLead.id, e.target.value as any)}
+                  style={{ fontSize: '11px', height: '30px', padding: '0 6px', border: '1px solid var(--border-light)', borderRadius: '6px' }}
+                >
+                  <option value="new">Необроблений</option>
+                  <option value="contact">Перший контакт</option>
+                  <option value="negotiation">Узгодження ТЗ</option>
+                  <option value="review">Думає / КП</option>
+                  <option value="converted">Готово / Виконано</option>
+                </select>
+                <button
+                  type="button"
+                  onClick={() => convertToClient(selectedLead)}
+                  className="ios-btn ios-btn-secondary"
+                  style={{ fontSize: '11px', padding: '0 6px', height: '30px' }}
+                >
+                  В Клієнти
+                </button>
               </div>
-            )}
+            </div>
 
             <button
               type="button"
-              onClick={() => deleteLead(selectedLead.id)}
+              onClick={() => handleDeleteLead(selectedLead.id)}
               className="ios-btn"
               style={{
                 width: '100%',
@@ -633,7 +658,7 @@ export const Leads: React.FC = () => {
                 border: 'none',
                 fontSize: '11px',
                 fontWeight: '700',
-                marginTop: '10px'
+                marginTop: '4px'
               }}
             >
               Вилучити запит
@@ -662,7 +687,7 @@ export const Leads: React.FC = () => {
                 <label className="ios-label">Тема запиту / Виріб *</label>
                 <input 
                   required
-                  placeholder="напр. Друк книг в твердій обкладинці"
+                  placeholder="напр. Друк книг у твердій обкладинці"
                   value={newName} 
                   onChange={(e) => setNewName(e.target.value)} 
                 />
@@ -714,6 +739,7 @@ export const Leads: React.FC = () => {
                     onChange={(e) => setNewSource(e.target.value as any)} 
                   >
                     <option value="Site">Сайт</option>
+                    <option value="Calculator">🌐 Онлайн-калькулятор</option>
                     <option value="Phone">Телефон</option>
                     <option value="Instagram">Instagram</option>
                     <option value="Facebook">Facebook</option>

@@ -12,7 +12,8 @@ import type {
   ClientSection,
   TaskItem,
   NoteItem,
-  NoteReply
+  NoteReply,
+  Lead
 } from '../types';
 import { isUserBlocked } from '../utils/security';
 
@@ -33,6 +34,11 @@ interface AppContextType {
   novaPoshtaAccounts: string[];
   tasks: TaskItem[];
   notes: NoteItem[];
+  leads: Lead[];
+  addLead: (lead: Omit<Lead, 'id'> & { id?: string }) => Lead;
+  updateLead: (lead: Lead) => void;
+  deleteLead: (leadId: string) => void;
+  updateLeadStatus: (leadId: string, status: Lead['status']) => void;
   login: (username: string, password: string) => boolean;
   logout: () => void;
   addClient: (client: Omit<Client, 'id'>) => Client;
@@ -586,6 +592,150 @@ const initialNotesData: NoteItem[] = [
   }
 ];
 
+
+export const initialLeadsData: Lead[] = [
+  {
+    id: 'L-101',
+    name: 'Калькуляція: Друк меню А4 для кафе "Капучино"',
+    contactPerson: 'Олег Петренко',
+    phone: '+380671234567',
+    email: 'oleg.p@gmail.com',
+    budget: 3500,
+    source: 'Calculator',
+    status: 'new',
+    date: getTodayDateStr(),
+    notes: 'Розрахунок з калькулятора: 50 меню А4 на щільному крейдованому папері 300г з матовою ламінацією 1+1.',
+    tags: ['Онлайн-калькулятор', 'Меню', 'Терміново'],
+    files: ['Макет_меню.pdf'],
+    customFieldValues: { 'Ширина': 210, 'Висота': 297 },
+    calcSpecs: {
+      category: 'Меню',
+      format: 'A4 (210×297 мм)',
+      quantity: 50,
+      material: 'Крейдований 300г',
+      colors: '4+4',
+      totalPrice: 3500,
+      unitPrice: 70.0,
+      options: 'Матова ламінація 1+1, 1 біг'
+    }
+  },
+  {
+    id: 'L-102',
+    name: 'Калькуляція: Візитки преміум 1000 шт',
+    contactPerson: 'Ігор Шевченко',
+    phone: '+380509876543',
+    email: 'igor.auto@ukr.net',
+    budget: 850,
+    source: 'Calculator',
+    status: 'new',
+    date: getRelativeDateStr(-1),
+    notes: 'Розрахунок з калькулятора: Візитки 90х50 мм, 1000 шт, Крейда МАТ 350г, софт-тач ламінація.',
+    tags: ['Онлайн-калькулятор', 'Візитки'],
+    files: ['Visytka_Garage.eps'],
+    customFieldValues: { 'Ширина': 90, 'Висота': 50 },
+    calcSpecs: {
+      category: 'Візитки',
+      format: '90×50 мм',
+      quantity: 1000,
+      material: 'Крейда МАТ 350г',
+      colors: '4+4',
+      totalPrice: 850,
+      unitPrice: 0.85,
+      options: 'Soft-touch ламінація 1+1'
+    }
+  },
+  {
+    id: 'L-103',
+    name: 'Друк каталогу продукції А4 (64 стор.)',
+    contactPerson: 'Олена Ковальчук (ТОВ ФармаТрейд)',
+    phone: '+380673214567',
+    email: 'o.koval@pharmatrade.com',
+    budget: 24500,
+    source: 'Phone',
+    status: 'negotiation',
+    date: getRelativeDateStr(-2),
+    notes: 'Обкладинка 250г + УФ лак, блок 115г крейда. Тираж 500 примірників. Збірка на скобу.',
+    tags: ['B2B', 'Каталоги'],
+    files: ['Catalog_Pharma_v2.pdf'],
+    customFieldValues: { 'Ширина': 210, 'Висота': 297 }
+  },
+  {
+    id: 'L-104',
+    name: 'Самоклеючі етикетки на банки соків 10 000 шт.',
+    contactPerson: 'Василь Гнатюк (ПРАТ ЕкоСок)',
+    phone: '+380934567890',
+    email: 'v.hnatyuk@ecosok.ua',
+    budget: 18200,
+    source: 'Site',
+    status: 'review',
+    date: getRelativeDateStr(-3),
+    notes: 'Рулонний флексодрук, напівглянцевий самоклей, висічка під овальний штамп.',
+    tags: ['Етикетка', 'Флексодрук'],
+    files: ['Label_Juice_Apple.ai'],
+    customFieldValues: { 'Ширина': 75, 'Висота': 120 }
+  },
+  {
+    id: 'L-105',
+    name: 'Картонні брендовані пакети 1 000 шт.',
+    contactPerson: 'Марія Бойко (Бутік ModaLux)',
+    phone: '+380961112233',
+    email: 'm.boyko@modalux.ua',
+    budget: 32000,
+    source: 'Instagram',
+    status: 'new',
+    date: getRelativeDateStr(-4),
+    notes: 'Крейдований папір 200г, шовкотрафаретний друк золотом, люверси та шовковий шнур.',
+    tags: ['Упаковка', 'Преміум'],
+    files: ['Bag_ModaLux_print.pdf'],
+    customFieldValues: { 'Ширина': 250, 'Висота': 350 }
+  },
+  {
+    id: 'L-106',
+    name: 'Фірмові настінні календарі ТРІО 500 шт.',
+    contactPerson: 'Віктор Савченко (СК Україна)',
+    phone: '+380503334455',
+    email: 'v.savchenko@sk-ukraine.ua',
+    budget: 45000,
+    source: 'Phone',
+    status: 'contact',
+    date: getRelativeDateStr(-5),
+    notes: 'Верхній постер 300г з глянцевою ламінацією, 3 курсори, білі металеві пружини.',
+    tags: ['Календарі', 'Новий Рік'],
+    files: ['Calendar_Trio_2027.pdf'],
+    customFieldValues: { 'Ширина': 297, 'Висота': 840 }
+  },
+  {
+    id: 'L-107',
+    name: 'Друк плакатів А1 для рекламної кампанії 200 шт.',
+    contactPerson: 'Оксана Дмитренко (Креатив Агентство)',
+    phone: '+380678889900',
+    email: 'o.dmytrenko@creative.com',
+    budget: 9600,
+    source: 'Facebook',
+    status: 'negotiation',
+    date: getRelativeDateStr(-6),
+    notes: "Широкоформатний інтер'єрний друк на сіті-папері 150г з високою роздільною здатністю.",
+    tags: ['Плакати', 'Широкий формат'],
+    files: ['Poster_A1_Promo.tif'],
+    customFieldValues: { 'Ширина': 594, 'Висота': 841 }
+  },
+  {
+    id: 'L-108',
+    name: 'Блокноти А5 на пружині з логотипом 300 шт.',
+    contactPerson: 'Андрій Кравченко (SoftTech)',
+    phone: '+380937776655',
+    email: 'a.kravchenko@softtech.io',
+    budget: 14400,
+    source: 'Site',
+    status: 'converted',
+    date: getRelativeDateStr(-7),
+    notes: 'Обкладинка софт-тач, блок 50 аркушів клітинка офсет 80г, навивка на чорну пружину.',
+    tags: ['Сувеніри', 'Блокноти'],
+    files: ['Notebook_Cover_SoftTech.pdf'],
+    customFieldValues: { 'Ширина': 148, 'Висота': 210 }
+  }
+];
+
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(() => {
     if (typeof window !== 'undefined') {
@@ -735,6 +885,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return saved ? JSON.parse(saved) : initialNotesData;
   });
 
+  const [leads, setLeads] = useState<Lead[]>(() => {
+    const saved = localStorage.getItem('crm_leads');
+    if (!saved) return initialLeadsData;
+    try {
+      const parsed: Lead[] = JSON.parse(saved);
+      return parsed.length > 0 ? parsed : initialLeadsData;
+    } catch (e) {
+      return initialLeadsData;
+    }
+  });
+
   const [npVolumeCalcEnabled, setNpVolumeCalcEnabled] = useState<boolean>(() => {
     const saved = localStorage.getItem('crm_np_vol_calc');
     return saved ? JSON.parse(saved) : false;
@@ -879,6 +1040,10 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   useEffect(() => {
     localStorage.setItem('crm_np_vol_calc', JSON.stringify(npVolumeCalcEnabled));
   }, [npVolumeCalcEnabled]);
+
+  useEffect(() => {
+    localStorage.setItem('crm_leads', JSON.stringify(leads));
+  }, [leads]);
 
   // Security Real-Time Session Kill-Switch Guard
   useEffect(() => {
@@ -1303,6 +1468,50 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     });
   };
 
+
+  // --- Lead Methods ---
+  const addLead = (leadData: Omit<Lead, 'id'> & { id?: string }): Lead => {
+    const newLead: Lead = {
+      ...leadData,
+      id: leadData.id || `L-${Date.now().toString().slice(-4)}`,
+      date: leadData.date || new Date().toISOString().split('T')[0],
+      status: leadData.status || 'new',
+      tags: leadData.tags || [],
+      files: leadData.files || []
+    };
+    setLeads(prev => {
+      const updated = [newLead, ...prev];
+      localStorage.setItem('crm_leads', JSON.stringify(updated));
+      return updated;
+    });
+    addSystemNotification(`📩 Новий запит (${newLead.source === 'Calculator' ? 'Калькулятор' : 'Звернення'}): "${newLead.name}" - ${newLead.budget} ₴`);
+    return newLead;
+  };
+
+  const updateLead = (lead: Lead) => {
+    setLeads(prev => {
+      const updated = prev.map(l => l.id === lead.id ? lead : l);
+      localStorage.setItem('crm_leads', JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  const deleteLead = (leadId: string) => {
+    setLeads(prev => {
+      const updated = prev.filter(l => l.id !== leadId);
+      localStorage.setItem('crm_leads', JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  const updateLeadStatus = (leadId: string, status: Lead['status']) => {
+    setLeads(prev => {
+      const updated = prev.map(l => l.id === leadId ? { ...l, status } : l);
+      localStorage.setItem('crm_leads', JSON.stringify(updated));
+      return updated;
+    });
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -1322,6 +1531,11 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         novaPoshtaAccounts,
         tasks,
         notes,
+        leads,
+        addLead,
+        updateLead,
+        deleteLead,
+        updateLeadStatus,
         login,
         logout,
         addClient,
