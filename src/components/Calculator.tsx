@@ -7138,17 +7138,11 @@ export const Calculator: React.FC = () => {
 
                         {/* Top Strip: Client Contacts vs Staff CRM fields */}
                         {currentUser?.role === 'client' ? (
-                          <div className="grid grid-cols-1 md:grid-cols-12 gap-3.5 p-4 rounded-2xl bg-white border border-slate-200/90 shadow-sm">
-                            {/* ПІБ або компанія (Обов'язкове) */}
+                          <div className="grid grid-cols-1 md:grid-cols-12 gap-4 p-4 md:p-5 rounded-2xl bg-slate-50/70 border border-slate-200/80 shadow-2xs">
+                            {/* 1. ПІБ або компанія */}
                             <div className="md:col-span-4 flex flex-col gap-1.5">
-                              <label className="text-[11px] font-extrabold text-slate-800 uppercase flex items-center justify-between">
-                                <span className="flex items-center gap-1">
-                                  <span>ПІБ або компанія</span>
-                                  <span className="text-rose-500 font-black">*</span>
-                                </span>
-                                <span className="text-[10px] px-2 py-0.5 rounded-md bg-rose-50 text-rose-600 font-extrabold border border-rose-200 uppercase tracking-wide">
-                                  Обов'язково
-                                </span>
+                              <label className="text-[11px] font-extrabold text-slate-700 uppercase tracking-wider">
+                                ПІБ або компанія <span className="text-rose-500 font-bold">*</span>:
                               </label>
                               <input
                                 type="text"
@@ -7161,20 +7155,14 @@ export const Calculator: React.FC = () => {
                                     localStorage.setItem('crm_client_profile', JSON.stringify({ ...prev, name: e.target.value, contactPerson: e.target.value }));
                                   } catch {}
                                 }}
-                                className="w-full px-3 py-2 rounded-xl border border-slate-300 border-l-[3.5px] border-l-blue-600 bg-white text-xs font-bold text-slate-900 focus:border-blue-600 focus:ring-3 focus:ring-blue-500/15 focus:outline-none transition-all shadow-2xs placeholder:text-slate-400 placeholder:font-medium"
+                                className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-800 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all shadow-2xs placeholder:text-slate-400 placeholder:font-normal"
                               />
                             </div>
 
-                            {/* Номер телефону (Обов'язкове) */}
+                            {/* 2. Номер телефону */}
                             <div className="md:col-span-4 flex flex-col gap-1.5">
-                              <label className="text-[11px] font-extrabold text-slate-800 uppercase flex items-center justify-between">
-                                <span className="flex items-center gap-1">
-                                  <span>Номер телефону</span>
-                                  <span className="text-rose-500 font-black">*</span>
-                                </span>
-                                <span className="text-[10px] px-2 py-0.5 rounded-md bg-rose-50 text-rose-600 font-extrabold border border-rose-200 uppercase tracking-wide">
-                                  Обов'язково
-                                </span>
+                              <label className="text-[11px] font-extrabold text-slate-700 uppercase tracking-wider">
+                                Номер телефону <span className="text-rose-500 font-bold">*</span>:
                               </label>
                               <input
                                 type="text"
@@ -7188,26 +7176,19 @@ export const Calculator: React.FC = () => {
                                     localStorage.setItem('crm_client_profile', JSON.stringify({ ...prev, phone: formatted }));
                                   } catch {}
                                 }}
-                                className="w-full px-3 py-2 rounded-xl border border-slate-300 border-l-[3.5px] border-l-blue-600 bg-white text-xs font-bold text-slate-900 focus:border-blue-600 focus:ring-3 focus:ring-blue-500/15 focus:outline-none font-mono transition-all shadow-2xs placeholder:text-slate-400"
+                                className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-800 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 focus:outline-none font-mono transition-all shadow-2xs placeholder:text-slate-400 placeholder:font-normal"
                               />
                             </div>
 
-                            {/* Нік у Telegram */}
+                            {/* 3. Нік у Telegram */}
                             <div className="md:col-span-4 flex flex-col gap-1.5">
-                              <label className="text-[11px] font-extrabold text-slate-800 uppercase flex items-center justify-between">
-                                <span className="flex items-center gap-1">
-                                  <span>Нік у Telegram:</span>
-                                </span>
-                                {customClientTelegram && (
-                                  <span className="text-[10px] px-2 py-0.5 rounded-md bg-sky-50 text-sky-700 font-extrabold border border-sky-200">
-                                    авто-з бота
-                                  </span>
-                                )}
+                              <label className="text-[11px] font-extrabold text-slate-700 uppercase tracking-wider">
+                                Нік у Telegram:
                               </label>
-                              <div className="flex rounded-xl border border-slate-300 bg-white overflow-hidden shadow-2xs focus-within:border-blue-600 focus-within:ring-3 focus-within:ring-blue-500/15 transition-all">
-                                <div className="flex items-center justify-center px-3 bg-slate-50 border-r border-slate-200 text-slate-500 font-black text-xs select-none">
+                              <div className="flex rounded-xl border border-slate-200 bg-white overflow-hidden shadow-2xs focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-100 transition-all">
+                                <span className="inline-flex items-center px-3 bg-slate-50 text-slate-400 font-bold text-xs border-r border-slate-200 select-none">
                                   @
-                                </div>
+                                </span>
                                 <input
                                   type="text"
                                   placeholder="username"
@@ -7221,7 +7202,7 @@ export const Calculator: React.FC = () => {
                                       localStorage.setItem('crm_client_profile', JSON.stringify({ ...prev, telegram: val }));
                                     } catch {}
                                   }}
-                                  className="w-full px-3 py-2 bg-white text-xs font-bold text-slate-900 focus:outline-none placeholder:text-slate-400 placeholder:font-normal"
+                                  className="w-full px-3 py-2 bg-white text-xs font-bold text-slate-800 focus:outline-none placeholder:text-slate-400 placeholder:font-normal"
                                 />
                               </div>
                             </div>
@@ -9848,17 +9829,11 @@ export const Calculator: React.FC = () => {
 
                         {/* Top Strip: Client Contacts vs Staff CRM fields */}
                         {currentUser?.role === 'client' ? (
-                          <div className="grid grid-cols-1 md:grid-cols-12 gap-3.5 p-4 rounded-2xl bg-white border border-slate-200/90 shadow-sm">
-                            {/* ПІБ або компанія (Обов'язкове) */}
+                          <div className="grid grid-cols-1 md:grid-cols-12 gap-4 p-4 md:p-5 rounded-2xl bg-slate-50/70 border border-slate-200/80 shadow-2xs">
+                            {/* 1. ПІБ або компанія */}
                             <div className="md:col-span-4 flex flex-col gap-1.5">
-                              <label className="text-[11px] font-extrabold text-slate-800 uppercase flex items-center justify-between">
-                                <span className="flex items-center gap-1">
-                                  <span>ПІБ або компанія</span>
-                                  <span className="text-rose-500 font-black">*</span>
-                                </span>
-                                <span className="text-[10px] px-2 py-0.5 rounded-md bg-rose-50 text-rose-600 font-extrabold border border-rose-200 uppercase tracking-wide">
-                                  Обов'язково
-                                </span>
+                              <label className="text-[11px] font-extrabold text-slate-700 uppercase tracking-wider">
+                                ПІБ або компанія <span className="text-rose-500 font-bold">*</span>:
                               </label>
                               <input
                                 type="text"
@@ -9871,20 +9846,14 @@ export const Calculator: React.FC = () => {
                                     localStorage.setItem('crm_client_profile', JSON.stringify({ ...prev, name: e.target.value, contactPerson: e.target.value }));
                                   } catch {}
                                 }}
-                                className="w-full px-3 py-2 rounded-xl border border-slate-300 border-l-[3.5px] border-l-blue-600 bg-white text-xs font-bold text-slate-900 focus:border-blue-600 focus:ring-3 focus:ring-blue-500/15 focus:outline-none transition-all shadow-2xs placeholder:text-slate-400 placeholder:font-medium"
+                                className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-800 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all shadow-2xs placeholder:text-slate-400 placeholder:font-normal"
                               />
                             </div>
 
-                            {/* Номер телефону (Обов'язкове) */}
+                            {/* 2. Номер телефону */}
                             <div className="md:col-span-4 flex flex-col gap-1.5">
-                              <label className="text-[11px] font-extrabold text-slate-800 uppercase flex items-center justify-between">
-                                <span className="flex items-center gap-1">
-                                  <span>Номер телефону</span>
-                                  <span className="text-rose-500 font-black">*</span>
-                                </span>
-                                <span className="text-[10px] px-2 py-0.5 rounded-md bg-rose-50 text-rose-600 font-extrabold border border-rose-200 uppercase tracking-wide">
-                                  Обов'язково
-                                </span>
+                              <label className="text-[11px] font-extrabold text-slate-700 uppercase tracking-wider">
+                                Номер телефону <span className="text-rose-500 font-bold">*</span>:
                               </label>
                               <input
                                 type="text"
@@ -9898,26 +9867,19 @@ export const Calculator: React.FC = () => {
                                     localStorage.setItem('crm_client_profile', JSON.stringify({ ...prev, phone: formatted }));
                                   } catch {}
                                 }}
-                                className="w-full px-3 py-2 rounded-xl border border-slate-300 border-l-[3.5px] border-l-blue-600 bg-white text-xs font-bold text-slate-900 focus:border-blue-600 focus:ring-3 focus:ring-blue-500/15 focus:outline-none font-mono transition-all shadow-2xs placeholder:text-slate-400"
+                                className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-800 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 focus:outline-none font-mono transition-all shadow-2xs placeholder:text-slate-400 placeholder:font-normal"
                               />
                             </div>
 
-                            {/* Нік у Telegram */}
+                            {/* 3. Нік у Telegram */}
                             <div className="md:col-span-4 flex flex-col gap-1.5">
-                              <label className="text-[11px] font-extrabold text-slate-800 uppercase flex items-center justify-between">
-                                <span className="flex items-center gap-1">
-                                  <span>Нік у Telegram:</span>
-                                </span>
-                                {customClientTelegram && (
-                                  <span className="text-[10px] px-2 py-0.5 rounded-md bg-sky-50 text-sky-700 font-extrabold border border-sky-200">
-                                    авто-з бота
-                                  </span>
-                                )}
+                              <label className="text-[11px] font-extrabold text-slate-700 uppercase tracking-wider">
+                                Нік у Telegram:
                               </label>
-                              <div className="flex rounded-xl border border-slate-300 bg-white overflow-hidden shadow-2xs focus-within:border-blue-600 focus-within:ring-3 focus-within:ring-blue-500/15 transition-all">
-                                <div className="flex items-center justify-center px-3 bg-slate-50 border-r border-slate-200 text-slate-500 font-black text-xs select-none">
+                              <div className="flex rounded-xl border border-slate-200 bg-white overflow-hidden shadow-2xs focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-100 transition-all">
+                                <span className="inline-flex items-center px-3 bg-slate-50 text-slate-400 font-bold text-xs border-r border-slate-200 select-none">
                                   @
-                                </div>
+                                </span>
                                 <input
                                   type="text"
                                   placeholder="username"
@@ -9931,7 +9893,7 @@ export const Calculator: React.FC = () => {
                                       localStorage.setItem('crm_client_profile', JSON.stringify({ ...prev, telegram: val }));
                                     } catch {}
                                   }}
-                                  className="w-full px-3 py-2 bg-white text-xs font-bold text-slate-900 focus:outline-none placeholder:text-slate-400 placeholder:font-normal"
+                                  className="w-full px-3 py-2 bg-white text-xs font-bold text-slate-800 focus:outline-none placeholder:text-slate-400 placeholder:font-normal"
                                 />
                               </div>
                             </div>
@@ -13233,17 +13195,11 @@ export const Calculator: React.FC = () => {
 
                         {/* Top Strip: Client Contacts vs Staff CRM fields */}
                         {currentUser?.role === 'client' ? (
-                          <div className="grid grid-cols-1 md:grid-cols-12 gap-3.5 p-4 rounded-2xl bg-white border border-slate-200/90 shadow-sm">
-                            {/* ПІБ або компанія (Обов'язкове) */}
+                          <div className="grid grid-cols-1 md:grid-cols-12 gap-4 p-4 md:p-5 rounded-2xl bg-slate-50/70 border border-slate-200/80 shadow-2xs">
+                            {/* 1. ПІБ або компанія */}
                             <div className="md:col-span-4 flex flex-col gap-1.5">
-                              <label className="text-[11px] font-extrabold text-slate-800 uppercase flex items-center justify-between">
-                                <span className="flex items-center gap-1">
-                                  <span>ПІБ або компанія</span>
-                                  <span className="text-rose-500 font-black">*</span>
-                                </span>
-                                <span className="text-[10px] px-2 py-0.5 rounded-md bg-rose-50 text-rose-600 font-extrabold border border-rose-200 uppercase tracking-wide">
-                                  Обов'язково
-                                </span>
+                              <label className="text-[11px] font-extrabold text-slate-700 uppercase tracking-wider">
+                                ПІБ або компанія <span className="text-rose-500 font-bold">*</span>:
                               </label>
                               <input
                                 type="text"
@@ -13256,20 +13212,14 @@ export const Calculator: React.FC = () => {
                                     localStorage.setItem('crm_client_profile', JSON.stringify({ ...prev, name: e.target.value, contactPerson: e.target.value }));
                                   } catch {}
                                 }}
-                                className="w-full px-3 py-2 rounded-xl border border-slate-300 border-l-[3.5px] border-l-blue-600 bg-white text-xs font-bold text-slate-900 focus:border-blue-600 focus:ring-3 focus:ring-blue-500/15 focus:outline-none transition-all shadow-2xs placeholder:text-slate-400 placeholder:font-medium"
+                                className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-800 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all shadow-2xs placeholder:text-slate-400 placeholder:font-normal"
                               />
                             </div>
 
-                            {/* Номер телефону (Обов'язкове) */}
+                            {/* 2. Номер телефону */}
                             <div className="md:col-span-4 flex flex-col gap-1.5">
-                              <label className="text-[11px] font-extrabold text-slate-800 uppercase flex items-center justify-between">
-                                <span className="flex items-center gap-1">
-                                  <span>Номер телефону</span>
-                                  <span className="text-rose-500 font-black">*</span>
-                                </span>
-                                <span className="text-[10px] px-2 py-0.5 rounded-md bg-rose-50 text-rose-600 font-extrabold border border-rose-200 uppercase tracking-wide">
-                                  Обов'язково
-                                </span>
+                              <label className="text-[11px] font-extrabold text-slate-700 uppercase tracking-wider">
+                                Номер телефону <span className="text-rose-500 font-bold">*</span>:
                               </label>
                               <input
                                 type="text"
@@ -13283,26 +13233,19 @@ export const Calculator: React.FC = () => {
                                     localStorage.setItem('crm_client_profile', JSON.stringify({ ...prev, phone: formatted }));
                                   } catch {}
                                 }}
-                                className="w-full px-3 py-2 rounded-xl border border-slate-300 border-l-[3.5px] border-l-blue-600 bg-white text-xs font-bold text-slate-900 focus:border-blue-600 focus:ring-3 focus:ring-blue-500/15 focus:outline-none font-mono transition-all shadow-2xs placeholder:text-slate-400"
+                                className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-800 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 focus:outline-none font-mono transition-all shadow-2xs placeholder:text-slate-400 placeholder:font-normal"
                               />
                             </div>
 
-                            {/* Нік у Telegram */}
+                            {/* 3. Нік у Telegram */}
                             <div className="md:col-span-4 flex flex-col gap-1.5">
-                              <label className="text-[11px] font-extrabold text-slate-800 uppercase flex items-center justify-between">
-                                <span className="flex items-center gap-1">
-                                  <span>Нік у Telegram:</span>
-                                </span>
-                                {customClientTelegram && (
-                                  <span className="text-[10px] px-2 py-0.5 rounded-md bg-sky-50 text-sky-700 font-extrabold border border-sky-200">
-                                    авто-з бота
-                                  </span>
-                                )}
+                              <label className="text-[11px] font-extrabold text-slate-700 uppercase tracking-wider">
+                                Нік у Telegram:
                               </label>
-                              <div className="flex rounded-xl border border-slate-300 bg-white overflow-hidden shadow-2xs focus-within:border-blue-600 focus-within:ring-3 focus-within:ring-blue-500/15 transition-all">
-                                <div className="flex items-center justify-center px-3 bg-slate-50 border-r border-slate-200 text-slate-500 font-black text-xs select-none">
+                              <div className="flex rounded-xl border border-slate-200 bg-white overflow-hidden shadow-2xs focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-100 transition-all">
+                                <span className="inline-flex items-center px-3 bg-slate-50 text-slate-400 font-bold text-xs border-r border-slate-200 select-none">
                                   @
-                                </div>
+                                </span>
                                 <input
                                   type="text"
                                   placeholder="username"
@@ -13316,7 +13259,7 @@ export const Calculator: React.FC = () => {
                                       localStorage.setItem('crm_client_profile', JSON.stringify({ ...prev, telegram: val }));
                                     } catch {}
                                   }}
-                                  className="w-full px-3 py-2 bg-white text-xs font-bold text-slate-900 focus:outline-none placeholder:text-slate-400 placeholder:font-normal"
+                                  className="w-full px-3 py-2 bg-white text-xs font-bold text-slate-800 focus:outline-none placeholder:text-slate-400 placeholder:font-normal"
                                 />
                               </div>
                             </div>
@@ -16782,7 +16725,7 @@ export const Calculator: React.FC = () => {
                 <span>📩</span> Оформлення запиту менеджеру
               </h3>
               <p className="text-xs text-slate-500 mt-1 m-0">
-                Вкажіть ваше ПІБ та телефон, щоб ми зв'язалися для узгодження та запуску замовлення у друк.
+                Вкажіть ваші контакти, щоб ми зв'язалися для узгодження та запуску замовлення у друк.
               </p>
             </div>
 
@@ -16818,14 +16761,8 @@ export const Calculator: React.FC = () => {
               className="flex flex-col gap-3.5"
             >
               <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-extrabold text-slate-800 uppercase flex items-center justify-between">
-                  <span className="flex items-center gap-1">
-                    <span>Ваше ПІБ або компанія</span>
-                    <span className="text-rose-500 font-black">*</span>
-                  </span>
-                  <span className="text-[10px] px-2 py-0.5 rounded-md bg-rose-50 text-rose-600 font-extrabold border border-rose-200 uppercase tracking-wide">
-                    Обов'язково
-                  </span>
+                <label className="text-[11px] font-extrabold text-slate-700 uppercase tracking-wider">
+                  Ваше ПІБ або компанія <span className="text-rose-500 font-bold">*</span>:
                 </label>
                 <input
                   required
@@ -16833,20 +16770,14 @@ export const Calculator: React.FC = () => {
                   placeholder="напр. Шевченко Тарас або ТОВ «Едельвейс»"
                   value={customClientName}
                   onChange={(e) => setCustomClientName(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-xl border border-slate-300 border-l-[3.5px] border-l-blue-600 bg-white text-xs font-bold text-slate-900 focus:border-blue-600 focus:ring-3 focus:ring-blue-500/15 focus:outline-none transition-all shadow-2xs placeholder:text-slate-400 placeholder:font-normal"
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-800 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 focus:outline-none transition-all shadow-2xs placeholder:text-slate-400 placeholder:font-normal"
                   autoFocus
                 />
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-extrabold text-slate-800 uppercase flex items-center justify-between">
-                  <span className="flex items-center gap-1">
-                    <span>Номер телефону для зв'язку</span>
-                    <span className="text-rose-500 font-black">*</span>
-                  </span>
-                  <span className="text-[10px] px-2 py-0.5 rounded-md bg-rose-50 text-rose-600 font-extrabold border border-rose-200 uppercase tracking-wide">
-                    Обов'язково
-                  </span>
+                <label className="text-[11px] font-extrabold text-slate-700 uppercase tracking-wider">
+                  Номер телефону для зв'язку <span className="text-rose-500 font-bold">*</span>:
                 </label>
                 <input
                   required
@@ -16854,23 +16785,18 @@ export const Calculator: React.FC = () => {
                   placeholder="+(380)-__-___-__-__"
                   value={customClientPhone}
                   onChange={(e) => setCustomClientPhone(formatPhoneNumber(e.target.value))}
-                  className="w-full px-3 py-2.5 rounded-xl border border-slate-300 border-l-[3.5px] border-l-blue-600 bg-white text-xs font-bold text-slate-900 focus:border-blue-600 focus:ring-3 focus:ring-blue-500/15 focus:outline-none font-mono transition-all shadow-2xs placeholder:text-slate-400"
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-800 focus:border-blue-500 focus:ring-2 focus:ring-blue-100 focus:outline-none font-mono transition-all shadow-2xs placeholder:text-slate-400 placeholder:font-normal"
                 />
               </div>
 
               <div className="flex flex-col gap-1.5">
-                <label className="text-[11px] font-extrabold text-slate-800 uppercase flex items-center justify-between">
-                  <span>Нік у Telegram:</span>
-                  {customClientTelegram && (
-                    <span className="text-[10px] px-2 py-0.5 rounded-md bg-sky-50 text-sky-700 font-extrabold border border-sky-200">
-                      авто-з бота
-                    </span>
-                  )}
+                <label className="text-[11px] font-extrabold text-slate-700 uppercase tracking-wider">
+                  Нік у Telegram:
                 </label>
-                <div className="flex rounded-xl border border-slate-300 bg-white overflow-hidden shadow-2xs focus-within:border-blue-600 focus-within:ring-3 focus-within:ring-blue-500/15 transition-all">
-                  <div className="flex items-center justify-center px-3 bg-slate-50 border-r border-slate-200 text-slate-500 font-black text-xs select-none">
+                <div className="flex rounded-xl border border-slate-200 bg-white overflow-hidden shadow-2xs focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-100 transition-all">
+                  <span className="inline-flex items-center px-3 bg-slate-50 text-slate-400 font-bold text-xs border-r border-slate-200 select-none">
                     @
-                  </div>
+                  </span>
                   <input
                     type="text"
                     placeholder="username"
@@ -16879,7 +16805,7 @@ export const Calculator: React.FC = () => {
                       const raw = e.target.value.replace(/^@/, '').trim();
                       setCustomClientTelegram(raw ? `@${raw}` : '');
                     }}
-                    className="w-full px-3 py-2.5 bg-white text-xs font-bold text-slate-900 focus:outline-none placeholder:text-slate-400"
+                    className="w-full px-3 py-2.5 bg-white text-xs font-bold text-slate-800 focus:outline-none placeholder:text-slate-400 placeholder:font-normal"
                   />
                 </div>
               </div>
