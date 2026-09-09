@@ -874,6 +874,35 @@ const renderBookletFoldBlueprint = (
 };
 
 // Clean restored Calculator version 1.0.5
+// Helper to auto-extract Telegram username from Telegram WebApp / Bot or URL
+const getInitialTelegram = (currentUser?: any): string => {
+  try {
+    if (typeof window !== 'undefined') {
+      const tg = (window as any).Telegram?.WebApp;
+      if (tg?.initDataUnsafe?.user?.username) {
+        return `@${tg.initDataUnsafe.user.username.replace(/^@/, '')}`;
+      }
+      const params = new URLSearchParams(window.location.search);
+      const urlTg = params.get('tg_username') || params.get('tg_user') || params.get('telegram') || params.get('tg');
+      if (urlTg) {
+        return `@${decodeURIComponent(urlTg).replace(/^@/, '')}`;
+      }
+    }
+    if (currentUser?.telegram) {
+      return `@${currentUser.telegram.replace(/^@/, '')}`;
+    }
+    const savedProfile = JSON.parse(localStorage.getItem('crm_client_profile') || '{}');
+    if (savedProfile.telegram) {
+      return `@${savedProfile.telegram.replace(/^@/, '')}`;
+    }
+    const storedTg = localStorage.getItem('tg_username') || localStorage.getItem('tg_user');
+    if (storedTg) {
+      return `@${storedTg.replace(/^@/, '')}`;
+    }
+  } catch {}
+  return '';
+};
+
 export const Calculator: React.FC = () => {
   const { clients, materials, norms, addOrder, addLead, currentUser, updateNorms } = useApp();
   const isClient = currentUser?.role === 'client';
@@ -1220,14 +1249,8 @@ export const Calculator: React.FC = () => {
   const [isSamNaSebe, setIsSamNaSebe] = useState(true);
   const [turnType, setTurnType] = useState<'sam_na_sebe' | 'bez_oborotu' | 'chuzhyi_oborut'>('sam_na_sebe');
   const [selectedClientId, setSelectedClientId] = useState(clients[0]?.id || '');
-  const [customClientName, setCustomClientName] = useState<string>(() => {
-    try {
-      const saved = JSON.parse(localStorage.getItem('crm_client_profile') || '{}');
-      return saved.name || saved.contactPerson || '';
-    } catch {
-      return '';
-    }
-  });
+  // Client contact states: ПІБ starts strictly empty so the user types it themselves; Telegram is auto-extracted from bot/URL
+  const [customClientName, setCustomClientName] = useState<string>('');
   const [customClientPhone, setCustomClientPhone] = useState<string>(() => {
     try {
       const saved = JSON.parse(localStorage.getItem('crm_client_profile') || '{}');
@@ -1236,14 +1259,7 @@ export const Calculator: React.FC = () => {
       return '';
     }
   });
-  const [customClientTelegram, setCustomClientTelegram] = useState<string>(() => {
-    try {
-      const saved = JSON.parse(localStorage.getItem('crm_client_profile') || '{}');
-      return saved.telegram || '';
-    } catch {
-      return '';
-    }
-  });
+  const [customClientTelegram, setCustomClientTelegram] = useState<string>(() => getInitialTelegram(currentUser));
   const [isNewClientMode, setIsNewClientMode] = useState<boolean>(false);
   const [showClientContactModal, setShowClientContactModal] = useState<boolean>(false);
   const [pendingLeadPayload, setPendingLeadPayload] = useState<any | null>(null);
@@ -1286,12 +1302,19 @@ export const Calculator: React.FC = () => {
     phone: string;
     telegram?: string;
   }) => {
+    if (!data.name.trim()) {
+      alert('⚠️ Будь ласка, вкажіть ваше ПІБ або назву компанії для надсилання розрахунку менеджеру!');
+      return;
+    }
+    if (!isPhoneComplete(data.phone)) {
+      alert('⚠️ Будь ласка, введіть коректний номер телефону (9 цифр після коду +380) для зв\'язку!');
+      return;
+    }
+
     try {
       const prev = JSON.parse(localStorage.getItem('crm_client_profile') || '{}');
       localStorage.setItem('crm_client_profile', JSON.stringify({
         ...prev,
-        name: data.name,
-        contactPerson: data.name,
         phone: data.phone,
         telegram: data.telegram
       }));
@@ -1332,37 +1355,22 @@ export const Calculator: React.FC = () => {
   };
   const [marginPercent, setMarginPercent] = useState<number>(100);
 
-  // Auto-fill client contacts from URL, Telegram Bot session or localStorage profile
+  // Auto-fill Telegram from bot/WebApp or URL params; keep PIB empty for user manual input
   useEffect(() => {
     try {
+      const tg = getInitialTelegram(currentUser);
+      if (tg) {
+        setCustomClientTelegram(tg);
+      }
       if (typeof window !== 'undefined') {
         const params = new URLSearchParams(window.location.search);
-        const urlName = params.get('name') || params.get('company') || params.get('client') || params.get('user');
         const urlPhone = params.get('phone') || params.get('tel');
-        if (urlName && !customClientName) setCustomClientName(decodeURIComponent(urlName));
-        if (urlPhone && !customClientPhone) setCustomClientPhone(decodeURIComponent(urlPhone));
-      }
-
-      const savedProfile = localStorage.getItem('crm_client_profile');
-      if (savedProfile) {
-        const parsed = JSON.parse(savedProfile);
-        const effectiveName = parsed.name || parsed.companyName || parsed.contactPerson;
-        if (effectiveName && !customClientName) {
-          setCustomClientName(effectiveName);
-        }
-        if (parsed.phone && !customClientPhone) {
-          setCustomClientPhone(parsed.phone);
-        }
-      } else if (currentUser?.role === 'client') {
-        if (currentUser.name && currentUser.name !== 'Клієнт друкарні' && !customClientName) {
-          setCustomClientName(currentUser.name);
-        }
-        if ((currentUser as any).phone && !customClientPhone) {
-          setCustomClientPhone((currentUser as any).phone);
+        if (urlPhone && !customClientPhone) {
+          setCustomClientPhone(formatPhoneNumber(decodeURIComponent(urlPhone)));
         }
       }
     } catch (err) {
-      console.error('Error loading client profile for calculator:', err);
+      console.error('Error loading bot data for calculator:', err);
     }
   }, [currentUser]);
 
@@ -7126,10 +7134,15 @@ export const Calculator: React.FC = () => {
                         {currentUser?.role === 'client' ? (
                           <div className="grid grid-cols-1 md:grid-cols-12 gap-3 p-4 rounded-xl bg-blue-50/60 border border-blue-100">
                             <div className="md:col-span-4 flex flex-col gap-1">
-                              <label className="text-[11px] font-extrabold text-slate-700 uppercase">ПІБ або компанія *:</label>
+                              <label className="text-[11px] font-extrabold text-slate-700 uppercase flex items-center justify-between">
+                                <span>ПІБ або компанія <span className="text-rose-500">*</span>:</span>
+                                {!customClientName.trim() && (
+                                  <span className="text-[10px] text-rose-500 font-bold lowercase">обов'язково</span>
+                                )}
+                              </label>
                               <input
                                 type="text"
-                                placeholder="Шевченко Тарас / ТОВ Едельвейс"
+                                placeholder="Вкажіть ваше ПІБ або компанію"
                                 value={customClientName}
                                 onChange={(e) => {
                                   setCustomClientName(e.target.value);
@@ -7138,11 +7151,20 @@ export const Calculator: React.FC = () => {
                                     localStorage.setItem('crm_client_profile', JSON.stringify({ ...prev, name: e.target.value, contactPerson: e.target.value }));
                                   } catch {}
                                 }}
-                                className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-900 focus:border-blue-600 focus:outline-none"
+                                className={`w-full px-3 py-2 rounded-xl border text-xs font-bold focus:outline-none transition-colors ${
+                                  !customClientName.trim()
+                                    ? 'border-amber-400 bg-amber-50/20 text-slate-900 focus:border-blue-600'
+                                    : 'border-slate-200 bg-white text-slate-900 focus:border-blue-600'
+                                }`}
                               />
                             </div>
                             <div className="md:col-span-4 flex flex-col gap-1">
-                              <label className="text-[11px] font-extrabold text-slate-700 uppercase">Номер телефону *:</label>
+                              <label className="text-[11px] font-extrabold text-slate-700 uppercase flex items-center justify-between">
+                                <span>Номер телефону <span className="text-rose-500">*</span>:</span>
+                                {!isPhoneComplete(customClientPhone) && (
+                                  <span className="text-[10px] text-rose-500 font-bold lowercase">обов'язково</span>
+                                )}
+                              </label>
                               <input
                                 type="text"
                                 placeholder="+(380)-__-___-__-__"
@@ -7155,11 +7177,20 @@ export const Calculator: React.FC = () => {
                                     localStorage.setItem('crm_client_profile', JSON.stringify({ ...prev, phone: formatted }));
                                   } catch {}
                                 }}
-                                className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-900 focus:border-blue-600 focus:outline-none font-mono"
+                                className={`w-full px-3 py-2 rounded-xl border text-xs font-bold focus:outline-none font-mono transition-colors ${
+                                  !isPhoneComplete(customClientPhone)
+                                    ? 'border-amber-400 bg-amber-50/20 text-slate-900 focus:border-blue-600'
+                                    : 'border-slate-200 bg-white text-slate-900 focus:border-blue-600'
+                                }`}
                               />
                             </div>
                             <div className="md:col-span-4 flex flex-col gap-1">
-                              <label className="text-[11px] font-extrabold text-slate-700 uppercase">Нік у Telegram:</label>
+                              <label className="text-[11px] font-extrabold text-slate-700 uppercase flex items-center justify-between">
+                                <span>Нік у Telegram:</span>
+                                {customClientTelegram && (
+                                  <span className="text-[10px] text-blue-600 font-bold lowercase">з бота / профілю</span>
+                                )}
+                              </label>
                               <div className="relative">
                                 <span className="absolute left-3 top-2 text-slate-400 font-bold text-xs">@</span>
                                 <input
@@ -9804,10 +9835,15 @@ export const Calculator: React.FC = () => {
                         {currentUser?.role === 'client' ? (
                           <div className="grid grid-cols-1 md:grid-cols-12 gap-3 p-4 rounded-xl bg-blue-50/60 border border-blue-100">
                             <div className="md:col-span-4 flex flex-col gap-1">
-                              <label className="text-[11px] font-extrabold text-slate-700 uppercase">ПІБ або компанія *:</label>
+                              <label className="text-[11px] font-extrabold text-slate-700 uppercase flex items-center justify-between">
+                                <span>ПІБ або компанія <span className="text-rose-500">*</span>:</span>
+                                {!customClientName.trim() && (
+                                  <span className="text-[10px] text-rose-500 font-bold lowercase">обов'язково</span>
+                                )}
+                              </label>
                               <input
                                 type="text"
-                                placeholder="Шевченко Тарас / ТОВ Едельвейс"
+                                placeholder="Вкажіть ваше ПІБ або компанію"
                                 value={customClientName}
                                 onChange={(e) => {
                                   setCustomClientName(e.target.value);
@@ -9816,11 +9852,20 @@ export const Calculator: React.FC = () => {
                                     localStorage.setItem('crm_client_profile', JSON.stringify({ ...prev, name: e.target.value, contactPerson: e.target.value }));
                                   } catch {}
                                 }}
-                                className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-900 focus:border-blue-600 focus:outline-none"
+                                className={`w-full px-3 py-2 rounded-xl border text-xs font-bold focus:outline-none transition-colors ${
+                                  !customClientName.trim()
+                                    ? 'border-amber-400 bg-amber-50/20 text-slate-900 focus:border-blue-600'
+                                    : 'border-slate-200 bg-white text-slate-900 focus:border-blue-600'
+                                }`}
                               />
                             </div>
                             <div className="md:col-span-4 flex flex-col gap-1">
-                              <label className="text-[11px] font-extrabold text-slate-700 uppercase">Номер телефону *:</label>
+                              <label className="text-[11px] font-extrabold text-slate-700 uppercase flex items-center justify-between">
+                                <span>Номер телефону <span className="text-rose-500">*</span>:</span>
+                                {!isPhoneComplete(customClientPhone) && (
+                                  <span className="text-[10px] text-rose-500 font-bold lowercase">обов'язково</span>
+                                )}
+                              </label>
                               <input
                                 type="text"
                                 placeholder="+(380)-__-___-__-__"
@@ -9833,11 +9878,20 @@ export const Calculator: React.FC = () => {
                                     localStorage.setItem('crm_client_profile', JSON.stringify({ ...prev, phone: formatted }));
                                   } catch {}
                                 }}
-                                className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-900 focus:border-blue-600 focus:outline-none font-mono"
+                                className={`w-full px-3 py-2 rounded-xl border text-xs font-bold focus:outline-none font-mono transition-colors ${
+                                  !isPhoneComplete(customClientPhone)
+                                    ? 'border-amber-400 bg-amber-50/20 text-slate-900 focus:border-blue-600'
+                                    : 'border-slate-200 bg-white text-slate-900 focus:border-blue-600'
+                                }`}
                               />
                             </div>
                             <div className="md:col-span-4 flex flex-col gap-1">
-                              <label className="text-[11px] font-extrabold text-slate-700 uppercase">Нік у Telegram:</label>
+                              <label className="text-[11px] font-extrabold text-slate-700 uppercase flex items-center justify-between">
+                                <span>Нік у Telegram:</span>
+                                {customClientTelegram && (
+                                  <span className="text-[10px] text-blue-600 font-bold lowercase">з бота / профілю</span>
+                                )}
+                              </label>
                               <div className="relative">
                                 <span className="absolute left-3 top-2 text-slate-400 font-bold text-xs">@</span>
                                 <input
@@ -13157,10 +13211,15 @@ export const Calculator: React.FC = () => {
                         {currentUser?.role === 'client' ? (
                           <div className="grid grid-cols-1 md:grid-cols-12 gap-3 p-4 rounded-xl bg-blue-50/60 border border-blue-100">
                             <div className="md:col-span-4 flex flex-col gap-1">
-                              <label className="text-[11px] font-extrabold text-slate-700 uppercase">ПІБ або компанія *:</label>
+                              <label className="text-[11px] font-extrabold text-slate-700 uppercase flex items-center justify-between">
+                                <span>ПІБ або компанія <span className="text-rose-500">*</span>:</span>
+                                {!customClientName.trim() && (
+                                  <span className="text-[10px] text-rose-500 font-bold lowercase">обов'язково</span>
+                                )}
+                              </label>
                               <input
                                 type="text"
-                                placeholder="Шевченко Тарас / ТОВ Едельвейс"
+                                placeholder="Вкажіть ваше ПІБ або компанію"
                                 value={customClientName}
                                 onChange={(e) => {
                                   setCustomClientName(e.target.value);
@@ -13169,11 +13228,20 @@ export const Calculator: React.FC = () => {
                                     localStorage.setItem('crm_client_profile', JSON.stringify({ ...prev, name: e.target.value, contactPerson: e.target.value }));
                                   } catch {}
                                 }}
-                                className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-900 focus:border-blue-600 focus:outline-none"
+                                className={`w-full px-3 py-2 rounded-xl border text-xs font-bold focus:outline-none transition-colors ${
+                                  !customClientName.trim()
+                                    ? 'border-amber-400 bg-amber-50/20 text-slate-900 focus:border-blue-600'
+                                    : 'border-slate-200 bg-white text-slate-900 focus:border-blue-600'
+                                }`}
                               />
                             </div>
                             <div className="md:col-span-4 flex flex-col gap-1">
-                              <label className="text-[11px] font-extrabold text-slate-700 uppercase">Номер телефону *:</label>
+                              <label className="text-[11px] font-extrabold text-slate-700 uppercase flex items-center justify-between">
+                                <span>Номер телефону <span className="text-rose-500">*</span>:</span>
+                                {!isPhoneComplete(customClientPhone) && (
+                                  <span className="text-[10px] text-rose-500 font-bold lowercase">обов'язково</span>
+                                )}
+                              </label>
                               <input
                                 type="text"
                                 placeholder="+(380)-__-___-__-__"
@@ -13186,11 +13254,20 @@ export const Calculator: React.FC = () => {
                                     localStorage.setItem('crm_client_profile', JSON.stringify({ ...prev, phone: formatted }));
                                   } catch {}
                                 }}
-                                className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-900 focus:border-blue-600 focus:outline-none font-mono"
+                                className={`w-full px-3 py-2 rounded-xl border text-xs font-bold focus:outline-none font-mono transition-colors ${
+                                  !isPhoneComplete(customClientPhone)
+                                    ? 'border-amber-400 bg-amber-50/20 text-slate-900 focus:border-blue-600'
+                                    : 'border-slate-200 bg-white text-slate-900 focus:border-blue-600'
+                                }`}
                               />
                             </div>
                             <div className="md:col-span-4 flex flex-col gap-1">
-                              <label className="text-[11px] font-extrabold text-slate-700 uppercase">Нік у Telegram:</label>
+                              <label className="text-[11px] font-extrabold text-slate-700 uppercase flex items-center justify-between">
+                                <span>Нік у Telegram:</span>
+                                {customClientTelegram && (
+                                  <span className="text-[10px] text-blue-600 font-bold lowercase">з бота / профілю</span>
+                                )}
+                              </label>
                               <div className="relative">
                                 <span className="absolute left-3 top-2 text-slate-400 font-bold text-xs">@</span>
                                 <input
@@ -16672,7 +16749,7 @@ export const Calculator: React.FC = () => {
                 <span>📩</span> Оформлення запиту менеджеру
               </h3>
               <p className="text-xs text-slate-500 mt-1 m-0">
-                Вкажіть ваші контакти, щоб ми надіслали прорахунок та зв'язалися для запуску в роботу.
+                Вкажіть ваші контакти, щоб ми зв'язалися для узгодження та запуску замовлення у друк.
               </p>
             </div>
 
@@ -16691,11 +16768,11 @@ export const Calculator: React.FC = () => {
               onSubmit={(e) => {
                 e.preventDefault();
                 if (!customClientName.trim()) {
-                  alert('Будь ласка, вкажіть ваше ПІБ або назву компанії');
+                  alert('⚠️ Будь ласка, вкажіть ваше ПІБ або назву компанії для надсилання розрахунку менеджеру!');
                   return;
                 }
                 if (!isPhoneComplete(customClientPhone)) {
-                  alert('Будь ласка, введіть коректний номер телефону (9 цифр після коду +380)');
+                  alert('⚠️ Будь ласка, введіть коректний номер телефону (9 цифр після коду +380)!');
                   return;
                 }
                 submitClientLead({
@@ -16708,22 +16785,33 @@ export const Calculator: React.FC = () => {
               className="flex flex-col gap-3"
             >
               <div className="flex flex-col gap-1">
-                <label className="text-[11px] font-extrabold text-slate-700 uppercase">
-                  Ваше ПІБ або компанія <span className="text-rose-500">*</span>:
+                <label className="text-[11px] font-extrabold text-slate-700 uppercase flex items-center justify-between">
+                  <span>Ваше ПІБ або компанія <span className="text-rose-500">*</span>:</span>
+                  {!customClientName.trim() && (
+                    <span className="text-[10px] text-rose-500 font-bold lowercase">обов'язкове поле</span>
+                  )}
                 </label>
                 <input
                   required
                   type="text"
-                  placeholder="напр. Шевченко Тарас Григорович"
+                  placeholder="напр. Шевченко Тарас або ТОВ «Едельвейс»"
                   value={customClientName}
                   onChange={(e) => setCustomClientName(e.target.value)}
-                  className="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-white text-xs font-bold text-slate-900 focus:border-blue-600 focus:outline-none"
+                  className={`w-full px-3 py-2.5 rounded-xl border text-xs font-bold focus:outline-none transition-colors ${
+                    !customClientName.trim()
+                      ? 'border-amber-400 bg-amber-50/20 text-slate-900 focus:border-blue-600'
+                      : 'border-slate-300 bg-white text-slate-900 focus:border-blue-600'
+                  }`}
+                  autoFocus
                 />
               </div>
 
               <div className="flex flex-col gap-1">
-                <label className="text-[11px] font-extrabold text-slate-700 uppercase">
-                  Номер телефону для зв'язку <span className="text-rose-500">*</span>:
+                <label className="text-[11px] font-extrabold text-slate-700 uppercase flex items-center justify-between">
+                  <span>Номер телефону для зв'язку <span className="text-rose-500">*</span>:</span>
+                  {!isPhoneComplete(customClientPhone) && (
+                    <span className="text-[10px] text-rose-500 font-bold lowercase">обов'язкове поле</span>
+                  )}
                 </label>
                 <input
                   required
@@ -16731,13 +16819,20 @@ export const Calculator: React.FC = () => {
                   placeholder="+(380)-__-___-__-__"
                   value={customClientPhone}
                   onChange={(e) => setCustomClientPhone(formatPhoneNumber(e.target.value))}
-                  className="w-full px-3 py-2.5 rounded-xl border border-slate-300 bg-white text-xs font-bold text-slate-900 focus:border-blue-600 focus:outline-none font-mono"
+                  className={`w-full px-3 py-2.5 rounded-xl border text-xs font-bold focus:outline-none font-mono transition-colors ${
+                    !isPhoneComplete(customClientPhone)
+                      ? 'border-amber-400 bg-amber-50/20 text-slate-900 focus:border-blue-600'
+                      : 'border-slate-300 bg-white text-slate-900 focus:border-blue-600'
+                  }`}
                 />
               </div>
 
               <div className="flex flex-col gap-1">
-                <label className="text-[11px] font-extrabold text-slate-700 uppercase">
-                  Нік у Telegram (необов'язково):
+                <label className="text-[11px] font-extrabold text-slate-700 uppercase flex items-center justify-between">
+                  <span>Нік у Telegram:</span>
+                  {customClientTelegram && (
+                    <span className="text-[10px] text-blue-600 font-bold lowercase">з бота / профілю</span>
+                  )}
                 </label>
                 <div className="relative">
                   <span className="absolute left-3 top-2.5 text-slate-400 font-bold text-xs">@</span>
@@ -16754,6 +16849,19 @@ export const Calculator: React.FC = () => {
                 </div>
               </div>
 
+              {(!customClientName.trim() || !isPhoneComplete(customClientPhone)) && (
+                <div className="p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-[11px] font-bold text-amber-900 flex items-center gap-2">
+                  <span>⚠️</span>
+                  <span>
+                    {!customClientName.trim() && !isPhoneComplete(customClientPhone)
+                      ? "Вкажіть ПІБ та повний телефон для надсилання рахунку"
+                      : !customClientName.trim()
+                      ? "Будь ласка, вкажіть ваше ПІБ або компанію"
+                      : "Введіть номер телефону повністю"}
+                  </span>
+                </div>
+              )}
+
               <div className="flex items-center gap-3 pt-2">
                 <button
                   type="button"
@@ -16764,7 +16872,12 @@ export const Calculator: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="w-2/3 py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-extrabold shadow-md shadow-blue-500/20 transition-all flex items-center justify-center gap-1.5"
+                  disabled={!customClientName.trim() || !isPhoneComplete(customClientPhone)}
+                  className={`w-2/3 py-2.5 px-4 rounded-xl text-xs font-extrabold shadow-md transition-all flex items-center justify-center gap-1.5 ${
+                    !customClientName.trim() || !isPhoneComplete(customClientPhone)
+                      ? 'bg-slate-200 text-slate-400 border border-slate-300 cursor-not-allowed shadow-none'
+                      : 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/20'
+                  }`}
                 >
                   <span>🚀 Надіслати запит</span>
                 </button>
