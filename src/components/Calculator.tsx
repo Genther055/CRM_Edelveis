@@ -7531,113 +7531,12 @@ export const Calculator: React.FC = () => {
                               </div>
                             )}
 
-                            {/* Horizontal Action Buttons Right: [ ШАБЛОН ] [ PDF ] [ КП ] [ ВИРОБНИЦТВО ] */}
-                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 pt-3 border-t border-slate-100">
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setTemplateName(customTitleMap['digital'] ?? fullComposedName);
-                                  setShowTemplateModal(true);
-                                }}
-                                className="py-2.5 px-2 rounded-xl border border-slate-200/80 bg-slate-50/80 hover:bg-slate-100 text-slate-700 font-bold text-xs shadow-2xs transition-all text-center flex items-center justify-center gap-1.5"
-                              >
-                                <LayoutTemplate size={14} className="text-slate-500" />
-                                <span>Шаблон</span>
-                              </button>
-                              
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setName(fullComposedName);
-                                  setShowInvoice(true);
-                                }}
-                                className="py-2.5 px-2 rounded-xl border border-slate-200/80 bg-slate-50/80 hover:bg-slate-100 text-slate-700 font-bold text-xs shadow-2xs transition-all text-center flex items-center justify-center gap-1.5"
-                              >
-                                <FileDown size={14} className="text-slate-500" />
-                                <span>ПДФ</span>
-                              </button>
-
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  const text = `Комерційна пропозиція № ${orderNumber}
-Замовник: ${effectiveClient}
-Продукція: ${category === 'Бланки' ? subCategory : (category as string)}
-Розмір: ${sheetCustomWidth} × ${sheetCustomHeight} ${sheetUnit}
-Матеріал: ${activeCalc.matName}
-Покриття: ${activeCalc.covName}
-Друк: ${activeCalc.colStr} (Оборот: ${turnShortLabel})
-Тираж: ${activeCalc.tirazh} шт
-Вартість замовлення: ${liveFinalPrice} грн (${liveUnitPrice.toFixed(2)} грн/шт)
-Друкарня "Едельвейс і К"`;
-                                  navigator.clipboard.writeText(text);
-                                  alert('Комерційну пропозицію (КП) скопійовано в буфер обміну.');
-                                }}
-                                className="py-2.5 px-2 rounded-xl border border-slate-200/80 bg-slate-50/80 hover:bg-slate-100 text-slate-700 font-bold text-xs shadow-2xs transition-all text-center flex items-center justify-center gap-1.5"
-                              >
-                                <FileText size={14} className="text-slate-500" />
-                                <span>КП</span>
-                              </button>
-
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  const pSizeOrd = parseInt(postPackingText.replace(/\D/g, '')) || 0;
-                                  const pCountOrd = pSizeOrd > 0 ? Math.ceil(activeCalc.tirazh / pSizeOrd) : 0;
-                                  const packingInfoStr = postPackingText.trim() 
-                                    ? `${postPackingText.trim()}${pCountOrd > 0 ? ` (${pCountOrd} пачок по ${pSizeOrd} шт)` : ''}`
-                                    : 'Стандартна упаковка в папір/стрейч';
-
-                                  const itemW = parseFloat(sheetCustomWidth) || 210;
-                                  const itemH = parseFloat(sheetCustomHeight) || 297;
-                                  const sheetW = 450;
-                                  const sheetH = 320;
-                                  const fit1 = Math.floor(sheetW / itemW) * Math.floor(sheetH / itemH);
-                                  const fit2 = Math.floor(sheetW / itemH) * Math.floor(sheetH / itemW);
-                                  const itemsPerSheetCalc = Math.max(1, fit1, fit2);
-
-                                  const physSheets = Math.ceil(activeCalc.tirazh / itemsPerSheetCalc);
-                                  const priladka = turnType === 'sam_na_sebe' ? 30 : turnType === 'chuzhyi_oborut' ? 50 : 20;
-                                  const techWaste = Math.max(10, Math.ceil(physSheets * 0.04));
-                                  const grossSheets = physSheets + priladka + techWaste;
-
-                                  const plates = activeCalc.colStr === '4+4' 
-                                    ? (turnType === 'sam_na_sebe' ? 4 : 8) 
-                                    : activeCalc.colStr === '4+0' ? 4 
-                                    : activeCalc.colStr === '1+1' ? (turnType === 'sam_na_sebe' ? 1 : 2) : 1;
-
-                                  const postpressList: Array<{ name: string; qty: string }> = [
-                                    { name: `Порізка в готовий розмір ${sheetCustomWidth}×${sheetCustomHeight} мм`, qty: `${activeCalc.tirazh} шт` }
-                                  ];
-                                  if (activeCalc.covId && activeCalc.covId !== '0') {
-                                    postpressList.push({ name: `Ламінування: ${activeCalc.covName}`, qty: `${physSheets} арк.` });
-                                  }
-                                  if (postCorners !== '0') {
-                                    postpressList.push({ name: `Скруглення кутів (${postCorners} кути)`, qty: `${activeCalc.tirazh} шт` });
-                                  }
-                                  if (postLuvers !== '0') {
-                                    postpressList.push({ name: `Встановлення люверсів (${postLuversCount} шт)`, qty: `${activeCalc.tirazh * postLuversCount} шт` });
-                                  }
-                                  if (postFolding !== '0') {
-                                    postpressList.push({ name: `Фальцювання (${postFolding})`, qty: `${activeCalc.tirazh} шт` });
-                                  }
-                                  if (postCreasing !== '0') {
-                                    postpressList.push({ name: `Біговка (${postCreasing} біги)`, qty: `${activeCalc.tirazh * parseInt(postCreasing)} бігів` });
-                                  }
-                                  if (postDrilling !== '0') {
-                                    postpressList.push({ name: `Свердління отворів (Ø ${postDrillingDia} мм)`, qty: `${activeCalc.tirazh * parseInt(postDrilling)} отв.` });
-                                  }
-                                  if (postGluing !== '0') {
-                                    postpressList.push({ name: `Проклейка в блок (по ${postGluing} листів)`, qty: `${Math.ceil(activeCalc.tirazh / parseInt(postGluing))} блоків` });
-                                  }
-                                  if (postPersonalization !== '0') {
-                                    postpressList.push({ name: `Персоналізація (${postPersonalization === '1' ? 'Нумерація / Штрихкод' : 'Змінні дані'})`, qty: `${activeCalc.tirazh} шт` });
-                                  }
-                                  if (postPackingText.trim()) {
-                                    postpressList.push({ name: `Фасування та пакування (${postPackingText.trim()})`, qty: pCountOrd > 0 ? `${pCountOrd} пачок` : '1 тираж' });
-                                  }
-
-                                  if (isClient) {
+                            {/* Action Buttons: Simple 'Оформити запит' for client, full tools for staff */}
+                            {isClient ? (
+                              <div className="pt-3 border-t border-slate-100">
+                                <button
+                                  type="button"
+                                  onClick={() => {
                                     requestClientSubmission({
                                       category: category === 'Бланки' ? subCategory : (category as string),
                                       format: `${sheetCustomWidth}×${sheetCustomHeight} ${sheetUnit}`,
@@ -7649,51 +7548,162 @@ export const Calculator: React.FC = () => {
                                       options: `${activeCalc.covName}, ${turnShortLabel}`,
                                       composedName: name || fullComposedName
                                     });
-                                    return;
-                                  }
+                                  }}
+                                  className="w-full py-3.5 px-6 rounded-2xl bg-blue-600 hover:bg-blue-700 active:scale-[0.99] text-white font-extrabold text-sm shadow-md shadow-blue-500/25 transition-all flex items-center justify-center gap-2"
+                                >
+                                  <Send size={16} />
+                                  <span>Оформити запит</span>
+                                </button>
+                              </div>
+                            ) : (
+                              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 pt-3 border-t border-slate-100">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setTemplateName(customTitleMap['digital'] ?? fullComposedName);
+                                    setShowTemplateModal(true);
+                                  }}
+                                  className="py-2.5 px-2 rounded-xl border border-slate-200/80 bg-slate-50/80 hover:bg-slate-100 text-slate-700 font-bold text-xs shadow-2xs transition-all text-center flex items-center justify-center gap-1.5"
+                                >
+                                  <LayoutTemplate size={14} className="text-slate-500" />
+                                  <span>Шаблон</span>
+                                </button>
+                                
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setName(fullComposedName);
+                                    setShowInvoice(true);
+                                  }}
+                                  className="py-2.5 px-2 rounded-xl border border-slate-200/80 bg-slate-50/80 hover:bg-slate-100 text-slate-700 font-bold text-xs shadow-2xs transition-all text-center flex items-center justify-center gap-1.5"
+                                >
+                                  <FileDown size={14} className="text-slate-500" />
+                                  <span>ПДФ</span>
+                                </button>
 
-                                  addOrder({
-                                    id: orderNumber.toString(),
-                                    name: name || fullComposedName,
-                                    clientId: isNewClientMode ? (customClientName || 'Новий клієнт') : selectedClientId,
-                                    category: category === 'Бланки' ? subCategory : (category as string),
-                                    quantity: activeCalc.tirazh,
-                                    packingCount: pSizeOrd > 0 ? pSizeOrd : 100,
-                                    paperType: activeCalc.matId === '80' ? 'offset' : 'coated',
-                                    paperName: activeCalc.matName,
-                                    sheetSize: `${sheetW} × ${sheetH} мм (SRA3+)`,
-                                    turnTypeLabel: turnType === 'sam_na_sebe' ? 'Сам на себе (с/с)' : turnType === 'chuzhyi_oborut' ? 'Чужий оборот (ч/о)' : 'Без обороту',
-                                    colors: activeCalc.colStr,
-                                    isSamNaSebe: turnType === 'sam_na_sebe',
-                                    designCost: designCost,
-                                    margin: marginPercent,
-                                    machine: 'Офсетна машина Heidelberg PM 52-4',
-                                    format: `${sheetCustomWidth}×${sheetCustomHeight} ${sheetUnit}`,
-                                    physicalSheets: physSheets,
-                                    itemsPerSheet: itemsPerSheetCalc,
-                                    priladkaSheets: priladka,
-                                    techWasteSheets: techWaste,
-                                    totalGrossSheets: grossSheets,
-                                    platesCount: plates,
-                                    postpressOps: postpressList,
-                                    packingInfo: packingInfoStr,
-                                    subtotal: activeCalc.rawCost,
-                                    marginAmount: liveMarginAmount,
-                                    finalPrice: liveFinalPrice,
-                                    unitPrice: liveUnitPrice,
-                                    paymentStatus: 'unpaid',
-                                    prepayment: 0,
-                                    notes: `Специфікація: ${name || fullComposedName}, ${sheetCustomWidth}×${sheetCustomHeight} ${sheetUnit}, ${activeCalc.matName}, ${activeCalc.covName}, ${activeCalc.colStr}, ${turnShortLabel}, ${activeCalc.tirazh} шт.`
-                                  });
-                                  alert(`Замовлення № ${orderNumber} успішно сформовано з автоматичним розрахунком виробництва та передано в цех!`);
-                                  setOrderNumber(Math.floor(10000 + Math.random() * 90000));
-                                }}
-                                className="py-2.5 px-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs shadow-md shadow-blue-500/25 transition-all text-center flex items-center justify-center gap-1.5"
-                              >
-                                <Send size={14} className="text-white" />
-                                <span>{isClient ? 'Оформити запит' : 'Виробництво'}</span>
-                              </button>
-                            </div>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const text = `Комерційна пропозиція № ${orderNumber}
+Замовник: ${effectiveClient}
+Продукція: ${category === 'Бланки' ? subCategory : (category as string)}
+Розмір: ${sheetCustomWidth} × ${sheetCustomHeight} ${sheetUnit}
+Матеріал: ${activeCalc.matName}
+Покриття: ${activeCalc.covName}
+Друк: ${activeCalc.colStr} (Оборот: ${turnShortLabel})
+Тираж: ${activeCalc.tirazh} шт
+Вартість замовлення: ${liveFinalPrice} грн (${liveUnitPrice.toFixed(2)} грн/шт)
+Друкарня "Едельвейс і К"`;
+                                    navigator.clipboard.writeText(text);
+                                    alert('Комерційну пропозицію (КП) скопійовано в буфер обміну.');
+                                  }}
+                                  className="py-2.5 px-2 rounded-xl border border-slate-200/80 bg-slate-50/80 hover:bg-slate-100 text-slate-700 font-bold text-xs shadow-2xs transition-all text-center flex items-center justify-center gap-1.5"
+                                >
+                                  <FileText size={14} className="text-slate-500" />
+                                  <span>КП</span>
+                                </button>
+
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const pSizeOrd = parseInt(postPackingText.replace(/\D/g, '')) || 0;
+                                    const pCountOrd = pSizeOrd > 0 ? Math.ceil(activeCalc.tirazh / pSizeOrd) : 0;
+                                    const packingInfoStr = postPackingText.trim() 
+                                      ? `${postPackingText.trim()}${pCountOrd > 0 ? ` (${pCountOrd} пачок по ${pSizeOrd} шт)` : ''}`
+                                      : 'Стандартна упаковка в папір/стрейч';
+
+                                    const itemW = parseFloat(sheetCustomWidth) || 210;
+                                    const itemH = parseFloat(sheetCustomHeight) || 297;
+                                    const sheetW = 450;
+                                    const sheetH = 320;
+                                    const fit1 = Math.floor(sheetW / itemW) * Math.floor(sheetH / itemH);
+                                    const fit2 = Math.floor(sheetW / itemH) * Math.floor(sheetH / itemW);
+                                    const itemsPerSheetCalc = Math.max(1, fit1, fit2);
+
+                                    const physSheets = Math.ceil(activeCalc.tirazh / itemsPerSheetCalc);
+                                    const priladka = turnType === 'sam_na_sebe' ? 30 : turnType === 'chuzhyi_oborut' ? 50 : 20;
+                                    const techWaste = Math.max(10, Math.ceil(physSheets * 0.04));
+                                    const grossSheets = physSheets + priladka + techWaste;
+
+                                    const plates = activeCalc.colStr === '4+4' 
+                                      ? (turnType === 'sam_na_sebe' ? 4 : 8) 
+                                      : activeCalc.colStr === '4+0' ? 4 
+                                      : activeCalc.colStr === '1+1' ? (turnType === 'sam_na_sebe' ? 1 : 2) : 1;
+
+                                    const postpressList: Array<{ name: string; qty: string }> = [
+                                      { name: `Порізка в готовий розмір ${sheetCustomWidth}×${sheetCustomHeight} мм`, qty: `${activeCalc.tirazh} шт` }
+                                    ];
+                                    if (activeCalc.covId && activeCalc.covId !== '0') {
+                                      postpressList.push({ name: `Ламінування: ${activeCalc.covName}`, qty: `${physSheets} арк.` });
+                                    }
+                                    if (postCorners !== '0') {
+                                      postpressList.push({ name: `Скруглення кутів (${postCorners} кути)`, qty: `${activeCalc.tirazh} шт` });
+                                    }
+                                    if (postLuvers !== '0') {
+                                      postpressList.push({ name: `Встановлення люверсів (${postLuversCount} шт)`, qty: `${activeCalc.tirazh * postLuversCount} шт` });
+                                    }
+                                    if (postFolding !== '0') {
+                                      postpressList.push({ name: `Фальцювання (${postFolding})`, qty: `${activeCalc.tirazh} шт` });
+                                    }
+                                    if (postCreasing !== '0') {
+                                      postpressList.push({ name: `Біговка (${postCreasing} біги)`, qty: `${activeCalc.tirazh * parseInt(postCreasing)} бігів` });
+                                    }
+                                    if (postDrilling !== '0') {
+                                      postpressList.push({ name: `Свердління отворів (Ø ${postDrillingDia} мм)`, qty: `${activeCalc.tirazh * parseInt(postDrilling)} отв.` });
+                                    }
+                                    if (postGluing !== '0') {
+                                      postpressList.push({ name: `Проклейка в блок (по ${postGluing} листів)`, qty: `${Math.ceil(activeCalc.tirazh / parseInt(postGluing))} блоків` });
+                                    }
+                                    if (postPersonalization !== '0') {
+                                      postpressList.push({ name: `Персоналізація (${postPersonalization === '1' ? 'Нумерація / Штрихкод' : 'Змінні дані'})`, qty: `${activeCalc.tirazh} шт` });
+                                    }
+                                    if (postPackingText.trim()) {
+                                      postpressList.push({ name: `Фасування та пакування (${postPackingText.trim()})`, qty: pCountOrd > 0 ? `${pCountOrd} пачок` : '1 тираж' });
+                                    }
+
+                                    addOrder({
+                                      id: orderNumber.toString(),
+                                      name: name || fullComposedName,
+                                      clientId: isNewClientMode ? (customClientName || 'Новий клієнт') : selectedClientId,
+                                      category: category === 'Бланки' ? subCategory : (category as string),
+                                      quantity: activeCalc.tirazh,
+                                      packingCount: pSizeOrd > 0 ? pSizeOrd : 100,
+                                      paperType: activeCalc.matId === '80' ? 'offset' : 'coated',
+                                      paperName: activeCalc.matName,
+                                      sheetSize: `${sheetW} × ${sheetH} мм (SRA3+)`,
+                                      turnTypeLabel: turnType === 'sam_na_sebe' ? 'Сам на себе (с/с)' : turnType === 'chuzhyi_oborut' ? 'Чужий оборот (ч/о)' : 'Без обороту',
+                                      colors: activeCalc.colStr,
+                                      isSamNaSebe: turnType === 'sam_na_sebe',
+                                      designCost: designCost,
+                                      margin: marginPercent,
+                                      machine: 'Офсетна машина Heidelberg PM 52-4',
+                                      format: `${sheetCustomWidth}×${sheetCustomHeight} ${sheetUnit}`,
+                                      physicalSheets: physSheets,
+                                      itemsPerSheet: itemsPerSheetCalc,
+                                      priladkaSheets: priladka,
+                                      techWasteSheets: techWaste,
+                                      totalGrossSheets: grossSheets,
+                                      platesCount: plates,
+                                      postpressOps: postpressList,
+                                      packingInfo: packingInfoStr,
+                                      subtotal: activeCalc.rawCost,
+                                      marginAmount: liveMarginAmount,
+                                      finalPrice: liveFinalPrice,
+                                      unitPrice: liveUnitPrice,
+                                      paymentStatus: 'unpaid',
+                                      prepayment: 0,
+                                      notes: `Специфікація: ${name || fullComposedName}, ${sheetCustomWidth}×${sheetCustomHeight} ${sheetUnit}, ${activeCalc.matName}, ${activeCalc.covName}, ${activeCalc.colStr}, ${turnShortLabel}, ${activeCalc.tirazh} шт.`
+                                    });
+                                    alert(`Замовлення № ${orderNumber} успішно сформовано з автоматичним розрахунком виробництва та передано в цех!`);
+                                    setOrderNumber(Math.floor(10000 + Math.random() * 90000));
+                                  }}
+                                  className="py-2.5 px-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs shadow-md shadow-blue-500/25 transition-all text-center flex items-center justify-center gap-1.5"
+                                >
+                                  <Send size={14} className="text-white" />
+                                  <span>Виробництво</span>
+                                </button>
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -10151,66 +10161,12 @@ export const Calculator: React.FC = () => {
                               </div>
                             </div>
 
-                            {/* Horizontal Action Buttons Right: [ ШАБЛОН ] [ PDF ] [ КП ] [ ВИРОБНИЦТВО ] */}
-                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 pt-3 border-t border-slate-100">
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setTemplateName(customTitleMap['digital'] ?? fullComposedName);
-                                  setShowTemplateModal(true);
-                                }}
-                                className="py-2.5 px-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-2xs transition-colors text-center"
-                              >
-                                Шаблон
-                              </button>
-                              
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setName(fullComposedName);
-                                  setShowInvoice(true);
-                                }}
-                                className="py-2.5 px-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-2xs transition-colors text-center"
-                              >
-                                ПДФ
-                              </button>
-
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  const text = `Комерційна пропозиція № ${orderNumber}
-Замовник: ${effectiveClient}
-Продукція: Цифровий друк
-Розмір: ${sheetCustomWidth} × ${sheetCustomHeight} ${sheetUnit}
-Матеріал: ${digMatLabels[digMatId] || '350г'}
-Покриття: ${digCovLabels[digCovId] || 'БП'}
-Друк: ${digColId} (Оборот: ${turnShortLabel})
-Тираж: ${digTir} шт
-Вартість замовлення: ${digFinalPrice} грн (${digUnitPrice.toFixed(2)} грн/шт)
-Друкарня "Едельвейс і К"`;
-                                  navigator.clipboard.writeText(text);
-                                  alert('Комерційну пропозицію (КП) скопійовано в буфер обміну.');
-                                }}
-                                className="py-2.5 px-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-2xs transition-colors text-center"
-                              >
-                                КП
-                              </button>
-
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  const itemW = parseFloat(sheetCustomWidth) || 210;
-                                  const itemH = parseFloat(sheetCustomHeight) || 297;
-                                  const sheetW = 450;
-                                  const sheetH = 320;
-                                  const fit1 = Math.floor(sheetW / itemW) * Math.floor(sheetH / itemH);
-                                  const fit2 = Math.floor(sheetW / itemH) * Math.floor(sheetH / itemW);
-                                  const itemsPerSheetCalc = Math.max(1, fit1, fit2);
-                                  const physSheets = Math.ceil(digTir / itemsPerSheetCalc);
-                                  const priladka = 3;
-                                  const techWaste = Math.max(2, Math.ceil(physSheets * 0.02));
-
-                                  if (isClient) {
+                            {/* Action Buttons: Simple 'Оформити запит' for client, full tools for staff */}
+                            {isClient ? (
+                              <div className="pt-3 border-t border-slate-100">
+                                <button
+                                  type="button"
+                                  onClick={() => {
                                     requestClientSubmission({
                                       category: 'Цифровий друк',
                                       format: `${sheetCustomWidth}×${sheetCustomHeight} ${sheetUnit}`,
@@ -10222,54 +10178,122 @@ export const Calculator: React.FC = () => {
                                       options: digCovLabels[digCovId] || 'Без ламінації',
                                       composedName: name || fullComposedName
                                     });
-                                    return;
-                                  }
+                                  }}
+                                  className="w-full py-3.5 px-6 rounded-2xl bg-blue-600 hover:bg-blue-700 active:scale-[0.99] text-white font-extrabold text-sm shadow-md shadow-blue-500/25 transition-all flex items-center justify-center gap-2"
+                                >
+                                  <Send size={16} />
+                                  <span>Оформити запит</span>
+                                </button>
+                              </div>
+                            ) : (
+                              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 pt-3 border-t border-slate-100">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setTemplateName(customTitleMap['digital'] ?? fullComposedName);
+                                    setShowTemplateModal(true);
+                                  }}
+                                  className="py-2.5 px-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-2xs transition-colors text-center flex items-center justify-center gap-1.5"
+                                >
+                                  <LayoutTemplate size={14} className="text-slate-500" />
+                                  <span>Шаблон</span>
+                                </button>
+                                
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setName(fullComposedName);
+                                    setShowInvoice(true);
+                                  }}
+                                  className="py-2.5 px-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-2xs transition-colors text-center flex items-center justify-center gap-1.5"
+                                >
+                                  <FileDown size={14} className="text-slate-500" />
+                                  <span>ПДФ</span>
+                                </button>
 
-                                  addOrder({
-                                    id: orderNumber.toString(),
-                                    name: name || fullComposedName,
-                                    clientId: isNewClientMode ? (customClientName || 'Новий клієнт') : selectedClientId,
-                                    category: 'Цифровий друк',
-                                    quantity: digTir,
-                                    packingCount: 100,
-                                    paperType: 'coated',
-                                    paperName: digMatLabels[digMatId] || 'Крейдований 350 г/м²',
-                                    sheetSize: '320 × 450 мм (SRA3)',
-                                    turnTypeLabel: turnType === 'sam_na_sebe' ? 'Сам на себе (с/с)' : 'Без обороту',
-                                    colors: digColId,
-                                    isSamNaSebe: turnType === 'sam_na_sebe',
-                                    designCost: designCost,
-                                    margin: marginPercent,
-                                    machine: 'Цифрова машина Konica Minolta AccurioPress C7090',
-                                    format: `${sheetCustomWidth}×${sheetCustomHeight} ${sheetUnit}`,
-                                    physicalSheets: physSheets,
-                                    itemsPerSheet: itemsPerSheetCalc,
-                                    priladkaSheets: priladka,
-                                    techWasteSheets: techWaste,
-                                    totalGrossSheets: physSheets + priladka + techWaste,
-                                    platesCount: 0,
-                                    postpressOps: [
-                                      { name: `Порізка в готовий розмір ${sheetCustomWidth}×${sheetCustomHeight} мм`, qty: `${digTir} шт` },
-                                      ...(digCovId !== '0' ? [{ name: `Ламінування: ${digCovLabels[digCovId] || 'Ламінація'}`, qty: `${physSheets} арк.` }] : []),
-                                      { name: 'Фасування та упаковка продукції', qty: 'Стандартна' }
-                                    ],
-                                    packingInfo: 'Стандартна упаковка в папір/стрейч',
-                                    subtotal: digRawCost,
-                                    marginAmount: digMarginAmount,
-                                    finalPrice: digFinalPrice,
-                                    unitPrice: digUnitPrice,
-                                    paymentStatus: 'unpaid',
-                                    prepayment: 0,
-                                    notes: `Специфікація: ${name || fullComposedName}, ${sheetCustomWidth}×${sheetCustomHeight} ${sheetUnit}, ${digMatLabels[digMatId] || '350г'}, ${digCovLabels[digCovId] || 'БП'}, ${digColId}, ${digTir} шт.`
-                                  });
-                                  alert(`Замовлення № ${orderNumber} успішно сформовано з автоматичним розрахунком виробництва та передано в цех!`);
-                                  setOrderNumber(Math.floor(10000 + Math.random() * 90000));
-                                }}
-                                className="py-2.5 px-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs shadow-md shadow-blue-500/20 transition-all text-center"
-                              >
-                                {isClient ? 'Оформити запит' : 'Виробництво'}
-                              </button>
-                            </div>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const text = `Комерційна пропозиція № ${orderNumber}
+Замовник: ${effectiveClient}
+Продукція: Цифровий друк
+Розмір: ${sheetCustomWidth} × ${sheetCustomHeight} ${sheetUnit}
+Матеріал: ${digMatLabels[digMatId] || '350г'}
+Покриття: ${digCovLabels[digCovId] || 'БП'}
+Друк: ${digColId} (Оборот: ${turnShortLabel})
+Тираж: ${digTir} шт
+Вартість замовлення: ${digFinalPrice} грн (${digUnitPrice.toFixed(2)} грн/шт)
+Друкарня "Едельвейс і К"`;
+                                    navigator.clipboard.writeText(text);
+                                    alert('Комерційну пропозицію (КП) скопійовано в буфер обміну.');
+                                  }}
+                                  className="py-2.5 px-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-2xs transition-colors text-center flex items-center justify-center gap-1.5"
+                                >
+                                  <FileText size={14} className="text-slate-500" />
+                                  <span>КП</span>
+                                </button>
+
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const itemW = parseFloat(sheetCustomWidth) || 210;
+                                    const itemH = parseFloat(sheetCustomHeight) || 297;
+                                    const sheetW = 450;
+                                    const sheetH = 320;
+                                    const fit1 = Math.floor(sheetW / itemW) * Math.floor(sheetH / itemH);
+                                    const fit2 = Math.floor(sheetW / itemH) * Math.floor(sheetH / itemW);
+                                    const itemsPerSheetCalc = Math.max(1, fit1, fit2);
+                                    const physSheets = Math.ceil(digTir / itemsPerSheetCalc);
+                                    const priladka = 3;
+                                    const techWaste = Math.max(2, Math.ceil(physSheets * 0.02));
+
+                                    addOrder({
+                                      id: orderNumber.toString(),
+                                      name: name || fullComposedName,
+                                      clientId: isNewClientMode ? (customClientName || 'Новий клієнт') : selectedClientId,
+                                      category: 'Цифровий друк',
+                                      quantity: digTir,
+                                      packingCount: 100,
+                                      paperType: 'coated',
+                                      paperName: digMatLabels[digMatId] || 'Крейдований 350 г/м²',
+                                      sheetSize: '320 × 450 мм (SRA3)',
+                                      turnTypeLabel: turnType === 'sam_na_sebe' ? 'Сам на себе (с/с)' : 'Без обороту',
+                                      colors: digColId,
+                                      isSamNaSebe: turnType === 'sam_na_sebe',
+                                      designCost: designCost,
+                                      margin: marginPercent,
+                                      machine: 'Цифрова машина Konica Minolta AccurioPress C7090',
+                                      format: `${sheetCustomWidth}×${sheetCustomHeight} ${sheetUnit}`,
+                                      physicalSheets: physSheets,
+                                      itemsPerSheet: itemsPerSheetCalc,
+                                      priladkaSheets: priladka,
+                                      techWasteSheets: techWaste,
+                                      totalGrossSheets: physSheets + priladka + techWaste,
+                                      platesCount: 0,
+                                      postpressOps: [
+                                        { name: `Порізка в готовий розмір ${sheetCustomWidth}×${sheetCustomHeight} мм`, qty: `${digTir} шт` },
+                                        ...(digCovId !== '0' ? [{ name: `Ламінування: ${digCovLabels[digCovId] || 'Ламінація'}`, qty: `${physSheets} арк.` }] : []),
+                                        { name: 'Фасування та упаковка продукції', qty: 'Стандартна' }
+                                      ],
+                                      packingInfo: 'Стандартна упаковка в папір/стрейч',
+                                      subtotal: digRawCost,
+                                      marginAmount: digMarginAmount,
+                                      finalPrice: digFinalPrice,
+                                      unitPrice: digUnitPrice,
+                                      paymentStatus: 'unpaid',
+                                      prepayment: 0,
+                                      notes: `Специфікація: ${name || fullComposedName}, ${sheetCustomWidth}×${sheetCustomHeight} ${sheetUnit}, ${digMatLabels[digMatId] || '350г'}, ${digCovLabels[digCovId] || 'БП'}, ${digColId}, ${digTir} шт.`
+                                    });
+                                    alert(`Замовлення № ${orderNumber} успішно сформовано з автоматичним розрахунком виробництва та передано в цех!`);
+                                    setOrderNumber(Math.floor(10000 + Math.random() * 90000));
+                                  }}
+                                  className="py-2.5 px-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs shadow-md shadow-blue-500/20 transition-all text-center flex items-center justify-center gap-1.5"
+                                >
+                                  <Send size={14} className="text-white" />
+                                  <span>Виробництво</span>
+                                </button>
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -13506,54 +13530,12 @@ export const Calculator: React.FC = () => {
                               </div>
                             )}
 
-                            {/* Horizontal Action Buttons Right: [ ШАБЛОН ] [ PDF ] [ КП ] [ ВИРОБНИЦТВО ] */}
-                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 pt-3 border-t border-slate-100">
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setTemplateName(customTitleMap['digital'] ?? fullComposedName);
-                                  setShowTemplateModal(true);
-                                }}
-                                className="py-2.5 px-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-2xs transition-colors text-center"
-                              >
-                                Шаблон
-                              </button>
-                              
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setName(fullComposedName);
-                                  setShowInvoice(true);
-                                }}
-                                className="py-2.5 px-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-2xs transition-colors text-center"
-                              >
-                                ПДФ
-                              </button>
-
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  const text = `Комерційна пропозиція № ${orderNumber}
-Замовник: ${effectiveClient}
-Продукція: Широкоформатний друк
-Розмір: ${wideWidth} × ${wideHeight} ${wideUnit} (${areaM2.toFixed(2)} м²)
-Матеріал: ${matInfo.label}
-Якість: ${wideResId} dpi
-Тираж: ${wideTir} шт
-Вартість замовлення: ${wideFinalPrice} грн (${wideUnitPrice.toFixed(2)} грн/шт)
-Друкарня "Едельвейс і К"`;
-                                  navigator.clipboard.writeText(text);
-                                  alert('Комерційну пропозицію (КП) скопійовано в буфер обміну.');
-                                }}
-                                className="py-2.5 px-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-2xs transition-colors text-center"
-                              >
-                                КП
-                              </button>
-
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  if (isClient) {
+                            {/* Action Buttons: Simple 'Оформити запит' for client, full tools for staff */}
+                            {isClient ? (
+                              <div className="pt-3 border-t border-slate-100">
+                                <button
+                                  type="button"
+                                  onClick={() => {
                                     requestClientSubmission({
                                       category: 'Широкоформатний друк',
                                       format: `${wideWidth}×${wideHeight} ${wideUnit}`,
@@ -13565,40 +13547,96 @@ export const Calculator: React.FC = () => {
                                       options: fullComposedName,
                                       composedName: name || fullComposedName
                                     });
-                                    return;
-                                  }
+                                  }}
+                                  className="w-full py-3.5 px-6 rounded-2xl bg-blue-600 hover:bg-blue-700 active:scale-[0.99] text-white font-extrabold text-sm shadow-md shadow-blue-500/25 transition-all flex items-center justify-center gap-2"
+                                >
+                                  <Send size={16} />
+                                  <span>Оформити запит</span>
+                                </button>
+                              </div>
+                            ) : (
+                              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 pt-3 border-t border-slate-100">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setTemplateName(customTitleMap['digital'] ?? fullComposedName);
+                                    setShowTemplateModal(true);
+                                  }}
+                                  className="py-2.5 px-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-2xs transition-colors text-center flex items-center justify-center gap-1.5"
+                                >
+                                  <LayoutTemplate size={14} className="text-slate-500" />
+                                  <span>Шаблон</span>
+                                </button>
+                                
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setName(fullComposedName);
+                                    setShowInvoice(true);
+                                  }}
+                                  className="py-2.5 px-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-2xs transition-colors text-center flex items-center justify-center gap-1.5"
+                                >
+                                  <FileDown size={14} className="text-slate-500" />
+                                  <span>ПДФ</span>
+                                </button>
 
-                                  addOrder({
-                                    name: name || fullComposedName,
-                                    clientId: isNewClientMode ? (customClientName || 'Новий клієнт') : selectedClientId,
-                                    category: 'Широкоформатний друк',
-                                    quantity: wideTir,
-                                    packingCount: 1,
-                                    paperType: 'coated',
-                                    colors: `${wideResId} dpi`,
-                                    isSamNaSebe: false,
-                                    designCost: designCost,
-                                    margin: marginPercent,
-                                    machine: 'Широкоформатний плотер Flora',
-                                    format: `${wideWidth}×${wideHeight}`,
-                                    physicalSheets: wideTir,
-                                    itemsPerSheet: 1,
-                                    subtotal: wideRawCost,
-                                    marginAmount: wideMarginAmount,
-                                    finalPrice: wideFinalPrice,
-                                    unitPrice: wideUnitPrice,
-                                    paymentStatus: 'unpaid',
-                                    prepayment: 0,
-                                    notes: `Специфікація: ${name || fullComposedName}, ${wideWidth}×${wideHeight} ${wideUnit}, ${matInfo.label}, ${wideResId} dpi, ${wideTir} шт.`
-                                  });
-                                  alert(`Замовлення № ${orderNumber} створено та передано у виробництво.`);
-                                  setOrderNumber(Math.floor(10000 + Math.random() * 90000));
-                                }}
-                                className="py-2.5 px-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs shadow-md shadow-blue-500/20 transition-all text-center"
-                              >
-                                {isClient ? 'Оформити запит' : 'Виробництво'}
-                              </button>
-                            </div>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const text = `Комерційна пропозиція № ${orderNumber}
+Замовник: ${effectiveClient}
+Продукція: Широкоформатний друк
+Розмір: ${wideWidth} × ${wideHeight} ${wideUnit} (${areaM2.toFixed(2)} м²)
+Матеріал: ${matInfo.label}
+Якість: ${wideResId} dpi
+Тираж: ${wideTir} шт
+Вартість замовлення: ${wideFinalPrice} грн (${wideUnitPrice.toFixed(2)} грн/шт)
+Друкарня "Едельвейс і К"`;
+                                    navigator.clipboard.writeText(text);
+                                    alert('Комерційну пропозицію (КП) скопійовано в буфер обміну.');
+                                  }}
+                                  className="py-2.5 px-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-2xs transition-colors text-center flex items-center justify-center gap-1.5"
+                                >
+                                  <FileText size={14} className="text-slate-500" />
+                                  <span>КП</span>
+                                </button>
+
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    addOrder({
+                                      name: name || fullComposedName,
+                                      clientId: isNewClientMode ? (customClientName || 'Новий клієнт') : selectedClientId,
+                                      category: 'Широкоформатний друк',
+                                      quantity: wideTir,
+                                      packingCount: 1,
+                                      paperType: 'coated',
+                                      colors: `${wideResId} dpi`,
+                                      isSamNaSebe: false,
+                                      designCost: designCost,
+                                      margin: marginPercent,
+                                      machine: 'Широкоформатний плотер Flora',
+                                      format: `${wideWidth}×${wideHeight}`,
+                                      physicalSheets: wideTir,
+                                      itemsPerSheet: 1,
+                                      subtotal: wideRawCost,
+                                      marginAmount: wideMarginAmount,
+                                      finalPrice: wideFinalPrice,
+                                      unitPrice: wideUnitPrice,
+                                      paymentStatus: 'unpaid',
+                                      prepayment: 0,
+                                      notes: `Специфікація: ${name || fullComposedName}, ${wideWidth}×${wideHeight} ${wideUnit}, ${matInfo.label}, ${wideResId} dpi, ${wideTir} шт.`
+                                    });
+                                    alert(`Замовлення № ${orderNumber} створено та передано у виробництво.`);
+                                    setOrderNumber(Math.floor(10000 + Math.random() * 90000));
+                                  }}
+                                  className="py-2.5 px-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs shadow-md shadow-blue-500/20 transition-all text-center flex items-center justify-center gap-1.5"
+                                >
+                                  <Send size={14} className="text-white" />
+                                  <span>Виробництво</span>
+                                </button>
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -14486,53 +14524,12 @@ export const Calculator: React.FC = () => {
                             </div>
                           </div>
 
-                          {/* Horizontal Action Buttons Right: [ ШАБЛОН ] [ PDF ] [ КП ] [ ВИРОБНИЦТВО ] */}
-                          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 pt-3 border-t border-slate-100">
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setTemplateName(customTitleMap['roll_print'] ?? fullComposedName);
-                                setShowTemplateModal(true);
-                              }}
-                              className="py-2.5 px-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-2xs transition-colors text-center"
-                            >
-                              Шаблон
-                            </button>
-                            
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setName(fullComposedName);
-                                setShowInvoice(true);
-                              }}
-                              className="py-2.5 px-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-2xs transition-colors text-center"
-                            >
-                              ПДФ
-                            </button>
-
-                            <button
-                              type="button"
-                              onClick={() => {
-                                const text = `Комерційна пропозиція № ${orderNumber}
-Замовник: ${effectiveClient}
-Продукція: Рулонна етикетка
-Розмір: ${rollWidth} × ${rollHeight} мм
-Матеріал: ${matLabels[rollMaterial] || 'Raflatac'}
-Тираж: ${rollQuantity} шт (${approxRolls} рул.)
-Вартість замовлення: ${rollFinalPrice} грн (${rollUnitPrice.toFixed(4)} грн/шт)
-Друкарня "Едельвейс і К"`;
-                                navigator.clipboard.writeText(text);
-                                alert('Комерційну пропозицію (КП) скопійовано в буфер обміну.');
-                              }}
-                              className="py-2.5 px-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-2xs transition-colors text-center"
-                            >
-                              КП
-                            </button>
-
-                            <button
-                              type="button"
-                              onClick={() => {
-                                if (isClient) {
+                          {/* Action Buttons: Simple 'Оформити запит' for client, full tools for staff */}
+                          {isClient ? (
+                            <div className="pt-3 border-t border-slate-100">
+                              <button
+                                type="button"
+                                onClick={() => {
                                   requestClientSubmission({
                                     category: 'Рулонний друк',
                                     format: `${rollWidth}×${rollHeight} мм`,
@@ -14544,40 +14541,95 @@ export const Calculator: React.FC = () => {
                                     options: `Втулка Ø${rollCore}мм, орієнтація №${rollOrientation}`,
                                     composedName: name || fullComposedName
                                   });
-                                  return;
-                                }
+                                }}
+                                className="w-full py-3.5 px-6 rounded-2xl bg-blue-600 hover:bg-blue-700 active:scale-[0.99] text-white font-extrabold text-sm shadow-md shadow-blue-500/25 transition-all flex items-center justify-center gap-2"
+                              >
+                                <Send size={16} />
+                                <span>Оформити запит</span>
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 pt-3 border-t border-slate-100">
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setTemplateName(customTitleMap['roll_print'] ?? fullComposedName);
+                                  setShowTemplateModal(true);
+                                }}
+                                className="py-2.5 px-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-2xs transition-colors text-center flex items-center justify-center gap-1.5"
+                              >
+                                <LayoutTemplate size={14} className="text-slate-500" />
+                                <span>Шаблон</span>
+                              </button>
+                              
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setName(fullComposedName);
+                                  setShowInvoice(true);
+                                }}
+                                className="py-2.5 px-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-2xs transition-colors text-center flex items-center justify-center gap-1.5"
+                              >
+                                <FileDown size={14} className="text-slate-500" />
+                                <span>ПДФ</span>
+                              </button>
 
-                                addOrder({
-                                  name: name || fullComposedName,
-                                  clientId: isNewClientMode ? (customClientName || 'Новий клієнт') : selectedClientId,
-                                  category: 'Рулонний друк',
-                                  quantity: rollQuantity,
-                                  packingCount: approxRolls,
-                                  paperType: 'coated',
-                                  colors: 'Флексодрук',
-                                  isSamNaSebe: false,
-                                  designCost: designCost,
-                                  margin: marginPercent,
-                                  machine: 'Флексографічна машина',
-                                  format: `${rollWidth}×${rollHeight}`,
-                                  physicalSheets: approxRolls,
-                                  itemsPerSheet: 1,
-                                  subtotal: rollRawCost,
-                                  marginAmount: rollMarginAmount,
-                                  finalPrice: rollFinalPrice,
-                                  unitPrice: rollUnitPrice,
-                                  paymentStatus: 'unpaid',
-                                  prepayment: 0,
-                                  notes: `Специфікація: ${name || fullComposedName}, ${rollWidth}×${rollHeight} мм, ${matLabels[rollMaterial] || 'Raflatac'}, втулка Ø${rollCore}мм, орієнтація №${rollOrientation}, ${rollQuantity} шт.`
-                                });
-                                alert(`Замовлення № ${orderNumber} створено та передано у виробництво.`);
-                                setOrderNumber(Math.floor(10000 + Math.random() * 90000));
-                              }}
-                              className="py-2.5 px-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs shadow-md shadow-blue-500/20 transition-all text-center"
-                            >
-                              {isClient ? 'Оформити запит' : 'Виробництво'}
-                            </button>
-                          </div>
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const text = `Комерційна пропозиція № ${orderNumber}
+Замовник: ${effectiveClient}
+Продукція: Рулонна етикетка
+Розмір: ${rollWidth} × ${rollHeight} мм
+Матеріал: ${matLabels[rollMaterial] || 'Raflatac'}
+Тираж: ${rollQuantity} шт (${approxRolls} рул.)
+Вартість замовлення: ${rollFinalPrice} грн (${rollUnitPrice.toFixed(4)} грн/шт)
+Друкарня "Едельвейс і К"`;
+                                  navigator.clipboard.writeText(text);
+                                  alert('Комерційну пропозицію (КП) скопійовано в буфер обміну.');
+                                }}
+                                className="py-2.5 px-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs shadow-2xs transition-colors text-center flex items-center justify-center gap-1.5"
+                              >
+                                <FileText size={14} className="text-slate-500" />
+                                <span>КП</span>
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  addOrder({
+                                    name: name || fullComposedName,
+                                    clientId: isNewClientMode ? (customClientName || 'Новий клієнт') : selectedClientId,
+                                    category: 'Рулонний друк',
+                                    quantity: rollQuantity,
+                                    packingCount: approxRolls,
+                                    paperType: 'coated',
+                                    colors: 'Флексодрук',
+                                    isSamNaSebe: false,
+                                    designCost: designCost,
+                                    margin: marginPercent,
+                                    machine: 'Флексографічна машина',
+                                    format: `${rollWidth}×${rollHeight}`,
+                                    physicalSheets: approxRolls,
+                                    itemsPerSheet: 1,
+                                    subtotal: rollRawCost,
+                                    marginAmount: rollMarginAmount,
+                                    finalPrice: rollFinalPrice,
+                                    unitPrice: rollUnitPrice,
+                                    paymentStatus: 'unpaid',
+                                    prepayment: 0,
+                                    notes: `Специфікація: ${name || fullComposedName}, ${rollWidth}×${rollHeight} мм, ${matLabels[rollMaterial] || 'Raflatac'}, втулка Ø${rollCore}мм, орієнтація №${rollOrientation}, ${rollQuantity} шт.`
+                                  });
+                                  alert(`Замовлення № ${orderNumber} створено та передано у виробництво.`);
+                                  setOrderNumber(Math.floor(10000 + Math.random() * 90000));
+                                }}
+                                className="py-2.5 px-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-black text-xs shadow-md shadow-blue-500/20 transition-all text-center flex items-center justify-center gap-1.5"
+                              >
+                                <Send size={14} className="text-white" />
+                                <span>Виробництво</span>
+                              </button>
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -15574,35 +15626,38 @@ export const Calculator: React.FC = () => {
                 <div className="flex flex-col gap-2 pt-1">
                   <button 
                     onClick={handleSendToProduction}
-                    disabled={!paperWarehouseStatus.hasEnough}
-                    className={`w-full py-2.5 rounded-xl font-bold text-xs transition-all shadow-sm ${
-                      paperWarehouseStatus.hasEnough
+                    disabled={!paperWarehouseStatus.hasEnough && !isClient}
+                    className={`w-full py-3 rounded-xl font-extrabold text-xs transition-all shadow-md flex items-center justify-center gap-2 ${
+                      paperWarehouseStatus.hasEnough || isClient
                         ? 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-500/20'
                         : 'bg-slate-200 text-slate-400 cursor-not-allowed'
                     }`}
                   >
-                    Запустити у виробництво
+                    <Send size={15} />
+                    <span>{isClient ? 'Оформити запит' : 'Запустити у виробництво'}</span>
                   </button>
-                  <div className="grid grid-cols-2 gap-2">
-                    <button 
-                      type="button" 
-                      onClick={() => setShowInvoice(true)} 
-                      className="py-2 px-3 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-sm transition-colors text-center"
-                    >
-                      Рахунок PDF
-                    </button>
-                    <button 
-                      type="button" 
-                      onClick={() => {
-                        const text = `Розрахунок замовлення: ${category}\nНаклад: ${quantity} шт\nСобівартість: ${calculatedOps.subtotal.toFixed(2)} грн\nМаржа: ${marginPercent}%\nЦіна для клієнта: ${calculatedOps.finalPrice.toFixed(2)} грн (${calculatedOps.unitPrice.toFixed(2)} грн/шт)\nДрукарня "Едельвейс і К"`;
-                        navigator.clipboard.writeText(text);
-                        alert('Специфікацію та ціну скопійовано для клієнта!');
-                      }} 
-                      className="py-2 px-3 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-sm transition-colors text-center"
-                    >
-                      Копіювати КП
-                    </button>
-                  </div>
+                  {!isClient && (
+                    <div className="grid grid-cols-2 gap-2">
+                      <button 
+                        type="button" 
+                        onClick={() => setShowInvoice(true)} 
+                        className="py-2 px-3 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-sm transition-colors text-center"
+                      >
+                        Рахунок PDF
+                      </button>
+                      <button 
+                        type="button" 
+                        onClick={() => {
+                          const text = `Розрахунок замовлення: ${category}\nНаклад: ${quantity} шт\nСобівартість: ${calculatedOps.subtotal.toFixed(2)} грн\nМаржа: ${marginPercent}%\nЦіна для клієнта: ${calculatedOps.finalPrice.toFixed(2)} грн (${calculatedOps.unitPrice.toFixed(2)} грн/шт)\nДрукарня "Едельвейс і К"`;
+                          navigator.clipboard.writeText(text);
+                          alert('Специфікацію та ціну скопійовано для клієнта!');
+                        }} 
+                        className="py-2 px-3 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-sm transition-colors text-center"
+                      >
+                        Копіювати КП
+                      </button>
+                    </div>
+                  )}
                 </div>
 
               </div>
