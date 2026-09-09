@@ -15,7 +15,9 @@ import {
   Copy,
   Info
 } from 'lucide-react';
-import type { Order } from '../types';
+import type { Order, TaskItem } from '../types';
+import { NotesSection } from './NotesSection';
+import { CheckSquare, UserPlus, FileText } from 'lucide-react';
 import { PIPELINE_STAGES } from '../data/pipelineStages';
 
 export const Deals: React.FC = () => {
@@ -29,13 +31,150 @@ export const Deals: React.FC = () => {
     materials,
     updateMaterialStock,
     transitionMatrix,
-    stageDurations
+    stageDurations,
+    addOrder,
+    addClient,
+    addTask
   } = useApp();
 
   const [activePipeline, setActivePipeline] = useState<'b2b' | 'pos'>('b2b');
   const [search, setSearch] = useState('');
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [showFunnelGuideModal, setShowFunnelGuideModal] = useState(false);
+
+  // Create Deal Modal State
+  const [showAddDealModal, setShowAddDealModal] = useState(false);
+  const [dealName, setDealName] = useState('');
+  const [dealCategory, setDealCategory] = useState('Листова продукція');
+  const [dealPaperType, setDealPaperType] = useState<'offset' | 'gazetka' | 'coated'>('coated');
+  const [dealFormat, setDealFormat] = useState('A4');
+  const [dealQuantity, setDealQuantity] = useState<number>(1000);
+  const [dealFinalPrice, setDealFinalPrice] = useState<number>(1250);
+  const [dealPrepayment, setDealPrepayment] = useState<number>(625);
+  const [dealNotes, setDealNotes] = useState('');
+  const [dealIsImportant, setDealIsImportant] = useState(false);
+
+  // Client Selection / Inline Creation State
+  const [clientMode, setClientMode] = useState<'existing' | 'new'>('existing');
+  const [selectedClientId, setSelectedClientId] = useState<string>('');
+  const [newClientName, setNewClientName] = useState('');
+  const [newClientPhone, setNewClientPhone] = useState('');
+  const [newClientEmail, setNewClientEmail] = useState('');
+  const [newClientCity, setNewClientCity] = useState('Вінниця');
+  const [newClientDiscount, setNewClientDiscount] = useState<number>(0);
+
+  // Inline Task Creation State
+  const [createLinkedTask, setCreateLinkedTask] = useState(true);
+  const [taskTitle, setTaskTitle] = useState('');
+  const [taskType, setTaskType] = useState<TaskItem['type']>('Перевірка макета');
+  const [taskAssignee, setTaskAssignee] = useState('Анна (Дизайнер)');
+  const [taskDeadline, setTaskDeadline] = useState(new Date().toISOString().split('T')[0]);
+  const [taskDeadlineTime, setTaskDeadlineTime] = useState('15:00');
+  const [taskPriority, setTaskPriority] = useState<TaskItem['priority']>('medium');
+
+  const handleCreateDealSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!dealName.trim()) {
+      alert('Будь ласка, введіть назву угоди!');
+      return;
+    }
+
+    let finalClientId = selectedClientId;
+    let finalClientName = '';
+
+    if (clientMode === 'new') {
+      if (!newClientName.trim()) {
+        alert("Введіть назву або ім'я нового замовника!");
+        return;
+      }
+      const created = addClient({
+        name: newClientName.trim(),
+        contact: newClientName.trim(),
+        phone: newClientPhone.trim(),
+        email: newClientEmail.trim(),
+        city: newClientCity.trim() || 'Вінниця',
+        discount: Number(newClientDiscount) || 0,
+        tags: ['Новий замовник'],
+        type: 'client'
+      });
+      finalClientId = created.id;
+      finalClientName = created.name;
+    } else {
+      if (!finalClientId && clients.length > 0) {
+        finalClientId = clients[0].id;
+      }
+      finalClientName = clients.find(c => c.id === finalClientId)?.name || 'Покупець';
+    }
+
+    const priceNum = Number(dealFinalPrice) || 0;
+    const prepayNum = Number(dealPrepayment) || 0;
+    const paymentStatus = prepayNum >= priceNum && priceNum > 0 ? 'paid' : (prepayNum > 0 ? 'partial' : 'unpaid');
+
+    const newDeal = addOrder({
+      name: dealName.trim(),
+      clientId: finalClientId,
+      category: dealCategory,
+      quantity: Number(dealQuantity) || 1,
+      packingCount: 100,
+      paperType: dealPaperType,
+      paperName: dealPaperType === 'coated' ? 'Крейдований 130г' : (dealPaperType === 'offset' ? 'Офсет 80г' : 'Газетка 45г'),
+      colors: '4+4',
+      isSamNaSebe: false,
+      designCost: 0,
+      margin: 50,
+      machine: 'Цифрова машина',
+      format: dealFormat,
+      physicalSheets: Number(dealQuantity) || 1,
+      itemsPerSheet: 1,
+      subtotal: priceNum,
+      marginAmount: 0,
+      finalPrice: priceNum,
+      unitPrice: Number((priceNum / (Number(dealQuantity) || 1)).toFixed(2)),
+      paymentStatus: paymentStatus,
+      prepayment: prepayNum,
+      notes: dealNotes.trim(),
+      isImportant: dealIsImportant
+    });
+
+    // Create linked task if checked
+    if (createLinkedTask) {
+      const defaultTaskTitle = taskTitle.trim() || `Перевірити макет та узгодити деталі по угоді "${newDeal.name}"`;
+      addTask({
+        title: defaultTaskTitle,
+        type: taskType,
+        assignee: taskAssignee,
+        deadline: taskDeadline || new Date().toISOString().split('T')[0],
+        deadlineTime: taskDeadlineTime || '15:00',
+        priority: taskPriority,
+        status: 'todo',
+        clientName: finalClientName,
+        dealName: newDeal.name,
+        dealId: newDeal.id,
+        clientId: finalClientId,
+        checklist: [
+          { id: 'c-init-1', text: "Зв'язатися з замовником та підтвердити технічні параметри", checked: false },
+          { id: 'c-init-2', text: "Перевірити готовність файлів до друку", checked: false }
+        ]
+      });
+    }
+
+    addSystemNotification(`🎉 Створено нову угоду "${newDeal.name}" (${priceNum.toLocaleString()} ₴)${createLinkedTask ? " та прив'язане завдання" : ""}`);
+
+    // Reset Form
+    setDealName('');
+    setDealQuantity(1000);
+    setDealFinalPrice(1250);
+    setDealPrepayment(625);
+    setDealNotes('');
+    setDealIsImportant(false);
+    setClientMode('existing');
+    setNewClientName('');
+    setNewClientPhone('');
+    setNewClientEmail('');
+    setTaskTitle('');
+    setShowAddDealModal(false);
+  };
+
 
   // Filters state
   const [importantFilter, setImportantFilter] = useState<'all' | 'important'>('all');
@@ -205,6 +344,18 @@ export const Deals: React.FC = () => {
           <p className="subtitle">Керування воронками дистрибуції, B2B друком та роздрібними POS-чеками</p>
         </div>
         
+
+        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+          <button
+            type="button"
+            onClick={() => setShowAddDealModal(true)}
+            className="ios-btn ios-btn-primary"
+            style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '6px 14px', fontSize: '12px', fontWeight: '750' }}
+          >
+            <Plus size={16} />
+            Створити угоду
+          </button>
+
         <div style={{ display: 'flex', gap: '4px', backgroundColor: 'var(--bg-card-subtle)', border: '1px solid var(--border-light)', padding: '2px', borderRadius: '8px' }}>
           <button
             type="button"
@@ -236,6 +387,7 @@ export const Deals: React.FC = () => {
           >
             Каса Роздрібу (POS)
           </button>
+        </div>
         </div>
       </div>
 
@@ -732,6 +884,18 @@ export const Deals: React.FC = () => {
                     </div>
                   )}
 
+
+                  {/* Notes & Discussions for this Deal */}
+                  <div style={{ borderTop: '1px solid var(--border-light)', paddingTop: '12px', marginTop: '6px' }}>
+                    <NotesSection
+                      targetType="deal"
+                      targetId={selectedOrder.id}
+                      title="Замітки та обговорення угоди"
+                      placeholder={`Додайте замітку по угоді ${selectedOrder.name}...`}
+                      compact={true}
+                    />
+                  </div>
+
                   {/* TTN Logistics panel */}
                   <div style={{ borderTop: '1px solid var(--border-light)', paddingTop: '10px' }}>
                     <span style={{ color: 'var(--text-medium)', fontSize: '9px', fontWeight: '700', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>
@@ -999,6 +1163,398 @@ export const Deals: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* 🌟 Create Deal Modal with Inline Client & Task Creation */}
+      {showAddDealModal && (
+        <div className="ios-modal-overlay">
+          <form onSubmit={handleCreateDealSubmit} className="ios-modal" style={{ maxWidth: '640px', maxHeight: '90vh', overflowY: 'auto' }}>
+            <div className="ios-modal-header">
+              <div>
+                <h2 className="ios-modal-title" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <Plus size={18} style={{ color: 'var(--primary)' }} />
+                  Створення нової угоди (KeepinCRM)
+                </h2>
+                <p style={{ fontSize: '11px', color: 'var(--text-medium)', margin: '2px 0 0 0' }}>
+                  Створіть угоду, оберіть або додайте нового клієнта та заплануйте завдання в 1 клік
+                </p>
+              </div>
+              <button 
+                type="button" 
+                onClick={() => setShowAddDealModal(false)}
+                style={{ border: 'none', background: 'transparent', color: 'var(--text-medium)', cursor: 'pointer', fontSize: '18px' }}
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="ios-modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+              
+              {/* SECTION 1: DEAL PARAMETERS */}
+              <div style={{ padding: '12px', borderRadius: '10px', backgroundColor: 'var(--bg-card-subtle)', border: '1px solid var(--border-light)', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <h3 style={{ fontSize: '12px', fontWeight: '800', color: 'var(--primary)', margin: 0, textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <FileText size={14} /> 1. Параметри замовлення / угоди
+                </h3>
+
+                <div className="ios-input-group" style={{ marginBottom: 0 }}>
+                  <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Назва замовлення / продукції</label>
+                  <input
+                    type="text"
+                    required
+                    value={dealName}
+                    onChange={(e) => setDealName(e.target.value)}
+                    placeholder="e.g. Друк буклетів А4, 1000 шт, 4+4"
+                    style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
+                  />
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                  <div className="ios-input-group" style={{ marginBottom: 0 }}>
+                    <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Категорія</label>
+                    <select
+                      value={dealCategory}
+                      onChange={(e) => setDealCategory(e.target.value)}
+                      style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
+                    >
+                      <option value="Листова продукція">Листова продукція</option>
+                      <option value="Буклети">Буклети</option>
+                      <option value="Бланки А4">Бланки А4</option>
+                      <option value="Блокноти">Блокноти</option>
+                      <option value="Візитки">Візитки</option>
+                      <option value="Каталоги">Каталоги</option>
+                      <option value="Наклейки">Наклейки</option>
+                    </select>
+                  </div>
+
+                  <div className="ios-input-group" style={{ marginBottom: 0 }}>
+                    <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Матеріал / Папір</label>
+                    <select
+                      value={dealPaperType}
+                      onChange={(e) => setDealPaperType(e.target.value as any)}
+                      style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
+                    >
+                      <option value="coated">Крейдований 130г</option>
+                      <option value="offset">Офсетний 80г</option>
+                      <option value="gazetka">Газетний 45г</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px' }}>
+                  <div className="ios-input-group" style={{ marginBottom: 0 }}>
+                    <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Формат</label>
+                    <select
+                      value={dealFormat}
+                      onChange={(e) => setDealFormat(e.target.value)}
+                      style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
+                    >
+                      <option value="A4">A4 (210×297)</option>
+                      <option value="A5">A5 (148×210)</option>
+                      <option value="A6">A6 (105×148)</option>
+                      <option value="A3">A3 (297×420)</option>
+                    </select>
+                  </div>
+
+                  <div className="ios-input-group" style={{ marginBottom: 0 }}>
+                    <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Тираж (шт)</label>
+                    <input
+                      type="number"
+                      min="1"
+                      value={dealQuantity}
+                      onChange={(e) => setDealQuantity(Number(e.target.value))}
+                      style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
+                    />
+                  </div>
+
+                  <div className="ios-input-group" style={{ marginBottom: 0 }}>
+                    <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Сума угоди (грн)</label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={dealFinalPrice}
+                      onChange={(e) => setDealFinalPrice(Number(e.target.value))}
+                      style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-dark)', border: '1px solid var(--border-light)', fontWeight: '800' }}
+                    />
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                  <div className="ios-input-group" style={{ marginBottom: 0 }}>
+                    <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Передплата (грн)</label>
+                    <input
+                      type="number"
+                      min="0"
+                      value={dealPrepayment}
+                      onChange={(e) => setDealPrepayment(Number(e.target.value))}
+                      style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
+                    />
+                  </div>
+
+                  <div style={{ display: 'flex', alignItems: 'center', marginTop: '18px' }}>
+                    <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', fontWeight: '750', cursor: 'pointer', color: 'var(--text-dark)' }}>
+                      <input
+                        type="checkbox"
+                        checked={dealIsImportant}
+                        onChange={(e) => setDealIsImportant(e.target.checked)}
+                      />
+                      ⭐ Важлива угода (VIP)
+                    </label>
+                  </div>
+                </div>
+
+                <div className="ios-input-group" style={{ marginBottom: 0 }}>
+                  <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Примітка до специфікації (необов'язково)</label>
+                  <input
+                    type="text"
+                    value={dealNotes}
+                    onChange={(e) => setDealNotes(e.target.value)}
+                    placeholder="e.g. Ламінація матова, віддати до п'ятниці 14:00"
+                    style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
+                  />
+                </div>
+              </div>
+
+              {/* SECTION 2: CLIENT SELECTION & INLINE CREATION */}
+              <div style={{ padding: '12px', borderRadius: '10px', backgroundColor: 'var(--bg-card-subtle)', border: '1px solid var(--border-light)', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <h3 style={{ fontSize: '12px', fontWeight: '800', color: '#8b5cf6', margin: 0, textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <UserPlus size={14} /> 2. Замовник угоди
+                  </h3>
+                  <div style={{ display: 'flex', gap: '4px', backgroundColor: 'var(--bg-card)', padding: '2px', borderRadius: '6px', border: '1px solid var(--border-light)' }}>
+                    <button
+                      type="button"
+                      onClick={() => setClientMode('existing')}
+                      style={{
+                        padding: '3px 8px',
+                        fontSize: '10.5px',
+                        borderRadius: '4px',
+                        border: 'none',
+                        backgroundColor: clientMode === 'existing' ? 'var(--primary)' : 'transparent',
+                        color: clientMode === 'existing' ? '#ffffff' : 'var(--text-dark)',
+                        fontWeight: '700',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      Існуючий замовник
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setClientMode('new')}
+                      style={{
+                        padding: '3px 8px',
+                        fontSize: '10.5px',
+                        borderRadius: '4px',
+                        border: 'none',
+                        backgroundColor: clientMode === 'new' ? '#8b5cf6' : 'transparent',
+                        color: clientMode === 'new' ? '#ffffff' : 'var(--text-dark)',
+                        fontWeight: '700',
+                        cursor: 'pointer'
+                      }}
+                    >
+                      + Новий замовник
+                    </button>
+                  </div>
+                </div>
+
+                {clientMode === 'existing' ? (
+                  <div className="ios-input-group" style={{ marginBottom: 0 }}>
+                    <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Оберіть замовника з бази</label>
+                    <select
+                      value={selectedClientId || (clients[0]?.id || '')}
+                      onChange={(e) => setSelectedClientId(e.target.value)}
+                      style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
+                    >
+                      {clients.map(c => (
+                        <option key={c.id} value={c.id}>
+                          {c.name} {c.phone ? `(${c.phone})` : ''} — знижка {c.discount}%
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '8px' }}>
+                      <div className="ios-input-group" style={{ marginBottom: 0 }}>
+                        <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Назва компанії / ПІБ *</label>
+                        <input
+                          type="text"
+                          required
+                          value={newClientName}
+                          onChange={(e) => setNewClientName(e.target.value)}
+                          placeholder="ТОВ «Новий Партнер»"
+                          style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
+                        />
+                      </div>
+
+                      <div className="ios-input-group" style={{ marginBottom: 0 }}>
+                        <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Телефон</label>
+                        <input
+                          type="tel"
+                          value={newClientPhone}
+                          onChange={(e) => setNewClientPhone(e.target.value)}
+                          placeholder="+380..."
+                          style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
+                        />
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 100px', gap: '8px' }}>
+                      <div className="ios-input-group" style={{ marginBottom: 0 }}>
+                        <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Email</label>
+                        <input
+                          type="email"
+                          value={newClientEmail}
+                          onChange={(e) => setNewClientEmail(e.target.value)}
+                          placeholder="client@mail.com"
+                          style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
+                        />
+                      </div>
+
+                      <div className="ios-input-group" style={{ marginBottom: 0 }}>
+                        <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Місто</label>
+                        <input
+                          type="text"
+                          value={newClientCity}
+                          onChange={(e) => setNewClientCity(e.target.value)}
+                          placeholder="Вінниця"
+                          style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
+                        />
+                      </div>
+
+                      <div className="ios-input-group" style={{ marginBottom: 0 }}>
+                        <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Знижка %</label>
+                        <input
+                          type="number"
+                          min="0"
+                          max="50"
+                          value={newClientDiscount}
+                          onChange={(e) => setNewClientDiscount(Number(e.target.value))}
+                          style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* SECTION 3: INLINE TASK CREATION */}
+              <div style={{ padding: '12px', borderRadius: '10px', backgroundColor: 'var(--bg-card-subtle)', border: '1px solid var(--border-light)', display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <label style={{ fontSize: '12px', fontWeight: '800', color: '#10b981', margin: 0, textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '6px', cursor: 'pointer' }}>
+                    <input
+                      type="checkbox"
+                      checked={createLinkedTask}
+                      onChange={(e) => setCreateLinkedTask(e.target.checked)}
+                    />
+                    <CheckSquare size={14} /> 3. Створити завдання до цієї угоди
+                  </label>
+                </div>
+
+                {createLinkedTask && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    <div className="ios-input-group" style={{ marginBottom: 0 }}>
+                      <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Назва завдання / Що зробити</label>
+                      <input
+                        type="text"
+                        value={taskTitle}
+                        onChange={(e) => setTaskTitle(e.target.value)}
+                        placeholder={`e.g. Перевірити макет для ${dealName || 'нової угоди'}`}
+                        style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
+                      />
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
+                      <div className="ios-input-group" style={{ marginBottom: 0 }}>
+                        <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Тип завдання</label>
+                        <select
+                          value={taskType}
+                          onChange={(e) => setTaskType(e.target.value as any)}
+                          style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
+                        >
+                          <option value="Перевірка макета">Перевірка макета</option>
+                          <option value="Друк">Друк</option>
+                          <option value="Порізка">Порізка</option>
+                          <option value="Дзвінок">Дзвінок замовнику</option>
+                          <option value="Доставка">Доставка</option>
+                          <option value="Оплата">Оплата</option>
+                        </select>
+                      </div>
+
+                      <div className="ios-input-group" style={{ marginBottom: 0 }}>
+                        <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Відповідальний виконавець</label>
+                        <select
+                          value={taskAssignee}
+                          onChange={(e) => setTaskAssignee(e.target.value)}
+                          style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
+                        >
+                          <option value="Анна (Дизайнер)">Анна (Дизайнер)</option>
+                          <option value="Іван (Палітурник)">Іван (Палітурник)</option>
+                          <option value="Сергій (Оператор)">Сергій (Оператор)</option>
+                          <option value="Віктор (Менеджер)">Віктор (Менеджер)</option>
+                          <option value="Працівник А (Адміністратор)">Працівник А (Адміністратор)</option>
+                        </select>
+                      </div>
+                    </div>
+
+                    <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 1fr', gap: '8px' }}>
+                      <div className="ios-input-group" style={{ marginBottom: 0 }}>
+                        <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Дата терміну</label>
+                        <input
+                          type="date"
+                          value={taskDeadline}
+                          onChange={(e) => setTaskDeadline(e.target.value)}
+                          style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
+                        />
+                      </div>
+
+                      <div className="ios-input-group" style={{ marginBottom: 0 }}>
+                        <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Час</label>
+                        <input
+                          type="time"
+                          value={taskDeadlineTime}
+                          onChange={(e) => setTaskDeadlineTime(e.target.value)}
+                          style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
+                        />
+                      </div>
+
+                      <div className="ios-input-group" style={{ marginBottom: 0 }}>
+                        <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Пріоритет</label>
+                        <select
+                          value={taskPriority}
+                          onChange={(e) => setTaskPriority(e.target.value as any)}
+                          style={{ backgroundColor: 'var(--bg-card)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
+                        >
+                          <option value="high">Високий 🔥</option>
+                          <option value="medium">Середній</option>
+                          <option value="low">Низький</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+            </div>
+
+            <div className="ios-modal-footer">
+              <button 
+                type="button" 
+                onClick={() => setShowAddDealModal(false)}
+                className="ios-btn ios-btn-secondary"
+              >
+                Скасувати
+              </button>
+              <button 
+                type="submit" 
+                className="ios-btn ios-btn-primary"
+                style={{ padding: '8px 20px', fontWeight: '800' }}
+              >
+                + Зберегти угоду
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
     </div>
   );
 };

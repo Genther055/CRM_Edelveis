@@ -36,11 +36,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
   isOpenOnMobile = false,
   onCloseMobile
 }) => {
-  const { currentUser, theme, toggleTheme, logout } = useApp();
+  const { currentUser, theme, toggleTheme, logout, tasks } = useApp();
   const rawRole = (currentUser?.role as string) || 'operator';
   const isAdmin = rawRole === 'admin' || rawRole === 'Директор' || currentUser?.username === 'admin';
   const isManager = isAdmin || rawRole === 'manager' || rawRole === 'Технолог' || rawRole.toLowerCase().includes('менеджер') || currentUser?.username === 'manager' || currentUser?.username === 'technolog';
   const roleLabel = isAdmin ? 'Адміністратор' : (isManager ? 'Менеджер' : (rawRole === 'client' ? 'Клієнт' : 'Оператор'));
+
+  const todayStr = new Date().toISOString().split('T')[0];
+  const overdueTasksCount = (tasks || []).filter(t => t.status !== 'done' && t.deadline && t.deadline < todayStr).length;
+  const todayTasksCount = (tasks || []).filter(t => t.status !== 'done' && t.deadline && t.deadline === todayStr).length;
 
   // KeepinCRM Modules List with role visibility guards
   const menuItems = [
@@ -210,6 +214,46 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       >
                         <Icon size={17} style={{ flexShrink: 0 }} />
                         <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.name}</span>
+                        {item.id === 'tasks' && (overdueTasksCount > 0 || todayTasksCount > 0) && (
+                          <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0 }}>
+                            {overdueTasksCount > 0 && (
+                              <span 
+                                title={`Протермінованих завдань: ${overdueTasksCount}`}
+                                style={{
+                                  backgroundColor: '#ef4444',
+                                  color: '#ffffff',
+                                  fontSize: '10px',
+                                  fontWeight: '800',
+                                  padding: '1px 6px',
+                                  borderRadius: '10px',
+                                  minWidth: '18px',
+                                  textAlign: 'center',
+                                  boxShadow: '0 1px 3px rgba(239, 68, 68, 0.4)'
+                                }}
+                              >
+                                {overdueTasksCount}
+                              </span>
+                            )}
+                            {todayTasksCount > 0 && (
+                              <span 
+                                title={`Завдань на сьогодні: ${todayTasksCount}`}
+                                style={{
+                                  backgroundColor: '#f59e0b',
+                                  color: '#ffffff',
+                                  fontSize: '10px',
+                                  fontWeight: '800',
+                                  padding: '1px 6px',
+                                  borderRadius: '10px',
+                                  minWidth: '18px',
+                                  textAlign: 'center',
+                                  boxShadow: '0 1px 3px rgba(245, 158, 11, 0.4)'
+                                }}
+                              >
+                                {todayTasksCount}
+                              </span>
+                            )}
+                          </div>
+                        )}
                       </button>
                     );
                   })}
@@ -424,6 +468,46 @@ export const Sidebar: React.FC<SidebarProps> = ({
                   >
                     <Icon size={17} style={{ flexShrink: 0 }} />
                     <span style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{item.name}</span>
+                    {item.id === 'tasks' && (overdueTasksCount > 0 || todayTasksCount > 0) && (
+                      <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '4px', flexShrink: 0 }}>
+                        {overdueTasksCount > 0 && (
+                          <span 
+                            title={`Протермінованих завдань: ${overdueTasksCount}`}
+                            style={{
+                              backgroundColor: '#ef4444',
+                              color: '#ffffff',
+                              fontSize: '9.5px',
+                              fontWeight: '800',
+                              padding: '1px 5px',
+                              borderRadius: '10px',
+                              minWidth: '16px',
+                              textAlign: 'center',
+                              boxShadow: '0 1px 3px rgba(239, 68, 68, 0.4)'
+                            }}
+                          >
+                            {overdueTasksCount}
+                          </span>
+                        )}
+                        {todayTasksCount > 0 && (
+                          <span 
+                            title={`Завдань на сьогодні: ${todayTasksCount}`}
+                            style={{
+                              backgroundColor: '#f59e0b',
+                              color: '#ffffff',
+                              fontSize: '9.5px',
+                              fontWeight: '800',
+                              padding: '1px 5px',
+                              borderRadius: '10px',
+                              minWidth: '16px',
+                              textAlign: 'center',
+                              boxShadow: '0 1px 3px rgba(245, 158, 11, 0.4)'
+                            }}
+                          >
+                            {todayTasksCount}
+                          </span>
+                        )}
+                      </div>
+                    )}
                   </button>
                 );
               })}

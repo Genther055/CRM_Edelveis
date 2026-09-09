@@ -1,5 +1,19 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import type { User, UserRole, Client, Material, Order, Norms, DeliveryItem, CustomField, AutoPaymentTrigger, ClientSection } from '../types';
+import type { 
+  User, 
+  UserRole, 
+  Client, 
+  Material, 
+  Order, 
+  Norms, 
+  DeliveryItem, 
+  CustomField, 
+  AutoPaymentTrigger, 
+  ClientSection,
+  TaskItem,
+  NoteItem,
+  NoteReply
+} from '../types';
 import { isUserBlocked } from '../utils/security';
 
 interface AppContextType {
@@ -17,11 +31,13 @@ interface AppContextType {
   transitionMatrix: Record<string, string[]>;
   stageDurations: Record<string, number>; // SLA hours limits
   novaPoshtaAccounts: string[];
+  tasks: TaskItem[];
+  notes: NoteItem[];
   login: (username: string, password: string) => boolean;
   logout: () => void;
-  addClient: (client: Omit<Client, 'id'>) => void;
+  addClient: (client: Omit<Client, 'id'>) => Client;
   updateClient: (client: Client) => void;
-  addOrder: (order: Omit<Order, 'id' | 'createdAt' | 'createdBy' | 'status'> & { id?: string }) => void;
+  addOrder: (order: Omit<Order, 'id' | 'createdAt' | 'createdBy' | 'status'> & { id?: string }) => Order;
   updateOrder: (order: Order) => void;
   updateOrderStatus: (orderId: string, status: Order['status']) => void;
   updateOrderPayment: (orderId: string, paymentStatus: Order['paymentStatus'], prepayment: number) => void;
@@ -44,6 +60,17 @@ interface AppContextType {
   updateStageDurations: (durations: Record<string, number>) => void;
   addNovaPoshtaAccount: (accountName: string) => void;
   deleteNovaPoshtaAccount: (accountName: string) => void;
+  addTask: (task: Omit<TaskItem, 'id' | 'createdAt'> & { id?: string; createdAt?: string }) => TaskItem;
+  updateTask: (task: TaskItem) => void;
+  deleteTask: (taskId: string) => void;
+  toggleTaskStatus: (taskId: string) => void;
+  toggleTaskChecklistItem: (taskId: string, itemId: string) => void;
+  addNote: (note: Omit<NoteItem, 'id' | 'createdAt'> & { id?: string; createdAt?: string }) => void;
+  editNote: (noteId: string, text: string) => void;
+  deleteNote: (noteId: string) => void;
+  addNoteReply: (noteId: string, text: string, author: string, authorRole?: string) => void;
+  editNoteReply: (noteId: string, replyId: string, newText: string) => void;
+  deleteNoteReply: (noteId: string, replyId: string) => void;
   addSystemNotification: (message: string) => void;
   notifications: string[];
   npVolumeCalcEnabled: boolean;
@@ -438,6 +465,127 @@ const defaultStageDurations = {
   ready: 72
 };
 
+const getTodayDateStr = () => new Date().toISOString().split('T')[0];
+const getRelativeDateStr = (daysOffset: number) => {
+  const d = new Date();
+  d.setDate(d.getDate() + daysOffset);
+  return d.toISOString().split('T')[0];
+};
+
+const initialTasksData: TaskItem[] = [
+  {
+    id: 'T-301',
+    title: 'Зробити кольоропробу CMYK для тиражу бланків A4',
+    type: 'Перевірка макета',
+    deadline: getRelativeDateStr(-2), // Overdue!
+    deadlineTime: '14:00',
+    priority: 'high',
+    assignee: 'Анна (Дизайнер)',
+    checklist: [
+      { id: 'c1', text: 'Завантажити файл макета у високій якості (300 dpi)', checked: true },
+      { id: 'c2', text: 'Узгодити виліт 2мм з друкарем цифрової машини', checked: true },
+      { id: 'c3', text: 'Отримати фінальне підтвердження від замовника по Email', checked: false }
+    ],
+    status: 'todo',
+    createdAt: getRelativeDateStr(-3),
+    clientName: 'ТОВ «ФармаТрейд»',
+    dealName: 'Замовлення №31101 — Бланки А4',
+    dealId: '1',
+    createdBy: 'Віктор (Менеджер)',
+    autoTriggered: true,
+    stageTrigger: 'Підготовка документів'
+  },
+  {
+    id: 'T-302',
+    title: 'Підготувати порізку тиражу 1500 шт на гіпер-порізчику',
+    type: 'Порізка',
+    deadline: getTodayDateStr(), // Due Today!
+    deadlineTime: '16:30',
+    priority: 'medium',
+    assignee: 'Іван (Палітурник)',
+    checklist: [
+      { id: 'c4', text: 'Перевірити наявність крейдованого паперу 130г на стелажі А', checked: true },
+      { id: 'c5', text: 'Виставити стопові мітки порізу 210х297мм', checked: false }
+    ],
+    status: 'todo',
+    createdAt: getRelativeDateStr(-1),
+    clientName: 'ПРАТ «ЕкоСок»',
+    dealName: 'Замовлення №1502 — Буклети',
+    dealId: '2',
+    createdBy: 'Працівник А (Адміністратор)',
+    autoTriggered: true,
+    stageTrigger: 'Склад'
+  },
+  {
+    id: 'T-303',
+    title: 'Ламінування матовою плівкою 30мкм тиражу меню',
+    type: 'Друк',
+    deadline: getRelativeDateStr(2), // Future
+    deadlineTime: '11:00',
+    priority: 'low',
+    assignee: 'Сергій (Оператор)',
+    checklist: [
+      { id: 'c6', text: 'Прогріти рулонний ламінатор до 115°C', checked: false },
+      { id: 'c7', text: 'Упакувати готовий тираж у крафт-папір для доставки', checked: false }
+    ],
+    status: 'todo',
+    createdAt: getTodayDateStr(),
+    clientName: 'Кафе «Капучино»',
+    dealName: 'Замовлення №884 — Меню',
+    dealId: '3',
+    createdBy: 'Віктор (Менеджер)'
+  },
+  {
+    id: 'T-304',
+    title: 'Дзвінок замовнику щодо узгодження передплати 50%',
+    type: 'Дзвінок',
+    deadline: getRelativeDateStr(-1), // Overdue!
+    deadlineTime: '18:00',
+    priority: 'high',
+    assignee: 'Працівник А (Адміністратор)',
+    checklist: [
+      { id: 'c8', text: 'Виставити рахунок-специфікацію', checked: true },
+      { id: 'c9', text: 'Підтвердити надходження коштів на р/р ПриватБанку', checked: false }
+    ],
+    status: 'todo',
+    createdAt: getRelativeDateStr(-2),
+    clientName: 'ТОВ «МЕД-СЕРВІС»',
+    dealName: 'Замовлення №9941 — Буклети',
+    createdBy: 'Працівник А (Адміністратор)'
+  }
+];
+
+const initialNotesData: NoteItem[] = [
+  {
+    id: 'N-101',
+    targetType: 'client',
+    targetId: '1',
+    author: 'Віктор (Менеджер)',
+    authorRole: 'Менеджер',
+    text: 'Замовник просить виставити рахунок з ПДВ та надати сертифікат відповідності на папір.',
+    createdAt: new Date(Date.now() - 2 * 86400000).toISOString(),
+    replies: [
+      {
+        id: 'NR-1',
+        author: 'Анна (Дизайнер)',
+        authorRole: 'Дизайнер',
+        text: 'Сертифікат відповідності додано в теку з макетом замовлення.',
+        createdAt: new Date(Date.now() - 1.5 * 86400000).toISOString()
+      }
+    ]
+  },
+  {
+    id: 'N-102',
+    targetType: 'deal',
+    targetId: '1',
+    author: 'Працівник А (Адміністратор)',
+    authorRole: 'Адміністратор',
+    text: 'Узгоджено терміновий друк за 24 години без додаткової націнки за умови 100% передплати.',
+    createdAt: new Date(Date.now() - 86400000).toISOString(),
+    replies: []
+  }
+];
+
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(() => {
     if (typeof window !== 'undefined') {
@@ -575,6 +723,16 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   const [novaPoshtaAccounts, setNovaPoshtaAccounts] = useState<string[]>(() => {
     const saved = localStorage.getItem('crm_np_accounts');
     return saved ? JSON.parse(saved) : ['ФОП Шевченко (Основний)', 'ТОВ Едельвейс (Регіональний)'];
+  });
+
+  const [tasks, setTasks] = useState<TaskItem[]>(() => {
+    const saved = localStorage.getItem('crm_tasks');
+    return saved ? JSON.parse(saved) : initialTasksData;
+  });
+
+  const [notes, setNotes] = useState<NoteItem[]>(() => {
+    const saved = localStorage.getItem('crm_notes');
+    return saved ? JSON.parse(saved) : initialNotesData;
   });
 
   const [npVolumeCalcEnabled, setNpVolumeCalcEnabled] = useState<boolean>(() => {
@@ -767,7 +925,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     localStorage.removeItem('crm_user');
   };
 
-  const addClient = (clientData: Omit<Client, 'id'>) => {
+  const addClient = (clientData: Omit<Client, 'id'>): Client => {
     const newClient: Client = {
       ...clientData,
       id: `c_${Date.now()}`,
@@ -777,6 +935,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     };
     setClients(prev => [...prev, newClient]);
     syncServer('save_client', newClient);
+    return newClient;
   };
 
   const updateClient = (updatedClient: Client) => {
@@ -812,7 +971,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     }
   };
 
-  const addOrder = (orderData: Omit<Order, 'id' | 'createdAt' | 'createdBy' | 'status'> & { id?: string }) => {
+  const addOrder = (orderData: Omit<Order, 'id' | 'createdAt' | 'createdBy' | 'status'> & { id?: string }): Order => {
     const orderId = orderData.id || String(orders.length + 1);
     const newOrder: Order = {
       ...orderData,
@@ -853,6 +1012,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
     handleBotPaymentCheck(newOrder, 'design');
     syncServer('save_order', newOrder);
+    return newOrder;
   };
 
   const updateOrder = (updatedOrder: Order) => {
@@ -993,6 +1153,156 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setNovaPoshtaAccounts(novaPoshtaAccounts.filter(a => a !== accountName));
   };
 
+  // --- Task Methods ---
+  const addTask = (taskData: Omit<TaskItem, 'id' | 'createdAt'> & { id?: string; createdAt?: string }): TaskItem => {
+    const newTask: TaskItem = {
+      ...taskData,
+      id: taskData.id || `T-${Date.now().toString().slice(-4)}`,
+      createdAt: taskData.createdAt || new Date().toISOString().split('T')[0],
+      checklist: taskData.checklist || [],
+      status: taskData.status || 'todo'
+    };
+    setTasks(prev => {
+      const updated = [newTask, ...prev];
+      localStorage.setItem('crm_tasks', JSON.stringify(updated));
+      return updated;
+    });
+    addSystemNotification(`📋 Створено нове завдання: "${newTask.title}"`);
+    return newTask;
+  };
+
+  const updateTask = (task: TaskItem) => {
+    setTasks(prev => {
+      const updated = prev.map(t => t.id === task.id ? task : t);
+      localStorage.setItem('crm_tasks', JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  const deleteTask = (taskId: string) => {
+    setTasks(prev => {
+      const updated = prev.filter(t => t.id !== taskId);
+      localStorage.setItem('crm_tasks', JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  const toggleTaskStatus = (taskId: string) => {
+    setTasks(prev => {
+      const updated = prev.map(t => {
+        if (t.id === taskId) {
+          const nextStatus = t.status === 'todo' ? 'done' : 'todo';
+          return { ...t, status: nextStatus as 'todo' | 'done' };
+        }
+        return t;
+      });
+      localStorage.setItem('crm_tasks', JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  const toggleTaskChecklistItem = (taskId: string, itemId: string) => {
+    setTasks(prev => {
+      const updated = prev.map(task => {
+        if (task.id === taskId) {
+          return {
+            ...task,
+            checklist: task.checklist.map(item => item.id === itemId ? { ...item, checked: !item.checked } : item)
+          };
+        }
+        return task;
+      });
+      localStorage.setItem('crm_tasks', JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  // --- Note Methods ---
+  const addNote = (noteData: Omit<NoteItem, 'id' | 'createdAt'> & { id?: string; createdAt?: string }) => {
+    const newNote: NoteItem = {
+      ...noteData,
+      id: noteData.id || `N-${Date.now().toString().slice(-5)}`,
+      createdAt: noteData.createdAt || new Date().toISOString(),
+      replies: noteData.replies || []
+    };
+    setNotes(prev => {
+      const updated = [newNote, ...prev];
+      localStorage.setItem('crm_notes', JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  const editNote = (noteId: string, text: string) => {
+    setNotes(prev => {
+      const updated = prev.map(n => n.id === noteId ? { ...n, text, updatedAt: new Date().toISOString() } : n);
+      localStorage.setItem('crm_notes', JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  const deleteNote = (noteId: string) => {
+    setNotes(prev => {
+      const updated = prev.filter(n => n.id !== noteId);
+      localStorage.setItem('crm_notes', JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  const addNoteReply = (noteId: string, text: string, author: string, authorRole?: string) => {
+    const newReply: NoteReply = {
+      id: `NR-${Date.now().toString().slice(-4)}`,
+      author,
+      authorRole,
+      text,
+      createdAt: new Date().toISOString()
+    };
+    setNotes(prev => {
+      const updated = prev.map(n => {
+        if (n.id === noteId) {
+          return {
+            ...n,
+            replies: [...(n.replies || []), newReply]
+          };
+        }
+        return n;
+      });
+      localStorage.setItem('crm_notes', JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  const editNoteReply = (noteId: string, replyId: string, newText: string) => {
+    setNotes(prev => {
+      const updated = prev.map(n => {
+        if (n.id === noteId) {
+          return {
+            ...n,
+            replies: (n.replies || []).map(r => r.id === replyId ? { ...r, text: newText, updatedAt: new Date().toISOString() } : r)
+          };
+        }
+        return n;
+      });
+      localStorage.setItem('crm_notes', JSON.stringify(updated));
+      return updated;
+    });
+  };
+
+  const deleteNoteReply = (noteId: string, replyId: string) => {
+    setNotes(prev => {
+      const updated = prev.map(n => {
+        if (n.id === noteId) {
+          return {
+            ...n,
+            replies: (n.replies || []).filter(r => r.id !== replyId)
+          };
+        }
+        return n;
+      });
+      localStorage.setItem('crm_notes', JSON.stringify(updated));
+      return updated;
+    });
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -1010,6 +1320,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         transitionMatrix,
         stageDurations,
         novaPoshtaAccounts,
+        tasks,
+        notes,
         login,
         logout,
         addClient,
@@ -1037,6 +1349,17 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         updateStageDurations,
         addNovaPoshtaAccount,
         deleteNovaPoshtaAccount,
+        addTask,
+        updateTask,
+        deleteTask,
+        toggleTaskStatus,
+        toggleTaskChecklistItem,
+        addNote,
+        editNote,
+        deleteNote,
+        addNoteReply,
+        editNoteReply,
+        deleteNoteReply,
         addSystemNotification,
         notifications,
         npVolumeCalcEnabled,

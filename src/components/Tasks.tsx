@@ -10,116 +10,43 @@ import {
   Search, 
   Briefcase, 
   AlertTriangle, 
-  ListTodo
+  ListTodo,
+  CalendarRange,
+  MessageSquare,
+  ChevronDown,
+  ChevronUp,
+  X
 } from 'lucide-react';
+import type { TaskItem } from '../types';
+import { NotesSection } from './NotesSection';
 
-interface TaskChecklistItem {
-  id: string;
-  text: string;
-  checked: boolean;
-}
-
-interface TaskItem {
-  id: string;
-  title: string;
-  type: 'Дзвінок' | 'Зустріч' | 'Перевірка макета' | 'Друк' | 'Порізка' | 'Доставка' | 'Оплата';
-  deadline: string;
-  deadlineTime?: string;
-  priority: 'high' | 'medium' | 'low';
-  assignee: string;
-  checklist: TaskChecklistItem[];
-  status: 'todo' | 'done';
-  clientName?: string;
-  dealName?: string;
-  createdBy?: string;
-  autoTriggered?: boolean;
-  stageTrigger?: string;
-}
-
-type TaskSubTab = 'all' | 'my' | 'assigned_by_me' | 'overdue' | 'auto_triggers' | 'task_types';
+type TaskSubTab = 'all' | 'today' | 'my' | 'assigned_by_me' | 'overdue' | 'auto_triggers' | 'task_types';
 
 export const Tasks: React.FC = () => {
-  const { clients, orders, currentUser } = useApp();
+  const { 
+    clients, 
+    orders, 
+    currentUser, 
+    tasks, 
+    addTask, 
+    deleteTask, 
+    toggleTaskStatus, 
+    toggleTaskChecklistItem,
+    theme 
+  } = useApp();
+
+  const isDark = theme === 'dark';
 
   const [activeSubTab, setActiveSubTab] = useState<TaskSubTab>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [typeFilter, setTypeFilter] = useState('Всі');
+  
+  // Date Creation Filter
+  const [createdDateFilter, setCreatedDateFilter] = useState<'all' | 'today' | 'yesterday' | 'last7' | 'last30' | 'custom'>('all');
+  const [customCreatedDate, setCustomCreatedDate] = useState('');
 
-  const [tasks, setTasks] = useState<TaskItem[]>([
-    {
-      id: 'T-301',
-      title: 'Зробити кольоропробу CMYK для тиражу бланків A4',
-      type: 'Перевірка макета',
-      deadline: '2026-08-18',
-      deadlineTime: '14:00',
-      priority: 'high',
-      assignee: 'Анна (Дизайнер)',
-      checklist: [
-        { id: 'c1', text: 'Завантажити файл макета у високій якості (300 dpi)', checked: true },
-        { id: 'c2', text: 'Узгодити виліт 2мм з друкарем цифрової машини', checked: true },
-        { id: 'c3', text: 'Отримати фінальне підтвердження від замовника по Email', checked: false }
-      ],
-      status: 'todo',
-      clientName: 'ТОВ «ФармаТрейд»',
-      dealName: 'Замовлення №31101 — Бланки А4',
-      createdBy: 'Віктор (Менеджер)',
-      autoTriggered: true,
-      stageTrigger: 'Підготовка документів'
-    },
-    {
-      id: 'T-302',
-      title: 'Підготувати порізку тиражу 1500 шт на гіпер-порізчику',
-      type: 'Порізка',
-      deadline: '2026-08-19',
-      deadlineTime: '16:30',
-      priority: 'medium',
-      assignee: 'Іван (Палітурник)',
-      checklist: [
-        { id: 'c4', text: 'Перевірити наявність крейдованого паперу 130г на стелажі А', checked: true },
-        { id: 'c5', text: 'Виставити стопові мітки порізу 210х297мм', checked: false }
-      ],
-      status: 'todo',
-      clientName: 'ПРАТ «ЕкоСок»',
-      dealName: 'Замовлення №1502 — Буклети',
-      createdBy: 'Працівник А (Адміністратор)',
-      autoTriggered: true,
-      stageTrigger: 'Склад'
-    },
-    {
-      id: 'T-303',
-      title: 'Ламінування матовою плівкою 30мкм тиражу меню',
-      type: 'Друк',
-      deadline: '2026-08-20',
-      deadlineTime: '11:00',
-      priority: 'low',
-      assignee: 'Сергій (Оператор)',
-      checklist: [
-        { id: 'c6', text: 'Прогріти рулонний ламінатор до 115°C', checked: false },
-        { id: 'c7', text: 'Упакувати готовий тираж у крафт-папір для доставки', checked: false }
-      ],
-      status: 'todo',
-      clientName: 'Кафе «Капучино»',
-      dealName: 'Замовлення №884 — Меню',
-      createdBy: 'Віктор (Менеджер)'
-    },
-    {
-      id: 'T-304',
-      title: 'Дзвінок замовнику щодо узгодження передплати 50%',
-      type: 'Дзвінок',
-      deadline: '2026-08-17',
-      deadlineTime: '18:00',
-      priority: 'high',
-      assignee: 'Працівник А (Адміністратор)',
-      checklist: [
-        { id: 'c8', text: 'Виставити рахунок-специфікацію', checked: true },
-        { id: 'c9', text: 'Підтвердити надходження коштів на р/р ПриватБанку', checked: false }
-      ],
-      status: 'todo',
-      clientName: 'ТОВ «МЕД-СЕРВІС»',
-      dealName: 'Замовлення №9941 — Буклети',
-      createdBy: 'Працівник А (Адміністратор)'
-    }
-  ]);
+  // Expanded notes state per task
+  const [expandedNotes, setExpandedNotes] = useState<Record<string, boolean>>({});
 
   // Modal Form State
   const [showAddModal, setShowAddModal] = useState(false);
@@ -139,9 +66,8 @@ export const Tasks: React.FC = () => {
     e.preventDefault();
     if (!newTitle.trim()) return;
 
-    const newTask: TaskItem = {
-      id: `T-${Date.now().toString().slice(-3)}`,
-      title: newTitle,
+    addTask({
+      title: newTitle.trim(),
       type: newType,
       deadline: newDeadline || new Date().toISOString().split('T')[0],
       deadlineTime: newDeadlineTime,
@@ -151,14 +77,14 @@ export const Tasks: React.FC = () => {
         .filter(text => text.trim())
         .map((text, idx) => ({ id: `c-${idx}-${Date.now()}`, text, checked: false })),
       status: 'todo',
+      createdAt: new Date().toISOString().split('T')[0],
       clientName: selectedClient || undefined,
       dealName: selectedDeal || undefined,
       createdBy: currentUser?.name || 'Працівник А (Адміністратор)',
       autoTriggered: enableAutoTrigger,
       stageTrigger: enableAutoTrigger ? selectedTriggerStage : undefined
-    };
+    });
 
-    setTasks([newTask, ...tasks]);
     setShowAddModal(false);
     
     // Reset Form
@@ -173,50 +99,63 @@ export const Tasks: React.FC = () => {
     setEnableAutoTrigger(false);
   };
 
-  const toggleChecklistItem = (taskId: string, itemId: string) => {
-    setTasks(tasks.map(task => {
-      if (task.id === taskId) {
-        return {
-          ...task,
-          checklist: task.checklist.map(item => item.id === itemId ? { ...item, checked: !item.checked } : item)
-        };
-      }
-      return task;
+  const toggleNotesForTask = (taskId: string) => {
+    setExpandedNotes(prev => ({
+      ...prev,
+      [taskId]: !prev[taskId]
     }));
   };
 
-  const toggleTaskStatus = (id: string) => {
-    setTasks(tasks.map(t => t.id === id ? { ...t, status: t.status === 'todo' ? 'done' : 'todo' } : t));
-  };
-
-  const deleteTask = (id: string) => {
-    if (confirm('Видалити завдання зі списку?')) {
-      setTasks(tasks.filter(t => t.id !== id));
-    }
-  };
-
   const currentUserName = currentUser?.name || 'Працівник А (Адміністратор)';
+  const todayStr = new Date().toISOString().split('T')[0];
 
-  // Filter Tasks by Sub-tab & Search
+  const getPastDateStr = (daysAgo: number) => {
+    const d = new Date();
+    d.setDate(d.getDate() - daysAgo);
+    return d.toISOString().split('T')[0];
+  };
+
+  // Filter Tasks by Sub-tab, Date Creation & Search
   const filteredTasks = tasks.filter(task => {
-    if (activeSubTab === 'my') {
+    if (activeSubTab === 'today') {
+      if (!task.deadline || task.deadline !== todayStr || task.status === 'done') return false;
+    } else if (activeSubTab === 'my') {
       if (!task.assignee.includes(currentUserName.split(' ')[0])) return false;
     } else if (activeSubTab === 'assigned_by_me') {
       if (!task.createdBy?.includes(currentUserName.split(' ')[0])) return false;
     } else if (activeSubTab === 'overdue') {
-      const today = new Date().toISOString().split('T')[0];
-      if (task.deadline >= today || task.status === 'done') return false;
+      if (!task.deadline || task.deadline >= todayStr || task.status === 'done') return false;
     } else if (activeSubTab === 'auto_triggers') {
       if (!task.autoTriggered) return false;
     }
 
     if (typeFilter !== 'Всі' && task.type !== typeFilter) return false;
 
+    // Creation Date Filter
+    if (createdDateFilter !== 'all') {
+      const created = task.createdAt ? task.createdAt.split('T')[0] : '';
+      if (createdDateFilter === 'today') {
+        if (created !== todayStr) return false;
+      } else if (createdDateFilter === 'yesterday') {
+        const yesterday = getPastDateStr(1);
+        if (created !== yesterday) return false;
+      } else if (createdDateFilter === 'last7') {
+        const last7 = getPastDateStr(7);
+        if (created < last7) return false;
+      } else if (createdDateFilter === 'last30') {
+        const last30 = getPastDateStr(30);
+        if (created < last30) return false;
+      } else if (createdDateFilter === 'custom' && customCreatedDate) {
+        if (created !== customCreatedDate) return false;
+      }
+    }
+
     if (searchQuery) {
       const q = searchQuery.toLowerCase();
       return task.title.toLowerCase().includes(q) || 
              (task.clientName && task.clientName.toLowerCase().includes(q)) || 
-             (task.dealName && task.dealName.toLowerCase().includes(q));
+             (task.dealName && task.dealName.toLowerCase().includes(q)) ||
+             (task.assignee && task.assignee.toLowerCase().includes(q));
     }
 
     return true;
@@ -230,6 +169,9 @@ export const Tasks: React.FC = () => {
     }
   };
 
+  const overdueCount = tasks.filter(t => t.status !== 'done' && t.deadline && t.deadline < todayStr).length;
+  const todayCount = tasks.filter(t => t.status !== 'done' && t.deadline && t.deadline === todayStr).length;
+
   return (
     <div className="main-content" style={{ backgroundColor: 'var(--bg-system)', height: '100%', overflowY: 'auto' }}>
       
@@ -240,7 +182,7 @@ export const Tasks: React.FC = () => {
             <CheckSquare size={24} style={{ color: 'var(--primary)' }} />
             Завдання та бізнес-доручення (KeepinCRM)
           </h1>
-          <p className="subtitle">Планування завдань, покрокові чек-листи та авто-створення за тригерами у воронці</p>
+          <p className="subtitle">Планування завдань, фільтри за датою створення, замітки та авто-тригери воронки</p>
         </div>
         <button 
           onClick={() => setShowAddModal(true)}
@@ -257,10 +199,10 @@ export const Tasks: React.FC = () => {
         backgroundColor: 'var(--bg-card)', 
         border: '1px solid var(--border-light)', 
         padding: '8px 14px', 
-        marginBottom: '20px',
+        marginBottom: '16px',
         boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
       }}>
-        <div style={{ display: 'flex', gap: '20px', overflowX: 'auto', whiteSpace: 'nowrap' }}>
+        <div style={{ display: 'flex', gap: '18px', overflowX: 'auto', whiteSpace: 'nowrap', alignItems: 'center' }}>
           <button
             onClick={() => setActiveSubTab('all')}
             style={{
@@ -274,6 +216,21 @@ export const Tasks: React.FC = () => {
             }}
           >
             <ListTodo size={14} /> Всі завдання ({tasks.length})
+          </button>
+
+          <button
+            onClick={() => setActiveSubTab('today')}
+            style={{
+              padding: '8px 4px',
+              fontSize: '13px',
+              fontWeight: activeSubTab === 'today' ? '800' : '600',
+              color: activeSubTab === 'today' ? '#f59e0b' : 'var(--text-medium)',
+              borderBottom: activeSubTab === 'today' ? '2px solid #f59e0b' : '2px solid transparent',
+              background: 'transparent', borderTop: 'none', borderLeft: 'none', borderRight: 'none',
+              cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px'
+            }}
+          >
+            <Calendar size={14} style={{ color: '#f59e0b' }} /> На сьогодні ({todayCount})
           </button>
 
           <button
@@ -318,7 +275,7 @@ export const Tasks: React.FC = () => {
               cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px'
             }}
           >
-            <AlertTriangle size={14} /> Протерміновані
+            <AlertTriangle size={14} /> Протерміновані ({overdueCount})
           </button>
 
           <button
@@ -338,48 +295,155 @@ export const Tasks: React.FC = () => {
         </div>
       </div>
 
-      {/* Search & Type Filter Control Bar */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', gap: '16px', flexWrap: 'wrap' }}>
-        <div style={{ position: 'relative', width: '320px' }}>
-          <Search size={14} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-medium)' }} />
-          <input
-            type="text"
-            placeholder="Пошук завдань за назвою, угодою чи клієнтом..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            style={{
-              width: '100%',
-              height: '34px',
-              paddingLeft: '32px',
-              fontSize: '12px',
-              backgroundColor: 'var(--bg-card)',
-              color: 'var(--text-dark)',
-              border: '1px solid var(--border-light)',
-              borderRadius: '6px'
-            }}
-          />
+      {/* Filter Control Bar (Search + Type + CREATION DATE FILTER) */}
+      <div className="ios-card" style={{ 
+        backgroundColor: 'var(--bg-card)', 
+        border: '1px solid var(--border-light)', 
+        padding: '12px 16px', 
+        marginBottom: '20px',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '12px'
+      }}>
+        {/* Top Row: Search and Type */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '14px', flexWrap: 'wrap' }}>
+          <div style={{ position: 'relative', width: '320px', maxWidth: '100%' }}>
+            <Search size={14} style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-medium)' }} />
+            <input
+              type="text"
+              placeholder="Пошук за назвою, клієнтом, виконавцем..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{
+                width: '100%',
+                height: '32px',
+                paddingLeft: '32px',
+                fontSize: '12px',
+                backgroundColor: 'var(--bg-card-subtle)',
+                color: 'var(--text-dark)',
+                border: '1px solid var(--border-light)',
+                borderRadius: '6px'
+              }}
+            />
+          </div>
+
+          <div style={{ display: 'flex', gap: '6px', alignItems: 'center', overflowX: 'auto' }}>
+            <span style={{ fontSize: '11px', color: 'var(--text-medium)', fontWeight: '600' }}>Тип:</span>
+            {['Всі', 'Дзвінок', 'Перевірка макета', 'Друк', 'Порізка', 'Доставка'].map(type => (
+              <button
+                key={type}
+                onClick={() => setTypeFilter(type)}
+                style={{
+                  padding: '4px 10px',
+                  borderRadius: '6px',
+                  fontSize: '11px',
+                  fontWeight: typeFilter === type ? '750' : '500',
+                  backgroundColor: typeFilter === type ? 'var(--primary)' : 'var(--bg-card-subtle)',
+                  color: typeFilter === type ? '#ffffff' : 'var(--text-dark)',
+                  border: '1px solid var(--border-light)',
+                  cursor: 'pointer'
+                }}
+              >
+                {type}
+              </button>
+            ))}
+          </div>
         </div>
 
-        <div style={{ display: 'flex', gap: '6px', alignItems: 'center', overflowX: 'auto' }}>
-          <span style={{ fontSize: '11px', color: 'var(--text-medium)', fontWeight: '600' }}>Тип:</span>
-          {['Всі', 'Дзвінок', 'Перевірка макета', 'Друк', 'Порізка', 'Доставка'].map(type => (
+        {/* Bottom Row: Creation Date Filter Controls */}
+        <div style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'space-between', 
+          gap: '12px', 
+          flexWrap: 'wrap',
+          borderTop: '1px solid var(--border-light)',
+          paddingTop: '10px'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+            <span style={{ fontSize: '11.5px', fontWeight: '750', color: 'var(--text-dark)', display: 'flex', alignItems: 'center', gap: '5px' }}>
+              <CalendarRange size={13} style={{ color: 'var(--primary)' }} />
+              Дата створення задач:
+            </span>
+
+            <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
+              {[
+                { id: 'all', label: 'Всі дати' },
+                { id: 'today', label: 'Сьогодні' },
+                { id: 'yesterday', label: 'Вчора' },
+                { id: 'last7', label: 'Останні 7 днів' },
+                { id: 'last30', label: 'Останні 30 днів' },
+                { id: 'custom', label: 'Календарний вибір...' }
+              ].map(d => (
+                <button
+                  key={d.id}
+                  type="button"
+                  onClick={() => setCreatedDateFilter(d.id as any)}
+                  style={{
+                    padding: '3px 8px',
+                    fontSize: '10.5px',
+                    borderRadius: '5px',
+                    border: '1px solid var(--border-light)',
+                    backgroundColor: createdDateFilter === d.id ? 'var(--primary)' : 'var(--bg-card-subtle)',
+                    color: createdDateFilter === d.id ? '#ffffff' : 'var(--text-dark)',
+                    fontWeight: createdDateFilter === d.id ? '750' : '500',
+                    cursor: 'pointer'
+                  }}
+                >
+                  {d.label}
+                </button>
+              ))}
+            </div>
+
+            {createdDateFilter === 'custom' && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <input
+                  type="date"
+                  value={customCreatedDate}
+                  onChange={(e) => setCustomCreatedDate(e.target.value)}
+                  style={{
+                    height: '26px',
+                    padding: '0 6px',
+                    fontSize: '11px',
+                    backgroundColor: 'var(--bg-card-subtle)',
+                    color: 'var(--text-dark)',
+                    border: '1px solid var(--primary)',
+                    borderRadius: '5px'
+                  }}
+                />
+                {customCreatedDate && (
+                  <button
+                    type="button"
+                    onClick={() => setCustomCreatedDate('')}
+                    style={{ border: 'none', background: 'transparent', color: 'var(--text-medium)', cursor: 'pointer' }}
+                    title="Скинути дату"
+                  >
+                    <X size={13} />
+                  </button>
+                )}
+              </div>
+            )}
+          </div>
+
+          {createdDateFilter !== 'all' && (
             <button
-              key={type}
-              onClick={() => setTypeFilter(type)}
+              type="button"
+              onClick={() => {
+                setCreatedDateFilter('all');
+                setCustomCreatedDate('');
+              }}
               style={{
-                padding: '4px 10px',
-                borderRadius: '6px',
+                border: 'none',
+                background: 'transparent',
+                color: 'var(--primary)',
                 fontSize: '11px',
-                fontWeight: typeFilter === type ? '750' : '500',
-                backgroundColor: typeFilter === type ? 'var(--primary)' : 'var(--bg-card-subtle)',
-                color: typeFilter === type ? '#ffffff' : 'var(--text-dark)',
-                border: '1px solid var(--border-light)',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                fontWeight: '700'
               }}
             >
-              {type}
+              ✕ Скинути фільтр дати
             </button>
-          ))}
+          )}
         </div>
       </div>
 
@@ -394,6 +458,7 @@ export const Tasks: React.FC = () => {
             const completedCount = task.checklist.filter(c => c.checked).length;
             const progressPercent = task.checklist.length > 0 ? Math.round((completedCount / task.checklist.length) * 100) : 0;
             const isDone = task.status === 'done';
+            const isNotesOpen = Boolean(expandedNotes[task.id]);
 
             return (
               <div 
@@ -406,7 +471,8 @@ export const Tasks: React.FC = () => {
                   opacity: isDone ? 0.75 : 1,
                   display: 'flex',
                   flexDirection: 'column',
-                  gap: '14px'
+                  gap: '14px',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.03)'
                 }}
               >
                 {/* Task Card Header */}
@@ -428,7 +494,7 @@ export const Tasks: React.FC = () => {
                       }}>
                         {task.title}
                       </h3>
-                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: '4px', fontSize: '11px' }}>
+                      <div style={{ display: 'flex', gap: '8px', alignItems: 'center', marginTop: '4px', fontSize: '11px', flexWrap: 'wrap' }}>
                         <span className="ios-badge ios-badge-blue">{task.type}</span>
                         <span className={getPriorityBadgeClass(task.priority)}>
                           {task.priority === 'high' ? '🔥 Високий пріоритет' : task.priority === 'medium' ? 'Середній' : 'Низький'}
@@ -438,12 +504,19 @@ export const Tasks: React.FC = () => {
                             <Zap size={10} /> Авто-тригер ({task.stageTrigger})
                           </span>
                         )}
+                        <span style={{ fontSize: '10.5px', color: 'var(--text-medium)', display: 'flex', alignItems: 'center', gap: '3px' }}>
+                          <CalendarRange size={11} /> Створено: <strong style={{ color: 'var(--text-dark)' }}>{task.createdAt ? task.createdAt.split('T')[0] : '—'}</strong>
+                        </span>
                       </div>
                     </div>
                   </div>
 
                   <button 
-                    onClick={() => deleteTask(task.id)}
+                    onClick={() => {
+                      if (window.confirm(`Видалити завдання "${task.title}"?`)) {
+                        deleteTask(task.id);
+                      }
+                    }}
                     style={{ border: 'none', background: 'transparent', color: '#94a3b8', cursor: 'pointer', padding: '4px' }}
                     title="Видалити завдання"
                   >
@@ -481,7 +554,7 @@ export const Tasks: React.FC = () => {
                           <input 
                             type="checkbox"
                             checked={item.checked}
-                            onChange={() => toggleChecklistItem(task.id, item.id)}
+                            onChange={() => toggleTaskChecklistItem(task.id, item.id)}
                             style={{ 
                               width: '16px', 
                               height: '16px', 
@@ -500,24 +573,66 @@ export const Tasks: React.FC = () => {
                   </div>
                 )}
 
-                {/* Footer Metadata */}
+                {/* Footer Metadata & Notes Toggle */}
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border-light)', paddingTop: '10px', fontSize: '11px', color: 'var(--text-medium)', flexWrap: 'wrap', gap: '8px' }}>
-                  <div style={{ display: 'flex', gap: '14px', alignItems: 'center' }}>
+                  <div style={{ display: 'flex', gap: '14px', alignItems: 'center', flexWrap: 'wrap' }}>
                     <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                       <User size={13} style={{ color: 'var(--primary)' }} /> Виконавець: <strong style={{ color: 'var(--text-dark)' }}>{task.assignee}</strong>
                     </span>
                     <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                      <Calendar size={13} style={{ color: 'var(--warning)' }} /> Термін: <strong style={{ color: 'var(--text-dark)' }}>{task.deadline} {task.deadlineTime ? `о ${task.deadlineTime}` : ''}</strong>
+                      <Calendar size={13} style={{ color: task.deadline < todayStr && !isDone ? 'var(--danger)' : 'var(--warning)' }} /> 
+                      Термін: <strong style={{ color: task.deadline < todayStr && !isDone ? 'var(--danger)' : 'var(--text-dark)' }}>{task.deadline} {task.deadlineTime ? `о ${task.deadlineTime}` : ''}</strong>
                     </span>
                   </div>
 
-                  {(task.dealName || task.clientName) && (
-                    <div style={{ display: 'flex', gap: '6px', alignItems: 'center' }}>
-                      {task.dealName && <span className="ios-badge ios-badge-blue">💼 {task.dealName}</span>}
-                      {task.clientName && <span className="ios-badge ios-badge-purple">🏢 {task.clientName}</span>}
-                    </div>
-                  )}
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center', flexWrap: 'wrap' }}>
+                    {task.dealName && <span className="ios-badge ios-badge-blue">💼 {task.dealName}</span>}
+                    {task.clientName && <span className="ios-badge ios-badge-purple">🏢 {task.clientName}</span>}
+
+                    {/* Notes expansion button */}
+                    <button
+                      type="button"
+                      onClick={() => toggleNotesForTask(task.id)}
+                      style={{
+                        padding: '4px 8px',
+                        borderRadius: '6px',
+                        fontSize: '11px',
+                        border: '1px solid var(--border-light)',
+                        backgroundColor: isNotesOpen ? 'var(--primary)' : 'var(--bg-card-subtle)',
+                        color: isNotesOpen ? '#ffffff' : 'var(--text-dark)',
+                        fontWeight: '700',
+                        cursor: 'pointer',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px'
+                      }}
+                    >
+                      <MessageSquare size={12} />
+                      Замітки
+                      {isNotesOpen ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
+                    </button>
+                  </div>
                 </div>
+
+                {/* Embedded Notes Section */}
+                {isNotesOpen && (
+                  <div style={{ 
+                    borderTop: '1px dashed var(--border-light)', 
+                    paddingTop: '12px', 
+                    marginTop: '2px',
+                    backgroundColor: isDark ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.01)',
+                    borderRadius: '8px',
+                    padding: '12px'
+                  }}>
+                    <NotesSection
+                      targetType="task"
+                      targetId={task.id}
+                      title="Замітки та коментарі до цього завдання"
+                      placeholder="Напишіть замітку або відповідь до завдання..."
+                      compact={true}
+                    />
+                  </div>
+                )}
 
               </div>
             );
@@ -624,13 +739,13 @@ export const Tasks: React.FC = () => {
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                 <div className="ios-input-group">
-                  <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Прив'язка до Угоди</label>
+                  <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Прив\'язка до Угоди</label>
                   <select 
                     value={selectedDeal}
                     onChange={(e) => setSelectedDeal(e.target.value)}
                     style={{ backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
                   >
-                    <option value="">Без прив'язки</option>
+                    <option value="">Без прив\'язки</option>
                     {orders.map(o => (
                       <option key={o.id} value={`${o.id} — ${o.name || o.category}`}>{o.id} — {o.name || o.category}</option>
                     ))}
@@ -638,13 +753,13 @@ export const Tasks: React.FC = () => {
                 </div>
 
                 <div className="ios-input-group">
-                  <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Прив'язка до Замовника</label>
+                  <label className="ios-label" style={{ color: 'var(--text-medium)' }}>Прив\'язка до Замовника</label>
                   <select 
                     value={selectedClient}
                     onChange={(e) => setSelectedClient(e.target.value)}
                     style={{ backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
                   >
-                    <option value="">Без прив'язки</option>
+                    <option value="">Без прив\'язки</option>
                     {clients.map(c => (
                       <option key={c.id} value={c.name}>{c.name}</option>
                     ))}

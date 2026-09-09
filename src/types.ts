@@ -153,3 +153,51 @@ export interface Norms {
     planeta: number;          // Cost per print sheet (A1)
   };
 }
+
+export interface TaskChecklistItem {
+  id: string;
+  text: string;
+  checked: boolean;
+}
+
+export interface TaskItem {
+  id: string;
+  title: string;
+  type: 'Дзвінок' | 'Зустріч' | 'Перевірка макета' | 'Друк' | 'Порізка' | 'Доставка' | 'Оплата';
+  deadline: string; // YYYY-MM-DD
+  deadlineTime?: string; // HH:mm
+  priority: 'high' | 'medium' | 'low';
+  assignee: string;
+  checklist: TaskChecklistItem[];
+  status: 'todo' | 'done';
+  createdAt: string; // YYYY-MM-DD or ISO
+  clientName?: string;
+  dealName?: string;
+  dealId?: string;
+  clientId?: string;
+  createdBy?: string;
+  autoTriggered?: boolean;
+  stageTrigger?: string;
+}
+
+export interface NoteReply {
+  id: string;
+  author: string;
+  authorRole?: string;
+  text: string;
+  createdAt: string;
+  updatedAt?: string;
+}
+
+export interface NoteItem {
+  id: string;
+  targetType: 'client' | 'deal' | 'task' | 'general';
+  targetId?: string;
+  author: string;
+  authorRole?: string;
+  text: string;
+  createdAt: string;
+  updatedAt?: string;
+  replies?: NoteReply[];
+}
+

@@ -15,6 +15,7 @@ import {
   Paperclip
 } from 'lucide-react';
 import type { Client } from '../types';
+import { NotesSection } from './NotesSection';
 
 export const Clients: React.FC = () => {
   const { 
@@ -533,10 +534,12 @@ export const Clients: React.FC = () => {
 
                 {/* Notes Tab Content */}
                 {profileTab === 'notes' && (
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                    <textarea rows={3} placeholder="Введіть нотатку по клієнту..." style={{ padding: '8px', fontSize: '11px', backgroundColor: 'var(--bg-card-subtle)', color: 'var(--text-dark)', border: '1px solid var(--border-light)', borderRadius: '6px' }} />
-                    <button type="button" className="ios-btn ios-btn-primary ios-btn-small" style={{ alignSelf: 'flex-start' }}>+ Зберегти нотатку</button>
-                  </div>
+                  <NotesSection
+                    targetType="client"
+                    targetId={selectedClient.id}
+                    title="Замітки по замовнику"
+                    placeholder={`Напишіть замітку або коментар по клієнту ${selectedClient.name}...`}
+                  />
                 )}
 
                 {/* Chats Tab Content */}
