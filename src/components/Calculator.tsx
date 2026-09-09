@@ -874,7 +874,7 @@ const renderBookletFoldBlueprint = (
 };
 
 // Clean restored Calculator version 1.0.5
-// Helper to auto-extract Telegram username from Telegram WebApp / Bot or URL
+// Helper to auto-extract Telegram username from Telegram WebApp / Bot, session user or URL
 const getInitialTelegram = (currentUser?: any): string => {
   try {
     if (typeof window !== 'undefined') {
@@ -883,19 +883,25 @@ const getInitialTelegram = (currentUser?: any): string => {
         return `@${tg.initDataUnsafe.user.username.replace(/^@/, '')}`;
       }
       const params = new URLSearchParams(window.location.search);
-      const urlTg = params.get('tg_username') || params.get('tg_user') || params.get('telegram') || params.get('tg');
-      if (urlTg) {
+      const urlTg = params.get('tg_username') || params.get('tg_user') || params.get('telegram') || params.get('tg') || params.get('username') || params.get('user');
+      if (urlTg && !['admin', 'manager', 'operator'].includes(urlTg.toLowerCase())) {
         return `@${decodeURIComponent(urlTg).replace(/^@/, '')}`;
       }
     }
     if (currentUser?.telegram) {
       return `@${currentUser.telegram.replace(/^@/, '')}`;
     }
+    if (currentUser?.username && !['admin', 'manager', 'operator', 'client'].includes(currentUser.username.toLowerCase())) {
+      return `@${currentUser.username.replace(/^@/, '')}`;
+    }
+    if (currentUser?.name && !['admin', 'manager', 'operator', 'client', 'клієнт друкарні'].includes(currentUser.name.toLowerCase())) {
+      return `@${currentUser.name.replace(/^@/, '')}`;
+    }
     const savedProfile = JSON.parse(localStorage.getItem('crm_client_profile') || '{}');
     if (savedProfile.telegram) {
       return `@${savedProfile.telegram.replace(/^@/, '')}`;
     }
-    const storedTg = localStorage.getItem('tg_username') || localStorage.getItem('tg_user');
+    const storedTg = localStorage.getItem('tg_username') || localStorage.getItem('tg_user') || localStorage.getItem('telegram_username');
     if (storedTg) {
       return `@${storedTg.replace(/^@/, '')}`;
     }
@@ -7132,13 +7138,17 @@ export const Calculator: React.FC = () => {
 
                         {/* Top Strip: Client Contacts vs Staff CRM fields */}
                         {currentUser?.role === 'client' ? (
-                          <div className="grid grid-cols-1 md:grid-cols-12 gap-3 p-4 rounded-xl bg-blue-50/60 border border-blue-100">
-                            <div className="md:col-span-4 flex flex-col gap-1">
-                              <label className="text-[11px] font-extrabold text-slate-700 uppercase flex items-center justify-between">
-                                <span>ПІБ або компанія <span className="text-rose-500">*</span>:</span>
-                                {!customClientName.trim() && (
-                                  <span className="text-[10px] text-rose-500 font-bold lowercase">обов'язково</span>
-                                )}
+                          <div className="grid grid-cols-1 md:grid-cols-12 gap-3.5 p-4 rounded-2xl bg-white border border-slate-200/90 shadow-sm">
+                            {/* ПІБ або компанія (Обов'язкове) */}
+                            <div className="md:col-span-4 flex flex-col gap-1.5">
+                              <label className="text-[11px] font-extrabold text-slate-800 uppercase flex items-center justify-between">
+                                <span className="flex items-center gap-1">
+                                  <span>ПІБ або компанія</span>
+                                  <span className="text-rose-500 font-black">*</span>
+                                </span>
+                                <span className="text-[10px] px-2 py-0.5 rounded-md bg-rose-50 text-rose-600 font-extrabold border border-rose-200 uppercase tracking-wide">
+                                  Обов'язково
+                                </span>
                               </label>
                               <input
                                 type="text"
@@ -7151,19 +7161,20 @@ export const Calculator: React.FC = () => {
                                     localStorage.setItem('crm_client_profile', JSON.stringify({ ...prev, name: e.target.value, contactPerson: e.target.value }));
                                   } catch {}
                                 }}
-                                className={`w-full px-3 py-2 rounded-xl border text-xs font-bold focus:outline-none transition-colors ${
-                                  !customClientName.trim()
-                                    ? 'border-amber-400 bg-amber-50/20 text-slate-900 focus:border-blue-600'
-                                    : 'border-slate-200 bg-white text-slate-900 focus:border-blue-600'
-                                }`}
+                                className="w-full px-3 py-2 rounded-xl border border-slate-300 border-l-[3.5px] border-l-blue-600 bg-white text-xs font-bold text-slate-900 focus:border-blue-600 focus:ring-3 focus:ring-blue-500/15 focus:outline-none transition-all shadow-2xs placeholder:text-slate-400 placeholder:font-medium"
                               />
                             </div>
-                            <div className="md:col-span-4 flex flex-col gap-1">
-                              <label className="text-[11px] font-extrabold text-slate-700 uppercase flex items-center justify-between">
-                                <span>Номер телефону <span className="text-rose-500">*</span>:</span>
-                                {!isPhoneComplete(customClientPhone) && (
-                                  <span className="text-[10px] text-rose-500 font-bold lowercase">обов'язково</span>
-                                )}
+
+                            {/* Номер телефону (Обов'язкове) */}
+                            <div className="md:col-span-4 flex flex-col gap-1.5">
+                              <label className="text-[11px] font-extrabold text-slate-800 uppercase flex items-center justify-between">
+                                <span className="flex items-center gap-1">
+                                  <span>Номер телефону</span>
+                                  <span className="text-rose-500 font-black">*</span>
+                                </span>
+                                <span className="text-[10px] px-2 py-0.5 rounded-md bg-rose-50 text-rose-600 font-extrabold border border-rose-200 uppercase tracking-wide">
+                                  Обов'язково
+                                </span>
                               </label>
                               <input
                                 type="text"
@@ -7177,22 +7188,26 @@ export const Calculator: React.FC = () => {
                                     localStorage.setItem('crm_client_profile', JSON.stringify({ ...prev, phone: formatted }));
                                   } catch {}
                                 }}
-                                className={`w-full px-3 py-2 rounded-xl border text-xs font-bold focus:outline-none font-mono transition-colors ${
-                                  !isPhoneComplete(customClientPhone)
-                                    ? 'border-amber-400 bg-amber-50/20 text-slate-900 focus:border-blue-600'
-                                    : 'border-slate-200 bg-white text-slate-900 focus:border-blue-600'
-                                }`}
+                                className="w-full px-3 py-2 rounded-xl border border-slate-300 border-l-[3.5px] border-l-blue-600 bg-white text-xs font-bold text-slate-900 focus:border-blue-600 focus:ring-3 focus:ring-blue-500/15 focus:outline-none font-mono transition-all shadow-2xs placeholder:text-slate-400"
                               />
                             </div>
-                            <div className="md:col-span-4 flex flex-col gap-1">
-                              <label className="text-[11px] font-extrabold text-slate-700 uppercase flex items-center justify-between">
-                                <span>Нік у Telegram:</span>
+
+                            {/* Нік у Telegram */}
+                            <div className="md:col-span-4 flex flex-col gap-1.5">
+                              <label className="text-[11px] font-extrabold text-slate-800 uppercase flex items-center justify-between">
+                                <span className="flex items-center gap-1">
+                                  <span>Нік у Telegram:</span>
+                                </span>
                                 {customClientTelegram && (
-                                  <span className="text-[10px] text-blue-600 font-bold lowercase">з бота / профілю</span>
+                                  <span className="text-[10px] px-2 py-0.5 rounded-md bg-sky-50 text-sky-700 font-extrabold border border-sky-200">
+                                    авто-з бота
+                                  </span>
                                 )}
                               </label>
-                              <div className="relative">
-                                <span className="absolute left-3 top-2 text-slate-400 font-bold text-xs">@</span>
+                              <div className="flex rounded-xl border border-slate-300 bg-white overflow-hidden shadow-2xs focus-within:border-blue-600 focus-within:ring-3 focus-within:ring-blue-500/15 transition-all">
+                                <div className="flex items-center justify-center px-3 bg-slate-50 border-r border-slate-200 text-slate-500 font-black text-xs select-none">
+                                  @
+                                </div>
                                 <input
                                   type="text"
                                   placeholder="username"
@@ -7206,7 +7221,7 @@ export const Calculator: React.FC = () => {
                                       localStorage.setItem('crm_client_profile', JSON.stringify({ ...prev, telegram: val }));
                                     } catch {}
                                   }}
-                                  className="w-full pl-7 pr-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-900 focus:border-blue-600 focus:outline-none"
+                                  className="w-full px-3 py-2 bg-white text-xs font-bold text-slate-900 focus:outline-none placeholder:text-slate-400 placeholder:font-normal"
                                 />
                               </div>
                             </div>
@@ -9833,13 +9848,17 @@ export const Calculator: React.FC = () => {
 
                         {/* Top Strip: Client Contacts vs Staff CRM fields */}
                         {currentUser?.role === 'client' ? (
-                          <div className="grid grid-cols-1 md:grid-cols-12 gap-3 p-4 rounded-xl bg-blue-50/60 border border-blue-100">
-                            <div className="md:col-span-4 flex flex-col gap-1">
-                              <label className="text-[11px] font-extrabold text-slate-700 uppercase flex items-center justify-between">
-                                <span>ПІБ або компанія <span className="text-rose-500">*</span>:</span>
-                                {!customClientName.trim() && (
-                                  <span className="text-[10px] text-rose-500 font-bold lowercase">обов'язково</span>
-                                )}
+                          <div className="grid grid-cols-1 md:grid-cols-12 gap-3.5 p-4 rounded-2xl bg-white border border-slate-200/90 shadow-sm">
+                            {/* ПІБ або компанія (Обов'язкове) */}
+                            <div className="md:col-span-4 flex flex-col gap-1.5">
+                              <label className="text-[11px] font-extrabold text-slate-800 uppercase flex items-center justify-between">
+                                <span className="flex items-center gap-1">
+                                  <span>ПІБ або компанія</span>
+                                  <span className="text-rose-500 font-black">*</span>
+                                </span>
+                                <span className="text-[10px] px-2 py-0.5 rounded-md bg-rose-50 text-rose-600 font-extrabold border border-rose-200 uppercase tracking-wide">
+                                  Обов'язково
+                                </span>
                               </label>
                               <input
                                 type="text"
@@ -9852,19 +9871,20 @@ export const Calculator: React.FC = () => {
                                     localStorage.setItem('crm_client_profile', JSON.stringify({ ...prev, name: e.target.value, contactPerson: e.target.value }));
                                   } catch {}
                                 }}
-                                className={`w-full px-3 py-2 rounded-xl border text-xs font-bold focus:outline-none transition-colors ${
-                                  !customClientName.trim()
-                                    ? 'border-amber-400 bg-amber-50/20 text-slate-900 focus:border-blue-600'
-                                    : 'border-slate-200 bg-white text-slate-900 focus:border-blue-600'
-                                }`}
+                                className="w-full px-3 py-2 rounded-xl border border-slate-300 border-l-[3.5px] border-l-blue-600 bg-white text-xs font-bold text-slate-900 focus:border-blue-600 focus:ring-3 focus:ring-blue-500/15 focus:outline-none transition-all shadow-2xs placeholder:text-slate-400 placeholder:font-medium"
                               />
                             </div>
-                            <div className="md:col-span-4 flex flex-col gap-1">
-                              <label className="text-[11px] font-extrabold text-slate-700 uppercase flex items-center justify-between">
-                                <span>Номер телефону <span className="text-rose-500">*</span>:</span>
-                                {!isPhoneComplete(customClientPhone) && (
-                                  <span className="text-[10px] text-rose-500 font-bold lowercase">обов'язково</span>
-                                )}
+
+                            {/* Номер телефону (Обов'язкове) */}
+                            <div className="md:col-span-4 flex flex-col gap-1.5">
+                              <label className="text-[11px] font-extrabold text-slate-800 uppercase flex items-center justify-between">
+                                <span className="flex items-center gap-1">
+                                  <span>Номер телефону</span>
+                                  <span className="text-rose-500 font-black">*</span>
+                                </span>
+                                <span className="text-[10px] px-2 py-0.5 rounded-md bg-rose-50 text-rose-600 font-extrabold border border-rose-200 uppercase tracking-wide">
+                                  Обов'язково
+                                </span>
                               </label>
                               <input
                                 type="text"
@@ -9878,22 +9898,26 @@ export const Calculator: React.FC = () => {
                                     localStorage.setItem('crm_client_profile', JSON.stringify({ ...prev, phone: formatted }));
                                   } catch {}
                                 }}
-                                className={`w-full px-3 py-2 rounded-xl border text-xs font-bold focus:outline-none font-mono transition-colors ${
-                                  !isPhoneComplete(customClientPhone)
-                                    ? 'border-amber-400 bg-amber-50/20 text-slate-900 focus:border-blue-600'
-                                    : 'border-slate-200 bg-white text-slate-900 focus:border-blue-600'
-                                }`}
+                                className="w-full px-3 py-2 rounded-xl border border-slate-300 border-l-[3.5px] border-l-blue-600 bg-white text-xs font-bold text-slate-900 focus:border-blue-600 focus:ring-3 focus:ring-blue-500/15 focus:outline-none font-mono transition-all shadow-2xs placeholder:text-slate-400"
                               />
                             </div>
-                            <div className="md:col-span-4 flex flex-col gap-1">
-                              <label className="text-[11px] font-extrabold text-slate-700 uppercase flex items-center justify-between">
-                                <span>Нік у Telegram:</span>
+
+                            {/* Нік у Telegram */}
+                            <div className="md:col-span-4 flex flex-col gap-1.5">
+                              <label className="text-[11px] font-extrabold text-slate-800 uppercase flex items-center justify-between">
+                                <span className="flex items-center gap-1">
+                                  <span>Нік у Telegram:</span>
+                                </span>
                                 {customClientTelegram && (
-                                  <span className="text-[10px] text-blue-600 font-bold lowercase">з бота / профілю</span>
+                                  <span className="text-[10px] px-2 py-0.5 rounded-md bg-sky-50 text-sky-700 font-extrabold border border-sky-200">
+                                    авто-з бота
+                                  </span>
                                 )}
                               </label>
-                              <div className="relative">
-                                <span className="absolute left-3 top-2 text-slate-400 font-bold text-xs">@</span>
+                              <div className="flex rounded-xl border border-slate-300 bg-white overflow-hidden shadow-2xs focus-within:border-blue-600 focus-within:ring-3 focus-within:ring-blue-500/15 transition-all">
+                                <div className="flex items-center justify-center px-3 bg-slate-50 border-r border-slate-200 text-slate-500 font-black text-xs select-none">
+                                  @
+                                </div>
                                 <input
                                   type="text"
                                   placeholder="username"
@@ -9907,7 +9931,7 @@ export const Calculator: React.FC = () => {
                                       localStorage.setItem('crm_client_profile', JSON.stringify({ ...prev, telegram: val }));
                                     } catch {}
                                   }}
-                                  className="w-full pl-7 pr-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-900 focus:border-blue-600 focus:outline-none"
+                                  className="w-full px-3 py-2 bg-white text-xs font-bold text-slate-900 focus:outline-none placeholder:text-slate-400 placeholder:font-normal"
                                 />
                               </div>
                             </div>
@@ -13209,13 +13233,17 @@ export const Calculator: React.FC = () => {
 
                         {/* Top Strip: Client Contacts vs Staff CRM fields */}
                         {currentUser?.role === 'client' ? (
-                          <div className="grid grid-cols-1 md:grid-cols-12 gap-3 p-4 rounded-xl bg-blue-50/60 border border-blue-100">
-                            <div className="md:col-span-4 flex flex-col gap-1">
-                              <label className="text-[11px] font-extrabold text-slate-700 uppercase flex items-center justify-between">
-                                <span>ПІБ або компанія <span className="text-rose-500">*</span>:</span>
-                                {!customClientName.trim() && (
-                                  <span className="text-[10px] text-rose-500 font-bold lowercase">обов'язково</span>
-                                )}
+                          <div className="grid grid-cols-1 md:grid-cols-12 gap-3.5 p-4 rounded-2xl bg-white border border-slate-200/90 shadow-sm">
+                            {/* ПІБ або компанія (Обов'язкове) */}
+                            <div className="md:col-span-4 flex flex-col gap-1.5">
+                              <label className="text-[11px] font-extrabold text-slate-800 uppercase flex items-center justify-between">
+                                <span className="flex items-center gap-1">
+                                  <span>ПІБ або компанія</span>
+                                  <span className="text-rose-500 font-black">*</span>
+                                </span>
+                                <span className="text-[10px] px-2 py-0.5 rounded-md bg-rose-50 text-rose-600 font-extrabold border border-rose-200 uppercase tracking-wide">
+                                  Обов'язково
+                                </span>
                               </label>
                               <input
                                 type="text"
@@ -13228,19 +13256,20 @@ export const Calculator: React.FC = () => {
                                     localStorage.setItem('crm_client_profile', JSON.stringify({ ...prev, name: e.target.value, contactPerson: e.target.value }));
                                   } catch {}
                                 }}
-                                className={`w-full px-3 py-2 rounded-xl border text-xs font-bold focus:outline-none transition-colors ${
-                                  !customClientName.trim()
-                                    ? 'border-amber-400 bg-amber-50/20 text-slate-900 focus:border-blue-600'
-                                    : 'border-slate-200 bg-white text-slate-900 focus:border-blue-600'
-                                }`}
+                                className="w-full px-3 py-2 rounded-xl border border-slate-300 border-l-[3.5px] border-l-blue-600 bg-white text-xs font-bold text-slate-900 focus:border-blue-600 focus:ring-3 focus:ring-blue-500/15 focus:outline-none transition-all shadow-2xs placeholder:text-slate-400 placeholder:font-medium"
                               />
                             </div>
-                            <div className="md:col-span-4 flex flex-col gap-1">
-                              <label className="text-[11px] font-extrabold text-slate-700 uppercase flex items-center justify-between">
-                                <span>Номер телефону <span className="text-rose-500">*</span>:</span>
-                                {!isPhoneComplete(customClientPhone) && (
-                                  <span className="text-[10px] text-rose-500 font-bold lowercase">обов'язково</span>
-                                )}
+
+                            {/* Номер телефону (Обов'язкове) */}
+                            <div className="md:col-span-4 flex flex-col gap-1.5">
+                              <label className="text-[11px] font-extrabold text-slate-800 uppercase flex items-center justify-between">
+                                <span className="flex items-center gap-1">
+                                  <span>Номер телефону</span>
+                                  <span className="text-rose-500 font-black">*</span>
+                                </span>
+                                <span className="text-[10px] px-2 py-0.5 rounded-md bg-rose-50 text-rose-600 font-extrabold border border-rose-200 uppercase tracking-wide">
+                                  Обов'язково
+                                </span>
                               </label>
                               <input
                                 type="text"
@@ -13254,22 +13283,26 @@ export const Calculator: React.FC = () => {
                                     localStorage.setItem('crm_client_profile', JSON.stringify({ ...prev, phone: formatted }));
                                   } catch {}
                                 }}
-                                className={`w-full px-3 py-2 rounded-xl border text-xs font-bold focus:outline-none font-mono transition-colors ${
-                                  !isPhoneComplete(customClientPhone)
-                                    ? 'border-amber-400 bg-amber-50/20 text-slate-900 focus:border-blue-600'
-                                    : 'border-slate-200 bg-white text-slate-900 focus:border-blue-600'
-                                }`}
+                                className="w-full px-3 py-2 rounded-xl border border-slate-300 border-l-[3.5px] border-l-blue-600 bg-white text-xs font-bold text-slate-900 focus:border-blue-600 focus:ring-3 focus:ring-blue-500/15 focus:outline-none font-mono transition-all shadow-2xs placeholder:text-slate-400"
                               />
                             </div>
-                            <div className="md:col-span-4 flex flex-col gap-1">
-                              <label className="text-[11px] font-extrabold text-slate-700 uppercase flex items-center justify-between">
-                                <span>Нік у Telegram:</span>
+
+                            {/* Нік у Telegram */}
+                            <div className="md:col-span-4 flex flex-col gap-1.5">
+                              <label className="text-[11px] font-extrabold text-slate-800 uppercase flex items-center justify-between">
+                                <span className="flex items-center gap-1">
+                                  <span>Нік у Telegram:</span>
+                                </span>
                                 {customClientTelegram && (
-                                  <span className="text-[10px] text-blue-600 font-bold lowercase">з бота / профілю</span>
+                                  <span className="text-[10px] px-2 py-0.5 rounded-md bg-sky-50 text-sky-700 font-extrabold border border-sky-200">
+                                    авто-з бота
+                                  </span>
                                 )}
                               </label>
-                              <div className="relative">
-                                <span className="absolute left-3 top-2 text-slate-400 font-bold text-xs">@</span>
+                              <div className="flex rounded-xl border border-slate-300 bg-white overflow-hidden shadow-2xs focus-within:border-blue-600 focus-within:ring-3 focus-within:ring-blue-500/15 transition-all">
+                                <div className="flex items-center justify-center px-3 bg-slate-50 border-r border-slate-200 text-slate-500 font-black text-xs select-none">
+                                  @
+                                </div>
                                 <input
                                   type="text"
                                   placeholder="username"
@@ -13283,7 +13316,7 @@ export const Calculator: React.FC = () => {
                                       localStorage.setItem('crm_client_profile', JSON.stringify({ ...prev, telegram: val }));
                                     } catch {}
                                   }}
-                                  className="w-full pl-7 pr-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-900 focus:border-blue-600 focus:outline-none"
+                                  className="w-full px-3 py-2 bg-white text-xs font-bold text-slate-900 focus:outline-none placeholder:text-slate-400 placeholder:font-normal"
                                 />
                               </div>
                             </div>
@@ -16749,12 +16782,12 @@ export const Calculator: React.FC = () => {
                 <span>📩</span> Оформлення запиту менеджеру
               </h3>
               <p className="text-xs text-slate-500 mt-1 m-0">
-                Вкажіть ваші контакти, щоб ми зв'язалися для узгодження та запуску замовлення у друк.
+                Вкажіть ваше ПІБ та телефон, щоб ми зв'язалися для узгодження та запуску замовлення у друк.
               </p>
             </div>
 
             {/* Product Summary Box */}
-            <div className="p-3 bg-blue-50 rounded-xl border border-blue-100 flex flex-col gap-1 text-xs">
+            <div className="p-3 bg-blue-50/80 rounded-xl border border-blue-100 flex flex-col gap-1 text-xs">
               <div className="flex justify-between font-bold text-blue-900">
                 <span>{pendingLeadPayload.category} ({pendingLeadPayload.format})</span>
                 <span className="font-extrabold text-blue-700">{pendingLeadPayload.totalPrice.toLocaleString()} ₴</span>
@@ -16782,14 +16815,17 @@ export const Calculator: React.FC = () => {
                   telegram: customClientTelegram.trim()
                 });
               }}
-              className="flex flex-col gap-3"
+              className="flex flex-col gap-3.5"
             >
-              <div className="flex flex-col gap-1">
-                <label className="text-[11px] font-extrabold text-slate-700 uppercase flex items-center justify-between">
-                  <span>Ваше ПІБ або компанія <span className="text-rose-500">*</span>:</span>
-                  {!customClientName.trim() && (
-                    <span className="text-[10px] text-rose-500 font-bold lowercase">обов'язкове поле</span>
-                  )}
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[11px] font-extrabold text-slate-800 uppercase flex items-center justify-between">
+                  <span className="flex items-center gap-1">
+                    <span>Ваше ПІБ або компанія</span>
+                    <span className="text-rose-500 font-black">*</span>
+                  </span>
+                  <span className="text-[10px] px-2 py-0.5 rounded-md bg-rose-50 text-rose-600 font-extrabold border border-rose-200 uppercase tracking-wide">
+                    Обов'язково
+                  </span>
                 </label>
                 <input
                   required
@@ -16797,21 +16833,20 @@ export const Calculator: React.FC = () => {
                   placeholder="напр. Шевченко Тарас або ТОВ «Едельвейс»"
                   value={customClientName}
                   onChange={(e) => setCustomClientName(e.target.value)}
-                  className={`w-full px-3 py-2.5 rounded-xl border text-xs font-bold focus:outline-none transition-colors ${
-                    !customClientName.trim()
-                      ? 'border-amber-400 bg-amber-50/20 text-slate-900 focus:border-blue-600'
-                      : 'border-slate-300 bg-white text-slate-900 focus:border-blue-600'
-                  }`}
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-300 border-l-[3.5px] border-l-blue-600 bg-white text-xs font-bold text-slate-900 focus:border-blue-600 focus:ring-3 focus:ring-blue-500/15 focus:outline-none transition-all shadow-2xs placeholder:text-slate-400 placeholder:font-normal"
                   autoFocus
                 />
               </div>
 
-              <div className="flex flex-col gap-1">
-                <label className="text-[11px] font-extrabold text-slate-700 uppercase flex items-center justify-between">
-                  <span>Номер телефону для зв'язку <span className="text-rose-500">*</span>:</span>
-                  {!isPhoneComplete(customClientPhone) && (
-                    <span className="text-[10px] text-rose-500 font-bold lowercase">обов'язкове поле</span>
-                  )}
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[11px] font-extrabold text-slate-800 uppercase flex items-center justify-between">
+                  <span className="flex items-center gap-1">
+                    <span>Номер телефону для зв'язку</span>
+                    <span className="text-rose-500 font-black">*</span>
+                  </span>
+                  <span className="text-[10px] px-2 py-0.5 rounded-md bg-rose-50 text-rose-600 font-extrabold border border-rose-200 uppercase tracking-wide">
+                    Обов'язково
+                  </span>
                 </label>
                 <input
                   required
@@ -16819,23 +16854,23 @@ export const Calculator: React.FC = () => {
                   placeholder="+(380)-__-___-__-__"
                   value={customClientPhone}
                   onChange={(e) => setCustomClientPhone(formatPhoneNumber(e.target.value))}
-                  className={`w-full px-3 py-2.5 rounded-xl border text-xs font-bold focus:outline-none font-mono transition-colors ${
-                    !isPhoneComplete(customClientPhone)
-                      ? 'border-amber-400 bg-amber-50/20 text-slate-900 focus:border-blue-600'
-                      : 'border-slate-300 bg-white text-slate-900 focus:border-blue-600'
-                  }`}
+                  className="w-full px-3 py-2.5 rounded-xl border border-slate-300 border-l-[3.5px] border-l-blue-600 bg-white text-xs font-bold text-slate-900 focus:border-blue-600 focus:ring-3 focus:ring-blue-500/15 focus:outline-none font-mono transition-all shadow-2xs placeholder:text-slate-400"
                 />
               </div>
 
-              <div className="flex flex-col gap-1">
-                <label className="text-[11px] font-extrabold text-slate-700 uppercase flex items-center justify-between">
+              <div className="flex flex-col gap-1.5">
+                <label className="text-[11px] font-extrabold text-slate-800 uppercase flex items-center justify-between">
                   <span>Нік у Telegram:</span>
                   {customClientTelegram && (
-                    <span className="text-[10px] text-blue-600 font-bold lowercase">з бота / профілю</span>
+                    <span className="text-[10px] px-2 py-0.5 rounded-md bg-sky-50 text-sky-700 font-extrabold border border-sky-200">
+                      авто-з бота
+                    </span>
                   )}
                 </label>
-                <div className="relative">
-                  <span className="absolute left-3 top-2.5 text-slate-400 font-bold text-xs">@</span>
+                <div className="flex rounded-xl border border-slate-300 bg-white overflow-hidden shadow-2xs focus-within:border-blue-600 focus-within:ring-3 focus-within:ring-blue-500/15 transition-all">
+                  <div className="flex items-center justify-center px-3 bg-slate-50 border-r border-slate-200 text-slate-500 font-black text-xs select-none">
+                    @
+                  </div>
                   <input
                     type="text"
                     placeholder="username"
@@ -16844,23 +16879,10 @@ export const Calculator: React.FC = () => {
                       const raw = e.target.value.replace(/^@/, '').trim();
                       setCustomClientTelegram(raw ? `@${raw}` : '');
                     }}
-                    className="w-full pl-7 pr-3 py-2.5 rounded-xl border border-slate-300 bg-white text-xs font-bold text-slate-900 focus:border-blue-600 focus:outline-none"
+                    className="w-full px-3 py-2.5 bg-white text-xs font-bold text-slate-900 focus:outline-none placeholder:text-slate-400"
                   />
                 </div>
               </div>
-
-              {(!customClientName.trim() || !isPhoneComplete(customClientPhone)) && (
-                <div className="p-2.5 rounded-xl bg-amber-50 border border-amber-200 text-[11px] font-bold text-amber-900 flex items-center gap-2">
-                  <span>⚠️</span>
-                  <span>
-                    {!customClientName.trim() && !isPhoneComplete(customClientPhone)
-                      ? "Вкажіть ПІБ та повний телефон для надсилання рахунку"
-                      : !customClientName.trim()
-                      ? "Будь ласка, вкажіть ваше ПІБ або компанію"
-                      : "Введіть номер телефону повністю"}
-                  </span>
-                </div>
-              )}
 
               <div className="flex items-center gap-3 pt-2">
                 <button
