@@ -108,7 +108,19 @@ const initialClients: Client[] = [
     city: 'Київ',
     tags: ['B2B', 'VIP', 'Гурт', 'Каталоги'],
     files: ['Договір_ФармаТрейд_2026.pdf'],
-    type: 'client'
+    type: 'client',
+    additionalContacts: [
+      {
+        id: 'ac_1',
+        name: 'Андрій Бондаренко',
+        role: 'Головний дизайнер',
+        phone: '+380508889911',
+        email: 'a.bondar@pharmatrade.com',
+        telegram: '@andriy_design',
+        viber: '+380508889911',
+        notes: 'Узгоджує кольоропроби та макети буклетів'
+      }
+    ]
   },
   { 
     id: '2', 
@@ -180,7 +192,28 @@ const initialClients: Client[] = [
     city: 'Вінниця',
     tags: ['Новий', 'Візитки'],
     files: ['Visytka_Garage.eps'],
-    type: 'lead'
+    type: 'lead',
+    additionalContacts: [
+      {
+        id: 'ac_71',
+        name: 'Оксана Мельник',
+        role: 'Головний бухгалтер',
+        phone: '+380671112233',
+        email: 'buh.garage777@gmail.com',
+        telegram: '@oksana_buh_777',
+        viber: '+380671112233',
+        notes: 'Рахунки та акти виконаних робіт'
+      },
+      {
+        id: 'ac_72',
+        name: 'Дмитро Коваль',
+        role: 'Майстер-приймальник',
+        phone: '+380935554433',
+        telegram: '@dima_service_777',
+        viber: '+380935554433',
+        notes: 'Замовляє сервісні книжки та наліпки'
+      }
+    ]
   },
   { 
     id: '8', 

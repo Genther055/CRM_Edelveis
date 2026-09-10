@@ -1,20 +1,37 @@
 import React, { useState } from 'react';
 import { useApp } from '../context/AppContext';
-import type { Lead } from '../types';
+import type { Lead, Client, AdditionalContact } from '../types';
 import { formatPhoneNumber } from '../utils/phoneFormatter';
+import { findMatchingCompany, isContactInCompany } from '../utils/companyMatcher';
 import { 
   Plus, 
   Search, 
-  FileText,
-  X,
-  Globe,
-  PhoneCall,
-  Tag,
-  PackageCheck
+  FileText, 
+  X, 
+  Globe, 
+  PhoneCall, 
+  Tag, 
+  PackageCheck,
+  Building,
+  MessageSquare,
+  Send,
+  Mail
 } from 'lucide-react';
 
 export const Leads: React.FC = () => {
-  const { leads, addLead, updateLead, deleteLead, updateLeadStatus, addClient, clients, addOrder, customFields } = useApp();
+  const { 
+    leads, 
+    addLead, 
+    updateLead, 
+    deleteLead, 
+    updateLeadStatus, 
+    addClient, 
+    updateClient,
+    clients, 
+    addOrder, 
+    customFields,
+    addSystemNotification 
+  } = useApp();
 
   const [activeTab, setActiveTab] = useState<'all' | 'calculator' | 'direct'>('all');
   const [search, setSearch] = useState('');
@@ -106,15 +123,50 @@ export const Leads: React.FC = () => {
   };
 
   const convertToClient = (lead: Lead) => {
-    const existing = clients.find(c => c.phone === lead.phone || c.name.toLowerCase() === lead.name.toLowerCase());
-    if (existing) {
-      alert(`Клієнт "${existing.name}" вже існує в базі контрагентів!`);
+    // 1. Intelligent company fuzzy match & typo prevention
+    const match = findMatchingCompany(lead.name, clients);
+    
+    if (match && match.score >= 0.70) {
+      const existing = match.client;
+      const alreadyIn = isContactInCompany(existing, lead.phone, lead.contactPerson);
+      
+      if (!alreadyIn && (lead.contactPerson || lead.phone)) {
+        const newContact: AdditionalContact = {
+          id: `ac_${Date.now()}`,
+          name: lead.contactPerson || 'Представник',
+          role: lead.role || 'Замовник / Контакт',
+          phone: lead.phone || '',
+          email: lead.email || undefined,
+          telegram: lead.telegram || undefined,
+          viber: lead.viber || lead.phone || undefined,
+          notes: `Додано з онлайн-запиту: ${lead.notes || lead.name}`,
+          createdAt: new Date().toISOString()
+        };
+        const updatedClient: Client = {
+          ...existing,
+          additionalContacts: [...(existing.additionalContacts || []), newContact]
+        };
+        updateClient(updatedClient);
+        addSystemNotification(`🏢 Додано новий контакт «${newContact.name}» (${newContact.role}) до існуючої компанії «${existing.name}»`);
+        alert(`Знайдено існуючу компанію «${existing.name}» (${Math.round(match.score * 100)}% схожості)!\n\nКонтактну особу «${newContact.name}» (${newContact.phone}) додано як додатковий контакт без створення дубліката компанії.`);
+      } else {
+        alert(`Компанія «${existing.name}» вже зареєстрована в базі контрагентів!`);
+      }
       updateLeadStatus(lead.id, 'converted');
       return existing;
     }
 
+    // 2. Exact phone fallback
+    const existingByPhone = clients.find(c => lead.phone && isContactInCompany(c, lead.phone));
+    if (existingByPhone) {
+      alert(`Клієнт з номером ${lead.phone} вже зареєстрований як «${existingByPhone.name}»!`);
+      updateLeadStatus(lead.id, 'converted');
+      return existingByPhone;
+    }
+
+    // 3. Create fresh client card
     const created = addClient({
-      name: lead.contactPerson ? `${lead.contactPerson} (${lead.name})` : lead.name,
+      name: lead.name,
       contact: lead.contactPerson || 'Замовник',
       phone: lead.phone || '',
       email: lead.email || '',
@@ -124,16 +176,39 @@ export const Leads: React.FC = () => {
       files: lead.files || [],
       type: 'client'
     });
-    alert(`Лід "${lead.contactPerson || lead.name}" успішно конвертовано в Клієнта!\nСтворено картку контрагента в системі.`);
+    alert(`Лід «${lead.contactPerson || lead.name}» успішно додано до бази контрагентів!\nСтворено нову картку компанії «${created.name}».`);
     updateLeadStatus(lead.id, 'converted');
     return created;
   };
 
   const convertToOrder = (lead: Lead) => {
-    let client = clients.find(c => c.phone === lead.phone || c.name.toLowerCase() === lead.name.toLowerCase());
-    if (!client) {
+    // 1. Intelligent fuzzy match to attach to existing company
+    const match = findMatchingCompany(lead.name, clients);
+    let client = match ? match.client : clients.find(c => lead.phone && isContactInCompany(c, lead.phone));
+
+    if (client) {
+      // If contact not in company, attach as additional contact
+      if (!isContactInCompany(client, lead.phone, lead.contactPerson) && (lead.contactPerson || lead.phone)) {
+        const newContact: AdditionalContact = {
+          id: `ac_${Date.now()}`,
+          name: lead.contactPerson || 'Представник',
+          role: lead.role || 'Замовник',
+          phone: lead.phone || '',
+          email: lead.email || undefined,
+          telegram: lead.telegram || undefined,
+          viber: lead.viber || lead.phone || undefined,
+          notes: `Замовлення з онлайн-запиту: ${lead.notes || lead.name}`,
+          createdAt: new Date().toISOString()
+        };
+        updateClient({
+          ...client,
+          additionalContacts: [...(client.additionalContacts || []), newContact]
+        });
+        addSystemNotification(`👤 Контакт «${newContact.name}» додано до компанії «${client.name}»`);
+      }
+    } else {
       client = addClient({
-        name: lead.contactPerson ? `${lead.contactPerson} (${lead.name})` : lead.name,
+        name: lead.name,
         contact: lead.contactPerson || 'Замовник',
         phone: lead.phone || '',
         email: lead.email || '',
@@ -178,7 +253,7 @@ export const Leads: React.FC = () => {
     });
 
     updateLeadStatus(lead.id, 'converted');
-    alert(`🚀 Замовлення успішно створено та запущено у виробництво!\nЗапит ${lead.id} переведено у статус "Готово".`);
+    alert(`🚀 Замовлення успішно створено та закріплено за «${client.name}»!\nЗапит ${lead.id} переведено у статус "Готово".`);
   };
 
   const handleAddTag = () => {
@@ -417,6 +492,17 @@ export const Leads: React.FC = () => {
                               Калькулятор
                             </span>
                           )}
+                          {(() => {
+                            const match = findMatchingCompany(lead.name, clients);
+                            if (match && match.score >= 0.70) {
+                              return (
+                                <span className="ios-badge ios-badge-purple text-[9px] font-bold" title={`Схожість: ${Math.round(match.score * 100)}%`}>
+                                  🏢 {match.client.name}
+                                </span>
+                              );
+                            }
+                            return null;
+                          })()}
                           <span style={{ fontWeight: '700', color: 'var(--text-dark)' }}>{lead.name}</span>
                         </div>
                         <div style={{ fontSize: '11px', color: 'var(--text-medium)', marginTop: '2px', textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap', maxWidth: '300px' }}>
@@ -471,29 +557,87 @@ export const Leads: React.FC = () => {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', fontSize: '12px' }}>
               <div>
-                <span style={{ color: 'var(--text-medium)', fontSize: '10px', fontWeight: '700', textTransform: 'uppercase' }}>Тема / Виріб</span>
+                <span style={{ color: 'var(--text-medium)', fontSize: '10px', fontWeight: '700', textTransform: 'uppercase' }}>Тема / Організація</span>
                 <p style={{ fontWeight: '800', fontSize: '14px', color: 'var(--text-dark)', marginTop: '2px', lineHeight: '1.3' }}>{selectedLead.name}</p>
               </div>
 
+              {/* Match with existing company alert banner */}
+              {(() => {
+                const match = findMatchingCompany(selectedLead.name, clients);
+                if (!match || match.score < 0.70) return null;
+                return (
+                  <div style={{ padding: '8px 10px', backgroundColor: '#eff6ff', borderRadius: '8px', border: '1px solid #bfdbfe', fontSize: '11px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#1e40af', fontWeight: '800' }}>
+                      <Building size={13} className="text-blue-600" />
+                      <span>Існуюча компанія: <u>{match.client.name}</u> ({Math.round(match.score * 100)}%)</span>
+                    </div>
+                    <span style={{ fontSize: '10px', color: '#3b82f6' }}>
+                      {match.reason}. При оформленні цей контакт буде збережено до додаткових контактів компанії без дублювання.
+                    </span>
+                  </div>
+                );
+              })()}
+
               <div>
                 <span style={{ color: 'var(--text-medium)', fontSize: '10px', fontWeight: '700', textTransform: 'uppercase' }}>Контактна інформація</span>
-                <p style={{ color: 'var(--text-dark)', marginTop: '2px' }}><strong>{selectedLead.contactPerson || 'Замовник'}</strong></p>
-                <p style={{ fontFamily: 'var(--font-mono)', marginTop: '2px', color: 'var(--text-dark)', fontWeight: '700' }}>
-                  📱 {selectedLead.phone || 'Телефон не вказано'}
+                <p style={{ color: 'var(--text-dark)', marginTop: '2px', fontWeight: '700' }}>
+                  {selectedLead.contactPerson || 'Замовник'}
+                  {selectedLead.role && (
+                    <span className="ios-badge ios-badge-purple" style={{ fontSize: '9px', marginLeft: '6px' }}>
+                      {selectedLead.role}
+                    </span>
+                  )}
                 </p>
+
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap', marginTop: '4px' }}>
+                  <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--text-dark)', fontWeight: '700' }}>
+                    📱 {selectedLead.phone || 'Телефон не вказано'}
+                  </span>
+                  {selectedLead.phone && (
+                    <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+                      <a 
+                        href={`tel:${selectedLead.phone}`} 
+                        className="ios-badge ios-badge-green" 
+                        style={{ padding: '2px 6px', fontSize: '9px', display: 'flex', alignItems: 'center', gap: '3px', textDecoration: 'none' }}
+                        title="Подзвонити"
+                      >
+                        <PhoneCall size={9} /> Дзвінок
+                      </a>
+                      <a 
+                        href={`viber://chat?number=${encodeURIComponent(selectedLead.viber || selectedLead.phone)}`} 
+                        style={{ backgroundColor: '#7360f2', color: '#fff', padding: '2px 6px', borderRadius: '6px', fontSize: '9px', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '3px', textDecoration: 'none' }}
+                        title="Написати у Viber"
+                      >
+                        <MessageSquare size={9} /> Viber
+                      </a>
+                    </div>
+                  )}
+                </div>
+
                 {selectedLead.telegram && (
-                  <p style={{ marginTop: '2px' }}>
+                  <div style={{ marginTop: '4px' }}>
                     <a
                       href={`https://t.me/${selectedLead.telegram.replace('@', '')}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 font-bold hover:underline"
+                      className="ios-badge ios-badge-blue"
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', textDecoration: 'none', fontSize: '10px' }}
                     >
-                      💬 Telegram: {selectedLead.telegram}
+                      <Send size={9} /> Telegram: {selectedLead.telegram}
                     </a>
-                  </p>
+                  </div>
                 )}
-                {selectedLead.email && <p style={{ color: 'var(--text-medium)', fontSize: '11px', marginTop: '1px' }}>✉️ {selectedLead.email}</p>}
+
+                {selectedLead.email && (
+                  <div style={{ marginTop: '4px' }}>
+                    <a 
+                      href={`mailto:${selectedLead.email}`}
+                      style={{ backgroundColor: '#f1f5f9', color: '#475569', border: '1px solid #cbd5e1', padding: '2px 6px', borderRadius: '6px', fontSize: '10px', fontWeight: '600', display: 'inline-flex', alignItems: 'center', gap: '3px', textDecoration: 'none' }}
+                    >
+                      <Mail size={9} /> {selectedLead.email}
+                    </a>
+                  </div>
+                )}
               </div>
 
               {/* Calculator Spec Box */}

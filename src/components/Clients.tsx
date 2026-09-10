@@ -12,11 +12,19 @@ import {
   ArrowLeft,
   Phone,
   Edit3,
-  Paperclip
+  Paperclip,
+  PhoneCall,
+  MessageSquare,
+  Send,
+  Mail,
+  Trash2,
+  Building,
+  UserPlus
 } from 'lucide-react';
-import type { Client } from '../types';
+import type { Client, AdditionalContact } from '../types';
 import { NotesSection } from './NotesSection';
 import { formatPhoneNumber } from '../utils/phoneFormatter';
+import { findMatchingCompany } from '../utils/companyMatcher';
 
 export const Clients: React.FC = () => {
   const { 
@@ -34,6 +42,17 @@ export const Clients: React.FC = () => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showSectionModal, setShowSectionModal] = useState(false);
   const [selectedClient, setSelectedClient] = useState<Client | null>(null);
+
+  // Additional contact modal state
+  const [showContactModal, setShowContactModal] = useState(false);
+  const [editingContactId, setEditingContactId] = useState<string | null>(null);
+  const [contactName, setContactName] = useState('');
+  const [contactRole, setContactRole] = useState('Бухгалтер');
+  const [contactPhone, setContactPhone] = useState('');
+  const [contactEmail, setContactEmail] = useState('');
+  const [contactTelegram, setContactTelegram] = useState('');
+  const [contactViber, setContactViber] = useState('');
+  const [contactNotes, setContactNotes] = useState('');
 
   // Group / Section filtering state
   const [activeSegmentFilter, setActiveSegmentFilter] = useState<string>('all');
@@ -67,6 +86,95 @@ export const Clients: React.FC = () => {
   // Email form in Client Detail Page
   const [detailEmailSubject, setDetailEmailSubject] = useState('');
   const [detailEmailBody, setDetailEmailBody] = useState('');
+
+  // Potential duplicate match while typing new company name
+  const potentialMatch = name.trim().length >= 3 ? findMatchingCompany(name, clients) : null;
+
+  const openAddContactModal = (prefill?: { name?: string; role?: string; phone?: string; email?: string; telegram?: string; viber?: string }) => {
+    setEditingContactId(null);
+    setContactName(prefill?.name || '');
+    setContactRole(prefill?.role || 'Бухгалтер');
+    setContactPhone(prefill?.phone || '');
+    setContactEmail(prefill?.email || '');
+    setContactTelegram(prefill?.telegram || '');
+    setContactViber(prefill?.viber || prefill?.phone || '');
+    setContactNotes('');
+    setShowContactModal(true);
+  };
+
+  const openEditContactModal = (c: AdditionalContact) => {
+    setEditingContactId(c.id);
+    setContactName(c.name);
+    setContactRole(c.role || 'Бухгалтер');
+    setContactPhone(c.phone);
+    setContactEmail(c.email || '');
+    setContactTelegram(c.telegram || '');
+    setContactViber(c.viber || c.phone || '');
+    setContactNotes(c.notes || '');
+    setShowContactModal(true);
+  };
+
+  const handleSaveContact = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedClient || !contactName.trim()) return;
+
+    const newContactObj: AdditionalContact = {
+      id: editingContactId || `ac_${Date.now()}`,
+      name: contactName.trim(),
+      role: contactRole.trim() || 'Представник',
+      phone: contactPhone.trim(),
+      email: contactEmail.trim() || undefined,
+      telegram: contactTelegram.trim() ? (contactTelegram.trim().startsWith('@') ? contactTelegram.trim() : `@${contactTelegram.trim()}`) : undefined,
+      viber: contactViber.trim() || undefined,
+      notes: contactNotes.trim() || undefined,
+      createdAt: new Date().toISOString()
+    };
+
+    let updatedContacts: AdditionalContact[];
+    if (editingContactId) {
+      updatedContacts = (selectedClient.additionalContacts || []).map(c => 
+        c.id === editingContactId ? newContactObj : c
+      );
+      addSystemNotification(`👤 Оновлено контакт «${newContactObj.name}» (${newContactObj.role}) для ${selectedClient.name}`);
+    } else {
+      updatedContacts = [...(selectedClient.additionalContacts || []), newContactObj];
+      addSystemNotification(`👤 Додано новий контакт «${newContactObj.name}» (${newContactObj.role}) для ${selectedClient.name}`);
+    }
+
+    const updatedClient: Client = {
+      ...selectedClient,
+      additionalContacts: updatedContacts
+    };
+
+    updateClient(updatedClient);
+    setSelectedClient(updatedClient);
+    setShowContactModal(false);
+  };
+
+  const handleDeleteContact = (contactId: string) => {
+    if (!selectedClient) return;
+    if (window.confirm('Ви дійсно бажаєте видалити цей додатковий контакт?')) {
+      const updatedContacts = (selectedClient.additionalContacts || []).filter(c => c.id !== contactId);
+      const updatedClient: Client = {
+        ...selectedClient,
+        additionalContacts: updatedContacts
+      };
+      updateClient(updatedClient);
+      setSelectedClient(updatedClient);
+      addSystemNotification(`🗑️ Видалено контакт з картки ${selectedClient.name}`);
+    }
+  };
+
+  const handleAddContactToExisting = (targetComp: Client) => {
+    setShowAddModal(false);
+    setSelectedClient(targetComp);
+    openAddContactModal({
+      name: contact || name,
+      role: 'Представник / Співробітник',
+      phone: phone,
+      email: email
+    });
+  };
 
   const handleAddClient = (e: React.FormEvent) => {
     e.preventDefault();
@@ -252,19 +360,52 @@ export const Clients: React.FC = () => {
 
                 <div style={{ display: 'grid', gridTemplateColumns: '130px 1fr', alignItems: 'center' }}>
                   <span style={{ color: '#64748b' }}>Номери телефонів</span>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <Phone size={12} className="text-blue-500" />
-                    <span style={{ fontWeight: '700', fontFamily: 'var(--font-mono)', color: '#007aff' }}>
-                      {selectedClient.phone || '+380956357775'}
-                    </span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                      <Phone size={12} className="text-blue-500" />
+                      <span style={{ fontWeight: '700', fontFamily: 'var(--font-mono)', color: '#007aff' }}>
+                        {selectedClient.phone || '+380956357775'}
+                      </span>
+                    </div>
+                    {selectedClient.phone && (
+                      <div style={{ display: 'flex', gap: '4px', alignItems: 'center' }}>
+                        <a 
+                          href={`tel:${selectedClient.phone}`} 
+                          className="ios-badge ios-badge-green" 
+                          style={{ padding: '2px 6px', fontSize: '9px', display: 'flex', alignItems: 'center', gap: '3px', textDecoration: 'none' }}
+                          title="Подзвонити"
+                        >
+                          <PhoneCall size={9} /> Дзвінок
+                        </a>
+                        <a 
+                          href={`viber://chat?number=${encodeURIComponent(selectedClient.phone)}`} 
+                          style={{ backgroundColor: '#7360f2', color: '#fff', padding: '2px 6px', borderRadius: '6px', fontSize: '9px', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '3px', textDecoration: 'none' }}
+                          title="Написати у Viber"
+                        >
+                          <MessageSquare size={9} /> Viber
+                        </a>
+                      </div>
+                    )}
                   </div>
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '130px 1fr', alignItems: 'center' }}>
                   <span style={{ color: '#64748b' }}>Email</span>
-                  <span style={{ color: '#007aff', fontWeight: '600', fontFamily: 'var(--font-mono)', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                    {selectedClient.email || 'client1@edelveis.com'}
-                  </span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                    <span style={{ color: '#007aff', fontWeight: '600', fontFamily: 'var(--font-mono)', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {selectedClient.email || 'client1@edelveis.com'}
+                    </span>
+                    {selectedClient.email && (
+                      <a 
+                        href={`mailto:${selectedClient.email}`}
+                        className="ios-badge ios-badge-blue"
+                        style={{ padding: '2px 6px', fontSize: '9px', display: 'flex', alignItems: 'center', gap: '3px', textDecoration: 'none' }}
+                        title="Написати лист"
+                      >
+                        <Mail size={9} /> Написати
+                      </a>
+                    )}
+                  </div>
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '130px 1fr', alignItems: 'center' }}>
@@ -347,27 +488,128 @@ export const Clients: React.FC = () => {
               </div>
 
               {/* Additional Contacts Block */}
-              <div style={{ borderTop: '1px solid var(--border-light)', paddingTop: '12px', marginTop: '8px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                  <span style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-dark)' }}>Додаткові контакти</span>
-                  <button type="button" className="ios-btn ios-btn-secondary ios-btn-small" style={{ fontSize: '10px' }}>+ Додати</button>
+              <div style={{ borderTop: '1px solid var(--border-light)', paddingTop: '14px', marginTop: '8px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span style={{ fontSize: '12px', fontWeight: '800', color: 'var(--text-dark)' }}>Додаткові контакти</span>
+                    <span className="ios-badge ios-badge-purple" style={{ fontSize: '9px', padding: '1px 6px' }}>
+                      {selectedClient.additionalContacts?.length || 0}
+                    </span>
+                  </div>
+                  <button 
+                    type="button" 
+                    onClick={() => openAddContactModal()} 
+                    className="ios-btn ios-btn-primary ios-btn-small" 
+                    style={{ fontSize: '10px', padding: '3px 8px', display: 'flex', alignItems: 'center', gap: '3px' }}
+                  >
+                    <Plus size={11} /> Додати контакт
+                  </button>
                 </div>
-                <table style={{ width: '100%', fontSize: '10px', color: 'var(--text-medium)' }}>
-                  <thead>
-                    <tr style={{ textAlign: 'left', borderBottom: '1px solid var(--border-light)' }}>
-                      <th style={{ padding: '4px', color: 'var(--text-medium)' }}>ПІБ</th>
-                      <th style={{ padding: '4px', color: 'var(--text-medium)' }}>Телефон</th>
-                      <th style={{ padding: '4px', color: 'var(--text-medium)' }}>Email</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    <tr>
-                      <td colSpan={3} style={{ textAlign: 'center', padding: '16px 0', opacity: 0.5, color: 'var(--text-medium)' }}>
-                        Немає додаткових контактів
-                      </td>
-                    </tr>
-                  </tbody>
-                </table>
+
+                {(!selectedClient.additionalContacts || selectedClient.additionalContacts.length === 0) ? (
+                  <div style={{ textAlign: 'center', padding: '16px 8px', borderRadius: '8px', backgroundColor: 'var(--bg-card-subtle)', border: '1px dashed var(--border-light)', color: 'var(--text-medium)', fontSize: '11px' }}>
+                    <p style={{ margin: 0, fontWeight: '600' }}>Немає додаткових контактів</p>
+                    <p style={{ margin: '4px 0 0 0', fontSize: '10px', opacity: 0.8 }}>
+                      Додайте бухгалтера, дизайнера або іншого представника компанії
+                    </p>
+                  </div>
+                ) : (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {selectedClient.additionalContacts.map(c => (
+                      <div 
+                        key={c.id} 
+                        style={{ 
+                          padding: '8px 10px', 
+                          borderRadius: '8px', 
+                          border: '1px solid var(--border-light)', 
+                          backgroundColor: 'var(--bg-card-subtle)',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: '6px'
+                        }}
+                      >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <strong style={{ fontSize: '11px', color: 'var(--text-dark)' }}>{c.name}</strong>
+                            {c.role && (
+                              <span className="ios-badge ios-badge-purple" style={{ fontSize: '9px', padding: '1px 5px' }}>
+                                {c.role}
+                              </span>
+                            )}
+                          </div>
+                          <div style={{ display: 'flex', gap: '4px' }}>
+                            <button 
+                              type="button" 
+                              onClick={() => openEditContactModal(c)}
+                              style={{ border: 'none', background: 'transparent', color: 'var(--text-medium)', cursor: 'pointer', padding: '2px' }}
+                              title="Редагувати"
+                            >
+                              <Edit3 size={11} />
+                            </button>
+                            <button 
+                              type="button" 
+                              onClick={() => handleDeleteContact(c.id)}
+                              style={{ border: 'none', background: 'transparent', color: '#ef4444', cursor: 'pointer', padding: '2px' }}
+                              title="Видалити"
+                            >
+                              <Trash2 size={11} />
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Communication direct buttons */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px', flexWrap: 'wrap' }}>
+                          {c.phone && (
+                            <>
+                              <a 
+                                href={`tel:${c.phone}`} 
+                                className="ios-badge ios-badge-green" 
+                                style={{ padding: '2px 6px', fontSize: '9px', display: 'flex', alignItems: 'center', gap: '3px', textDecoration: 'none' }}
+                                title="Подзвонити"
+                              >
+                                <PhoneCall size={9} /> {c.phone}
+                              </a>
+                              <a 
+                                href={`viber://chat?number=${encodeURIComponent(c.viber || c.phone)}`} 
+                                style={{ backgroundColor: '#7360f2', color: '#fff', padding: '2px 6px', borderRadius: '6px', fontSize: '9px', fontWeight: '800', display: 'flex', alignItems: 'center', gap: '3px', textDecoration: 'none' }}
+                                title="Відкрити чат Viber"
+                              >
+                                <MessageSquare size={9} /> Viber
+                              </a>
+                            </>
+                          )}
+                          {c.telegram && (
+                            <a 
+                              href={`https://t.me/${c.telegram.replace('@', '')}`} 
+                              target="_blank" 
+                              rel="noreferrer"
+                              className="ios-badge ios-badge-blue" 
+                              style={{ padding: '2px 6px', fontSize: '9px', display: 'flex', alignItems: 'center', gap: '3px', textDecoration: 'none' }}
+                              title="Написати у Telegram"
+                            >
+                              <Send size={9} /> {c.telegram}
+                            </a>
+                          )}
+                          {c.email && (
+                            <a 
+                              href={`mailto:${c.email}`} 
+                              style={{ backgroundColor: '#f1f5f9', color: '#475569', border: '1px solid #cbd5e1', padding: '2px 6px', borderRadius: '6px', fontSize: '9px', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '3px', textDecoration: 'none' }}
+                              title="Надіслати Email"
+                            >
+                              <Mail size={9} /> {c.email}
+                            </a>
+                          )}
+                        </div>
+
+                        {c.notes && (
+                          <div style={{ fontSize: '10px', color: 'var(--text-medium)', fontStyle: 'italic' }}>
+                            💬 {c.notes}
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
             </div>
@@ -848,7 +1090,7 @@ export const Clients: React.FC = () => {
       {/* Add Client / Partner Modal */}
       {showAddModal && (
         <div className="ios-modal-overlay">
-          <form onSubmit={handleAddClient} className="ios-modal" style={{ maxWidth: '500px' }}>
+          <form onSubmit={handleAddClient} className="ios-modal" style={{ maxWidth: '520px' }}>
             <div className="ios-modal-header">
               <h3 className="ios-modal-title">Створити запис у базі</h3>
               <button type="button" onClick={() => setShowAddModal(false)} style={{ border: 'none', background: 'transparent', cursor: 'pointer' }}>✕</button>
@@ -856,8 +1098,29 @@ export const Clients: React.FC = () => {
             <div className="ios-modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
               <div className="ios-input-group">
                 <label className="ios-label">Назва / Організація *</label>
-                <input required placeholder="напр. ТОВ Едельвейс і К" value={name} onChange={(e) => setName(e.target.value)} />
+                <input required placeholder="напр. Автосервіс «Гараж 777» або ТОВ Едельвейс" value={name} onChange={(e) => setName(e.target.value)} />
               </div>
+
+              {/* Intelligent Typo & Duplicate Prevention Banner */}
+              {potentialMatch && potentialMatch.score >= 0.70 && (
+                <div style={{ padding: '10px 14px', backgroundColor: '#eff6ff', border: '1.5px solid #93c5fd', borderRadius: '10px', fontSize: '11px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: '#1e40af', fontWeight: '800' }}>
+                    <Building size={14} className="text-blue-600" />
+                    <span>У базі знайдено схожу компанію: <u>{potentialMatch.client.name}</u> ({Math.round(potentialMatch.score * 100)}% схожості)</span>
+                  </div>
+                  <div style={{ color: '#3b82f6', fontSize: '10.5px' }}>
+                    {potentialMatch.reason}. Щоб не плодити дублікати, ви можете прикріпити цю контактну особу до існуючої картки організації.
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleAddContactToExisting(potentialMatch.client)}
+                    className="ios-btn ios-btn-primary ios-btn-small"
+                    style={{ alignSelf: 'flex-start', marginTop: '2px', fontSize: '10px', display: 'flex', alignItems: 'center', gap: '4px' }}
+                  >
+                    <UserPlus size={11} /> Приєднати як контакт до «{potentialMatch.client.name}»
+                  </button>
+                </div>
+              )}
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
                 <div className="ios-input-group">
@@ -930,6 +1193,124 @@ export const Clients: React.FC = () => {
             <div className="ios-modal-footer">
               <button type="button" onClick={() => setShowAddModal(false)} className="ios-btn ios-btn-secondary">Скасувати</button>
               <button type="submit" className="ios-btn ios-btn-primary">Зберегти запис</button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {/* Add / Edit Additional Contact Modal */}
+      {showContactModal && selectedClient && (
+        <div className="ios-modal-overlay">
+          <form onSubmit={handleSaveContact} className="ios-modal" style={{ maxWidth: '480px' }}>
+            <div className="ios-modal-header">
+              <h3 className="ios-modal-title">
+                {editingContactId ? 'Редагувати контакт' : 'Додати контакт до компанії'}
+              </h3>
+              <button type="button" onClick={() => setShowContactModal(false)} style={{ border: 'none', background: 'transparent', cursor: 'pointer' }}>✕</button>
+            </div>
+            <div className="ios-modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              
+              <div style={{ padding: '8px 12px', backgroundColor: 'var(--bg-card-subtle)', borderRadius: '8px', fontSize: '11px', color: 'var(--text-medium)', border: '1px solid var(--border-light)' }}>
+                Організація: <strong style={{ color: 'var(--text-dark)' }}>{selectedClient.name}</strong>
+              </div>
+
+              <div className="ios-input-group">
+                <label className="ios-label">ПІБ / Ім'я контактної особи *</label>
+                <input 
+                  required 
+                  placeholder="напр. Мельник Оксана Сергіївна" 
+                  value={contactName} 
+                  onChange={(e) => setContactName(e.target.value)} 
+                />
+              </div>
+
+              <div className="ios-input-group">
+                <label className="ios-label">Посада / Роль</label>
+                <input 
+                  placeholder="напр. Головний бухгалтер, Дизайнер..." 
+                  value={contactRole} 
+                  onChange={(e) => setContactRole(e.target.value)} 
+                />
+                <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap', marginTop: '6px' }}>
+                  {['Бухгалтер', 'Директор', 'Дизайнер', 'Менеджер з закупівель', 'Майстер', 'Логіст'].map(preset => (
+                    <button
+                      key={preset}
+                      type="button"
+                      onClick={() => setContactRole(preset)}
+                      className="ios-badge"
+                      style={{ 
+                        backgroundColor: contactRole === preset ? 'var(--primary)' : 'var(--bg-card-subtle)', 
+                        color: contactRole === preset ? '#fff' : 'var(--text-dark)', 
+                        border: '1px solid var(--border-light)', 
+                        cursor: 'pointer',
+                        fontSize: '9px'
+                      }}
+                    >
+                      {preset}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div className="ios-input-group">
+                  <label className="ios-label">Телефон *</label>
+                  <input 
+                    required 
+                    placeholder="+(380)-__-___-__-__" 
+                    value={contactPhone} 
+                    onChange={(e) => {
+                      const formatted = formatPhoneNumber(e.target.value);
+                      setContactPhone(formatted);
+                      if (!contactViber) setContactViber(formatted);
+                    }} 
+                  />
+                </div>
+                <div className="ios-input-group">
+                  <label className="ios-label">Viber номер</label>
+                  <input 
+                    placeholder="+(380)-__-___-__-__" 
+                    value={contactViber} 
+                    onChange={(e) => setContactViber(formatPhoneNumber(e.target.value))} 
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div className="ios-input-group">
+                  <label className="ios-label">Telegram (@username)</label>
+                  <input 
+                    placeholder="@username" 
+                    value={contactTelegram} 
+                    onChange={(e) => setContactTelegram(e.target.value)} 
+                  />
+                </div>
+                <div className="ios-input-group">
+                  <label className="ios-label">Ел. пошта</label>
+                  <input 
+                    type="email" 
+                    placeholder="contact@company.com" 
+                    value={contactEmail} 
+                    onChange={(e) => setContactEmail(e.target.value)} 
+                  />
+                </div>
+              </div>
+
+              <div className="ios-input-group">
+                <label className="ios-label">Примітка / Зона відповідальності</label>
+                <input 
+                  placeholder="напр. Відповідає за рахунки та договори" 
+                  value={contactNotes} 
+                  onChange={(e) => setContactNotes(e.target.value)} 
+                />
+              </div>
+
+            </div>
+            <div className="ios-modal-footer">
+              <button type="button" onClick={() => setShowContactModal(false)} className="ios-btn ios-btn-secondary">Скасувати</button>
+              <button type="submit" className="ios-btn ios-btn-primary">
+                {editingContactId ? 'Зберегти зміни' : 'Додати контакт'}
+              </button>
             </div>
           </form>
         </div>

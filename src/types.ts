@@ -14,6 +14,18 @@ export interface ClientSection {
   statuses: string[];
 }
 
+export interface AdditionalContact {
+  id: string;
+  name: string;
+  role?: string; // наприклад, 'Бухгалтер', 'Дизайнер', 'Директор', 'Менеджер з закупівель'
+  phone: string;
+  email?: string;
+  telegram?: string;
+  viber?: string;
+  notes?: string;
+  createdAt?: string;
+}
+
 export interface Client {
   id: string;
   name: string;
@@ -28,6 +40,7 @@ export interface Client {
   sectionId?: string; // Прив'язка до користувацького розділу контрагентів
   sectionStatus?: string; // Статус у цьому розділі
   sectionFieldValues?: Record<string, string | number>;
+  additionalContacts?: AdditionalContact[]; // Додаткові контактні особи
 }
 
 export interface WarehouseLogEntry {
@@ -208,6 +221,8 @@ export interface Lead {
   phone: string;
   email: string;
   telegram?: string;
+  viber?: string;
+  role?: string;
   budget: number;
   source: 'Site' | 'Phone' | 'Instagram' | 'Facebook' | 'Recommendation' | 'Calculator';
   status: 'new' | 'contact' | 'negotiation' | 'review' | 'converted';
