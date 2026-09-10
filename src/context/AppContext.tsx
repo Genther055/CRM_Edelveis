@@ -834,7 +834,14 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       if (parsed.length < 10 || parsed.some(c => c.name.includes('Замовник №') || c.name.includes('Контрагент'))) {
         return initialClients;
       }
-      return parsed;
+      return parsed.map(c => {
+        const init = initialClients.find(ic => ic.id === c.id);
+        const hasContacts = c.additionalContacts && c.additionalContacts.length > 0;
+        return {
+          ...c,
+          additionalContacts: hasContacts ? c.additionalContacts : (init?.additionalContacts || [])
+        };
+      });
     } catch (e) {
       return initialClients;
     }

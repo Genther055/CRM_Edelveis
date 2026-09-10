@@ -34,6 +34,7 @@ export interface Client {
   email: string;
   discount: number; // % discount
   city?: string;    // City, defaults to "Вінниця"
+  comment?: string; // Загальний коментар по клієнту
   tags?: string[];  // Теги для категоризації
   files?: string[]; // Блок "Файли"
   type?: 'lead' | 'client'; // Можливість відносити до лідів або клієнтів

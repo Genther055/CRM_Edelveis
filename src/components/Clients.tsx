@@ -176,6 +176,58 @@ export const Clients: React.FC = () => {
     });
   };
 
+  // Edit Client Modal state
+  const [showEditClientModal, setShowEditClientModal] = useState(false);
+  const [editClientName, setEditClientName] = useState('');
+  const [editClientContact, setEditClientContact] = useState('');
+  const [editClientPhone, setEditClientPhone] = useState('');
+  const [editClientEmail, setEditClientEmail] = useState('');
+  const [editClientDiscount, setEditClientDiscount] = useState(0);
+  const [editClientCity, setEditClientCity] = useState('Вінниця');
+  const [editClientComment, setEditClientComment] = useState('');
+  const [editClientType, setEditClientType] = useState<'lead' | 'client'>('client');
+  const [editClientSectionId, setEditClientSectionId] = useState('');
+  const [editClientSectionStatus, setEditClientSectionStatus] = useState('');
+
+  const openEditClientModal = () => {
+    if (!selectedClient) return;
+    setEditClientName(selectedClient.name);
+    setEditClientContact(selectedClient.contact || '');
+    setEditClientPhone(selectedClient.phone || '');
+    setEditClientEmail(selectedClient.email || '');
+    setEditClientDiscount(selectedClient.discount || 0);
+    setEditClientCity(selectedClient.city || 'Вінниця');
+    setEditClientComment(selectedClient.comment || 'Постійний замовник поліграфічної продукції');
+    setEditClientType(selectedClient.type || 'client');
+    setEditClientSectionId(selectedClient.sectionId || '');
+    setEditClientSectionStatus(selectedClient.sectionStatus || '');
+    setShowEditClientModal(true);
+  };
+
+  const handleSaveEditedClient = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedClient || !editClientName.trim()) return;
+
+    const updatedClient: Client = {
+      ...selectedClient,
+      name: editClientName.trim(),
+      contact: editClientContact.trim(),
+      phone: editClientPhone.trim(),
+      email: editClientEmail.trim(),
+      discount: Number(editClientDiscount) || 0,
+      city: editClientCity.trim() || 'Вінниця',
+      comment: editClientComment.trim(),
+      type: editClientType,
+      sectionId: editClientSectionId || undefined,
+      sectionStatus: editClientSectionStatus || undefined
+    };
+
+    updateClient(updatedClient);
+    setSelectedClient(updatedClient);
+    setShowEditClientModal(false);
+    addSystemNotification(`💾 Дані картки контрагента «${updatedClient.name}» успішно оновлено`);
+  };
+
   const handleAddClient = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
@@ -305,7 +357,16 @@ export const Clients: React.FC = () => {
               </div>
             </div>
 
-            <div style={{ display: 'flex', gap: '8px' }}>
+            <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+              <button 
+                type="button"
+                onClick={openEditClientModal} 
+                className="ios-btn ios-btn-primary" 
+                style={{ fontSize: '11px', display: 'flex', alignItems: 'center', gap: '5px', padding: '6px 12px' }}
+              >
+                <Edit3 size={13} />
+                Редагувати картку
+              </button>
               <button onClick={() => setSelectedClient(null)} className="ios-btn ios-btn-secondary" style={{ fontSize: '11px' }}>✕ Закрити</button>
             </div>
           </div>
@@ -340,7 +401,7 @@ export const Clients: React.FC = () => {
                 
                 <div style={{ display: 'grid', gridTemplateColumns: '130px 1fr', alignItems: 'center' }}>
                   <span style={{ color: '#64748b' }}>Тип ціни</span>
-                  <span style={{ fontWeight: '700', color: '#0f172a' }}>Базова ціна</span>
+                  <span style={{ fontWeight: '700', color: '#0f172a' }}>Базова ціна {selectedClient.discount > 0 && `(Знижка ${selectedClient.discount}%)`}</span>
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '130px 1fr', alignItems: 'center' }}>
@@ -350,12 +411,22 @@ export const Clients: React.FC = () => {
 
                 <div style={{ display: 'grid', gridTemplateColumns: '130px 1fr', alignItems: 'center' }}>
                   <span style={{ color: '#64748b' }}>Назва компанії</span>
-                  <span style={{ fontWeight: '800', color: '#0f172a' }}>{selectedClient.name}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '6px' }}>
+                    <span style={{ fontWeight: '800', color: '#0f172a' }}>{selectedClient.name}</span>
+                    <button type="button" onClick={openEditClientModal} style={{ border: 'none', background: 'transparent', cursor: 'pointer', padding: '2px', color: 'var(--text-medium)' }} title="Редагувати">
+                      <Edit3 size={11} />
+                    </button>
+                  </div>
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '130px 1fr', alignItems: 'center' }}>
                   <span style={{ color: '#64748b' }}>Контактна особа</span>
-                  <span style={{ fontWeight: '700', color: '#007aff' }}>{selectedClient.contact || 'Віктор'}</span>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '6px' }}>
+                    <span style={{ fontWeight: '700', color: '#007aff' }}>{selectedClient.contact || 'Віктор'}</span>
+                    <button type="button" onClick={openEditClientModal} style={{ border: 'none', background: 'transparent', cursor: 'pointer', padding: '2px', color: 'var(--text-medium)' }} title="Редагувати">
+                      <Edit3 size={11} />
+                    </button>
+                  </div>
                 </div>
 
                 <div style={{ display: 'grid', gridTemplateColumns: '130px 1fr', alignItems: 'center' }}>
@@ -439,9 +510,11 @@ export const Clients: React.FC = () => {
 
                 <div style={{ display: 'grid', gridTemplateColumns: '130px 1fr', alignItems: 'flex-start' }}>
                   <span style={{ color: 'var(--text-medium)' }}>Коментар</span>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--text-dark)' }}>
-                    <span>Постійний замовник поліграфічної продукції</span>
-                    <Edit3 size={11} style={{ color: 'var(--text-medium)', cursor: 'pointer' }} />
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '4px', color: 'var(--text-dark)' }}>
+                    <span>{selectedClient.comment || 'Постійний замовник поліграфічної продукції'}</span>
+                    <button type="button" onClick={openEditClientModal} style={{ border: 'none', background: 'transparent', cursor: 'pointer', padding: '2px', color: 'var(--text-medium)', flexShrink: 0 }} title="Редагувати коментар">
+                      <Edit3 size={11} />
+                    </button>
                   </div>
                 </div>
 
@@ -1311,6 +1384,119 @@ export const Clients: React.FC = () => {
               <button type="submit" className="ios-btn ios-btn-primary">
                 {editingContactId ? 'Зберегти зміни' : 'Додати контакт'}
               </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      {/* Edit Client Full Card Modal */}
+      {showEditClientModal && selectedClient && (
+        <div className="ios-modal-overlay">
+          <form onSubmit={handleSaveEditedClient} className="ios-modal" style={{ maxWidth: '520px' }}>
+            <div className="ios-modal-header">
+              <h3 className="ios-modal-title">Редагувати картку клієнта</h3>
+              <button type="button" onClick={() => setShowEditClientModal(false)} style={{ border: 'none', background: 'transparent', cursor: 'pointer' }}>✕</button>
+            </div>
+            <div className="ios-modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              <div className="ios-input-group">
+                <label className="ios-label">Назва / Організація *</label>
+                <input 
+                  required 
+                  placeholder="напр. Автосервіс «Гараж 777»" 
+                  value={editClientName} 
+                  onChange={(e) => setEditClientName(e.target.value)} 
+                />
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div className="ios-input-group">
+                  <label className="ios-label">Класифікація</label>
+                  <select value={editClientType} onChange={(e) => setEditClientType(e.target.value as any)}>
+                    <option value="client">Клієнт (Постійний)</option>
+                    <option value="lead">Лід (Запит)</option>
+                  </select>
+                </div>
+                <div className="ios-input-group">
+                  <label className="ios-label">Розділ бази</label>
+                  <select 
+                    value={editClientSectionId} 
+                    onChange={(e) => {
+                      setEditClientSectionId(e.target.value);
+                      const sec = clientSections.find(s => s.id === e.target.value);
+                      setEditClientSectionStatus(sec?.statuses[0] || '');
+                    }}
+                  >
+                    <option value="">Без розділу</option>
+                    {clientSections.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
+                  </select>
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div className="ios-input-group">
+                  <label className="ios-label">Головна контактна особа</label>
+                  <input 
+                    placeholder="Прізвище ім'я" 
+                    value={editClientContact} 
+                    onChange={(e) => setEditClientContact(e.target.value)} 
+                  />
+                </div>
+                <div className="ios-input-group">
+                  <label className="ios-label">Основний телефон</label>
+                  <input 
+                    placeholder="+(380)-__-___-__-__" 
+                    value={editClientPhone} 
+                    onChange={(e) => setEditClientPhone(formatPhoneNumber(e.target.value))} 
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: '12px' }}>
+                <div className="ios-input-group">
+                  <label className="ios-label">Email</label>
+                  <input 
+                    type="email"
+                    placeholder="client@mail.com" 
+                    value={editClientEmail} 
+                    onChange={(e) => setEditClientEmail(e.target.value)} 
+                  />
+                </div>
+                <div className="ios-input-group">
+                  <label className="ios-label">Знижка (%)</label>
+                  <input 
+                    type="number" 
+                    min="0" 
+                    max="100" 
+                    value={editClientDiscount} 
+                    onChange={(e) => setEditClientDiscount(Number(e.target.value))} 
+                  />
+                </div>
+              </div>
+
+              <div className="ios-input-group">
+                <label className="ios-label">Місто</label>
+                <input 
+                  placeholder="Вінниця" 
+                  value={editClientCity} 
+                  onChange={(e) => setEditClientCity(e.target.value)} 
+                />
+              </div>
+
+              <div className="ios-input-group">
+                <label className="ios-label">Коментар по клієнту</label>
+                <textarea 
+                  rows={3}
+                  placeholder="Додаткова інформація про замовника..." 
+                  value={editClientComment} 
+                  onChange={(e) => setEditClientComment(e.target.value)} 
+                  style={{ padding: '8px', fontSize: '11px', borderRadius: '6px', border: '1px solid var(--border-light)' }}
+                />
+              </div>
+
+            </div>
+            <div className="ios-modal-footer">
+              <button type="button" onClick={() => setShowEditClientModal(false)} className="ios-btn ios-btn-secondary">Скасувати</button>
+              <button type="submit" className="ios-btn ios-btn-primary">Зберегти зміни</button>
             </div>
           </form>
         </div>
