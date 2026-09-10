@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useApp } from '../context/AppContext';
 import { 
   Download, 
@@ -321,11 +321,21 @@ export const Documents: React.FC = () => {
   const [activeSubTab, setActiveSubTab] = useState<'registry' | 'templates' | 'editor' | 'spreadsheet' | 'autonumber'>('registry');
   const [searchQuery, setSearchQuery] = useState('');
 
-  const [templates, setTemplates] = useState<DocTemplate[]>([
-    { id: '1', name: 'Рахунок-фактура (Стандарт)', type: 'Invoice', lastUsed: '2026-07-24' },
-    { id: '2', name: 'Акт виконаних робіт (Послуги)', type: 'Act', lastUsed: '2026-07-23' },
-    { id: '3', name: 'Договір про надання послуг друку', type: 'Contract', lastUsed: '2026-07-20' }
-  ]);
+  const [templates, setTemplates] = useState<DocTemplate[]>(() => {
+    const saved = localStorage.getItem('crm_doc_templates');
+    if (saved) {
+      try { return JSON.parse(saved); } catch (e) {}
+    }
+    return [
+      { id: '1', name: 'Рахунок-фактура (Стандарт)', type: 'Invoice', lastUsed: '2026-07-24' },
+      { id: '2', name: 'Акт виконаних робіт (Послуги)', type: 'Act', lastUsed: '2026-07-23' },
+      { id: '3', name: 'Договір про надання послуг друку', type: 'Contract', lastUsed: '2026-07-20' }
+    ];
+  });
+
+  useEffect(() => {
+    localStorage.setItem('crm_doc_templates', JSON.stringify(templates));
+  }, [templates]);
 
 
 

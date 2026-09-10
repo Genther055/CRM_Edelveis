@@ -44,28 +44,134 @@ import {
 } from 'lucide-react';
 import html2pdf from 'html2pdf.js';
 
-interface CalcTemplate {
+export interface CalcTemplate {
+  id?: string;
   name: string;
   category: string;
   quantity: number;
-  packingCount: number;
+  packingCount?: number;
   paperType: 'offset' | 'gazetka' | 'coated';
   colors: string;
-  isSamNaSebe: boolean;
-  marginPercent: number;
-  calcMode: 'auto' | 'operations';
-  activeOps: Record<string, boolean>;
-  opCustomRates: Record<string, number>;
-  opVolumes: Record<string, number>;
+  isSamNaSebe?: boolean;
+  marginPercent?: number;
+  calcMode?: 'auto' | 'operations';
+  activeOps?: Record<string, boolean>;
+  opCustomRates?: Record<string, number>;
+  opVolumes?: Record<string, number>;
   // Expanded options
-  format: string;
-  orientation: 'portrait' | 'landscape';
+  format?: string;
+  orientation?: 'portrait' | 'landscape';
   coverPaperType?: 'offset' | 'coated' | 'cardboard';
   coverColors?: string;
   bindingType?: 'none' | 'staple' | 'spring' | 'glue' | 'hardcover';
   laminationType?: 'none' | 'gloss' | 'matte' | 'softtouch';
   creaseCount?: number;
 }
+
+export const defaultCalcTemplates: CalcTemplate[] = [
+  {
+    name: 'Візитки стандартні 1000 шт (350г крейда, 4+4, мат. ламінація)',
+    category: 'Візитки',
+    quantity: 1000,
+    packingCount: 1,
+    paperType: 'coated',
+    colors: '4+4',
+    isSamNaSebe: false,
+    marginPercent: 25,
+    calcMode: 'auto',
+    activeOps: {},
+    opCustomRates: {},
+    opVolumes: {},
+    format: '90x50',
+    orientation: 'landscape',
+    laminationType: 'matte'
+  },
+  {
+    name: 'Флаєри Євро 1000 шт (130г крейда, 4+4, порізка)',
+    category: 'Флаєри',
+    quantity: 1000,
+    packingCount: 1,
+    paperType: 'coated',
+    colors: '4+4',
+    isSamNaSebe: false,
+    marginPercent: 25,
+    calcMode: 'auto',
+    activeOps: {},
+    opCustomRates: {},
+    opVolumes: {},
+    format: 'Єврофлаєр (210×99)',
+    orientation: 'portrait'
+  },
+  {
+    name: 'Буклети А4 2 згини 500 шт (150г крейда, 4+4, 2 біговки)',
+    category: 'Буклети',
+    quantity: 500,
+    packingCount: 1,
+    paperType: 'coated',
+    colors: '4+4',
+    isSamNaSebe: false,
+    marginPercent: 25,
+    calcMode: 'auto',
+    activeOps: {},
+    opCustomRates: {},
+    opVolumes: {},
+    format: 'А4 (297×210)',
+    orientation: 'landscape',
+    creaseCount: 2
+  },
+  {
+    name: 'Плакати А3 200 шт (200г крейда глянець, 4+0)',
+    category: 'Плакати',
+    quantity: 200,
+    packingCount: 1,
+    paperType: 'coated',
+    colors: '4+0',
+    isSamNaSebe: false,
+    marginPercent: 25,
+    calcMode: 'auto',
+    activeOps: {},
+    opCustomRates: {},
+    opVolumes: {},
+    format: 'А3 (420×297)',
+    orientation: 'portrait'
+  },
+  {
+    name: 'Блокноти А5 на пружині 100 шт (Обкл 300г лам + 50 арк 80г)',
+    category: 'Блокноти',
+    quantity: 100,
+    packingCount: 1,
+    paperType: 'offset',
+    colors: '1+0',
+    isSamNaSebe: false,
+    marginPercent: 25,
+    calcMode: 'auto',
+    activeOps: {},
+    opCustomRates: {},
+    opVolumes: {},
+    format: 'А5 (210×148)',
+    orientation: 'portrait',
+    coverPaperType: 'cardboard',
+    coverColors: '4+0',
+    bindingType: 'spring',
+    laminationType: 'gloss'
+  },
+  {
+    name: 'Бланки фірмові А4 1000 шт (Офсетний 80г, 4+0)',
+    category: 'Бланки',
+    quantity: 1000,
+    packingCount: 1,
+    paperType: 'offset',
+    colors: '4+0',
+    isSamNaSebe: false,
+    marginPercent: 20,
+    calcMode: 'auto',
+    activeOps: {},
+    opCustomRates: {},
+    opVolumes: {},
+    format: 'А4 (297×210)',
+    orientation: 'portrait'
+  }
+];
 
 export interface MaterialPriceItem {
   id: string;
@@ -1457,10 +1563,20 @@ export const Calculator: React.FC = () => {
   // Templates list
   const [templates, setTemplates] = useState<CalcTemplate[]>(() => {
     const saved = localStorage.getItem('crm_calc_templates');
-    return saved ? JSON.parse(saved) : [];
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      } catch (e) {}
+    }
+    return defaultCalcTemplates;
   });
   const [templateName, setTemplateName] = useState('');
   const [showTemplateModal, setShowTemplateModal] = useState(false);
+  const [showSavedTemplatesModal, setShowSavedTemplatesModal] = useState(false);
+  const [savedTemplatesSearch, setSavedTemplatesSearch] = useState('');
+  const [savedTemplatesCategory, setSavedTemplatesCategory] = useState('all');
+  const [templateLoadedToast, setTemplateLoadedToast] = useState<string | null>(null);
   const [showMaterialPricesModal, setShowMaterialPricesModal] = useState(false);
   const [materialPricesTab, setMaterialPricesTab] = useState<'paper' | 'postpress' | 'print'>('paper');
 
@@ -2403,28 +2519,47 @@ export const Calculator: React.FC = () => {
   };
 
   const handleLoadTemplate = (tpl: CalcTemplate) => {
-    setCategory(tpl.category as any);
-    setQuantity(tpl.quantity);
-    setPackingCount(tpl.packingCount);
-    setPaperType(tpl.paperType);
-    setColors(tpl.colors);
-    setIsSamNaSebe(tpl.isSamNaSebe);
-    setMarginPercent(tpl.marginPercent);
-    setCalcMode(tpl.calcMode || 'auto');
-    setActiveOps(tpl.activeOps);
-    setOpCustomRates(tpl.opCustomRates);
-    setOpVolumes(tpl.opVolumes);
+    if (tpl.category) setCategory(tpl.category as any);
+    if (tpl.quantity) setQuantity(tpl.quantity);
+    if (tpl.packingCount) setPackingCount(tpl.packingCount);
+    if (tpl.paperType) setPaperType(tpl.paperType);
+    if (tpl.colors) setColors(tpl.colors);
+    if (tpl.isSamNaSebe !== undefined) setIsSamNaSebe(tpl.isSamNaSebe);
+    if (tpl.marginPercent !== undefined) setMarginPercent(tpl.marginPercent);
+    if (tpl.calcMode) setCalcMode(tpl.calcMode);
+    if (tpl.activeOps) setActiveOps(tpl.activeOps);
+    if (tpl.opCustomRates) setOpCustomRates(tpl.opCustomRates);
+    if (tpl.opVolumes) setOpVolumes(tpl.opVolumes);
     
     if (tpl.format) setSelectedFormat(tpl.format);
     if (tpl.orientation) setOrientation(tpl.orientation);
+    if (tpl.coverPaperType) setCoverPaperType(tpl.coverPaperType);
+    if (tpl.coverColors) setCoverColors(tpl.coverColors);
     if (tpl.bindingType) setBindingType(tpl.bindingType);
     if (tpl.laminationType) setLaminationType(tpl.laminationType);
     if (tpl.creaseCount !== undefined) setCreaseCount(tpl.creaseCount);
 
+    setShowSavedTemplatesModal(false);
     setStep('editor');
-    alert(`Завантажено шаблон: ${tpl.name}`);
+    setTemplateLoadedToast(`Завантажено шаблон: ${tpl.name}`);
+    setTimeout(() => setTemplateLoadedToast(null), 3500);
   };
-  void handleLoadTemplate;
+
+  const handleDeleteTemplate = (index: number) => {
+    const tplName = templates[index]?.name || 'Шаблон';
+    if (window.confirm(`Ви дійсно бажаєте видалити шаблон "${tplName}"?`)) {
+      const updated = templates.filter((_, i) => i !== index);
+      setTemplates(updated);
+      localStorage.setItem('crm_calc_templates', JSON.stringify(updated));
+    }
+  };
+
+  const handleResetTemplates = () => {
+    if (window.confirm('Відновити типові стандартні шаблони поліграфії?')) {
+      setTemplates(defaultCalcTemplates);
+      localStorage.setItem('crm_calc_templates', JSON.stringify(defaultCalcTemplates));
+    }
+  };
 
   const generatePDF = () => {
     const element = document.getElementById('invoice-preview-container');
@@ -3533,6 +3668,28 @@ export const Calculator: React.FC = () => {
 
             {/* Action Buttons & Prominent Live Search Bar */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                onClick={() => setShowSavedTemplatesModal(true)}
+                className="ios-btn ios-btn-secondary"
+                style={{
+                  height: '36px',
+                  padding: '0 14px',
+                  borderRadius: '10px',
+                  fontWeight: 700,
+                  fontSize: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap'
+                }}
+                title="Збережені та типові шаблони розрахунків"
+              >
+                <FolderOpen size={15} style={{ color: 'var(--primary)' }} />
+                <span>Шаблони ({templates.length})</span>
+              </button>
+
               {currentUser?.role !== 'client' && (
               <button
                 type="button"
@@ -14827,17 +14984,30 @@ export const Calculator: React.FC = () => {
               </button>
             </div>
 
-            <button 
-              onClick={() => {
-                setTemplateName(name || `${category === 'Бланки' ? subCategory : category} ${quantity} шт`);
-                setShowTemplateModal(true);
-              }}
-              className="ios-badge ios-badge-blue"
-              style={{ padding: '8px 16px', borderRadius: 'var(--radius-md)', fontSize: '12px', fontWeight: '700', cursor: 'pointer', border: 'none', display: 'flex', alignItems: 'center', gap: '6px' }}
-            >
-              <Save size={14} />
-              <span>Зберегти шаблон</span>
-            </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <button 
+                type="button"
+                onClick={() => setShowSavedTemplatesModal(true)}
+                className="ios-badge ios-badge-secondary"
+                style={{ padding: '8px 14px', borderRadius: 'var(--radius-md)', fontSize: '12px', fontWeight: '700', cursor: 'pointer', border: '1px solid var(--border-light)', display: 'flex', alignItems: 'center', gap: '6px', backgroundColor: '#f8fafc', color: 'var(--text-dark)' }}
+                title="Відкрити список збережених шаблонів"
+              >
+                <FolderOpen size={14} style={{ color: 'var(--primary)' }} />
+                <span>Шаблони ({templates.length})</span>
+              </button>
+              <button 
+                type="button"
+                onClick={() => {
+                  setTemplateName(name || `${category === 'Бланки' ? subCategory : category} ${quantity} шт`);
+                  setShowTemplateModal(true);
+                }}
+                className="ios-badge ios-badge-blue"
+                style={{ padding: '8px 16px', borderRadius: 'var(--radius-md)', fontSize: '12px', fontWeight: '700', cursor: 'pointer', border: 'none', display: 'flex', alignItems: 'center', gap: '6px' }}
+              >
+                <Save size={14} />
+                <span>Зберегти шаблон</span>
+              </button>
+            </div>
           </div>
 
           {/* Detailed Constructor Calculator Grid */}
@@ -16184,6 +16354,273 @@ export const Calculator: React.FC = () => {
               </div>
             </div>
           </form>
+        </div>
+      )}
+
+      {/* Toast Notification */}
+      {templateLoadedToast && (
+        <div 
+          style={{
+            position: 'fixed',
+            top: '24px',
+            right: '24px',
+            zIndex: 10000,
+            backgroundColor: '#0f172a',
+            color: '#ffffff',
+            padding: '12px 20px',
+            borderRadius: '12px',
+            boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.3)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            fontSize: '13px',
+            fontWeight: 700,
+            border: '1px solid rgba(255,255,255,0.1)'
+          }}
+        >
+          <Check size={18} style={{ color: '#10b981' }} />
+          <span>{templateLoadedToast}</span>
+        </div>
+      )}
+
+      {/* Saved Templates Catalog Modal */}
+      {showSavedTemplatesModal && (
+        <div 
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(15, 23, 42, 0.65)',
+            backdropFilter: 'blur(4px)',
+            zIndex: 9999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '16px'
+          }}
+        >
+          <div 
+            className="ios-card"
+            style={{
+              backgroundColor: 'var(--bg-card)',
+              border: '1px solid var(--border-light)',
+              borderRadius: '16px',
+              maxWidth: '900px',
+              width: '100%',
+              maxHeight: '88vh',
+              display: 'flex',
+              flexDirection: 'column',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+              overflow: 'hidden'
+            }}
+          >
+            {/* Modal Header */}
+            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-white">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600">
+                  <LayoutTemplate size={20} />
+                </div>
+                <div>
+                  <h3 className="text-base font-extrabold text-slate-900 m-0">Збережені шаблони розрахунків</h3>
+                  <p className="text-xs text-slate-500 m-0">Швидкий запуск готових параметричних специфікацій у калькулятор</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleResetTemplates}
+                  className="px-2.5 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-50 text-slate-500 hover:text-slate-700 text-xs font-semibold transition-colors flex items-center gap-1"
+                  title="Відновити стандартні шаблони"
+                >
+                  <RotateCcw size={12} />
+                  <span>Скинути до типових</span>
+                </button>
+                <button 
+                  type="button" 
+                  onClick={() => setShowSavedTemplatesModal(false)} 
+                  className="text-slate-400 hover:text-slate-700 w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center transition-colors text-base font-bold"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+
+            {/* Filter & Search Toolbar */}
+            <div className="px-6 py-3 border-b border-slate-100 bg-slate-50/70 flex flex-wrap items-center justify-between gap-3">
+              {/* Category pills */}
+              <div className="flex items-center gap-1.5 overflow-x-auto py-1">
+                {[
+                  { id: 'all', label: 'Всі' },
+                  { id: 'Візитки', label: 'Візитки' },
+                  { id: 'Флаєри', label: 'Флаєри' },
+                  { id: 'Буклети', label: 'Буклети' },
+                  { id: 'Плакати', label: 'Плакати' },
+                  { id: 'Блокноти', label: 'Блокноти' },
+                  { id: 'Бланки', label: 'Бланки' },
+                ].map(cat => {
+                  const count = cat.id === 'all' 
+                    ? templates.length 
+                    : templates.filter(t => t.category === cat.id).length;
+                  const isActive = savedTemplatesCategory === cat.id;
+                  return (
+                    <button
+                      key={cat.id}
+                      type="button"
+                      onClick={() => setSavedTemplatesCategory(cat.id)}
+                      className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 ${
+                        isActive
+                          ? 'bg-blue-600 text-white shadow-2xs'
+                          : 'bg-white border border-slate-200/80 text-slate-600 hover:bg-slate-100'
+                      }`}
+                    >
+                      <span>{cat.label}</span>
+                      <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${
+                        isActive ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-500'
+                      }`}>
+                        {count}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Search input */}
+              <div className="relative min-w-[220px] flex-1 sm:max-w-xs">
+                <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="text"
+                  placeholder="Пошук за назвою або форматом..."
+                  value={savedTemplatesSearch}
+                  onChange={(e) => setSavedTemplatesSearch(e.target.value)}
+                  className="w-full pl-8 pr-3 py-1.5 rounded-lg border border-slate-200 bg-white text-xs font-medium text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                />
+              </div>
+            </div>
+
+            {/* Modal Body - List of Template Cards */}
+            <div className="p-6 overflow-y-auto max-h-[58vh] bg-slate-50/40">
+              {(() => {
+                const filtered = templates.filter(tpl => {
+                  const matchCat = savedTemplatesCategory === 'all' || tpl.category === savedTemplatesCategory;
+                  const searchLower = savedTemplatesSearch.toLowerCase().trim();
+                  const matchSearch = !searchLower || 
+                    tpl.name.toLowerCase().includes(searchLower) ||
+                    (tpl.format || '').toLowerCase().includes(searchLower) ||
+                    tpl.category.toLowerCase().includes(searchLower) ||
+                    tpl.paperType.toLowerCase().includes(searchLower);
+                  return matchCat && matchSearch;
+                });
+
+                if (filtered.length === 0) {
+                  return (
+                    <div className="text-center py-12 flex flex-col items-center justify-center gap-2">
+                      <LayoutTemplate size={36} className="text-slate-300" />
+                      <p className="text-sm font-bold text-slate-600 m-0">Шаблонів не знайдено</p>
+                      <p className="text-xs text-slate-400 m-0">Спробуйте змінити пошуковий запит або категорію</p>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                    {filtered.map((tpl, idx) => {
+                      const realIndex = templates.indexOf(tpl);
+                      const paperLabel = tpl.paperType === 'coated' ? 'Крейдований' : tpl.paperType === 'offset' ? 'Офсетний' : 'Газетний';
+                      return (
+                        <div
+                          key={idx}
+                          className="p-4 rounded-xl bg-white border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all flex flex-col justify-between gap-3 group"
+                        >
+                          {/* Card Top */}
+                          <div>
+                            <div className="flex items-start justify-between gap-2 mb-2">
+                              <h4 className="text-sm font-bold text-slate-900 m-0 group-hover:text-blue-600 transition-colors leading-snug">
+                                {tpl.name}
+                              </h4>
+                              <span className="px-2 py-0.5 rounded-md bg-blue-50 border border-blue-100 text-blue-700 font-bold text-[11px] whitespace-nowrap">
+                                {tpl.category}
+                              </span>
+                            </div>
+
+                            {/* Tags Grid */}
+                            <div className="flex flex-wrap items-center gap-1.5 text-[11px]">
+                              <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-mono font-bold">
+                                {tpl.quantity.toLocaleString('uk-UA')} шт
+                              </span>
+                              {tpl.format && (
+                                <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-semibold">
+                                  {tpl.format}
+                                </span>
+                              )}
+                              <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-700">
+                                {paperLabel}
+                              </span>
+                              <span className="px-2 py-0.5 rounded bg-slate-100 text-slate-700 font-mono font-semibold">
+                                {tpl.colors}
+                              </span>
+                              {tpl.laminationType && tpl.laminationType !== 'none' && (
+                                <span className="px-2 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200/60 font-medium">
+                                  Лам: {tpl.laminationType === 'gloss' ? 'Глянцева' : tpl.laminationType === 'matte' ? 'Матова' : 'Soft-touch'}
+                                </span>
+                              )}
+                              {tpl.bindingType && tpl.bindingType !== 'none' && (
+                                <span className="px-2 py-0.5 rounded bg-indigo-50 text-indigo-700 border border-indigo-200/60 font-medium">
+                                  {tpl.bindingType === 'staple' ? 'Скоба' : tpl.bindingType === 'spring' ? 'Пружина' : tpl.bindingType === 'glue' ? 'Термоклей' : 'Тверда'}
+                                </span>
+                              )}
+                              {tpl.creaseCount && tpl.creaseCount > 0 && (
+                                <span className="px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200/60 font-medium">
+                                  {tpl.creaseCount} біг.
+                                </span>
+                              )}
+                            </div>
+                          </div>
+
+                          {/* Card Action Buttons */}
+                          <div className="flex items-center justify-between pt-2.5 border-t border-slate-100 mt-1">
+                            <span className="text-[11px] text-slate-400 font-medium">
+                              Націнка: <strong className="text-slate-600 font-mono">{tpl.marginPercent || 25}%</strong>
+                            </span>
+                            <div className="flex items-center gap-1.5">
+                              <button
+                                type="button"
+                                onClick={() => handleDeleteTemplate(realIndex)}
+                                className="w-8 h-8 rounded-lg border border-slate-200 hover:border-red-200 hover:bg-red-50 text-slate-400 hover:text-red-600 flex items-center justify-center transition-colors"
+                                title="Видалити шаблон"
+                              >
+                                ✕
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => handleLoadTemplate(tpl)}
+                                className="px-3 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-2xs transition-all flex items-center gap-1.5 cursor-pointer"
+                              >
+                                <Zap size={13} />
+                                <span>Завантажити</span>
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })()}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="px-6 py-3.5 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-3">
+              <span className="text-xs text-slate-500">
+                💡 Зберегти новий шаблон можна у будь-якому розрахунку кнопкою <strong>«Зберегти шаблон»</strong>
+              </span>
+              <button 
+                type="button" 
+                onClick={() => setShowSavedTemplatesModal(false)} 
+                className="px-4 py-1.5 rounded-xl border border-slate-200 bg-white hover:bg-slate-100 text-slate-700 text-xs font-semibold shadow-xs transition-colors"
+              >
+                Закрити
+              </button>
+            </div>
+          </div>
         </div>
       )}
 
