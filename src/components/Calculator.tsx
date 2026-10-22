@@ -1099,7 +1099,6 @@ export const Calculator: React.FC = () => {
   const [rollOrientation, setRollOrientation] = useState<string>('1');
   const [rollMaterial, setRollMaterial] = useState<string>('209');
   const [rollColor, setRollColor] = useState<string>('1');
-  const [rollCoating, setRollCoating] = useState<string>('0');
   const [rollGlueType, setRollGlueType] = useState<'rubber' | 'acrylic'>('rubber');
   const [rollApplication, setRollApplication] = useState<'manual' | 'auto'>('manual');
   const [rollLabelsPerRoll, setRollLabelsPerRoll] = useState<number>(1250);
@@ -14348,13 +14347,13 @@ export const Calculator: React.FC = () => {
                                       width: '62px',
                                       height: lanes === 1 ? '58px' : '48px',
                                       borderRadius: rollDieCutShape === 'oval' ? '50% / 35%' : '8px',
-                                      backgroundColor: '#064e3b',
+                                      backgroundColor: '#ffffff',
                                       border: '1.5px dashed #f59e0b',
-                                      boxShadow: '0 2px 4px rgba(0,0,0,0.5)',
+                                      boxShadow: '0 1px 4px rgba(0,0,0,0.25)',
                                       position: 'relative',
                                       overflow: 'hidden'
                                     }}
-                                    title={`Етикетка ${laneIdx * labelsInRowPerMeter + colIdx + 1}, струмок ${laneIdx + 1} (${dimAcross}×${dimAlong} мм)`}
+                                    title={`Струмок ${laneIdx + 1}, позиція ${colIdx + 1} (${dimAcross}×${dimAlong} мм)`}
                                   >
                                     {rollUploadedFile ? (
                                       <div className="w-full h-full relative flex items-center justify-center bg-white">
@@ -14363,19 +14362,10 @@ export const Calculator: React.FC = () => {
                                           alt="Етикетка" 
                                           className="w-full h-full object-cover"
                                         />
-                                        <div className="absolute top-0.5 left-1 bg-black/60 text-white font-mono text-[7px] px-1 rounded font-bold">
-                                          #{laneIdx * labelsInRowPerMeter + colIdx + 1}
-                                        </div>
                                       </div>
                                     ) : (
-                                      <>
-                                        <div className="absolute inset-0 bg-gradient-to-b from-emerald-800 to-emerald-950 opacity-95"></div>
-                                        <div className="relative z-10 flex flex-col items-center justify-center p-0.5 text-center leading-tight">
-                                          <span className="text-[8px] font-black text-amber-300 font-mono">#{laneIdx * labelsInRowPerMeter + colIdx + 1}</span>
-                                          <span className="text-[6.5px] font-extrabold text-white tracking-tight">BIOBLYSK</span>
-                                          <span className="text-[5.5px] text-emerald-300 font-mono">{dimAcross}×{dimAlong}</span>
-                                        </div>
-                                      </>
+                                      <div className="w-full h-full bg-white flex items-center justify-center">
+                                      </div>
                                     )}
                                   </div>
                                 ))}
@@ -14489,42 +14479,7 @@ export const Calculator: React.FC = () => {
                   </div>
                 </div>
 
-                {/* 2. ПОКРИТТЯ */}
-                <div className="pt-2 border-t border-slate-100">
-                  <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block mb-2">ПОКРИТТЯ:</label>
-                  <div className="flex flex-wrap gap-2">
-                    {[
-                      { id: '0', title: 'Без покриття' },
-                      { id: '190', title: 'Лак глянцевий' },
-                      { id: '191', title: 'Лак матовий' },
-                    ].map(coat => {
-                      const isActive = rollCoating === coat.id;
-                      return (
-                        <button
-                          key={coat.id}
-                          type="button"
-                          onClick={() => setRollCoating(coat.id)}
-                          style={{
-                            padding: '6px 14px',
-                            borderRadius: '8px',
-                            fontSize: '12px',
-                            fontWeight: '700',
-                            border: isActive ? '1px solid #007AFF' : '0.5px solid var(--border-light)',
-                            backgroundColor: isActive ? '#007AFF' : 'var(--bg-system)',
-                            color: isActive ? '#ffffff' : 'var(--text-dark)',
-                            boxShadow: isActive ? '0 2px 6px rgba(0, 122, 255, 0.3)' : 'none',
-                            cursor: 'pointer',
-                            transition: 'all 0.15s ease'
-                          }}
-                        >
-                          {coat.title}
-                        </button>
-                      );
-                    })}
-                  </div>
-                </div>
-
-                {/* 3. ДРУК */}
+                {/* 2. ДРУК */}
                 <div className="pt-2 border-t border-slate-100">
                   <label className="text-xs font-bold text-slate-700 uppercase tracking-wider block mb-2">ДРУК:</label>
                   <div className="flex flex-wrap gap-2">
@@ -14642,8 +14597,6 @@ export const Calculator: React.FC = () => {
                         const h = parseFloat(rollHeight) || 25;
                         const gap = parseFloat(rollGap) || 4;
                         const colorAdd = rollColor === '14' ? 85 : rollColor === '8' ? 55 : 40;
-                        const coatAdd = rollCoating === '190' ? 25 : rollCoating === '191' ? 30 : 0;
-                        const coatName = rollCoating === '190' ? ' + Лак глянець' : rollCoating === '191' ? ' + Лак мат' : ' (без лаку)';
                         const colorName = rollColor === '14' ? '5+0 White+CMYK' : rollColor === '8' ? '1+0 White' : '4+0 CMYK';
 
                         const allTiers = [rollQuantity, ...[500, 1000, 2000, 5000, 10000, 25000].filter(t => t !== rollQuantity)];
@@ -14654,7 +14607,7 @@ export const Calculator: React.FC = () => {
                             className={`transition-colors ${isSelectedMat ? 'bg-blue-50/70 font-semibold' : 'hover:bg-slate-50'}`}
                           >
                             <td className="py-2.5 px-4 text-left font-semibold text-slate-800 border-r border-slate-100 flex items-center justify-between">
-                              <span>{row.matName}{coatName}</span>
+                              <span>{row.matName}</span>
                               {isSelectedMat && (
                                 <span className="ios-badge-blue text-[10px] px-1.5 py-0.5 rounded ml-2">Обрано</span>
                               )}
@@ -14666,7 +14619,7 @@ export const Calculator: React.FC = () => {
                             {allTiers.map((tir, idx) => {
                               const meters = (tir * (h + gap)) / 1000;
                               const sqM = (w / 1000) * meters;
-                              const totalCost = Math.round(sqM * (row.rate + colorAdd + coatAdd) + 380 + (includeDelivery ? 75 : 0));
+                              const totalCost = Math.round(sqM * (row.rate + colorAdd) + 380 + (includeDelivery ? 75 : 0));
                               const displayVal = priceCostVar === 'per_item'
                                 ? ((totalCost / tir) * 1000).toFixed(1)
                                 : totalCost.toString();
@@ -14722,15 +14675,13 @@ export const Calculator: React.FC = () => {
                   const approxRolls = Math.max(1, Math.ceil(rollQuantity / (rollLabelsPerRoll || 1000)));
 
                   const colorAdd = rollColor === '14' ? 85 : rollColor === '8' ? 55 : 40;
-                  const coatAdd = rollCoating === '190' ? 25 : rollCoating === '191' ? 30 : 0;
                   const baseRate = rollMaterial === '215' ? 165 : rollMaterial === '211' ? 150 : rollMaterial === '214' ? 135 : rollMaterial === '213' ? 110 : rollMaterial === '212' ? 95 : rollMaterial === '210' ? 85 : 65;
                   
                   const rollPaperCost = Math.round(sqMeters * baseRate);
                   const rollPrintCost = Math.round(sqMeters * colorAdd);
-                  const rollLamCost = Math.round(sqMeters * coatAdd);
                   const rollPostSum = 250;
                   const rollDelivery = includeDelivery ? 90 : 0;
-                  const rollRawCost = rollPaperCost + rollPrintCost + rollLamCost + rollPostSum + rollDelivery + 50;
+                  const rollRawCost = rollPaperCost + rollPrintCost + rollPostSum + rollDelivery + 50;
 
                   const rollFinalPrice = Math.round(rollRawCost * (1 + marginPercent / 100));
                   const rollMarginAmount = Math.max(0, rollFinalPrice - rollRawCost);
@@ -14929,10 +14880,7 @@ export const Calculator: React.FC = () => {
                                 <span className="text-slate-600 font-medium">Флексодрук / Фарби:</span>
                                 <strong className="font-mono text-slate-900">{rollPrintCost.toFixed(2)} ₴</strong>
                               </div>
-                              <div className="flex justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/60">
-                                <span className="text-slate-600 font-medium">Лак / Ламінація:</span>
-                                <strong className="font-mono text-slate-900">{rollLamCost.toFixed(2)} ₴</strong>
-                              </div>
+
                               <div className="flex justify-between p-2.5 rounded-xl bg-slate-50 border border-slate-200/60">
                                 <span className="text-slate-600 font-medium">Намотка та різка:</span>
                                 <strong className="font-mono text-slate-900">{rollPostSum.toFixed(2)} ₴</strong>
@@ -17089,17 +17037,21 @@ export const Calculator: React.FC = () => {
                               </span>
                             </div>
                           ) : (
-                            <div 
-                              className="border-2 border-dashed border-amber-500 bg-emerald-900 text-white rounded-full flex flex-col items-center justify-center shadow-md p-4 text-center"
-                              style={{
-                                width: '180px',
-                                height: '115px'
-                              }}
-                            >
-                              <span className="text-[11px] font-black tracking-widest text-amber-300">BIOBLYSK</span>
-                              <span className="text-[9px] font-semibold text-white/90">DISHWASHING LIQUID</span>
-                              <span className="text-[8px] text-emerald-200 mt-1">Pine Harmony 0.5L</span>
-                              <span className="text-[9px] font-mono font-bold text-amber-400 mt-0.5">{dimAcross}×{dimAlong} мм</span>
+                            <div className="flex flex-col items-center justify-center gap-2">
+                              <div 
+                                className="border-2 border-dashed border-amber-500 bg-white shadow-sm flex flex-col items-center justify-center p-4 text-center"
+                                style={{
+                                  width: '180px',
+                                  height: '115px',
+                                  borderRadius: rollDieCutShape === 'oval' ? '50% / 35%' : '8px'
+                                }}
+                              >
+                                <span className="text-xs font-bold text-slate-400">Контур ножа висічки</span>
+                                <span className="text-xs font-mono font-bold text-amber-600 mt-1">{dimAcross} × {dimAlong} мм</span>
+                              </div>
+                              <span className="text-[10px] text-slate-400">
+                                (Завантажте макет вище для відображення в бланку)
+                              </span>
                             </div>
                           )}
                         </div>
