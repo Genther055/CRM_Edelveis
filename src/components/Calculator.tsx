@@ -1088,16 +1088,20 @@ export const Calculator: React.FC = () => {
   const [gridYear, setGridYear] = useState<'2026' | '2027'>('2026');
   const [gridCursor, setGridCursor] = useState<boolean>(true);
 
-  // Roll Label Calculator specific states
-  const [rollWidth, setRollWidth] = useState<string>('25');
-  const [rollHeight, setRollHeight] = useState<string>('25');
-  const [rollQuantity, setRollQuantity] = useState<number>(1000);
+  // Roll Label Calculator specific states (Synced with production TZ standard: 330mm web, 60x107mm, rubber glue)
+  const [rollWidth, setRollWidth] = useState<string>('60');
+  const [rollHeight, setRollHeight] = useState<string>('107');
+  const [rollQuantity, setRollQuantity] = useState<number>(2500);
   const [rollGap, setRollGap] = useState<string>('4');
   const [rollCore, setRollCore] = useState<string>('76');
   const [rollOrientation, setRollOrientation] = useState<string>('1');
   const [rollMaterial, setRollMaterial] = useState<string>('209');
   const [rollColor, setRollColor] = useState<string>('1');
   const [rollCoating, setRollCoating] = useState<string>('0');
+  const [rollGlueType, setRollGlueType] = useState<'rubber' | 'acrylic'>('rubber');
+  const [rollApplication, setRollApplication] = useState<'manual' | 'auto'>('manual');
+  const [rollLabelsPerRoll, setRollLabelsPerRoll] = useState<number>(1250);
+  const [showRollTechTaskModal, setShowRollTechTaskModal] = useState<boolean>(false);
 
   // Mega Menu Interactive Dropdown States
   const [isMegaMenuOpen, setIsMegaMenuOpen] = useState<boolean>(false);
@@ -14028,7 +14032,286 @@ export const Calculator: React.FC = () => {
                     })}
                   </div>
                 </div>
+
+                {/* 6. Production TZ Parameters: Glue, Application & Winding */}
+                <div className="pt-3 border-t border-slate-100">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    {/* Glue Type */}
+                    <div>
+                      <label className="text-xs font-bold text-slate-700 block mb-2">
+                        Тип клею:
+                      </label>
+                      <div className="flex gap-2">
+                        {[
+                          { id: 'rubber', label: 'Каучук', desc: 'Hotmelt (посилений)' },
+                          { id: 'acrylic', label: 'Акрил', desc: 'Водний (стандартний)' }
+                        ].map(g => (
+                          <button
+                            key={g.id}
+                            type="button"
+                            onClick={() => setRollGlueType(g.id as any)}
+                            className={`flex-1 py-2 px-2.5 rounded-xl border text-xs font-bold transition-all text-left flex flex-col gap-0.5 ${
+                              rollGlueType === g.id
+                                ? 'bg-blue-50 border-blue-600 text-blue-700 shadow-2xs'
+                                : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+                            }`}
+                          >
+                            <span className="flex items-center gap-1.5">
+                              <span className={`w-3 h-3 rounded-full border flex items-center justify-center ${rollGlueType === g.id ? 'border-blue-600 bg-blue-600' : 'border-slate-300'}`}>
+                                {rollGlueType === g.id && <span className="w-1 h-1 rounded-full bg-white"></span>}
+                              </span>
+                              <span>{g.label}</span>
+                            </span>
+                            <span className="text-[10px] text-slate-500 font-normal pl-4.5">{g.desc}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Application method */}
+                    <div>
+                      <label className="text-xs font-bold text-slate-700 block mb-2">
+                        Поклейщик (нанесення):
+                      </label>
+                      <div className="flex gap-2">
+                        {[
+                          { id: 'manual', label: 'Ручний', desc: 'Ручне наклеювання' },
+                          { id: 'auto', label: 'Автм.', desc: 'Автомат-аплікатор' }
+                        ].map(a => (
+                          <button
+                            key={a.id}
+                            type="button"
+                            onClick={() => setRollApplication(a.id as any)}
+                            className={`flex-1 py-2 px-2.5 rounded-xl border text-xs font-bold transition-all text-left flex flex-col gap-0.5 ${
+                              rollApplication === a.id
+                                ? 'bg-blue-50 border-blue-600 text-blue-700 shadow-2xs'
+                                : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+                            }`}
+                          >
+                            <span className="flex items-center gap-1.5">
+                              <span className={`w-3 h-3 rounded-full border flex items-center justify-center ${rollApplication === a.id ? 'border-blue-600 bg-blue-600' : 'border-slate-300'}`}>
+                                {rollApplication === a.id && <span className="w-1 h-1 rounded-full bg-white"></span>}
+                              </span>
+                              <span>{a.label}</span>
+                            </span>
+                            <span className="text-[10px] text-slate-500 font-normal pl-4.5">{a.desc}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Labels per Finished Roll */}
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <label className="text-xs font-bold text-slate-700">
+                          К-сть у бобіні (намотка):
+                        </label>
+                        <span className="text-[11px] text-blue-600 font-bold">
+                          {Math.max(1, Math.ceil(rollQuantity / (rollLabelsPerRoll || 1000)))} рул.
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <div className="flex items-center bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 w-32 focus-within:border-blue-500 focus-within:bg-white transition-all">
+                          <input
+                            type="number"
+                            value={rollLabelsPerRoll}
+                            onChange={(e) => setRollLabelsPerRoll(Math.max(50, parseInt(e.target.value) || 500))}
+                            step="250"
+                            min="50"
+                            className="w-full bg-transparent text-sm font-bold text-slate-800 outline-none text-center"
+                          />
+                        </div>
+                        <span className="text-xs font-bold text-slate-500">шт/рул.</span>
+                        <div className="flex items-center gap-1">
+                          {[500, 1000, 1250, 2500].map(cnt => (
+                            <button
+                              key={cnt}
+                              type="button"
+                              onClick={() => setRollLabelsPerRoll(cnt)}
+                              className={`px-1.5 py-1 rounded text-[10px] font-bold border transition-colors ${
+                                rollLabelsPerRoll === cnt ? 'bg-blue-600 text-white border-blue-600' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+                              }`}
+                            >
+                              {cnt}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
+
+              {/* NEW SECTION: Imposition & Web Layout on 330mm Roll (Розкладка етикеток на погонний метр) */}
+              {(() => {
+                const w = parseFloat(rollWidth) || 60;
+                const h = parseFloat(rollHeight) || 107;
+                const gap = parseFloat(rollGap) || 4;
+
+                // Smart orientation dimension detection
+                const dimAcross = (rollOrientation === '3' || rollOrientation === '4')
+                  ? Math.min(w, h)
+                  : Math.max(w, h);
+                const dimAlong = (rollOrientation === '3' || rollOrientation === '4')
+                  ? Math.max(w, h)
+                  : Math.min(w, h);
+
+                const webWidth = 330; // 330 мм полотно
+                const printableWidth = 320; // 320 мм робоча зона друку
+                const lanes = Math.max(1, Math.floor((printableWidth + gap) / (dimAcross + gap)));
+                const pitchAlong = dimAlong + gap;
+                const labelsInRowPerMeter = Math.max(1, Math.floor(1000 / pitchAlong));
+                const labelsPerMeter = lanes * labelsInRowPerMeter;
+                const linearMeters = Math.max(1, Math.ceil((rollQuantity / lanes) * pitchAlong / 1000));
+                const linearMetersWithWaste = linearMeters + 5;
+                const sqMeters = Math.round((linearMetersWithWaste * 0.33) * 100) / 100;
+                const readyRolls = Math.max(1, Math.ceil(rollQuantity / (rollLabelsPerRoll || 1000)));
+
+                // Number of visual repeats on diagram
+                const visualColumns = 14;
+
+                return (
+                  <div className="ios-card bg-white" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '18px', border: '1px solid #bfdbfe', boxShadow: '0 4px 16px rgba(0, 122, 255, 0.06)' }}>
+                    {/* Header */}
+                    <div className="flex items-center justify-between flex-wrap gap-3 pb-3 border-b border-slate-100">
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-600">
+                          <Sparkles size={18} />
+                        </div>
+                        <div>
+                          <h4 className="text-base font-extrabold text-slate-900 m-0">
+                            Розкладка етикеток на погонний метр (полотно {webWidth} мм)
+                          </h4>
+                          <p className="text-xs text-slate-500 m-0">
+                            Автоматичний розрахунок кількості струмків, кроку намотки та виробничого метражу
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => setShowRollTechTaskModal(true)}
+                          className="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-2xs transition-all flex items-center gap-1.5 cursor-pointer"
+                        >
+                          <FileText size={14} />
+                          <span>Бланк погодження (ТЗ)</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Interactive Web Ribbon Diagram (Matching exact visual layout of media_1792672604192_e1180703.png) */}
+                    <div className="flex flex-col gap-2">
+                      <div className="flex items-center justify-between text-xs font-bold text-slate-600 px-1">
+                        <span className="flex items-center gap-1.5">
+                          <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+                          <span>Стрічка полотна: <strong>{webWidth} мм</strong> (робоча зона {printableWidth} мм, друк у <strong>{lanes} {lanes === 1 ? 'струмок' : lanes <= 4 ? 'струмки' : 'струмків'}</strong>)</span>
+                        </span>
+                        <span className="text-blue-700 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded font-mono">
+                          1 пог. м = {labelsPerMeter} етикеток
+                        </span>
+                      </div>
+
+                      {/* Visual Roll Web Canvas */}
+                      <div 
+                        className="relative w-full rounded-xl overflow-x-auto bg-slate-900 border-2 border-slate-800 p-2 shadow-inner"
+                        style={{ minHeight: lanes > 1 ? '160px' : '110px' }}
+                      >
+                        {/* Printable web margins guide lines (pink/magenta as in professional DTP software) */}
+                        <div 
+                          className="w-full h-full rounded-lg relative flex flex-col justify-between py-1.5 px-3"
+                          style={{
+                            background: 'linear-gradient(180deg, rgba(236,72,153,0.12) 0%, rgba(15,23,42,0.95) 8%, rgba(15,23,42,0.95) 92%, rgba(236,72,153,0.12) 100%)',
+                            borderTop: '2px dashed #ec4899',
+                            borderBottom: '2px dashed #ec4899'
+                          }}
+                        >
+                          {/* Repeat rows based on calculated lanes */}
+                          <div className="flex flex-col gap-2 my-auto w-full">
+                            {Array.from({ length: lanes }).map((_, laneIdx) => (
+                              <div key={laneIdx} className="flex items-center gap-1.5 overflow-hidden">
+                                {Array.from({ length: visualColumns }).map((_, colIdx) => (
+                                  <div
+                                    key={colIdx}
+                                    className="flex-shrink-0 flex flex-col items-center justify-center transition-transform hover:scale-105"
+                                    style={{
+                                      width: '62px',
+                                      height: lanes === 1 ? '58px' : '48px',
+                                      borderRadius: '50% / 35%',
+                                      backgroundColor: '#064e3b',
+                                      border: '1.5px dashed #f59e0b',
+                                      boxShadow: '0 2px 4px rgba(0,0,0,0.5)',
+                                      position: 'relative',
+                                      overflow: 'hidden'
+                                    }}
+                                    title={`Етикетка ${colIdx + 1}, струмок ${laneIdx + 1} (${dimAcross}×${dimAlong} мм)`}
+                                  >
+                                    <div className="absolute inset-0 bg-gradient-to-b from-emerald-800 to-emerald-950 opacity-90"></div>
+                                    <div className="relative z-10 flex flex-col items-center justify-center p-0.5 text-center leading-none">
+                                      <span className="text-[7px] font-black text-amber-300 tracking-wider">BIOBLYSK</span>
+                                      <span className="text-[6px] font-bold text-white/90">0.5L</span>
+                                      <span className="text-[5px] text-emerald-300/80 mt-0.5">{dimAcross}×{dimAlong}</span>
+                                    </div>
+                                  </div>
+                                ))}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Dimension annotations */}
+                        <div className="flex items-center justify-between text-[10px] font-mono text-slate-400 mt-1.5 px-2">
+                          <span>↕ Ширина матеріалу: {webWidth} мм</span>
+                          <span>↔ Крок намотки: {pitchAlong} мм ({dimAlong} + {gap} мм gap)</span>
+                          <span>Струмків: {lanes} ряд.</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* KPI Summary Tiles */}
+                    <div className="grid grid-cols-2 sm:grid-cols-5 gap-2.5 pt-2">
+                      <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80 flex flex-col gap-0.5">
+                        <span className="text-[11px] text-slate-500 font-semibold">Струмків на полотні:</span>
+                        <strong className="text-base font-extrabold text-slate-900 font-mono">
+                          {lanes} {lanes === 1 ? 'струмок' : lanes <= 4 ? 'струмки' : 'струмків'}
+                        </strong>
+                        <span className="text-[10px] text-slate-400">на полотні {webWidth} мм</span>
+                      </div>
+
+                      <div className="p-3 rounded-xl bg-blue-50/70 border border-blue-200/80 flex flex-col gap-0.5">
+                        <span className="text-[11px] text-blue-700 font-semibold">На 1 погонний метр:</span>
+                        <strong className="text-base font-extrabold text-blue-900 font-mono">
+                          {labelsPerMeter} шт / м.п.
+                        </strong>
+                        <span className="text-[10px] text-blue-600">крок {pitchAlong} мм</span>
+                      </div>
+
+                      <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80 flex flex-col gap-0.5">
+                        <span className="text-[11px] text-slate-500 font-semibold">Загальний метраж:</span>
+                        <strong className="text-base font-extrabold text-slate-900 font-mono">
+                          {linearMeters} м.п.
+                        </strong>
+                        <span className="text-[10px] text-slate-400">+5м приладка ({linearMetersWithWaste}м)</span>
+                      </div>
+
+                      <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80 flex flex-col gap-0.5">
+                        <span className="text-[11px] text-slate-500 font-semibold">Витрата матеріалу:</span>
+                        <strong className="text-base font-extrabold text-slate-900 font-mono">
+                          {sqMeters} м²
+                        </strong>
+                        <span className="text-[10px] text-slate-400">рулон {webWidth} мм</span>
+                      </div>
+
+                      <div className="p-3 rounded-xl bg-indigo-50/70 border border-indigo-200/80 flex flex-col gap-0.5">
+                        <span className="text-[11px] text-indigo-700 font-semibold">Готових бобін (рулонів):</span>
+                        <strong className="text-base font-extrabold text-indigo-900 font-mono">
+                          {readyRolls} рул.
+                        </strong>
+                        <span className="text-[10px] text-indigo-600">по {rollLabelsPerRoll} шт (Ø 76 мм)</span>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
 
               {/* Specification and Materials Filter Card (Matching exact styling of media_1787929205713.png) */}
               <div className="ios-card bg-white" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '16px' }}>
@@ -14291,12 +14574,27 @@ export const Calculator: React.FC = () => {
 
 {/* Extended Order & 1C Calculation Card for Roll Printing */}
                 {(() => {
-                  const w = parseFloat(rollWidth) || 25;
-                  const h = parseFloat(rollHeight) || 25;
+                  const w = parseFloat(rollWidth) || 60;
+                  const h = parseFloat(rollHeight) || 107;
                   const gap = parseFloat(rollGap) || 4;
-                  const linearMeters = Math.round((rollQuantity * (h + gap)) / 1000 * 10) / 10;
-                  const sqMeters = Math.round((w / 1000) * linearMeters * 100) / 100;
-                  const approxRolls = Math.max(1, Math.ceil(linearMeters / 100));
+
+                  const dimAcross = (rollOrientation === '3' || rollOrientation === '4')
+                    ? Math.min(w, h)
+                    : Math.max(w, h);
+                  const dimAlong = (rollOrientation === '3' || rollOrientation === '4')
+                    ? Math.max(w, h)
+                    : Math.min(w, h);
+
+                  const printableWidth = 320;
+                  const lanes = Math.max(1, Math.floor((printableWidth + gap) / (dimAcross + gap)));
+                  const pitchAlong = dimAlong + gap;
+                  const labelsInRowPerMeter = Math.max(1, Math.floor(1000 / pitchAlong));
+                  const labelsPerMeter = lanes * labelsInRowPerMeter;
+                  const linearMeters = Math.max(1, Math.ceil((rollQuantity / lanes) * pitchAlong / 1000));
+                  const linearMetersWithWaste = linearMeters + 5;
+                  const sqMeters = Math.round((linearMetersWithWaste * 0.33) * 100) / 100;
+                  const approxRolls = Math.max(1, Math.ceil(rollQuantity / (rollLabelsPerRoll || 1000)));
+
                   const colorAdd = rollColor === '14' ? 85 : rollColor === '8' ? 55 : 40;
                   const coatAdd = rollCoating === '190' ? 25 : rollCoating === '191' ? 30 : 0;
                   const baseRate = rollMaterial === '215' ? 165 : rollMaterial === '211' ? 150 : rollMaterial === '214' ? 135 : rollMaterial === '213' ? 110 : rollMaterial === '212' ? 95 : rollMaterial === '210' ? 85 : 65;
@@ -14346,10 +14644,10 @@ export const Calculator: React.FC = () => {
                         </div>
                         <div className="flex items-center gap-2">
                           <span className="text-xs font-bold px-3 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200">
-                            {rollQuantity} шт ({linearMeters} м.п.)
+                            {rollQuantity} шт ({linearMeters} м.п. • {labelsPerMeter} шт/м.п.)
                           </span>
                           <span className="text-xs font-bold px-3 py-1 rounded-full bg-slate-100 text-slate-700">
-                            Втулка {rollCore} мм (№{rollOrientation})
+                            Втулка {rollCore} мм (№{rollOrientation} • {lanes} струмки)
                           </span>
                         </div>
                       </div>
@@ -14573,7 +14871,17 @@ export const Calculator: React.FC = () => {
                               </button>
                             </div>
                           ) : (
-                            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3 pt-3 border-t border-slate-100">
+                            <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 sm:gap-2.5 pt-3 border-t border-slate-100">
+                              <button
+                                type="button"
+                                onClick={() => setShowRollTechTaskModal(true)}
+                                className="py-2.5 px-2 rounded-xl border border-blue-200 bg-blue-50/90 hover:bg-blue-100 text-blue-700 font-bold text-xs shadow-2xs transition-colors text-center flex items-center justify-center gap-1.5"
+                                title="Сформувати офіційний Бланк погодження (Технічне завдання)"
+                              >
+                                <FileText size={14} className="text-blue-600" />
+                                <span>ТЗ (Бланк)</span>
+                              </button>
+
                               <button
                                 type="button"
                                 onClick={() => {
@@ -16486,6 +16794,300 @@ export const Calculator: React.FC = () => {
               >
                 Закрити
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Technical Task & Customer Approval Sheet Modal (Бланк погодження ТЗ за зразком виробництва) */}
+      {showRollTechTaskModal && (
+        <div 
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(15, 23, 42, 0.75)',
+            backdropFilter: 'blur(4px)',
+            zIndex: 9999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '16px'
+          }}
+        >
+          <div 
+            className="ios-card"
+            style={{
+              backgroundColor: '#ffffff',
+              border: '1px solid var(--border-light)',
+              borderRadius: '16px',
+              maxWidth: '920px',
+              width: '100%',
+              maxHeight: '92vh',
+              display: 'flex',
+              flexDirection: 'column',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+              overflow: 'hidden'
+            }}
+          >
+            {/* Modal Actions Header (Non-printable) */}
+            <div className="px-6 py-3.5 border-b border-slate-200 flex items-center justify-between bg-slate-50 print:hidden">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center font-bold">
+                  <FileText size={18} />
+                </div>
+                <div>
+                  <h3 className="text-sm font-extrabold text-slate-900 m-0">Бланк погодження / Технічне завдання</h3>
+                  <span className="text-[11px] text-slate-500">Офіційний виробничий бланк цифрового рулонного друку</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => window.print()}
+                  className="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm transition-all"
+                >
+                  <Printer size={14} />
+                  <span>Друкувати ТЗ</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowRollTechTaskModal(false)}
+                  className="w-8 h-8 rounded-lg hover:bg-slate-200 text-slate-500 font-bold flex items-center justify-center transition-colors"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+
+            {/* Printable Production Approval Sheet (Exact Replica of D:\Telegram Desktop\бланк погодження(Pine Harmony_0.5l).pdf) */}
+            <div className="p-6 md:p-8 overflow-y-auto flex-1 font-sans text-slate-900 bg-white" id="roll-tz-printable-sheet">
+              {(() => {
+                const w = parseFloat(rollWidth) || 60;
+                const h = parseFloat(rollHeight) || 107;
+                const gap = parseFloat(rollGap) || 4;
+
+                const dimAcross = (rollOrientation === '3' || rollOrientation === '4')
+                  ? Math.min(w, h)
+                  : Math.max(w, h);
+                const dimAlong = (rollOrientation === '3' || rollOrientation === '4')
+                  ? Math.max(w, h)
+                  : Math.min(w, h);
+
+                const webWidth = 330;
+                const printableWidth = 320;
+                const lanes = Math.max(1, Math.floor((printableWidth + gap) / (dimAcross + gap)));
+                const pitchAlong = dimAlong + gap;
+                const labelsInRowPerMeter = Math.max(1, Math.floor(1000 / pitchAlong));
+                const labelsPerMeter = lanes * labelsInRowPerMeter;
+                const linearMeters = Math.max(1, Math.ceil((rollQuantity / lanes) * pitchAlong / 1000));
+                const linearMetersWithWaste = linearMeters + 5;
+                const sqMeters = Math.round((linearMetersWithWaste * 0.33) * 100) / 100;
+                const readyRolls = Math.max(1, Math.ceil(rollQuantity / (rollLabelsPerRoll || 1000)));
+
+                const matLabels: Record<string, string> = {
+                  '209': 'самоклеючий папір Raflatac',
+                  '210': 'самоклеючий папір Крафт',
+                  '212': 'поліпропіленова плівка біла',
+                  '213': 'поліпропіленова плівка прозора',
+                  '214': 'поліпропіленова плівка срібло',
+                  '211': 'винний папір Antique White',
+                  '215': 'винний папір Martel',
+                };
+
+                const orientTitles: Record<string, string> = {
+                  '1': '№1 (Головою вперед)',
+                  '2': '№2 (Низом вперед)',
+                  '3': '№3 (Правим краєм)',
+                  '4': '№4 (Лівим краєм)',
+                };
+
+                const effectiveClient = isNewClientMode && customClientName.trim()
+                  ? customClientName.trim()
+                  : (activeClient?.name || 'Замовник');
+
+                const fileName = `Pine_Harmony_(${dimAcross}х${dimAlong}мм)_${effectiveClient.replace(/\s+/g, '_')}`;
+
+                return (
+                  <div className="flex flex-col gap-4 border-2 border-slate-900 p-5 rounded-lg">
+                    {/* Top Cyan Title Bar matching TZ */}
+                    <div className="bg-[#0284c7] text-white p-3 rounded flex items-center justify-between font-black">
+                      <span className="text-sm tracking-wide">
+                        ТЕХНІЧНЕ ЗАВДАННЯ НА ВИГОТОВЛЕННЯ ЕТИКЕТКИ ЦИФРОВИЙ РУЛОННИЙ ДРУК
+                      </span>
+                      <span className="text-xs font-mono bg-white/20 px-2.5 py-0.5 rounded">
+                        ДАТА: {new Date().toLocaleDateString('uk-UA')}
+                      </span>
+                    </div>
+
+                    {/* Subhead Row */}
+                    <div className="flex items-center justify-between text-xs font-bold border-b-2 border-slate-200 pb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-slate-500">Назва файлу:</span>
+                        <strong className="text-slate-900 font-mono">{fileName}</strong>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-slate-500">Контур різу:</span>
+                        <span className="text-amber-600 font-mono font-bold border-b-2 border-dashed border-amber-500 px-1">
+                          ---- жовтий контур
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Main Grid: Left Mockup/Color/Orientation & Right Table */}
+                    <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
+                      {/* Left: Sticker Graphic + Colors + Roll Winding Scheme */}
+                      <div className="md:col-span-6 flex flex-col gap-4">
+                        {/* Mockup Box with Knife Dimensions */}
+                        <div className="border border-slate-300 rounded-lg p-6 bg-slate-50/50 flex flex-col items-center justify-center relative min-h-[220px]">
+                          <span className="absolute top-2 right-2 text-[10px] font-bold text-slate-400 bg-white px-2 py-0.5 rounded border border-slate-200">
+                            Масштаб 1:1
+                          </span>
+                          <div 
+                            className="border-2 border-dashed border-amber-500 bg-emerald-900 text-white rounded-full flex flex-col items-center justify-center shadow-md p-4 text-center"
+                            style={{
+                              width: '180px',
+                              height: '115px'
+                            }}
+                          >
+                            <span className="text-[11px] font-black tracking-widest text-amber-300">BIOBLYSK</span>
+                            <span className="text-[9px] font-semibold text-white/90">DISHWASHING LIQUID</span>
+                            <span className="text-[8px] text-emerald-200 mt-1">Pine Harmony 0.5L</span>
+                            <span className="text-[9px] font-mono font-bold text-amber-400 mt-0.5">{dimAcross}×{dimAlong} мм</span>
+                          </div>
+                        </div>
+
+                        {/* Colors Palette Strip */}
+                        <div className="border border-slate-200 rounded p-2.5 flex items-center justify-between text-xs font-bold">
+                          <div className="flex items-center gap-1.5">
+                            <span className="px-1.5 py-0.5 bg-cyan-500 text-white rounded font-mono text-[10px]">C</span>
+                            <span className="px-1.5 py-0.5 bg-pink-500 text-white rounded font-mono text-[10px]">M</span>
+                            <span className="px-1.5 py-0.5 bg-yellow-400 text-black rounded font-mono text-[10px]">Y</span>
+                            <span className="px-1.5 py-0.5 bg-slate-900 text-white rounded font-mono text-[10px]">K</span>
+                            <span className="text-slate-700 ml-1">CMYK</span>
+                          </div>
+                          <span className="text-slate-500 text-[11px]">
+                            Pantone: <strong className="text-slate-800">відсутні</strong>
+                          </span>
+                          <span className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded">
+                            Без брендування
+                          </span>
+                        </div>
+
+                        {/* Roll Unrolling Orientation Scheme matching PDF */}
+                        <div className="border border-slate-200 rounded p-3 flex flex-col gap-2 bg-slate-50/40">
+                          <span className="text-xs font-bold text-slate-700">Орієнтація намотки на рулоні:</span>
+                          <div className="flex items-center gap-4">
+                            <svg width="74" height="74" viewBox="0 0 68 68" fill="none">
+                              <ellipse cx="34" cy="18" rx="18" ry="6" fill="#E2E8F0" stroke="#64748B" strokeWidth="1.5"/>
+                              <path d="M16 18V44C16 47.3 24.1 50 34 50C43.9 50 52 47.3 52 44V18" fill="#F8FAFC" stroke="#64748B" strokeWidth="1.5"/>
+                              <ellipse cx="34" cy="44" rx="18" ry="6" fill="#FFFFFF" stroke="#64748B" strokeWidth="1.2"/>
+                              <path d="M18 38L4 58H34L48 38" fill="#FFFFFF" stroke="#007AFF" strokeWidth="1.5"/>
+                              <rect x="10" y="42" width="22" height="5" rx="1" fill="#007AFF" fillOpacity="0.8"/>
+                              <line x1="12" y1="51" x2="30" y2="51" stroke="#94A3B8" strokeWidth="1.5"/>
+                            </svg>
+                            <div className="flex flex-col text-xs leading-snug">
+                              <span className="font-extrabold text-blue-700">{orientTitles[rollOrientation] || `Напрямок №${rollOrientation}`}</span>
+                              <span className="text-slate-600">Втулка: <strong>Ø {rollCore} мм</strong></span>
+                              <span className="text-slate-600">Ширина виходу: <strong>{dimAlong} мм</strong></span>
+                              <span className="text-slate-500 text-[11px]">Кількість рядів у рулоні: <strong>1 шт</strong></span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Right: Detailed Specification Table matching TZ exactly */}
+                      <div className="md:col-span-6 flex flex-col gap-3">
+                        <table className="w-full text-xs border border-slate-300 border-collapse">
+                          <tbody>
+                            <tr className="border-b border-slate-200">
+                              <td className="p-2 font-bold bg-slate-50 border-r border-slate-200 w-1/2">Тираж, шт:</td>
+                              <td className="p-2 font-extrabold font-mono text-blue-700">{rollQuantity} шт</td>
+                            </tr>
+                            <tr className="border-b border-slate-200">
+                              <td className="p-2 font-bold bg-slate-50 border-r border-slate-200">Розмір етикетки (ВхШ):</td>
+                              <td className="p-2 font-mono font-bold">{dimAcross} × {dimAlong} мм</td>
+                            </tr>
+                            <tr className="border-b border-slate-200">
+                              <td className="p-2 font-bold bg-slate-50 border-r border-slate-200">Ширина матеріалу:</td>
+                              <td className="p-2 font-mono font-bold">{webWidth} мм</td>
+                            </tr>
+                            <tr className="border-b border-slate-200">
+                              <td className="p-2 font-bold bg-slate-50 border-r border-slate-200">Струмків на полотні:</td>
+                              <td className="p-2 font-bold text-emerald-700">{lanes} струмки ({labelsPerMeter} шт/пог.м)</td>
+                            </tr>
+                            <tr className="border-b border-slate-200">
+                              <td className="p-2 font-bold bg-slate-50 border-r border-slate-200">Метраж друку:</td>
+                              <td className="p-2 font-mono">{linearMeters} м.п. ({sqMeters} м²)</td>
+                            </tr>
+                            <tr className="border-b border-slate-200">
+                              <td className="p-2 font-bold bg-slate-50 border-r border-slate-200">Матеріал:</td>
+                              <td className="p-2 font-semibold text-slate-800">{matLabels[rollMaterial] || 'папір Raflatac'}</td>
+                            </tr>
+                            <tr className="border-b border-slate-200">
+                              <td className="p-2 font-bold bg-slate-50 border-r border-slate-200">Клей:</td>
+                              <td className="p-2">
+                                <span className="mr-3 font-semibold">
+                                  [{rollGlueType === 'acrylic' ? ' ✓ ' : '   '}] Акрил
+                                </span>
+                                <span className="font-semibold text-blue-700">
+                                  [{rollGlueType === 'rubber' ? ' ✓ ' : '   '}] Каучук
+                                </span>
+                              </td>
+                            </tr>
+                            <tr className="border-b border-slate-200">
+                              <td className="p-2 font-bold bg-slate-50 border-r border-slate-200">Поклейщик:</td>
+                              <td className="p-2">
+                                <span className="mr-3 font-semibold">
+                                  [{rollApplication === 'auto' ? ' ✓ ' : '   '}] Автм.
+                                </span>
+                                <span className="font-semibold text-blue-700">
+                                  [{rollApplication === 'manual' ? ' ✓ ' : '   '}] Ручний
+                                </span>
+                              </td>
+                            </tr>
+                            <tr className="border-b border-slate-200">
+                              <td className="p-2 font-bold bg-slate-50 border-r border-slate-200">Відстань між етикетками:</td>
+                              <td className="p-2 font-mono">{gap} мм (стандарт)</td>
+                            </tr>
+                            <tr className="border-b border-slate-200">
+                              <td className="p-2 font-bold bg-slate-50 border-r border-slate-200">К-сть етикеток в рулоні:</td>
+                              <td className="p-2 font-mono font-bold text-indigo-700">{rollLabelsPerRoll} шт (Разом {readyRolls} рул.)</td>
+                            </tr>
+                            <tr className="border-b border-slate-200">
+                              <td className="p-2 font-bold bg-slate-50 border-r border-slate-200">Кількість рядів у рулоні:</td>
+                              <td className="p-2 font-mono">1 шт</td>
+                            </tr>
+                            <tr className="border-b border-slate-200">
+                              <td className="p-2 font-bold bg-slate-50 border-r border-slate-200">Втулка:</td>
+                              <td className="p-2 font-mono">{rollCore} мм</td>
+                            </tr>
+                            <tr className="border-b border-slate-200">
+                              <td className="p-2 font-bold bg-slate-50 border-r border-slate-200">Менеджер:</td>
+                              <td className="p-2 text-slate-700">{currentUser?.name || 'Менеджер'}</td>
+                            </tr>
+                            <tr>
+                              <td className="p-2 font-bold bg-slate-50 border-r border-slate-200">Затвердив:</td>
+                              <td className="p-2 font-bold text-slate-900">{effectiveClient}</td>
+                            </tr>
+                          </tbody>
+                        </table>
+
+                        {/* Yellow Disclaimer matching PDF footer */}
+                        <div className="p-2.5 rounded bg-amber-50 border border-amber-300 text-[10px] text-amber-900 leading-tight">
+                          <strong>Будь ласка, будьте уважні!</strong> Після затвердження макета Замовник несе відповідальність за правильність всієї вказаної інформації, а саме: дані по матеріалу, розміри та конфігурація етикетки, намотка, текстова інформація, штрих-код, наявність та розташування знаків та елементів дизайну.
+                        </div>
+
+                        {/* Signatures Row */}
+                        <div className="grid grid-cols-3 gap-2 pt-2 text-[10px] font-semibold text-slate-600">
+                          <div>Менеджер: ____________</div>
+                          <div>Дизайнер: ____________</div>
+                          <div>Замовник: ____________</div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
           </div>
         </div>
