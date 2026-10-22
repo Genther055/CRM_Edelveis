@@ -14167,8 +14167,8 @@ export const Calculator: React.FC = () => {
                 const sqMeters = Math.round((linearMetersWithWaste * 0.33) * 100) / 100;
                 const readyRolls = Math.max(1, Math.ceil(rollQuantity / (rollLabelsPerRoll || 1000)));
 
-                // Number of visual repeats on diagram
-                const visualColumns = 14;
+                // Number of visual repeats on diagram (strictly synchronized with real labels per meter)
+                const visualColumns = Math.min(24, labelsInRowPerMeter);
 
                 return (
                   <div className="ios-card bg-white" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '18px', border: '1px solid #bfdbfe', boxShadow: '0 4px 16px rgba(0, 122, 255, 0.06)' }}>
@@ -14245,11 +14245,11 @@ export const Calculator: React.FC = () => {
                                     }}
                                     title={`Етикетка ${colIdx + 1}, струмок ${laneIdx + 1} (${dimAcross}×${dimAlong} мм)`}
                                   >
-                                    <div className="absolute inset-0 bg-gradient-to-b from-emerald-800 to-emerald-950 opacity-90"></div>
-                                    <div className="relative z-10 flex flex-col items-center justify-center p-0.5 text-center leading-none">
-                                      <span className="text-[7px] font-black text-amber-300 tracking-wider">BIOBLYSK</span>
-                                      <span className="text-[6px] font-bold text-white/90">0.5L</span>
-                                      <span className="text-[5px] text-emerald-300/80 mt-0.5">{dimAcross}×{dimAlong}</span>
+                                    <div className="absolute inset-0 bg-gradient-to-b from-emerald-800 to-emerald-950 opacity-95"></div>
+                                    <div className="relative z-10 flex flex-col items-center justify-center p-0.5 text-center leading-tight">
+                                      <span className="text-[8px] font-black text-amber-300 font-mono">#{laneIdx * labelsInRowPerMeter + colIdx + 1}</span>
+                                      <span className="text-[6.5px] font-extrabold text-white tracking-tight">BIOBLYSK</span>
+                                      <span className="text-[5.5px] text-emerald-300 font-mono">{dimAcross}×{dimAlong}</span>
                                     </div>
                                   </div>
                                 ))}
