@@ -40,7 +40,9 @@ import {
   Check,
   Search,
   RotateCcw,
-  ArrowLeftRight
+  ArrowLeftRight,
+  Upload,
+  Trash2
 } from 'lucide-react';
 import html2pdf from 'html2pdf.js';
 
@@ -1102,6 +1104,8 @@ export const Calculator: React.FC = () => {
   const [rollApplication, setRollApplication] = useState<'manual' | 'auto'>('manual');
   const [rollLabelsPerRoll, setRollLabelsPerRoll] = useState<number>(1250);
   const [showRollTechTaskModal, setShowRollTechTaskModal] = useState<boolean>(false);
+  const [rollUploadedFile, setRollUploadedFile] = useState<{ name: string; url: string; size?: string } | null>(null);
+  const [rollDieCutShape, setRollDieCutShape] = useState<'oval' | 'rect' | 'custom'>('oval');
 
   // Mega Menu Interactive Dropdown States
   const [isMegaMenuOpen, setIsMegaMenuOpen] = useState<boolean>(false);
@@ -2520,6 +2524,35 @@ export const Calculator: React.FC = () => {
     setTemplateName('');
     setShowTemplateModal(false);
     alert('Шаблон розрахунку збережено!');
+  };
+
+  const handleRollLabelUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/') && file.type !== 'application/pdf') {
+      alert('Будь ласка, оберіть графічний файл (PNG, JPG, SVG, WEBP) або PDF макет');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const dataUrl = event.target?.result as string;
+      const sizeStr = file.size > 1024 * 1024
+        ? `${(file.size / (1024 * 1024)).toFixed(1)} МБ`
+        : `${Math.round(file.size / 1024)} КБ`;
+      
+      setRollUploadedFile({
+        name: file.name,
+        url: dataUrl,
+        size: sizeStr
+      });
+
+      if (!name) {
+        setName(file.name.replace(/\.[^/.]+$/, ''));
+      }
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleLoadTemplate = (tpl: CalcTemplate) => {
@@ -13813,6 +13846,84 @@ export const Calculator: React.FC = () => {
             <div className="flex flex-col gap-6 md:gap-7">
               {/* Core Parameters Form Card */}
               <div className="ios-card bg-white" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '22px' }}>
+                {/* 0. File Upload Section for Real Label Layout */}
+                <div className="p-4 rounded-2xl bg-gradient-to-r from-blue-50/80 via-slate-50 to-indigo-50/50 border border-blue-100 flex flex-col md:flex-row items-center justify-between gap-4 shadow-2xs">
+                  <div className="flex items-center gap-3 w-full md:w-auto">
+                    {rollUploadedFile ? (
+                      <div className="relative w-14 h-14 rounded-xl overflow-hidden border-2 border-blue-500 shadow-sm flex-shrink-0 bg-white flex items-center justify-center">
+                        <img 
+                          src={rollUploadedFile.url} 
+                          alt="Макет етикетки" 
+                          className="w-full h-full object-contain p-0.5" 
+                        />
+                      </div>
+                    ) : (
+                      <div className="w-12 h-12 rounded-xl bg-blue-100/70 border border-blue-200 flex items-center justify-center text-blue-600 flex-shrink-0 shadow-2xs">
+                        <Image size={24} />
+                      </div>
+                    )}
+                    <div className="flex flex-col">
+                      <div className="flex items-center gap-2">
+                        <h4 className="text-sm font-black text-slate-900 m-0">
+                          {rollUploadedFile ? rollUploadedFile.name : 'Завантажте готовий макет етикетки'}
+                        </h4>
+                        {rollUploadedFile && (
+                          <span className="text-[10px] font-mono bg-blue-600 text-white px-2 py-0.5 rounded-full font-bold shadow-2xs">
+                            {rollUploadedFile.size}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-xs text-slate-500 m-0 mt-0.5">
+                        {rollUploadedFile 
+                          ? 'Макет готовий! Його автоматично розкладено по струмках на полотні 330 мм та вставлено в ТЗ' 
+                          : 'Підтримуються PNG, JPG, SVG, WEBP або PDF для візуальної розкладки по струмках'}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2.5 w-full md:w-auto justify-end">
+                    {/* Shape Selector */}
+                    <div className="flex items-center bg-white border border-slate-200 rounded-xl p-1 text-xs font-semibold shadow-2xs">
+                      <button
+                        type="button"
+                        onClick={() => setRollDieCutShape('oval')}
+                        className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${rollDieCutShape === 'oval' ? 'bg-blue-600 text-white shadow-2xs' : 'text-slate-600 hover:bg-slate-100'}`}
+                      >
+                        Овал
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setRollDieCutShape('rect')}
+                        className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${rollDieCutShape === 'rect' ? 'bg-blue-600 text-white shadow-2xs' : 'text-slate-600 hover:bg-slate-100'}`}
+                      >
+                        Прямокутник
+                      </button>
+                    </div>
+
+                    <label className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-bold text-xs shadow-xs transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap">
+                      <Upload size={14} />
+                      <span>{rollUploadedFile ? 'Замінити файл' : 'Обрати файл етикетки'}</span>
+                      <input 
+                        type="file" 
+                        accept="image/png,image/jpeg,image/webp,image/svg+xml,application/pdf" 
+                        onChange={handleRollLabelUpload} 
+                        className="hidden" 
+                      />
+                    </label>
+
+                    {rollUploadedFile && (
+                      <button
+                        type="button"
+                        onClick={() => setRollUploadedFile(null)}
+                        className="p-2 rounded-xl border border-slate-200 bg-white hover:bg-red-50 hover:border-red-200 hover:text-red-600 text-slate-400 transition-colors shadow-2xs"
+                        title="Видалити макет"
+                      >
+                        <Trash2 size={15} />
+                      </button>
+                    )}
+                  </div>
+                </div>
+
                 {/* 1. Size Inputs Row */}
                 <div>
                   <h3 style={{ fontSize: '15px', fontWeight: '800', color: 'var(--text-dark)', marginBottom: '12px' }}>
@@ -14236,21 +14347,36 @@ export const Calculator: React.FC = () => {
                                     style={{
                                       width: '62px',
                                       height: lanes === 1 ? '58px' : '48px',
-                                      borderRadius: '50% / 35%',
+                                      borderRadius: rollDieCutShape === 'oval' ? '50% / 35%' : '8px',
                                       backgroundColor: '#064e3b',
                                       border: '1.5px dashed #f59e0b',
                                       boxShadow: '0 2px 4px rgba(0,0,0,0.5)',
                                       position: 'relative',
                                       overflow: 'hidden'
                                     }}
-                                    title={`Етикетка ${colIdx + 1}, струмок ${laneIdx + 1} (${dimAcross}×${dimAlong} мм)`}
+                                    title={`Етикетка ${laneIdx * labelsInRowPerMeter + colIdx + 1}, струмок ${laneIdx + 1} (${dimAcross}×${dimAlong} мм)`}
                                   >
-                                    <div className="absolute inset-0 bg-gradient-to-b from-emerald-800 to-emerald-950 opacity-95"></div>
-                                    <div className="relative z-10 flex flex-col items-center justify-center p-0.5 text-center leading-tight">
-                                      <span className="text-[8px] font-black text-amber-300 font-mono">#{laneIdx * labelsInRowPerMeter + colIdx + 1}</span>
-                                      <span className="text-[6.5px] font-extrabold text-white tracking-tight">BIOBLYSK</span>
-                                      <span className="text-[5.5px] text-emerald-300 font-mono">{dimAcross}×{dimAlong}</span>
-                                    </div>
+                                    {rollUploadedFile ? (
+                                      <div className="w-full h-full relative flex items-center justify-center bg-white">
+                                        <img 
+                                          src={rollUploadedFile.url} 
+                                          alt="Етикетка" 
+                                          className="w-full h-full object-cover"
+                                        />
+                                        <div className="absolute top-0.5 left-1 bg-black/60 text-white font-mono text-[7px] px-1 rounded font-bold">
+                                          #{laneIdx * labelsInRowPerMeter + colIdx + 1}
+                                        </div>
+                                      </div>
+                                    ) : (
+                                      <>
+                                        <div className="absolute inset-0 bg-gradient-to-b from-emerald-800 to-emerald-950 opacity-95"></div>
+                                        <div className="relative z-10 flex flex-col items-center justify-center p-0.5 text-center leading-tight">
+                                          <span className="text-[8px] font-black text-amber-300 font-mono">#{laneIdx * labelsInRowPerMeter + colIdx + 1}</span>
+                                          <span className="text-[6.5px] font-extrabold text-white tracking-tight">BIOBLYSK</span>
+                                          <span className="text-[5.5px] text-emerald-300 font-mono">{dimAcross}×{dimAlong}</span>
+                                        </div>
+                                      </>
+                                    )}
                                   </div>
                                 ))}
                               </div>
@@ -16942,18 +17068,40 @@ export const Calculator: React.FC = () => {
                           <span className="absolute top-2 right-2 text-[10px] font-bold text-slate-400 bg-white px-2 py-0.5 rounded border border-slate-200">
                             Масштаб 1:1
                           </span>
-                          <div 
-                            className="border-2 border-dashed border-amber-500 bg-emerald-900 text-white rounded-full flex flex-col items-center justify-center shadow-md p-4 text-center"
-                            style={{
-                              width: '180px',
-                              height: '115px'
-                            }}
-                          >
-                            <span className="text-[11px] font-black tracking-widest text-amber-300">BIOBLYSK</span>
-                            <span className="text-[9px] font-semibold text-white/90">DISHWASHING LIQUID</span>
-                            <span className="text-[8px] text-emerald-200 mt-1">Pine Harmony 0.5L</span>
-                            <span className="text-[9px] font-mono font-bold text-amber-400 mt-0.5">{dimAcross}×{dimAlong} мм</span>
-                          </div>
+                          {rollUploadedFile ? (
+                            <div className="flex flex-col items-center justify-center gap-2">
+                              <div 
+                                className="border-2 border-dashed border-amber-500 shadow-md overflow-hidden bg-white flex items-center justify-center p-1"
+                                style={{
+                                  width: '200px',
+                                  height: '130px',
+                                  borderRadius: rollDieCutShape === 'oval' ? '50% / 35%' : '8px'
+                                }}
+                              >
+                                <img 
+                                  src={rollUploadedFile.url} 
+                                  alt="Макет етикетки" 
+                                  className="w-full h-full object-contain" 
+                                />
+                              </div>
+                              <span className="text-xs font-mono font-bold text-slate-800">
+                                {dimAcross} × {dimAlong} мм (контур висічки)
+                              </span>
+                            </div>
+                          ) : (
+                            <div 
+                              className="border-2 border-dashed border-amber-500 bg-emerald-900 text-white rounded-full flex flex-col items-center justify-center shadow-md p-4 text-center"
+                              style={{
+                                width: '180px',
+                                height: '115px'
+                              }}
+                            >
+                              <span className="text-[11px] font-black tracking-widest text-amber-300">BIOBLYSK</span>
+                              <span className="text-[9px] font-semibold text-white/90">DISHWASHING LIQUID</span>
+                              <span className="text-[8px] text-emerald-200 mt-1">Pine Harmony 0.5L</span>
+                              <span className="text-[9px] font-mono font-bold text-amber-400 mt-0.5">{dimAcross}×{dimAlong} мм</span>
+                            </div>
+                          )}
                         </div>
 
                         {/* Colors Palette Strip */}
