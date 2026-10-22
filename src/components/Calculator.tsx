@@ -1107,6 +1107,10 @@ export const Calculator: React.FC = () => {
   const [showRollPreviewModal, setShowRollPreviewModal] = useState<boolean>(false);
   const [rollUploadedFile, setRollUploadedFile] = useState<{ name: string; url: string; thumbUrl?: string; size?: string; widthPx?: number; heightPx?: number } | null>(null);
   const [rollDieCutShape, setRollDieCutShape] = useState<'oval' | 'rect' | 'custom'>('oval');
+  const [tzLabelSide, setTzLabelSide] = useState<'front' | 'back'>('front');
+  const [tzCustomFileName, setTzCustomFileName] = useState<string>('');
+  const [tzDesignerName, setTzDesignerName] = useState<string>('');
+  const [tzPantoneColors, setTzPantoneColors] = useState<string>('відсутні');
 
   // Mega Menu Interactive Dropdown States
   const [isMegaMenuOpen, setIsMegaMenuOpen] = useState<boolean>(false);
@@ -2661,6 +2665,28 @@ export const Calculator: React.FC = () => {
       setTemplates(defaultCalcTemplates);
       localStorage.setItem('crm_calc_templates', JSON.stringify(defaultCalcTemplates));
     }
+  };
+
+  const generateRollTzPDF = () => {
+    const element = document.getElementById('roll-tz-printable-sheet');
+    if (!element) return;
+
+    const opt = {
+      margin:       [4, 4, 4, 4] as [number, number, number, number],
+      filename:     `Бланк_погодження_${tzLabelSide}_${rollWidth}x${rollHeight}mm.pdf`,
+      image:        { type: 'jpeg' as const, quality: 0.98 },
+      html2canvas:  { 
+        scale: 2, 
+        useCORS: true, 
+        scrollX: 0, 
+        scrollY: 0, 
+        backgroundColor: '#FFFFFF' 
+      },
+      jsPDF:        { unit: 'mm', format: 'a4', orientation: 'landscape' as const },
+      pagebreak:    { mode: ['avoid-all', 'css'] }
+    };
+
+    html2pdf().from(element).set(opt).save();
   };
 
   const generatePDF = () => {
@@ -17209,7 +17235,7 @@ export const Calculator: React.FC = () => {
         </div>
       )}
 
-      {/* Technical Task & Customer Approval Sheet Modal (Бланк погодження ТЗ за зразком виробництва) */}
+      {/* Technical Task & Customer Approval Sheet Modal (Exact 100% Replica of Official Production Sheet) */}
       {showRollTechTaskModal && (
         <div 
           style={{
@@ -17224,41 +17250,114 @@ export const Calculator: React.FC = () => {
             padding: '16px'
           }}
         >
+          {/* Print CSS to isolate the sheet on standard A4 Landscape */}
+          <style dangerouslySetInnerHTML={{ __html: `
+            @media print {
+              body * {
+                visibility: hidden !important;
+              }
+              #roll-tz-printable-sheet, #roll-tz-printable-sheet * {
+                visibility: visible !important;
+              }
+              #roll-tz-printable-sheet {
+                position: fixed !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                border: 2px solid #231f20 !important;
+                box-shadow: none !important;
+                background-color: #ffffff !important;
+              }
+              .print\\:hidden {
+                display: none !important;
+              }
+              @page {
+                size: A4 landscape;
+                margin: 5mm;
+              }
+            }
+          `}} />
+
           <div 
             className="ios-card"
             style={{
               backgroundColor: '#ffffff',
               border: '1px solid var(--border-light)',
               borderRadius: '16px',
-              maxWidth: '920px',
+              maxWidth: '1060px',
               width: '100%',
-              maxHeight: '92vh',
+              maxHeight: '94vh',
               display: 'flex',
               flexDirection: 'column',
-              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.35)',
               overflow: 'hidden'
             }}
           >
             {/* Modal Actions Header (Non-printable) */}
-            <div className="px-6 py-3.5 border-b border-slate-200 flex items-center justify-between bg-slate-50 print:hidden">
+            <div className="px-6 py-3.5 border-b border-slate-200 flex items-center justify-between bg-slate-50 print:hidden flex-wrap gap-2">
               <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center font-bold">
+                <div className="w-8 h-8 rounded-lg bg-[#00adef] text-white flex items-center justify-center font-bold shadow-xs">
                   <FileText size={18} />
                 </div>
                 <div>
-                  <h3 className="text-sm font-extrabold text-slate-900 m-0">Бланк погодження / Технічне завдання</h3>
-                  <span className="text-[11px] text-slate-500">Офіційний виробничий бланк цифрового рулонного друку</span>
+                  <h3 className="text-sm font-extrabold text-slate-900 m-0">Бланк погодження (Технічне завдання)</h3>
+                  <span className="text-[11px] text-slate-500">Точна копія офіційного бланку погодження за зразком виробництва</span>
                 </div>
               </div>
-              <div className="flex items-center gap-2">
+
+              {/* Automation Side Switcher & Actions */}
+              <div className="flex items-center gap-2 flex-wrap">
+                {/* Front / Back Toggle */}
+                <div className="flex items-center bg-white border border-slate-200 rounded-lg p-0.5 text-xs font-bold shadow-2xs">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTzLabelSide('front');
+                      setTzCustomFileName('');
+                    }}
+                    className={`px-3 py-1 rounded-md text-xs font-bold transition-all ${
+                      tzLabelSide === 'front' ? 'bg-[#00adef] text-white shadow-2xs' : 'text-slate-600 hover:bg-slate-100'
+                    }`}
+                  >
+                    Лицьова (Front)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTzLabelSide('back');
+                      setTzCustomFileName('');
+                    }}
+                    className={`px-3 py-1 rounded-md text-xs font-bold transition-all ${
+                      tzLabelSide === 'back' ? 'bg-[#00adef] text-white shadow-2xs' : 'text-slate-600 hover:bg-slate-100'
+                    }`}
+                  >
+                    Контретикетка (Back)
+                  </button>
+                </div>
+
                 <button
                   type="button"
                   onClick={() => window.print()}
-                  className="px-3.5 py-1.5 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-sm transition-all"
+                  className="px-3 py-1.5 rounded-xl border border-slate-300 bg-white hover:bg-slate-100 text-slate-800 font-bold text-xs flex items-center gap-1.5 shadow-2xs transition-all"
+                  title="Друкувати на принтері (A4 Альбомна)"
                 >
-                  <Printer size={14} />
-                  <span>Друкувати ТЗ</span>
+                  <Printer size={14} className="text-[#00adef]" />
+                  <span>Друк ТЗ</span>
                 </button>
+
+                <button
+                  type="button"
+                  onClick={generateRollTzPDF}
+                  className="px-3.5 py-1.5 rounded-xl bg-[#00adef] hover:bg-[#0284c7] text-white font-bold text-xs flex items-center gap-1.5 shadow-sm transition-all"
+                  title="Завантажити готовий векторний PDF"
+                >
+                  <Download size={14} />
+                  <span>Зберегти PDF</span>
+                </button>
+
                 <button
                   type="button"
                   onClick={() => setShowRollTechTaskModal(false)}
@@ -17269,12 +17368,11 @@ export const Calculator: React.FC = () => {
               </div>
             </div>
 
-            {/* Printable Production Approval Sheet (Exact Replica of D:\Telegram Desktop\бланк погодження(Pine Harmony_0.5l).pdf) */}
-            <div className="p-6 md:p-8 overflow-y-auto flex-1 font-sans text-slate-900 bg-white" id="roll-tz-printable-sheet">
+            {/* Printable Production Approval Sheet (Exact 100% Replica) */}
+            <div className="p-4 sm:p-6 overflow-y-auto flex-1 font-sans text-slate-900 bg-slate-100/60 flex items-center justify-center">
               {(() => {
                 const w = parseFloat(rollWidth) || 60;
                 const h = parseFloat(rollHeight) || 107;
-                const gap = parseFloat(rollGap) || 4;
 
                 const dimAcross = (rollOrientation === '3' || rollOrientation === '4')
                   ? Math.min(w, h)
@@ -17284,22 +17382,13 @@ export const Calculator: React.FC = () => {
                   : Math.min(w, h);
 
                 const webWidth = 330;
-                const printableWidth = 320;
-                const lanes = Math.max(1, Math.floor((printableWidth + gap) / (dimAcross + gap)));
-                const pitchAlong = dimAlong + gap;
-                const labelsInRowPerMeter = Math.max(1, Math.floor(1000 / pitchAlong));
-                const labelsPerMeter = lanes * labelsInRowPerMeter;
-                const linearMeters = Math.max(1, Math.ceil((rollQuantity / lanes) * pitchAlong / 1000));
-                const linearMetersWithWaste = linearMeters + 5;
-                const sqMeters = Math.round((linearMetersWithWaste * 0.33) * 100) / 100;
-                const readyRolls = Math.max(1, Math.ceil(rollQuantity / (rollLabelsPerRoll || 1000)));
 
                 const matLabels: Record<string, string> = {
-                  '209': 'самоклеючий папір Raflatac',
+                  '209': 'самоклеючий папір',
                   '210': 'самоклеючий папір Крафт',
-                  '212': 'поліпропіленова плівка біла',
-                  '213': 'поліпропіленова плівка прозора',
-                  '214': 'поліпропіленова плівка срібло',
+                  '212': 'поліпропілен білий (PP)',
+                  '213': 'поліпропілен прозорий',
+                  '214': 'поліпропілен срібло',
                   '211': 'винний папір Antique White',
                   '215': 'винний папір Martel',
                 };
@@ -17315,209 +17404,483 @@ export const Calculator: React.FC = () => {
                   ? customClientName.trim()
                   : (activeClient?.name || 'Замовник');
 
-                const fileName = `Pine_Harmony_(${dimAcross}х${dimAlong}мм)_${effectiveClient.replace(/\s+/g, '_')}`;
+                const autoFileName = rollUploadedFile 
+                  ? `${rollUploadedFile.name.replace(/\.[^/.]+$/, '')}_(ВхШ ${dimAcross}х${dimAlong}мм)_${tzLabelSide}`
+                  : `Pine Harmony_0.5l_(ВхШ ${dimAcross}х${dimAlong}мм)_${tzLabelSide}`;
+                
+                const activeFileName = tzCustomFileName || autoFileName;
+                const todayFormatted = new Date().toLocaleDateString('uk-UA');
 
                 return (
-                  <div className="flex flex-col gap-4 border-2 border-slate-900 p-5 rounded-lg">
-                    {/* Top Cyan Title Bar matching TZ */}
-                    <div className="bg-[#0284c7] text-white p-3 rounded flex items-center justify-between font-black">
-                      <span className="text-sm tracking-wide">
+                  <div 
+                    id="roll-tz-printable-sheet" 
+                    className="bg-white shadow-md mx-auto"
+                    style={{
+                      width: '100%',
+                      maxWidth: '960px',
+                      border: '2px solid #231f20',
+                      fontFamily: "Bahnschrift, 'Segoe UI', Arial, sans-serif",
+                      display: 'flex',
+                      flexDirection: 'column'
+                    }}
+                  >
+                    {/* Top Cyan Title Bar matching PDF exact color [0.0, 0.681, 0.938] */}
+                    <div 
+                      style={{
+                        backgroundColor: '#00adef',
+                        color: '#ffffff',
+                        padding: '10px 16px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        borderBottom: '1px solid #231f20'
+                      }}
+                    >
+                      <h2 
+                        style={{
+                          fontSize: '14.5px',
+                          fontWeight: '900',
+                          letterSpacing: '0.02em',
+                          textTransform: 'uppercase',
+                          margin: 0
+                        }}
+                      >
                         ТЕХНІЧНЕ ЗАВДАННЯ НА ВИГОТОВЛЕННЯ ЕТИКЕТКИ ЦИФРОВИЙ РУЛОННИЙ ДРУК
-                      </span>
-                      <span className="text-xs font-mono bg-white/20 px-2.5 py-0.5 rounded">
-                        ДАТА: {new Date().toLocaleDateString('uk-UA')}
-                      </span>
+                      </h2>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{ fontSize: '13px', fontWeight: '800' }}>ДАТА:</span>
+                        <div 
+                          style={{
+                            backgroundColor: '#ffffff',
+                            color: '#231f20',
+                            border: '1px solid #231f20',
+                            padding: '1px 10px',
+                            fontSize: '13px',
+                            fontWeight: '800',
+                            fontFamily: 'monospace'
+                          }}
+                        >
+                          {todayFormatted}
+                        </div>
+                      </div>
                     </div>
 
-                    {/* Subhead Row */}
-                    <div className="flex items-center justify-between text-xs font-bold border-b-2 border-slate-200 pb-2">
-                      <div className="flex items-center gap-2">
-                        <span className="text-slate-500">Назва файлу:</span>
-                        <strong className="text-slate-900 font-mono">{fileName}</strong>
+                    {/* Subhead Light Cyan Bar matching PDF color [0.555, 0.846, 0.972] */}
+                    <div 
+                      style={{
+                        backgroundColor: '#8dd8f8',
+                        padding: '6px 16px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        borderBottom: '1px solid #231f20'
+                      }}
+                    >
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flex: 1, marginRight: '16px' }}>
+                        <span style={{ fontSize: '13px', fontWeight: '800', color: '#231f20', whiteSpace: 'nowrap' }}>
+                          Назва файлу
+                        </span>
+                        <input
+                          type="text"
+                          value={activeFileName}
+                          onChange={(e) => setTzCustomFileName(e.target.value)}
+                          style={{
+                            backgroundColor: '#ffffff',
+                            border: '1px solid #231f20',
+                            padding: '3px 8px',
+                            fontSize: '11px',
+                            fontWeight: '700',
+                            fontStyle: 'italic',
+                            color: '#231f20',
+                            fontFamily: 'Calibri, sans-serif',
+                            width: '100%',
+                            maxWidth: '420px',
+                            outline: 'none'
+                          }}
+                        />
                       </div>
-                      <div className="flex items-center gap-2">
-                        <span className="text-slate-500">Контур різу:</span>
-                        <span className="text-amber-600 font-mono font-bold border-b-2 border-dashed border-amber-500 px-1">
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', whiteSpace: 'nowrap' }}>
+                        <span style={{ fontSize: '13px', fontWeight: '800', color: '#231f20' }}>
+                          Контур різу
+                        </span>
+                        <span 
+                          style={{
+                            color: '#b45309',
+                            fontWeight: '900',
+                            borderBottom: '2px dashed #f59e0b',
+                            padding: '0 6px',
+                            fontSize: '11px'
+                          }}
+                        >
                           ---- жовтий контур
                         </span>
                       </div>
                     </div>
 
-                    {/* Main Grid: Left Mockup/Color/Orientation & Right Table */}
-                    <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
-                      {/* Left: Sticker Graphic + Colors + Roll Winding Scheme */}
-                      <div className="md:col-span-6 flex flex-col gap-4">
-                        {/* Mockup Box with Knife Dimensions */}
-                        <div className="border border-slate-300 rounded-lg p-6 bg-slate-50/50 flex flex-col items-center justify-center relative min-h-[220px]">
-                          <span className="absolute top-2 right-2 text-[10px] font-bold text-slate-400 bg-white px-2 py-0.5 rounded border border-slate-200">
-                            Масштаб 1:1
+                    {/* Main Split: Left Mockup, Colors, Winding Schemes | Right Technical Specs Table */}
+                    <div 
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: 'minmax(0, 1fr) 330px',
+                        backgroundColor: '#ffffff'
+                      }}
+                    >
+                      {/* LEFT COLUMN */}
+                      <div style={{ borderRight: '1px solid #231f20', display: 'flex', flexDirection: 'column' }}>
+                        {/* Mockup Box with Die-Cut Line and Dimensions */}
+                        <div 
+                          style={{
+                            padding: '24px',
+                            minHeight: '270px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            position: 'relative',
+                            backgroundColor: '#ffffff',
+                            borderBottom: '1px solid #231f20'
+                          }}
+                        >
+                          {/* Large dimension text matching PDF: '60х107мм' */}
+                          <span 
+                            style={{
+                              position: 'absolute',
+                              top: '12px',
+                              right: '20px',
+                              fontSize: '24px',
+                              fontWeight: 'bold',
+                              fontStyle: 'italic',
+                              fontFamily: 'Calibri, sans-serif',
+                              color: '#231f20'
+                            }}
+                          >
+                            {dimAcross}х{dimAlong}мм
                           </span>
-                          {rollUploadedFile ? (
-                            <div className="flex flex-col items-center justify-center gap-2">
-                              <div 
-                                className="border-2 border-dashed border-amber-500 shadow-md overflow-hidden bg-white flex items-center justify-center p-1"
-                                style={{
-                                  width: '200px',
-                                  height: '130px',
-                                  borderRadius: rollDieCutShape === 'oval' ? '50% / 35%' : '8px'
-                                }}
-                              >
-                                <img 
-                                  src={rollUploadedFile.url} 
-                                  alt="Макет етикетки" 
-                                  className="w-full h-full object-contain" 
-                                />
+
+                          {/* Die-cut Knife Container */}
+                          <div
+                            style={{
+                              width: '240px',
+                              height: '160px',
+                              border: '2.5px dashed #f59e0b',
+                              borderRadius: rollDieCutShape === 'oval' ? '50% / 35%' : '6px',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              backgroundColor: '#ffffff',
+                              boxShadow: '0 4px 14px rgba(0,0,0,0.06)',
+                              overflow: 'hidden',
+                              padding: '2px'
+                            }}
+                          >
+                            {rollUploadedFile ? (
+                              <img 
+                                src={rollUploadedFile.url} 
+                                alt="Макет етикетки" 
+                                style={{ width: '100%', height: '100%', objectFit: 'contain' }}
+                              />
+                            ) : (
+                              <div style={{ textAlign: 'center', padding: '10px' }}>
+                                <span style={{ fontSize: '11px', fontWeight: 'bold', color: '#64748b', display: 'block' }}>
+                                  Контур ножа висічки
+                                </span>
+                                <span style={{ fontSize: '14px', fontWeight: '900', color: '#b45309' }}>
+                                  {dimAcross} × {dimAlong} мм
+                                </span>
                               </div>
-                              <span className="text-xs font-mono font-bold text-slate-800">
-                                {dimAcross} × {dimAlong} мм (контур висічки)
-                              </span>
-                            </div>
-                          ) : (
-                            <div className="flex flex-col items-center justify-center gap-2">
-                              <div 
-                                className="border-2 border-dashed border-amber-500 bg-white shadow-sm flex flex-col items-center justify-center p-4 text-center"
-                                style={{
-                                  width: '180px',
-                                  height: '115px',
-                                  borderRadius: rollDieCutShape === 'oval' ? '50% / 35%' : '8px'
-                                }}
-                              >
-                                <span className="text-xs font-bold text-slate-400">Контур ножа висічки</span>
-                                <span className="text-xs font-mono font-bold text-amber-600 mt-1">{dimAcross} × {dimAlong} мм</span>
-                              </div>
-                              <span className="text-[10px] text-slate-400">
-                                (Завантажте макет вище для відображення в бланку)
-                              </span>
-                            </div>
-                          )}
+                            )}
+                          </div>
                         </div>
 
-                        {/* Colors Palette Strip */}
-                        <div className="border border-slate-200 rounded p-2.5 flex items-center justify-between text-xs font-bold">
-                          <div className="flex items-center gap-1.5">
-                            <span className="px-1.5 py-0.5 bg-cyan-500 text-white rounded font-mono text-[10px]">C</span>
-                            <span className="px-1.5 py-0.5 bg-pink-500 text-white rounded font-mono text-[10px]">M</span>
-                            <span className="px-1.5 py-0.5 bg-yellow-400 text-black rounded font-mono text-[10px]">Y</span>
-                            <span className="px-1.5 py-0.5 bg-slate-900 text-white rounded font-mono text-[10px]">K</span>
-                            <span className="text-slate-700 ml-1">CMYK</span>
+                        {/* Colors Palette Strip matching PDF */}
+                        <div 
+                          style={{
+                            backgroundColor: '#8dd8f8',
+                            padding: '6px 14px',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            borderBottom: '1px solid #231f20',
+                            fontSize: '12px',
+                            fontWeight: '700',
+                            color: '#231f20'
+                          }}
+                        >
+                          {/* CMYK Chips */}
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '3px' }}>
+                            <span style={{ backgroundColor: '#00adef', color: '#000', fontWeight: '900', padding: '2px 6px', fontSize: '12px', border: '1px solid #231f20' }}>C</span>
+                            <span style={{ backgroundColor: '#ec008c', color: '#fff', fontWeight: '900', padding: '2px 6px', fontSize: '12px', border: '1px solid #231f20' }}>M</span>
+                            <span style={{ backgroundColor: '#fff100', color: '#000', fontWeight: '900', padding: '2px 6px', fontSize: '12px', border: '1px solid #231f20' }}>Y</span>
+                            <span style={{ backgroundColor: '#231f20', color: '#fff', fontWeight: '900', padding: '2px 6px', fontSize: '12px', border: '1px solid #231f20' }}>K</span>
                           </div>
-                          <span className="text-slate-500 text-[11px]">
-                            Pantone: <strong className="text-slate-800">відсутні</strong>
-                          </span>
-                          <span className="text-[10px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded">
+
+                          {/* Pantone info */}
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                            <span>Додаткові кольори (Pantone):</span>
+                            <input
+                              type="text"
+                              value={tzPantoneColors}
+                              onChange={(e) => setTzPantoneColors(e.target.value)}
+                              style={{ border: 'none', borderBottom: '1px solid #231f20', background: 'transparent', fontSize: '11px', fontWeight: '800', width: '90px', outline: 'none' }}
+                            />
+                          </div>
+
+                          {/* Branding note */}
+                          <span style={{ fontSize: '11px', color: '#231f20' }}>
                             Без брендування
                           </span>
                         </div>
 
-                        {/* Roll Unrolling Orientation Scheme matching PDF */}
-                        <div className="border border-slate-200 rounded p-3 flex flex-col gap-2 bg-slate-50/40">
-                          <span className="text-xs font-bold text-slate-700">Орієнтація намотки на рулоні:</span>
-                          <div className="flex items-center gap-4">
-                            <svg width="74" height="74" viewBox="0 0 68 68" fill="none">
-                              <ellipse cx="34" cy="18" rx="18" ry="6" fill="#E2E8F0" stroke="#64748B" strokeWidth="1.5"/>
-                              <path d="M16 18V44C16 47.3 24.1 50 34 50C43.9 50 52 47.3 52 44V18" fill="#F8FAFC" stroke="#64748B" strokeWidth="1.5"/>
-                              <ellipse cx="34" cy="44" rx="18" ry="6" fill="#FFFFFF" stroke="#64748B" strokeWidth="1.2"/>
-                              <path d="M18 38L4 58H34L48 38" fill="#FFFFFF" stroke="#007AFF" strokeWidth="1.5"/>
-                              <rect x="10" y="42" width="22" height="5" rx="1" fill="#007AFF" fillOpacity="0.8"/>
-                              <line x1="12" y1="51" x2="30" y2="51" stroke="#94A3B8" strokeWidth="1.5"/>
-                            </svg>
-                            <div className="flex flex-col text-xs leading-snug">
-                              <span className="font-extrabold text-blue-700">{orientTitles[rollOrientation] || `Напрямок №${rollOrientation}`}</span>
-                              <span className="text-slate-600">Втулка: <strong>Ø {rollCore} мм</strong></span>
-                              <span className="text-slate-600">Ширина виходу: <strong>{dimAlong} мм</strong></span>
-                              <span className="text-slate-500 text-[11px]">Кількість рядів у рулоні: <strong>1 шт</strong></span>
-                            </div>
+                        {/* Roll Unrolling Orientation Schematics Strip (All 4 Schemes) */}
+                        <div style={{ padding: '10px 14px', backgroundColor: '#ffffff', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', fontSize: '11px', fontWeight: '800', color: '#231f20' }}>
+                            <span>Орієнтація намотки на рулоні (втулка Ø 76мм):</span>
+                            <span style={{ color: '#d2232a', fontWeight: '900', marginLeft: 'auto' }}>
+                              {orientTitles[rollOrientation] || `№${rollOrientation}`}
+                            </span>
+                          </div>
+
+                          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '8px' }}>
+                            {[1, 2, 3, 4].map(num => {
+                              const isSelected = rollOrientation === String(num);
+                              return (
+                                <div
+                                  key={num}
+                                  onClick={() => setRollOrientation(String(num))}
+                                  style={{
+                                    border: isSelected ? '2px solid #d2232a' : '1px solid #cbd5e1',
+                                    backgroundColor: isSelected ? 'rgba(210, 35, 42, 0.04)' : '#ffffff',
+                                    borderRadius: '6px',
+                                    padding: '4px',
+                                    cursor: 'pointer',
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    alignItems: 'center',
+                                    position: 'relative',
+                                    transition: 'all 0.15s ease'
+                                  }}
+                                  title={`Натисніть для вибору орієнтації №${num}`}
+                                >
+                                  {isSelected && (
+                                    <span 
+                                      style={{
+                                        position: 'absolute',
+                                        top: '2px',
+                                        right: '3px',
+                                        backgroundColor: '#d2232a',
+                                        color: '#ffffff',
+                                        fontSize: '8px',
+                                        fontWeight: '900',
+                                        padding: '1px 3px',
+                                        borderRadius: '3px'
+                                      }}
+                                    >
+                                      ✓
+                                    </span>
+                                  )}
+                                  <img 
+                                    src={`/roll-schemes/scheme_${num}.png`} 
+                                    alt={`Схема №${num}`} 
+                                    style={{ width: '100%', height: '80px', objectFit: 'contain' }}
+                                  />
+                                  <span 
+                                    style={{
+                                      fontSize: '10px',
+                                      fontWeight: isSelected ? '900' : '700',
+                                      color: isSelected ? '#d2232a' : '#475569',
+                                      marginTop: '2px'
+                                    }}
+                                  >
+                                    №{num}
+                                  </span>
+                                </div>
+                              );
+                            })}
                           </div>
                         </div>
                       </div>
 
-                      {/* Right: Detailed Specification Table matching TZ exactly */}
-                      <div className="md:col-span-6 flex flex-col gap-3">
-                        <table className="w-full text-xs border border-slate-300 border-collapse">
+                      {/* RIGHT COLUMN: TECHNICAL SPECIFICATIONS TABLE & WARNING BOX */}
+                      <div style={{ backgroundColor: '#8dd8f8', display: 'flex', flexDirection: 'column' }}>
+                        <table 
+                          style={{
+                            width: '100%',
+                            borderCollapse: 'collapse',
+                            fontSize: '11px',
+                            fontFamily: "Bahnschrift, 'Segoe UI', Arial, sans-serif"
+                          }}
+                        >
                           <tbody>
-                            <tr className="border-b border-slate-200">
-                              <td className="p-2 font-bold bg-slate-50 border-r border-slate-200 w-1/2">Тираж, шт:</td>
-                              <td className="p-2 font-extrabold font-mono text-blue-700">{rollQuantity} шт</td>
-                            </tr>
-                            <tr className="border-b border-slate-200">
-                              <td className="p-2 font-bold bg-slate-50 border-r border-slate-200">Розмір етикетки (ВхШ):</td>
-                              <td className="p-2 font-mono font-bold">{dimAcross} × {dimAlong} мм</td>
-                            </tr>
-                            <tr className="border-b border-slate-200">
-                              <td className="p-2 font-bold bg-slate-50 border-r border-slate-200">Ширина матеріалу:</td>
-                              <td className="p-2 font-mono font-bold">{webWidth} мм</td>
-                            </tr>
-                            <tr className="border-b border-slate-200">
-                              <td className="p-2 font-bold bg-slate-50 border-r border-slate-200">Струмків на полотні:</td>
-                              <td className="p-2 font-bold text-emerald-700">{lanes} струмки ({labelsPerMeter} шт/пог.м)</td>
-                            </tr>
-                            <tr className="border-b border-slate-200">
-                              <td className="p-2 font-bold bg-slate-50 border-r border-slate-200">Метраж друку:</td>
-                              <td className="p-2 font-mono">{linearMeters} м.п. ({sqMeters} м²)</td>
-                            </tr>
-                            <tr className="border-b border-slate-200">
-                              <td className="p-2 font-bold bg-slate-50 border-r border-slate-200">Матеріал:</td>
-                              <td className="p-2 font-semibold text-slate-800">{matLabels[rollMaterial] || 'папір Raflatac'}</td>
-                            </tr>
-                            <tr className="border-b border-slate-200">
-                              <td className="p-2 font-bold bg-slate-50 border-r border-slate-200">Клей:</td>
-                              <td className="p-2">
-                                <span className="mr-3 font-semibold">
-                                  [{rollGlueType === 'acrylic' ? ' ✓ ' : '   '}] Акрил
-                                </span>
-                                <span className="font-semibold text-blue-700">
-                                  [{rollGlueType === 'rubber' ? ' ✓ ' : '   '}] Каучук
-                                </span>
+                            {/* Row 1: Тираж, шт */}
+                            <tr style={{ borderBottom: '1px solid #231f20' }}>
+                              <td style={{ padding: '6px 10px', fontWeight: '800', color: '#231f20', width: '50%', borderRight: '1px solid #231f20' }}>
+                                Тираж, шт
+                              </td>
+                              <td style={{ padding: '6px 10px', fontWeight: '900', color: '#d2232a', fontSize: '13px' }}>
+                                {rollQuantity} шт
                               </td>
                             </tr>
-                            <tr className="border-b border-slate-200">
-                              <td className="p-2 font-bold bg-slate-50 border-r border-slate-200">Поклейщик:</td>
-                              <td className="p-2">
-                                <span className="mr-3 font-semibold">
-                                  [{rollApplication === 'auto' ? ' ✓ ' : '   '}] Автм.
-                                </span>
-                                <span className="font-semibold text-blue-700">
-                                  [{rollApplication === 'manual' ? ' ✓ ' : '   '}] Ручний
-                                </span>
+
+                            {/* Row 2: Вихід з рулону (ширина, мм) / НІЖ */}
+                            <tr style={{ borderBottom: '1px solid #231f20' }}>
+                              <td style={{ padding: '4px 10px', fontWeight: '800', color: '#231f20', borderRight: '1px solid #231f20' }}>
+                                <div>Вихід з рулону</div>
+                                <div style={{ fontSize: '9.5px', color: '#334155' }}>(ширина, мм)</div>
+                              </td>
+                              <td style={{ padding: '4px 10px', fontWeight: '900', color: '#d2232a', fontSize: '13px' }}>
+                                <div style={{ color: '#d2232a', fontSize: '12px' }}>НІЖ</div>
+                                <div>{webWidth} мм</div>
                               </td>
                             </tr>
-                            <tr className="border-b border-slate-200">
-                              <td className="p-2 font-bold bg-slate-50 border-r border-slate-200">Відстань між етикетками:</td>
-                              <td className="p-2 font-mono">{gap} мм (стандарт)</td>
+
+                            {/* Row 3: Матеріал */}
+                            <tr style={{ borderBottom: '1px solid #231f20' }}>
+                              <td style={{ padding: '6px 10px', fontWeight: '800', color: '#231f20', borderRight: '1px solid #231f20' }}>
+                                Матеріал
+                              </td>
+                              <td style={{ padding: '6px 10px', fontWeight: '900', color: '#d2232a', fontSize: '12px' }}>
+                                {matLabels[rollMaterial] || 'самоклеючий папір'}
+                              </td>
                             </tr>
-                            <tr className="border-b border-slate-200">
-                              <td className="p-2 font-bold bg-slate-50 border-r border-slate-200">К-сть етикеток в рулоні:</td>
-                              <td className="p-2 font-mono font-bold text-indigo-700">{rollLabelsPerRoll} шт (Разом {readyRolls} рул.)</td>
+
+                            {/* Row 4: Клей */}
+                            <tr style={{ borderBottom: '1px solid #231f20' }}>
+                              <td style={{ padding: '6px 10px', fontWeight: '800', color: '#231f20', borderRight: '1px solid #231f20' }}>
+                                Клей
+                              </td>
+                              <td style={{ padding: '6px 10px', color: '#231f20' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                                  <span 
+                                    onClick={() => setRollGlueType('acrylic')}
+                                    style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+                                  >
+                                    Акрил <strong style={{ color: '#d2232a', fontSize: '13px', fontWeight: '900' }}>[{rollGlueType === 'acrylic' ? '+' : ' '}]</strong>
+                                  </span>
+                                  <span 
+                                    onClick={() => setRollGlueType('rubber')}
+                                    style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+                                  >
+                                    Каучук <strong style={{ color: '#d2232a', fontSize: '13px', fontWeight: '900' }}>[{rollGlueType === 'rubber' ? '+' : ' '}]</strong>
+                                  </span>
+                                </div>
+                              </td>
                             </tr>
-                            <tr className="border-b border-slate-200">
-                              <td className="p-2 font-bold bg-slate-50 border-r border-slate-200">Кількість рядів у рулоні:</td>
-                              <td className="p-2 font-mono">1 шт</td>
+
+                            {/* Row 5: Поклейщик */}
+                            <tr style={{ borderBottom: '1px solid #231f20' }}>
+                              <td style={{ padding: '6px 10px', fontWeight: '800', color: '#231f20', borderRight: '1px solid #231f20' }}>
+                                Поклейщик
+                              </td>
+                              <td style={{ padding: '6px 10px', color: '#231f20' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+                                  <span 
+                                    onClick={() => setRollApplication('auto')}
+                                    style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+                                  >
+                                    Автм. <strong style={{ color: '#d2232a', fontSize: '13px', fontWeight: '900' }}>[{rollApplication === 'auto' ? '+' : ' '}]</strong>
+                                  </span>
+                                  <span 
+                                    onClick={() => setRollApplication('manual')}
+                                    style={{ cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px' }}
+                                  >
+                                    Ручний <strong style={{ color: '#d2232a', fontSize: '13px', fontWeight: '900' }}>[{rollApplication === 'manual' ? '+' : ' '}]</strong>
+                                  </span>
+                                </div>
+                              </td>
                             </tr>
-                            <tr className="border-b border-slate-200">
-                              <td className="p-2 font-bold bg-slate-50 border-r border-slate-200">Втулка:</td>
-                              <td className="p-2 font-mono">{rollCore} мм</td>
+
+                            {/* Row 6: К-сть. етикеток в рулоні, шт */}
+                            <tr style={{ borderBottom: '1px solid #231f20' }}>
+                              <td style={{ padding: '5px 10px', fontWeight: '800', color: '#231f20', borderRight: '1px solid #231f20' }}>
+                                <div>К-сть. етикеток</div>
+                                <div>в рулоні, шт</div>
+                              </td>
+                              <td style={{ padding: '5px 10px', fontWeight: '900', color: '#d2232a', fontSize: '13px' }}>
+                                {rollLabelsPerRoll} шт
+                              </td>
                             </tr>
-                            <tr className="border-b border-slate-200">
-                              <td className="p-2 font-bold bg-slate-50 border-r border-slate-200">Менеджер:</td>
-                              <td className="p-2 text-slate-700">{currentUser?.name || 'Менеджер'}</td>
+
+                            {/* Row 7: Відстань між етикетками,мм */}
+                            <tr style={{ borderBottom: '1px solid #231f20' }}>
+                              <td style={{ padding: '5px 10px', fontWeight: '800', color: '#231f20', borderRight: '1px solid #231f20' }}>
+                                <div>Відстань між</div>
+                                <div>етикетками,мм</div>
+                              </td>
+                              <td style={{ padding: '5px 10px', fontWeight: '900', color: '#d2232a', fontSize: '13px' }}>
+                                {rollGap} мм (стандарт)
+                              </td>
                             </tr>
-                            <tr>
-                              <td className="p-2 font-bold bg-slate-50 border-r border-slate-200">Затвердив:</td>
-                              <td className="p-2 font-bold text-slate-900">{effectiveClient}</td>
+
+                            {/* Row 8: Кількість рядів в рулоні, шт */}
+                            <tr style={{ borderBottom: '1px solid #231f20' }}>
+                              <td style={{ padding: '5px 10px', fontWeight: '800', color: '#231f20', borderRight: '1px solid #231f20' }}>
+                                <div>Кількість рядів</div>
+                                <div>в рулоні, шт</div>
+                              </td>
+                              <td style={{ padding: '5px 10px', fontWeight: '900', color: '#d2232a', fontSize: '13px' }}>
+                                1 шт
+                              </td>
+                            </tr>
+
+                            {/* Row 9: Втулка, мм */}
+                            <tr style={{ borderBottom: '1px solid #231f20' }}>
+                              <td style={{ padding: '6px 10px', fontWeight: '800', color: '#231f20', borderRight: '1px solid #231f20' }}>
+                                Втулка, мм
+                              </td>
+                              <td style={{ padding: '6px 10px', fontWeight: '900', color: '#d2232a', fontSize: '13px' }}>
+                                {rollCore} мм
+                              </td>
+                            </tr>
+
+                            {/* Row 10: Signatures */}
+                            <tr style={{ borderBottom: '1px solid #231f20' }}>
+                              <td colSpan={2} style={{ padding: '6px 10px', backgroundColor: '#8dd8f8' }}>
+                                <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', fontSize: '11px', fontWeight: '800' }}>
+                                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                    <span>Менеджер:</span>
+                                    <strong style={{ color: '#231f20' }}>{currentUser?.name || 'Менеджер'}</strong>
+                                  </div>
+                                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <span>Дизайнер:</span>
+                                    <input 
+                                      type="text" 
+                                      value={tzDesignerName} 
+                                      onChange={(e) => setTzDesignerName(e.target.value)}
+                                      placeholder="Введіть ПІБ" 
+                                      style={{ border: 'none', borderBottom: '1px solid #231f20', background: 'transparent', fontSize: '11px', textAlign: 'right', outline: 'none', width: '130px' }}
+                                    />
+                                  </div>
+                                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                    <span>Затвердив:</span>
+                                    <strong style={{ color: '#231f20' }}>{effectiveClient}</strong>
+                                  </div>
+                                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                                    <span>Дата:</span>
+                                    <strong style={{ color: '#231f20' }}>{todayFormatted}</strong>
+                                  </div>
+                                </div>
+                              </td>
                             </tr>
                           </tbody>
                         </table>
 
-                        {/* Yellow Disclaimer matching PDF footer */}
-                        <div className="p-2.5 rounded bg-amber-50 border border-amber-300 text-[10px] text-amber-900 leading-tight">
-                          <strong>Будь ласка, будьте уважні!</strong> Після затвердження макета Замовник несе відповідальність за правильність всієї вказаної інформації, а саме: дані по матеріалу, розміри та конфігурація етикетки, намотка, текстова інформація, штрих-код, наявність та розташування знаків та елементів дизайну.
-                        </div>
-
-                        {/* Signatures Row */}
-                        <div className="grid grid-cols-3 gap-2 pt-2 text-[10px] font-semibold text-slate-600">
-                          <div>Менеджер: ____________</div>
-                          <div>Дизайнер: ____________</div>
-                          <div>Замовник: ____________</div>
+                        {/* Yellow Warning Box matching PDF exactly */}
+                        <div 
+                          style={{
+                            margin: '8px',
+                            padding: '8px 10px',
+                            backgroundColor: '#fff9c4',
+                            border: '1px solid #231f20',
+                            fontSize: '9px',
+                            lineHeight: '1.3',
+                            color: '#231f20',
+                            fontFamily: 'Calibri, Arial, sans-serif'
+                          }}
+                        >
+                          <strong style={{ display: 'block', fontSize: '10.5px', marginBottom: '2px', fontWeight: '900' }}>
+                            Будь ласка, будьте уважні!
+                          </strong>
+                          Після затвердження макета Замовник несе відповідальність за правильність всієї вказаної інформації, а саме: дані по матеріалу, розміри та конфігурація етикетки, намотка, текстова інформація, штрих-код, наявність та розташування знаків та елементів дизайну.
                         </div>
                       </div>
                     </div>
@@ -17529,7 +17892,7 @@ export const Calculator: React.FC = () => {
         </div>
       )}
 
-                  {/* Material & Postpress Prices Modal - Clean CRM Design, No Emojis, 100% Editable List */}
+      {/* Material & Postpress Prices Modal - Clean CRM Design, No Emojis, 100% Editable List */}
       {showMaterialPricesModal && currentUser?.role !== 'client' && (
         <div 
           style={{
