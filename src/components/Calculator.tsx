@@ -13847,39 +13847,7 @@ export const Calculator: React.FC = () => {
                     </span>
                   </div>
 
-                  {/* Quick Preset Chips */}
-                  <div className="flex flex-wrap gap-1.5 mt-3">
-                    {[
-                      { label: '25×25', w: '25', h: '25' },
-                      { label: '30×20', w: '30', h: '20' },
-                      { label: '40×30', w: '40', h: '30' },
-                      { label: '50×50', w: '50', h: '50' },
-                      { label: '58×40', w: '58', h: '40' },
-                      { label: '70×50', w: '70', h: '50' },
-                      { label: '90×50', w: '90', h: '50' },
-                      { label: '100×100', w: '100', h: '100' },
-                      { label: '100×150', w: '100', h: '150' },
-                    ].map(p => (
-                      <button
-                        key={p.label}
-                        type="button"
-                        onClick={() => { setRollWidth(p.w); setRollHeight(p.h); }}
-                        style={{
-                          fontSize: '11px',
-                          fontWeight: '600',
-                          padding: '4px 10px',
-                          borderRadius: '8px',
-                          border: rollWidth === p.w && rollHeight === p.h ? '1px solid var(--primary)' : '0.5px solid var(--border-light)',
-                          backgroundColor: rollWidth === p.w && rollHeight === p.h ? 'var(--primary)' : 'var(--bg-system)',
-                          color: rollWidth === p.w && rollHeight === p.h ? '#ffffff' : 'var(--text-dark)',
-                          cursor: 'pointer',
-                          transition: 'all 0.15s ease'
-                        }}
-                      >
-                        {p.label}
-                      </button>
-                    ))}
-                  </div>
+
                 </div>
 
                 {/* 2. Quantity Input */}
@@ -13900,28 +13868,7 @@ export const Calculator: React.FC = () => {
                     </div>
                     <span className="text-xs font-bold text-slate-500">шт.</span>
 
-                    {/* Quick quantity buttons */}
-                    <div className="flex items-center gap-1.5 ml-2">
-                      {[500, 1000, 2000, 5000, 10000].map(q => (
-                        <button
-                          key={q}
-                          type="button"
-                          onClick={() => setRollQuantity(q)}
-                          style={{
-                            fontSize: '11px',
-                            fontWeight: '600',
-                            padding: '4px 8px',
-                            borderRadius: '6px',
-                            border: rollQuantity === q ? '1px solid var(--primary)' : '0.5px solid var(--border-light)',
-                            backgroundColor: rollQuantity === q ? 'rgba(0, 122, 255, 0.1)' : 'var(--bg-system)',
-                            color: rollQuantity === q ? 'var(--primary)' : 'var(--text-dark)',
-                            cursor: 'pointer'
-                          }}
-                        >
-                          {q}
-                        </button>
-                      ))}
-                    </div>
+
                   </div>
                 </div>
 
@@ -13953,8 +13900,6 @@ export const Calculator: React.FC = () => {
                   <div className="flex flex-wrap items-center gap-6">
                     {[
                       { id: '76', label: '76 мм (стандартна)' },
-                      { id: '40', label: '40 мм' },
-                      { id: '25', label: '25 мм' },
                     ].map(core => (
                       <label key={core.id} className="flex items-center gap-2 cursor-pointer group">
                         <input
