@@ -42,7 +42,8 @@ import {
   RotateCcw,
   ArrowLeftRight,
   Upload,
-  Trash2
+  Trash2,
+  Eye
 } from 'lucide-react';
 import html2pdf from 'html2pdf.js';
 
@@ -1103,7 +1104,8 @@ export const Calculator: React.FC = () => {
   const [rollApplication, setRollApplication] = useState<'manual' | 'auto'>('manual');
   const [rollLabelsPerRoll, setRollLabelsPerRoll] = useState<number>(1250);
   const [showRollTechTaskModal, setShowRollTechTaskModal] = useState<boolean>(false);
-  const [rollUploadedFile, setRollUploadedFile] = useState<{ name: string; url: string; size?: string } | null>(null);
+  const [showRollPreviewModal, setShowRollPreviewModal] = useState<boolean>(false);
+  const [rollUploadedFile, setRollUploadedFile] = useState<{ name: string; url: string; thumbUrl?: string; size?: string; widthPx?: number; heightPx?: number } | null>(null);
   const [rollDieCutShape, setRollDieCutShape] = useState<'oval' | 'rect' | 'custom'>('oval');
 
   // Mega Menu Interactive Dropdown States
@@ -2534,24 +2536,88 @@ export const Calculator: React.FC = () => {
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const dataUrl = event.target?.result as string;
-      const sizeStr = file.size > 1024 * 1024
-        ? `${(file.size / (1024 * 1024)).toFixed(1)} МБ`
-        : `${Math.round(file.size / 1024)} КБ`;
-      
+    const sizeStr = file.size > 1024 * 1024
+      ? `${(file.size / (1024 * 1024)).toFixed(1)} МБ`
+      : `${Math.round(file.size / 1024)} КБ`;
+
+    if (file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const rawDataUrl = event.target?.result as string;
+        const img = new window.Image();
+        img.onload = () => {
+          const origW = img.naturalWidth || img.width;
+          const origH = img.naturalHeight || img.height;
+
+          // 1. Scaled web preview (max 1000px) - lightweight and crisp, prevents browser lag
+          const maxP = 1000;
+          let pW = origW;
+          let pH = origH;
+          if (origW > maxP || origH > maxP) {
+            if (origW > origH) {
+              pW = maxP;
+              pH = Math.round((origH * maxP) / origW);
+            } else {
+              pH = maxP;
+              pW = Math.round((origW * maxP) / origH);
+            }
+          }
+          const canvasP = document.createElement('canvas');
+          canvasP.width = pW;
+          canvasP.height = pH;
+          const ctxP = canvasP.getContext('2d');
+          if (ctxP) ctxP.drawImage(img, 0, 0, pW, pH);
+          const previewUrl = canvasP.toDataURL('image/png');
+
+          // 2. Micro thumbnail for repeated imposition strip (max 160px, only ~15KB)
+          const maxT = 160;
+          let tW = origW;
+          let tH = origH;
+          if (origW > maxT || origH > maxT) {
+            if (origW > origH) {
+              tW = maxT;
+              tH = Math.round((origH * maxT) / origW);
+            } else {
+              tH = maxT;
+              tW = Math.round((origW * maxT) / origH);
+            }
+          }
+          const canvasT = document.createElement('canvas');
+          canvasT.width = tW;
+          canvasT.height = tH;
+          const ctxT = canvasT.getContext('2d');
+          if (ctxT) ctxT.drawImage(img, 0, 0, tW, tH);
+          const thumbUrl = canvasT.toDataURL('image/png');
+
+          setRollUploadedFile({
+            name: file.name,
+            url: previewUrl,
+            thumbUrl: thumbUrl,
+            size: sizeStr,
+            widthPx: origW,
+            heightPx: origH
+          });
+
+          if (!name) {
+            setName(file.name.replace(/\.[^/.]+$/, ''));
+          }
+
+          // Automatically open the preview modal
+          setShowRollPreviewModal(true);
+        };
+        img.src = rawDataUrl;
+      };
+      reader.readAsDataURL(file);
+    } else {
+      const objUrl = URL.createObjectURL(file);
       setRollUploadedFile({
         name: file.name,
-        url: dataUrl,
+        url: objUrl,
+        thumbUrl: objUrl,
         size: sizeStr
       });
-
-      if (!name) {
-        setName(file.name.replace(/\.[^/.]+$/, ''));
-      }
-    };
-    reader.readAsDataURL(file);
+      setShowRollPreviewModal(true);
+    }
   };
 
   const handleLoadTemplate = (tpl: CalcTemplate) => {
@@ -13845,63 +13911,86 @@ export const Calculator: React.FC = () => {
             <div className="flex flex-col gap-6 md:gap-7">
               {/* Core Parameters Form Card */}
               <div className="ios-card bg-white" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '22px' }}>
-                {/* 0. File Upload Section for Real Label Layout */}
-                <div className="p-4 rounded-2xl bg-gradient-to-r from-blue-50/80 via-slate-50 to-indigo-50/50 border border-blue-100 flex flex-col md:flex-row items-center justify-between gap-4 shadow-2xs">
-                  <div className="flex items-center gap-3 w-full md:w-auto">
+                {/* 0. File Upload Section with Dedicated Preview (Передогляд) */}
+                <div className="p-4 rounded-2xl bg-gradient-to-r from-blue-50/80 via-slate-50 to-indigo-50/50 border border-blue-100 flex flex-col md:flex-row items-center justify-between gap-4 shadow-2xs max-w-full overflow-hidden">
+                  <div className="flex items-center gap-3 min-w-0 flex-1">
                     {rollUploadedFile ? (
-                      <div className="relative w-14 h-14 rounded-xl overflow-hidden border-2 border-blue-500 shadow-sm flex-shrink-0 bg-white flex items-center justify-center">
+                      <div 
+                        onClick={() => setShowRollPreviewModal(true)}
+                        className="relative w-14 h-14 rounded-xl overflow-hidden border-2 border-blue-500 shadow-sm flex-shrink-0 bg-white flex items-center justify-center cursor-pointer group"
+                        title="Натисніть для передогляду макета"
+                      >
                         <img 
-                          src={rollUploadedFile.url} 
+                          src={rollUploadedFile.thumbUrl || rollUploadedFile.url} 
                           alt="Макет етикетки" 
-                          className="w-full h-full object-contain p-0.5" 
+                          className="w-full h-full object-contain p-0.5 group-hover:scale-105 transition-transform" 
+                          style={{ maxWidth: '100%', maxHeight: '100%', display: 'block' }}
                         />
+                        <div className="absolute inset-0 bg-blue-600/20 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                          <Eye size={16} className="text-white drop-shadow" />
+                        </div>
                       </div>
                     ) : (
-                      <div className="w-12 h-12 rounded-xl bg-blue-100/70 border border-blue-200 flex items-center justify-center text-blue-600 flex-shrink-0 shadow-2xs">
+                      <div 
+                        onClick={() => setShowRollPreviewModal(true)}
+                        className="w-12 h-12 rounded-xl bg-blue-100/70 border border-blue-200 flex items-center justify-center text-blue-600 flex-shrink-0 shadow-2xs cursor-pointer hover:bg-blue-100 transition-colors"
+                        title="Переглянути контур висічки"
+                      >
                         <Image size={24} />
                       </div>
                     )}
-                    <div className="flex flex-col">
-                      <div className="flex items-center gap-2">
-                        <h4 className="text-sm font-black text-slate-900 m-0">
+                    <div className="flex flex-col min-w-0 flex-1">
+                      <div className="flex items-center gap-2 min-w-0">
+                        <h4 className="text-sm font-black text-slate-900 m-0 truncate max-w-[200px] sm:max-w-[320px] md:max-w-[420px]" title={rollUploadedFile ? rollUploadedFile.name : undefined}>
                           {rollUploadedFile ? rollUploadedFile.name : 'Завантажте готовий макет етикетки'}
                         </h4>
                         {rollUploadedFile && (
-                          <span className="text-[10px] font-mono bg-blue-600 text-white px-2 py-0.5 rounded-full font-bold shadow-2xs">
+                          <span className="text-[10px] font-mono bg-blue-600 text-white px-2 py-0.5 rounded-full font-bold shadow-2xs flex-shrink-0">
                             {rollUploadedFile.size}
                           </span>
                         )}
                       </div>
-                      <p className="text-xs text-slate-500 m-0 mt-0.5">
+                      <p className="text-xs text-slate-500 m-0 mt-0.5 truncate">
                         {rollUploadedFile 
-                          ? 'Макет готовий! Його автоматично розкладено по струмках на полотні 330 мм та вставлено в ТЗ' 
-                          : 'Підтримуються PNG, JPG, SVG, WEBP або PDF для візуальної розкладки по струмках'}
+                          ? 'Макет готовий! Натисніть «Передогляд» для контролю контуру ножа та висічки' 
+                          : 'Підтримуються PNG, JPG, SVG, WEBP або PDF. Натисніть «Передогляд» для оцінки форми'}
                       </p>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2.5 w-full md:w-auto justify-end">
+                  <div className="flex items-center gap-2 w-full md:w-auto justify-end flex-wrap sm:flex-nowrap">
+                    {/* Dedicated Preview Button */}
+                    <button
+                      type="button"
+                      onClick={() => setShowRollPreviewModal(true)}
+                      className="px-3.5 py-2 rounded-xl border border-blue-200 bg-white hover:bg-blue-50 text-blue-700 font-bold text-xs shadow-2xs transition-all flex items-center gap-1.5 whitespace-nowrap"
+                      title="Відкрити передогляд макета та контуру різу"
+                    >
+                      <Eye size={14} className="text-blue-600" />
+                      <span>Передогляд</span>
+                    </button>
+
                     {/* Shape Selector */}
                     <div className="flex items-center bg-white border border-slate-200 rounded-xl p-1 text-xs font-semibold shadow-2xs">
                       <button
                         type="button"
                         onClick={() => setRollDieCutShape('oval')}
-                        className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${rollDieCutShape === 'oval' ? 'bg-blue-600 text-white shadow-2xs' : 'text-slate-600 hover:bg-slate-100'}`}
+                        className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${rollDieCutShape === 'oval' ? 'bg-blue-600 text-white shadow-2xs' : 'text-slate-600 hover:bg-slate-100'}`}
                       >
                         Овал
                       </button>
                       <button
                         type="button"
                         onClick={() => setRollDieCutShape('rect')}
-                        className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${rollDieCutShape === 'rect' ? 'bg-blue-600 text-white shadow-2xs' : 'text-slate-600 hover:bg-slate-100'}`}
+                        className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all ${rollDieCutShape === 'rect' ? 'bg-blue-600 text-white shadow-2xs' : 'text-slate-600 hover:bg-slate-100'}`}
                       >
                         Прямокутник
                       </button>
                     </div>
 
-                    <label className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-bold text-xs shadow-xs transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap">
+                    <label className="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 active:scale-95 text-white font-bold text-xs shadow-xs transition-all flex items-center gap-1.5 cursor-pointer whitespace-nowrap">
                       <Upload size={14} />
-                      <span>{rollUploadedFile ? 'Замінити файл' : 'Обрати файл етикетки'}</span>
+                      <span>{rollUploadedFile ? 'Замінити' : 'Обрати файл'}</span>
                       <input 
                         type="file" 
                         accept="image/png,image/jpeg,image/webp,image/svg+xml,application/pdf" 
@@ -13914,7 +14003,7 @@ export const Calculator: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => setRollUploadedFile(null)}
-                        className="p-2 rounded-xl border border-slate-200 bg-white hover:bg-red-50 hover:border-red-200 hover:text-red-600 text-slate-400 transition-colors shadow-2xs"
+                        className="p-2 rounded-xl border border-slate-200 bg-white hover:bg-red-50 hover:border-red-200 hover:text-red-600 text-slate-400 transition-colors shadow-2xs flex-shrink-0"
                         title="Видалити макет"
                       >
                         <Trash2 size={15} />
@@ -14309,26 +14398,37 @@ export const Calculator: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* Interactive Web Ribbon Diagram (Matching exact visual layout of media_1792672604192_e1180703.png) */}
-                    <div className="flex flex-col gap-2">
-                      <div className="flex items-center justify-between text-xs font-bold text-slate-600 px-1">
+                    {/* Interactive Web Ribbon Diagram (Protected from layout blowout) */}
+                    <div className="flex flex-col gap-2 max-w-full min-w-0 overflow-hidden">
+                      <div className="flex items-center justify-between text-xs font-bold text-slate-600 px-1 flex-wrap gap-2">
                         <span className="flex items-center gap-1.5">
                           <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
                           <span>Стрічка полотна: <strong>{webWidth} мм</strong> (робоча зона {printableWidth} мм, друк у <strong>{lanes} {lanes === 1 ? 'струмок' : lanes <= 4 ? 'струмки' : 'струмків'}</strong>)</span>
                         </span>
-                        <span className="text-blue-700 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded font-mono">
-                          1 пог. м = {labelsPerMeter} етикеток
-                        </span>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setShowRollPreviewModal(true)}
+                            className="text-xs font-bold text-blue-600 hover:text-blue-800 underline flex items-center gap-1 cursor-pointer"
+                            title="Відкрити передогляд макета та контуру висічки"
+                          >
+                            <Eye size={13} />
+                            <span>Передогляд макета</span>
+                          </button>
+                          <span className="text-blue-700 bg-blue-50 border border-blue-200 px-2 py-0.5 rounded font-mono">
+                            1 пог. м = {labelsPerMeter} етикеток
+                          </span>
+                        </div>
                       </div>
 
-                      {/* Visual Roll Web Canvas */}
+                      {/* Visual Roll Web Canvas with Horizontal Scroll Protection */}
                       <div 
-                        className="relative w-full rounded-xl overflow-x-auto bg-slate-900 border-2 border-slate-800 p-2 shadow-inner"
+                        className="relative w-full max-w-full rounded-xl overflow-x-auto bg-slate-900 border-2 border-slate-800 p-2 shadow-inner"
                         style={{ minHeight: lanes > 1 ? '160px' : '110px' }}
                       >
                         {/* Printable web margins guide lines (pink/magenta as in professional DTP software) */}
                         <div 
-                          className="w-full h-full rounded-lg relative flex flex-col justify-between py-1.5 px-3"
+                          className="h-full rounded-lg relative flex flex-col justify-between py-1.5 px-3 min-w-max"
                           style={{
                             background: 'linear-gradient(180deg, rgba(236,72,153,0.12) 0%, rgba(15,23,42,0.95) 8%, rgba(15,23,42,0.95) 92%, rgba(236,72,153,0.12) 100%)',
                             borderTop: '2px dashed #ec4899',
@@ -14336,16 +14436,20 @@ export const Calculator: React.FC = () => {
                           }}
                         >
                           {/* Repeat rows based on calculated lanes */}
-                          <div className="flex flex-col gap-2 my-auto w-full">
+                          <div className="flex flex-col gap-2 my-auto">
                             {Array.from({ length: lanes }).map((_, laneIdx) => (
-                              <div key={laneIdx} className="flex items-center gap-1.5 overflow-hidden">
+                              <div key={laneIdx} className="flex items-center gap-1.5">
                                 {Array.from({ length: visualColumns }).map((_, colIdx) => (
                                   <div
                                     key={colIdx}
-                                    className="flex-shrink-0 flex flex-col items-center justify-center transition-transform hover:scale-105"
+                                    className="flex-shrink-0 flex items-center justify-center transition-transform hover:scale-105"
                                     style={{
                                       width: '62px',
+                                      minWidth: '62px',
+                                      maxWidth: '62px',
                                       height: lanes === 1 ? '58px' : '48px',
+                                      minHeight: lanes === 1 ? '58px' : '48px',
+                                      maxHeight: lanes === 1 ? '58px' : '48px',
                                       borderRadius: rollDieCutShape === 'oval' ? '50% / 35%' : '8px',
                                       backgroundColor: '#ffffff',
                                       border: '1.5px dashed #f59e0b',
@@ -14356,11 +14460,12 @@ export const Calculator: React.FC = () => {
                                     title={`Струмок ${laneIdx + 1}, позиція ${colIdx + 1} (${dimAcross}×${dimAlong} мм)`}
                                   >
                                     {rollUploadedFile ? (
-                                      <div className="w-full h-full relative flex items-center justify-center bg-white">
+                                      <div className="w-full h-full relative flex items-center justify-center bg-white overflow-hidden p-0.5">
                                         <img 
-                                          src={rollUploadedFile.url} 
+                                          src={rollUploadedFile.thumbUrl || rollUploadedFile.url} 
                                           alt="Етикетка" 
-                                          className="w-full h-full object-cover"
+                                          className="w-full h-full object-contain pointer-events-none"
+                                          style={{ maxWidth: '100%', maxHeight: '100%', display: 'block' }}
                                         />
                                       </div>
                                     ) : (
@@ -16868,6 +16973,237 @@ export const Calculator: React.FC = () => {
               >
                 Закрити
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* NEW: Interactive Label Artwork Preview Modal (Передогляд макета) */}
+      {showRollPreviewModal && (
+        <div
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(15, 23, 42, 0.75)',
+            backdropFilter: 'blur(6px)',
+            zIndex: 99999,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            padding: '16px'
+          }}
+        >
+          <div 
+            className="ios-card bg-white"
+            style={{
+              borderRadius: '20px',
+              maxWidth: '780px',
+              width: '100%',
+              maxHeight: '92vh',
+              display: 'flex',
+              flexDirection: 'column',
+              boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.35)',
+              overflow: 'hidden'
+            }}
+          >
+            {/* Header */}
+            <div className="px-6 py-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/80">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold shadow-xs">
+                  <Eye size={18} />
+                </div>
+                <div>
+                  <h3 className="text-base font-black text-slate-900 m-0">
+                    Передогляд готового макета етикетки
+                  </h3>
+                  <span className="text-xs text-slate-500 font-medium">
+                    Розмір висічки: {rollWidth} × {rollHeight} мм • {rollDieCutShape === 'oval' ? 'Овальний контур' : 'Прямокутний контур'}
+                  </span>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowRollPreviewModal(false)}
+                className="w-8 h-8 rounded-xl hover:bg-slate-200 text-slate-500 font-bold flex items-center justify-center transition-colors"
+              >
+                ✕
+              </button>
+            </div>
+
+            {/* Main Preview Body */}
+            <div className="p-6 overflow-y-auto flex-1 flex flex-col items-center gap-6 bg-slate-100/50">
+              {/* Visual Label Canvas with Die-Cut Knife Overlay */}
+              <div 
+                className="w-full max-w-lg min-h-[280px] sm:min-h-[340px] rounded-2xl bg-white border border-slate-200 shadow-sm flex flex-col items-center justify-center p-6 relative overflow-hidden"
+                style={{
+                  backgroundImage: 'radial-gradient(#cbd5e1 1.2px, transparent 1.2px)',
+                  backgroundSize: '16px 16px'
+                }}
+              >
+                {(() => {
+                  const w = parseFloat(rollWidth) || 60;
+                  const h = parseFloat(rollHeight) || 107;
+                  const aspect = w / h;
+                  const maxBoxW = 320;
+                  const maxBoxH = 260;
+                  let boxW = maxBoxW;
+                  let boxH = Math.round(boxW / aspect);
+                  if (boxH > maxBoxH) {
+                    boxH = maxBoxH;
+                    boxW = Math.round(boxH * aspect);
+                  }
+
+                  return (
+                    <div className="relative flex flex-col items-center justify-center">
+                      {/* Bleed outline guide (pink/magenta +2mm) */}
+                      <div
+                        className="absolute -inset-2 border border-pink-400/50 pointer-events-none"
+                        style={{
+                          borderRadius: rollDieCutShape === 'oval' ? '50% / 35%' : '10px'
+                        }}
+                        title="Виліт під обріз (+2 мм)"
+                      />
+
+                      {/* Knife die-cut boundary (amber dashed) */}
+                      <div
+                        className="relative overflow-hidden bg-white shadow-lg flex items-center justify-center transition-all"
+                        style={{
+                          width: `${boxW}px`,
+                          height: `${boxH}px`,
+                          borderRadius: rollDieCutShape === 'oval' ? '50% / 35%' : '8px',
+                          border: '2.5px dashed #f59e0b',
+                          boxShadow: '0 8px 24px -4px rgba(0,0,0,0.12)'
+                        }}
+                      >
+                        {rollUploadedFile ? (
+                          <img
+                            src={rollUploadedFile.url}
+                            alt="Макет етикетки"
+                            className="w-full h-full object-contain pointer-events-none select-none"
+                            style={{ maxWidth: '100%', maxHeight: '100%' }}
+                          />
+                        ) : (
+                          <div className="flex flex-col items-center justify-center p-4 text-center">
+                            <span className="text-xs font-bold text-slate-400">Контур ножа висічки</span>
+                            <span className="text-sm font-mono font-black text-amber-600 mt-1">
+                              {rollWidth} × {rollHeight} мм
+                            </span>
+                            <span className="text-[11px] text-slate-400 mt-2">
+                              Оберіть файл макета для вставки
+                            </span>
+                          </div>
+                        )}
+
+                        {/* Safe zone inner guide (-2mm) */}
+                        <div
+                          className="absolute inset-1.5 border border-dashed border-emerald-500/40 pointer-events-none"
+                          style={{
+                            borderRadius: rollDieCutShape === 'oval' ? '50% / 35%' : '6px'
+                          }}
+                          title="Безпечна зона друку (-2 мм)"
+                        />
+                      </div>
+
+                      {/* Dimension labels */}
+                      <div className="mt-3 flex items-center gap-4 text-xs font-mono font-bold text-slate-700">
+                        <span>↔ Ширина: {rollWidth} мм</span>
+                        <span>↕ Висота: {rollHeight} мм</span>
+                      </div>
+                    </div>
+                  );
+                })()}
+              </div>
+
+              {/* Prepress Guide Legend */}
+              <div className="flex flex-wrap items-center justify-center gap-4 text-[11px] text-slate-600 bg-white px-4 py-2 rounded-xl border border-slate-200">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-3 h-0.5 border-b-2 border-dashed border-amber-500"></span>
+                  <span className="font-semibold text-slate-700">Лінія ножа (висічка)</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="w-3 h-0.5 border-b-2 border-dashed border-emerald-500"></span>
+                  <span className="font-semibold text-slate-700">Безпечна зона (2 мм)</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="w-3 h-0.5 border-b-2 border-pink-400"></span>
+                  <span className="font-semibold text-slate-700">Виліт під обріз (+2 мм)</span>
+                </div>
+              </div>
+
+              {/* Technical Information Grid */}
+              <div className="w-full grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs">
+                <div className="p-2.5 rounded-xl bg-white border border-slate-200 flex flex-col">
+                  <span className="text-[10px] text-slate-400 uppercase font-bold">Назва файлу:</span>
+                  <strong className="text-slate-900 truncate" title={rollUploadedFile?.name}>
+                    {rollUploadedFile?.name || 'Не завантажено'}
+                  </strong>
+                </div>
+                <div className="p-2.5 rounded-xl bg-white border border-slate-200 flex flex-col">
+                  <span className="text-[10px] text-slate-400 uppercase font-bold">Розмір файлу:</span>
+                  <strong className="text-slate-900 font-mono">
+                    {rollUploadedFile?.size || '—'}
+                  </strong>
+                </div>
+                <div className="p-2.5 rounded-xl bg-white border border-slate-200 flex flex-col">
+                  <span className="text-[10px] text-slate-400 uppercase font-bold">Пікселів у файлі:</span>
+                  <strong className="text-slate-900 font-mono">
+                    {rollUploadedFile?.widthPx ? `${rollUploadedFile.widthPx} × ${rollUploadedFile.heightPx} px` : '—'}
+                  </strong>
+                </div>
+                <div className="p-2.5 rounded-xl bg-white border border-slate-200 flex flex-col">
+                  <span className="text-[10px] text-slate-400 uppercase font-bold">Якість друку:</span>
+                  <strong className="text-emerald-700 font-bold">
+                    {rollUploadedFile?.widthPx 
+                      ? Math.round(rollUploadedFile.widthPx / (parseFloat(rollWidth) / 25.4)) >= 250
+                        ? '✓ 300 DPI (Висока)'
+                        : '✓ Оптимальна'
+                      : 'Готово'}
+                  </strong>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Footer Controls */}
+            <div className="px-6 py-3.5 border-t border-slate-200 flex flex-wrap items-center justify-between gap-3 bg-white">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-slate-600">Форма ножа:</span>
+                <div className="flex items-center bg-slate-100 rounded-lg p-0.5 text-xs font-semibold">
+                  <button
+                    type="button"
+                    onClick={() => setRollDieCutShape('oval')}
+                    className={`px-3 py-1 rounded-md text-xs font-bold transition-all ${rollDieCutShape === 'oval' ? 'bg-blue-600 text-white shadow-2xs' : 'text-slate-600 hover:bg-white'}`}
+                  >
+                    Овал
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setRollDieCutShape('rect')}
+                    className={`px-3 py-1 rounded-md text-xs font-bold transition-all ${rollDieCutShape === 'rect' ? 'bg-blue-600 text-white shadow-2xs' : 'text-slate-600 hover:bg-white'}`}
+                  >
+                    Прямокутник
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <label className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs cursor-pointer flex items-center gap-1.5 transition-colors">
+                  <Upload size={14} />
+                  <span>{rollUploadedFile ? 'Замінити файл' : 'Завантажити файл'}</span>
+                  <input 
+                    type="file" 
+                    accept="image/png,image/jpeg,image/webp,image/svg+xml,application/pdf" 
+                    onChange={handleRollLabelUpload} 
+                    className="hidden" 
+                  />
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setShowRollPreviewModal(false)}
+                  className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-sm transition-all"
+                >
+                  Зрозуміло
+                </button>
+              </div>
             </div>
           </div>
         </div>
