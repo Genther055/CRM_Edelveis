@@ -1029,7 +1029,7 @@ export const Calculator: React.FC = () => {
   const [mainCategoryTab, setMainCategoryTab] = useState<'products' | 'offset' | 'digital' | 'wide' | 'roll' | 'films'>('products');
 
   // Sub-tabs in Offset printing: 'overview' | 'sheets' | 'felling' | 'multipage' | 'custom'
-  const [offsetSubTab, setOffsetSubTab] = useState<'overview' | 'sheets' | 'felling' | 'multipage' | 'notebooks' | 'custom'>('overview');
+  const [offsetSubTab, setOffsetSubTab] = useState<'overview' | 'sheets' | 'felling' | 'magazines' | 'multipage' | 'notebooks' | 'custom'>('overview');
 
   // Sheet Offset Calculator specific states
   const [sheetSizePreset, setSheetSizePreset] = useState<string>('1'); // Default Business Card 90x50
@@ -1053,6 +1053,21 @@ export const Calculator: React.FC = () => {
   const [multiBlockMaterial, setMultiBlockMaterial] = useState<string>('130');
   const [multiBlockColor, setMultiBlockColor] = useState<string>('2'); // 4+4
   const [multiInsertPages, setMultiInsertPages] = useState<string>('0'); // Без вставки
+  // Dedicated Offset Magazines Calculator states
+  const [magFormat, setMagFormat] = useState<'A4' | 'A5' | 'A6' | 'custom'>('A4');
+  const [magCustomWidth, setMagCustomWidth] = useState<number>(210);
+  const [magCustomHeight, setMagCustomHeight] = useState<number>(297);
+  const [magBlockPages, setMagBlockPages] = useState<number>(32);
+  const [magQuantity, setMagQuantity] = useState<number>(1000);
+  const [magBlockPaper, setMagBlockPaper] = useState<string>('coat_115');
+  const [magCoverPaper, setMagCoverPaper] = useState<string>('coat_250');
+  const [magCoverPrint, setMagCoverPrint] = useState<'4+4' | '4+0' | '1+0' | '0+0'>('4+4');
+  const [magCoverLam, setMagCoverLam] = useState<'none' | 'gloss' | 'matte' | 'softtouch' | 'gloss_duo' | 'matte_duo'>('matte');
+  const [magBinding, setMagBinding] = useState<'staple' | 'kbs' | 'pur'>('staple');
+  const [magMarginPct, setMagMarginPct] = useState<number>(35);
+  const [magPriceView, setMagPriceView] = useState<'per_item' | 'per_total'>('per_item');
+  const [magShowCostDetails, setMagShowCostDetails] = useState<boolean>(true);
+
   const [multiInsertMaterial, setMultiInsertMaterial] = useState<string>('130');
   const [multiInsertColor, setMultiInsertColor] = useState<string>('2');
   const [multiCustomWidth, setMultiCustomWidth] = useState<string>('99');
@@ -1217,7 +1232,7 @@ export const Calculator: React.FC = () => {
   const openOffsetProduct = (params: {
     category: any;
     subCategory?: string;
-    subTab?: 'sheets' | 'felling' | 'multipage' | 'notebooks' | 'custom';
+    subTab?: 'sheets' | 'felling' | 'magazines' | 'multipage' | 'notebooks' | 'custom';
     preset?: string;
     w?: string;
     h?: string;
@@ -1361,7 +1376,8 @@ export const Calculator: React.FC = () => {
     | 'Нотаріальні книги' 
     | 'Дипломи і палітурка' 
     | 'Логотипи виготовлення' 
-    | 'Шкільні журнали' 
+    | 'Шкільні журнали'
+    | 'Журнали та каталоги' 
     | 'Етикетки'
     | 'Календарі'
     | 'Блокноти'
@@ -3772,6 +3788,858 @@ export const Calculator: React.FC = () => {
           
   };
 
+
+  // =========================================================================
+  // DEDICATED OFFSET MAGAZINES & CATALOGS CALCULATOR (ЖУРНАЛИ ТА КАТАЛОГИ)
+  // =========================================================================
+  const renderMagazinesCalculator = (_parentTab?: 'offset') => {
+    // 1. Dimensions
+    const isA4 = magFormat === 'A4';
+    const isA5 = magFormat === 'A5';
+    const isA6 = magFormat === 'A6';
+    const isCustom = magFormat === 'custom';
+    const wMm = isA4 ? 210 : isA5 ? 148 : isA6 ? 105 : Number(magCustomWidth || 210);
+    const hMm = isA4 ? 297 : isA5 ? 210 : isA6 ? 148 : Number(magCustomHeight || 297);
+
+    // 2. Paper Specs & Caliper
+    const paperSpecs: Record<string, { name: string; density: number; caliper: number; priceKg: number }> = {
+      coat_90: { name: 'Крейда матова 90 г/м²', density: 90, caliper: 0.075, priceKg: 68 },
+      coat_115: { name: 'Крейда глянц/мат 115 г/м²', density: 115, caliper: 0.090, priceKg: 66 },
+      coat_130: { name: 'Крейда глянц/мат 130 г/м²', density: 130, caliper: 0.105, priceKg: 65 },
+      coat_150: { name: 'Крейда 150 г/м²', density: 150, caliper: 0.125, priceKg: 67 },
+      off_70: { name: 'Офсетний папір 70 г/м²', density: 70, caliper: 0.095, priceKg: 58 },
+      off_80: { name: 'Офсетний папір 80 г/м²', density: 80, caliper: 0.110, priceKg: 56 },
+      off_100: { name: 'Офсетний папір 100 г/м²', density: 100, caliper: 0.130, priceKg: 60 }
+    };
+
+    const coverSpecs: Record<string, { name: string; density: number; caliper: number; priceKg: number }> = {
+      self: { name: 'Своя обкладинка (папір блоку)', density: paperSpecs[magBlockPaper]?.density || 115, caliper: paperSpecs[magBlockPaper]?.caliper || 0.09, priceKg: paperSpecs[magBlockPaper]?.priceKg || 66 },
+      coat_170: { name: 'Крейда 170 г/м²', density: 170, caliper: 0.145, priceKg: 70 },
+      coat_200: { name: 'Крейда 200 г/м²', density: 200, caliper: 0.170, priceKg: 71 },
+      coat_250: { name: 'Крейда 250 г/м² (Стандарт)', density: 250, caliper: 0.220, priceKg: 72 },
+      coat_300: { name: 'Крейда 300 г/м² (Щільна)', density: 300, caliper: 0.270, priceKg: 74 },
+      card_250: { name: 'Картон целюлозний 250 г/м²', density: 250, caliper: 0.330, priceKg: 85 }
+    };
+
+    const curBlockPaper = paperSpecs[magBlockPaper] || paperSpecs['coat_115'];
+    const curCoverPaper = coverSpecs[magCoverPaper] || coverSpecs['coat_250'];
+    const isSeparateCover = magCoverPaper !== 'self';
+
+    // 3. Page Count validation & Spine Thickness
+    const pages = Math.max(8, Math.round(magBlockPages / 4) * 4); // Multiple of 4
+    const sheetsInBlock = pages / 2;
+    const spineMm = Number((sheetsInBlock * curBlockPaper.caliper + (isSeparateCover ? curCoverPaper.caliper * 2 : 0)).toFixed(2));
+
+    // 4. Engineering Calculation Engine
+    const calculateMagazineRun = (qty: number) => {
+      // A. Signatures decomposition (Зошити)
+      // On standard offset B2 press (700x1000 / 640x900):
+      // A4 = 16 pages per sheet (8 front + 8 back)
+      // A5 = 32 pages per sheet (16 front + 16 back, processed as 16-page signatures)
+      const sigCapacity = 16;
+      const full16Sig = Math.floor(pages / sigCapacity);
+      const remPages = pages % sigCapacity;
+      const rem8Sig = remPages >= 8 ? 1 : 0;
+      const rem4Sig = (remPages % 8) >= 4 ? 1 : 0;
+      const totalSignatures = Math.max(1, full16Sig + rem8Sig + rem4Sig);
+
+      // B. Prepress & CTP Plates (4 plates CMYK per signature with work-and-turn)
+      const blockPlates = totalSignatures * 4;
+      const coverPlates = isSeparateCover ? (magCoverPrint === '0+0' ? 0 : 4) : 0;
+      const totalPlates = blockPlates + coverPlates;
+      const plateRate = 180; // грн / пластина CTP B2
+      const prepressCost = totalPlates * plateRate;
+
+      // C. Press Makereadies & Print runs
+      const blockMakereadies = totalSignatures;
+      const coverMakereadies = isSeparateCover && magCoverPrint !== '0+0' ? 1 : 0;
+      const totalMakereadies = blockMakereadies + coverMakereadies;
+      const makereadyRate = 420; // грн / приладка офсетної машини
+      const makereadyCost = totalMakereadies * makereadyRate;
+
+      // Print run (листопрогони B2)
+      const pagesPerSheet = isA5 ? 32 : isA6 ? 64 : 16;
+      const blockSheetsPerCopy = pages / pagesPerSheet;
+      const netBlockSheets = Math.ceil(qty * blockSheetsPerCopy);
+      // Makeready waste: 70 big sheets per signature
+      const wasteBlockSheets = totalSignatures * 70;
+      const grossBlockSheets = netBlockSheets + wasteBlockSheets;
+
+      // Cover sheets (B2)
+      const coversPerSheet = isA5 ? 4 : isA6 ? 8 : 2; // 2 A4 covers per B2 sheet
+      const netCoverSheets = isSeparateCover ? Math.ceil(qty / coversPerSheet) : 0;
+      const wasteCoverSheets = isSeparateCover ? 60 : 0;
+      const grossCoverSheets = netCoverSheets + wasteCoverSheets;
+
+      // Printing impression cost (прогони B2)
+      const printRatePer1000 = 380; // грн за 1000 відбитків B2
+      const blockPrintCost = (grossBlockSheets / 1000) * printRatePer1000;
+      const coverPrintCost = isSeparateCover ? Math.max(250, (grossCoverSheets / 1000) * printRatePer1000) : 0;
+      const printingRunCost = blockPrintCost + coverPrintCost;
+
+      // D. Materials (Paper)
+      // Weight = (W * H * Density * Sheets) / 10^9
+      const blockWeightKg = (700 * 1000 * curBlockPaper.density * grossBlockSheets) / 1e9;
+      const blockPaperCost = blockWeightKg * curBlockPaper.priceKg;
+
+      const coverWeightKg = isSeparateCover ? (700 * 1000 * curCoverPaper.density * grossCoverSheets) / 1e9 : 0;
+      const coverPaperCost = coverWeightKg * curCoverPaper.priceKg;
+      const totalPaperCost = blockPaperCost + coverPaperCost;
+
+      // E. Postpress Operations
+      const foldingCost = qty * totalSignatures * 0.35;
+      const gatheringCost = qty * totalSignatures * 0.18;
+
+      // Creasing: Скоба 2 біги (0.24 грн), КБС 4 біги (0.48 грн)
+      const creasingUnitRate = magBinding === 'staple' ? 0.24 : 0.48;
+      const creasingCost = (qty * creasingUnitRate) + (magBinding === 'staple' ? 60 : 80);
+
+      // Lamination
+      let lamRatePerM2 = 0;
+      if (magCoverLam === 'gloss') lamRatePerM2 = 14;
+      else if (magCoverLam === 'matte') lamRatePerM2 = 16;
+      else if (magCoverLam === 'softtouch') lamRatePerM2 = 28;
+      else if (magCoverLam === 'gloss_duo') lamRatePerM2 = 26;
+      else if (magCoverLam === 'matte_duo') lamRatePerM2 = 30;
+
+      const coverSpreadW = (wMm * 2) + spineMm;
+      const coverAreaM2 = (coverSpreadW * hMm) / 1e6;
+      const laminationCost = (isSeparateCover && magCoverLam !== 'none') ? (qty * coverAreaM2 * lamRatePerM2 + 150) : 0;
+
+      // Binding
+      let bindingCost = 0;
+      if (magBinding === 'staple') {
+        bindingCost = qty * 1.40 + 200; // ВШРА 2 скоби
+      } else if (magBinding === 'kbs') {
+        bindingCost = qty * 5.20 + 350; // Термоклей КБС
+      } else if (magBinding === 'pur') {
+        bindingCost = qty * 8.00 + 500; // PUR-клей
+      }
+
+      // Trimming & Packaging
+      const trimmingCost = qty * 1.30 + 100;
+      const packagingCost = Math.ceil(qty / 25) * 18 + 100;
+
+      const postpressTotal = foldingCost + gatheringCost + creasingCost + laminationCost + bindingCost + trimmingCost + packagingCost;
+
+      // F. Total Cost & Commercial Margin
+      const directCost = prepressCost + makereadyCost + printingRunCost + totalPaperCost + postpressTotal;
+      const overhead = directCost * 0.08; // 8% загальновиробничі витрати
+      const totalCost = directCost + overhead;
+
+      const marginRate = Math.min(0.60, Math.max(0.15, magMarginPct / 100));
+      const finalPrice = Math.round(totalCost / (1 - marginRate));
+      const unitPrice = Number((finalPrice / qty).toFixed(2));
+
+      return {
+        qty,
+        totalSignatures,
+        full16Sig,
+        rem8Sig,
+        rem4Sig,
+        totalPlates,
+        totalMakereadies,
+        grossBlockSheets,
+        grossCoverSheets,
+        blockWeightKg: Number(blockWeightKg.toFixed(1)),
+        coverWeightKg: Number(coverWeightKg.toFixed(1)),
+        totalWeightKg: Number((blockWeightKg + coverWeightKg).toFixed(1)),
+        prepressCost: Math.round(prepressCost),
+        makereadyCost: Math.round(makereadyCost),
+        printingRunCost: Math.round(printingRunCost),
+        totalPaperCost: Math.round(totalPaperCost),
+        blockPaperCost: Math.round(blockPaperCost),
+        coverPaperCost: Math.round(coverPaperCost),
+        foldingCost: Math.round(foldingCost),
+        gatheringCost: Math.round(gatheringCost),
+        creasingCost: Math.round(creasingCost),
+        laminationCost: Math.round(laminationCost),
+        bindingCost: Math.round(bindingCost),
+        trimmingCost: Math.round(trimmingCost),
+        packagingCost: Math.round(packagingCost),
+        postpressTotal: Math.round(postpressTotal),
+        directCost: Math.round(directCost),
+        overhead: Math.round(overhead),
+        totalCost: Math.round(totalCost),
+        finalPrice,
+        unitPrice
+      };
+    };
+
+    const currentCalc = calculateMagazineRun(magQuantity);
+
+    // Copy Quote helper
+    const handleCopyCommercialQuote = () => {
+      const bindingLabel = magBinding === 'staple' ? 'Скоба (2 шт.)' : magBinding === 'kbs' ? 'Термоклей (КБС)' : 'PUR-клей';
+      const lamLabel = magCoverLam === 'none' ? 'без ламінації' : magCoverLam === 'matte' ? 'матова ламінація' : magCoverLam === 'gloss' ? 'глянцева ламінація' : 'Soft-touch ламінація';
+      const text = `📋 КОМЕРЦІЙНА ПРОПОЗИЦІЯ: ВИГОТОВЛЕННЯ ЖУРНАЛІВ
+--------------------------------------------------
+Виріб: Журнал / Каталог (${magFormat}, ${wMm}x${hMm} мм)
+Обсяг: ${pages} сторінок блоку + обкладинка
+Тираж: ${magQuantity.toLocaleString('uk-UA')} шт.
+Скріплення: ${bindingLabel} (корінець: ${spineMm} мм)
+Папір блоку: ${curBlockPaper.name} (4+4 повноколір)
+Обкладинка: ${curCoverPaper.name} (${magCoverPrint}), ${lamLabel}
+Виробнича схема: ${currentCalc.totalSignatures} зошитів офсетного друку, ${currentCalc.totalPlates} форм CTP
+
+ВАРТІСТЬ ЗАМОВЛЕННЯ:
+- Ціна за 1 екземпляр: ${currentCalc.unitPrice.toFixed(2)} грн
+- ЗАГАЛЬНА ВАРТІСТЬ ТИРАЖУ: ${currentCalc.finalPrice.toLocaleString('uk-UA')} грн
+--------------------------------------------------
+Друкарня «Едельвейс і К»`;
+
+      navigator.clipboard.writeText(text);
+      alert('Комерційну пропозицію скопійовано в буфер обміну!');
+    };
+
+    return (
+      <div className="flex flex-col gap-6 md:gap-7">
+        {/* Sub-header Bar */}
+        <div className="ios-card bg-white" style={{ padding: '14px 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '12px', border: '1px solid #e2e8f0' }}>
+          <div className="flex items-center gap-3 flex-1 min-w-[260px]">
+            <button
+              type="button"
+              onClick={() => setOffsetSubTab('overview')}
+              className="px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-xs flex items-center gap-1.5 transition-colors shadow-2xs"
+              title="Повернутися до меню офсету"
+            >
+              <ArrowLeft size={16} />
+              <span>Назад</span>
+            </button>
+            
+            <div className="flex flex-col">
+              <div className="flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-wider text-slate-400">
+                <span>Офсетний друк</span>
+                <span>/</span>
+                <span className="text-blue-600 font-black">Журнали та каталоги</span>
+              </div>
+              <span className="text-sm font-black text-slate-900 leading-tight">
+                Інженерний розрахунок багатосторінкових виробів по зошитах
+              </span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setMagShowCostDetails(!magShowCostDetails)}
+              className={`px-3 py-2 rounded-xl border text-xs font-bold flex items-center gap-1.5 transition-colors shadow-2xs ${
+                magShowCostDetails ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-slate-50 border-slate-200 text-slate-700'
+              }`}
+            >
+              <Settings size={14} />
+              <span>{magShowCostDetails ? 'Приховати кошторис' : 'Детальний кошторис цеху'}</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setOffsetSubTab('overview')}
+              className="w-8 h-8 rounded-xl border border-slate-200 bg-slate-50 hover:bg-red-50 hover:border-red-200 hover:text-red-600 text-slate-500 font-bold text-sm flex items-center justify-center transition-colors shadow-2xs"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+
+        {/* Popular Presets Quick Selector */}
+        <div className="ios-card bg-white p-4" style={{ border: '1px solid #e2e8f0' }}>
+          <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-2.5">
+            Швидкі конфігурації (Популярні стандарти друкарні):
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+            {[
+              {
+                title: 'Глянцевий журнал А4 (32 стор.)',
+                sub: 'Скоба • 115г блок • 250г обкл. + мат',
+                onClick: () => {
+                  setMagFormat('A4');
+                  setMagBlockPages(32);
+                  setMagBlockPaper('coat_115');
+                  setMagCoverPaper('coat_250');
+                  setMagCoverLam('matte');
+                  setMagBinding('staple');
+                }
+              },
+              {
+                title: 'Корпоративний журнал А5 (48 стор.)',
+                sub: 'Скоба • 115г блок • 200г обкл. + глянець',
+                onClick: () => {
+                  setMagFormat('A5');
+                  setMagBlockPages(48);
+                  setMagBlockPaper('coat_115');
+                  setMagCoverPaper('coat_200');
+                  setMagCoverLam('gloss');
+                  setMagBinding('staple');
+                }
+              },
+              {
+                title: 'Товстий каталог А4 (64 стор.)',
+                sub: 'Термоклей КБС • 130г блок • 250г + Soft-touch',
+                onClick: () => {
+                  setMagFormat('A4');
+                  setMagBlockPages(64);
+                  setMagBlockPaper('coat_130');
+                  setMagCoverPaper('coat_250');
+                  setMagCoverLam('softtouch');
+                  setMagBinding('kbs');
+                }
+              },
+              {
+                title: 'Економ-брошура А5 (16 стор.)',
+                sub: 'Своя обкладинка з блоку 115г • 2 скоби',
+                onClick: () => {
+                  setMagFormat('A5');
+                  setMagBlockPages(16);
+                  setMagBlockPaper('coat_115');
+                  setMagCoverPaper('self');
+                  setMagCoverLam('none');
+                  setMagBinding('staple');
+                }
+              }
+            ].map((preset, idx) => (
+              <button
+                key={idx}
+                type="button"
+                onClick={preset.onClick}
+                className="text-left p-3 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-blue-50/60 hover:border-blue-300 transition-all text-xs"
+              >
+                <div className="font-extrabold text-slate-800">{preset.title}</div>
+                <div className="text-[11px] text-slate-500 mt-0.5">{preset.sub}</div>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Main 2-Column Work Area */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          {/* LEFT COLUMN: Controls (7 cols) */}
+          <div className="lg:col-span-7 flex flex-col gap-5">
+            {/* 1. Format & Geometry */}
+            <div className="ios-card bg-white p-5" style={{ border: '1px solid #e2e8f0' }}>
+              <div className="flex items-center justify-between mb-3 border-b border-slate-100 pb-2">
+                <span className="text-xs font-black uppercase tracking-wider text-slate-800">1. Формат журналу</span>
+                <span className="text-xs font-bold text-blue-600">{wMm} × {hMm} мм</span>
+              </div>
+              <div className="grid grid-cols-4 gap-2 mb-3">
+                {[
+                  { id: 'A4', label: 'А4', dim: '210×297' },
+                  { id: 'A5', label: 'А5', dim: '148×210' },
+                  { id: 'A6', label: 'А6', dim: '105×148' },
+                  { id: 'custom', label: 'Свій', dim: 'Ручний' }
+                ].map(fmt => (
+                  <button
+                    key={fmt.id}
+                    type="button"
+                    onClick={() => setMagFormat(fmt.id as any)}
+                    className={`py-2.5 px-2 rounded-xl border text-center transition-all ${
+                      magFormat === fmt.id
+                        ? 'border-blue-600 bg-blue-50 text-blue-700 font-extrabold shadow-2xs'
+                        : 'border-slate-200 bg-white text-slate-700 font-bold hover:bg-slate-50'
+                    }`}
+                  >
+                    <div className="text-sm">{fmt.label}</div>
+                    <div className="text-[10px] text-slate-400 mt-0.5">{fmt.dim}</div>
+                  </button>
+                ))}
+              </div>
+              {isCustom && (
+                <div className="grid grid-cols-2 gap-3 pt-2">
+                  <div>
+                    <label className="text-[11px] font-bold text-slate-600 block mb-1">Ширина (мм):</label>
+                    <input
+                      type="number"
+                      value={magCustomWidth}
+                      onChange={(e) => setMagCustomWidth(Number(e.target.value))}
+                      className="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs font-bold"
+                    />
+                  </div>
+                  <div>
+                    <label className="text-[11px] font-bold text-slate-600 block mb-1">Висота (мм):</label>
+                    <input
+                      type="number"
+                      value={magCustomHeight}
+                      onChange={(e) => setMagCustomHeight(Number(e.target.value))}
+                      className="w-full px-3 py-2 rounded-lg border border-slate-200 text-xs font-bold"
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* 2. Page Count & Binding */}
+            <div className="ios-card bg-white p-5" style={{ border: '1px solid #e2e8f0' }}>
+              <div className="flex items-center justify-between mb-3 border-b border-slate-100 pb-2">
+                <span className="text-xs font-black uppercase tracking-wider text-slate-800">2. Кількість сторінок та скріплення</span>
+                <span className="text-xs font-bold text-slate-500">Кратність: 4 сторінки</span>
+              </div>
+
+              {/* Pages Selector */}
+              <div className="mb-4">
+                <label className="text-xs font-semibold text-slate-600 block mb-2">Сторінок у блоці (без обкладинки):</label>
+                <div className="flex flex-wrap gap-2">
+                  {[8, 12, 16, 20, 24, 28, 32, 40, 48, 56, 64, 80, 96, 128].map(p => (
+                    <button
+                      key={p}
+                      type="button"
+                      onClick={() => setMagBlockPages(p)}
+                      className={`px-3 py-1.5 rounded-lg border text-xs font-bold transition-all ${
+                        magBlockPages === p
+                          ? 'bg-blue-600 text-white border-blue-600 shadow-2xs'
+                          : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
+                      }`}
+                    >
+                      {p} стор.
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Binding Method */}
+              <div>
+                <label className="text-xs font-semibold text-slate-600 block mb-2">Спосіб скріплення:</label>
+                <div className="grid grid-cols-3 gap-2.5">
+                  {[
+                    { id: 'staple', label: 'Скоба (2 шт.)', desc: 'Для блоків до 64 стор.', icon: '📌' },
+                    { id: 'kbs', label: 'Термоклей (КБС)', desc: 'Корінець від 2.5 мм', icon: '📕' },
+                    { id: 'pur', label: 'PUR-клей', desc: 'Для цупких крейдованих', icon: '💎' }
+                  ].map(b => (
+                    <button
+                      key={b.id}
+                      type="button"
+                      onClick={() => setMagBinding(b.id as any)}
+                      className={`p-3 rounded-xl border text-left transition-all ${
+                        magBinding === b.id
+                          ? 'border-blue-600 bg-blue-50/80 text-blue-900 shadow-2xs'
+                          : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
+                      }`}
+                    >
+                      <div className="text-base mb-1">{b.icon}</div>
+                      <div className="text-xs font-black">{b.label}</div>
+                      <div className="text-[10px] text-slate-500 mt-0.5">{b.desc}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* 3. Paper Selection (Block & Cover) */}
+            <div className="ios-card bg-white p-5" style={{ border: '1px solid #e2e8f0' }}>
+              <div className="flex items-center justify-between mb-3 border-b border-slate-100 pb-2">
+                <span className="text-xs font-black uppercase tracking-wider text-slate-800">3. Матеріали (Папір блоку та обкладинки)</span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {/* Block Paper */}
+                <div>
+                  <label className="text-xs font-semibold text-slate-600 block mb-1.5">Папір блоку:</label>
+                  <select
+                    value={magBlockPaper}
+                    onChange={(e) => setMagBlockPaper(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-800 focus:outline-blue-500"
+                  >
+                    <optgroup label="Крейдований папір (Глянцевий / Матовий)">
+                      <option value="coat_90">Крейда 90 г/м²</option>
+                      <option value="coat_115">Крейда 115 г/м² (Стандарт)</option>
+                      <option value="coat_130">Крейда 130 г/м²</option>
+                      <option value="coat_150">Крейда 150 г/м²</option>
+                    </optgroup>
+                    <optgroup label="Офсетний папір (Книжковий/Офісний)">
+                      <option value="off_70">Офсетний 70 г/м²</option>
+                      <option value="off_80">Офсетний 80 г/м²</option>
+                      <option value="off_100">Офсетний 100 г/м²</option>
+                    </optgroup>
+                  </select>
+                </div>
+
+                {/* Cover Paper */}
+                <div>
+                  <label className="text-xs font-semibold text-slate-600 block mb-1.5">Папір обкладинки:</label>
+                  <select
+                    value={magCoverPaper}
+                    onChange={(e) => setMagCoverPaper(e.target.value)}
+                    className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-800 focus:outline-blue-500"
+                  >
+                    <option value="self">Своя обкладинка (з блоку)</option>
+                    <option value="coat_170">Крейда 170 г/м²</option>
+                    <option value="coat_200">Крейда 200 г/м²</option>
+                    <option value="coat_250">Крейда 250 г/м² (Найпопулярніша)</option>
+                    <option value="coat_300">Крейда 300 г/м² (Щільна)</option>
+                    <option value="card_250">Картон 250 г/м²</option>
+                  </select>
+                </div>
+              </div>
+
+              {/* Cover Options if separate cover */}
+              {isSeparateCover && (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-3 pt-3 border-t border-slate-100">
+                  <div>
+                    <label className="text-xs font-semibold text-slate-600 block mb-1.5">Друк обкладинки:</label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setMagCoverPrint('4+4')}
+                        className={`py-2 px-2 rounded-lg border text-xs font-bold text-center ${
+                          magCoverPrint === '4+4' ? 'bg-blue-600 text-white border-blue-600' : 'bg-slate-50 text-slate-700 border-slate-200'
+                        }`}
+                      >
+                        4+4 (Обидва боки)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setMagCoverPrint('4+0')}
+                        className={`py-2 px-2 rounded-lg border text-xs font-bold text-center ${
+                          magCoverPrint === '4+0' ? 'bg-blue-600 text-white border-blue-600' : 'bg-slate-50 text-slate-700 border-slate-200'
+                        }`}
+                      >
+                        4+0 (Лише ззовні)
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-semibold text-slate-600 block mb-1.5">Ламінація обкладинки:</label>
+                    <select
+                      value={magCoverLam}
+                      onChange={(e) => setMagCoverLam(e.target.value as any)}
+                      className="w-full px-3 py-2 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-800"
+                    >
+                      <option value="none">Без ламінації</option>
+                      <option value="matte">Матова 1+0 (Захисна)</option>
+                      <option value="gloss">Глянцева 1+0 (Яскрава)</option>
+                      <option value="softtouch">Soft-touch 1+0 (Преміум оксамит)</option>
+                      <option value="matte_duo">Матова 1+1 (Обидва боки)</option>
+                      <option value="gloss_duo">Глянцева 1+1 (Обидва боки)</option>
+                    </select>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* 4. Quantity & Margin */}
+            <div className="ios-card bg-white p-5" style={{ border: '1px solid #e2e8f0' }}>
+              <div className="flex items-center justify-between mb-3 border-b border-slate-100 pb-2">
+                <span className="text-xs font-black uppercase tracking-wider text-slate-800">4. Тираж та Рентабельність</span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-semibold text-slate-600 block mb-1.5">Тираж (екземплярів):</label>
+                  <input
+                    type="number"
+                    min="50"
+                    step="50"
+                    value={magQuantity}
+                    onChange={(e) => setMagQuantity(Math.max(1, Number(e.target.value)))}
+                    className="w-full px-3 py-2.5 rounded-xl border border-slate-200 text-sm font-black text-slate-900 bg-white focus:outline-blue-500"
+                  />
+                  <div className="flex gap-1.5 mt-2">
+                    {[250, 500, 1000, 2000, 3000].map(q => (
+                      <button
+                        key={q}
+                        type="button"
+                        onClick={() => setMagQuantity(q)}
+                        className={`text-[10px] font-bold px-2 py-1 rounded border ${
+                          magQuantity === q ? 'bg-blue-600 text-white border-blue-600' : 'bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200'
+                        }`}
+                      >
+                        {q}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <div className="flex justify-between items-center mb-1.5">
+                    <label className="text-xs font-semibold text-slate-600">Комерційна націнка (Маржа):</label>
+                    <span className="text-xs font-black text-blue-600">{magMarginPct}%</span>
+                  </div>
+                  <input
+                    type="range"
+                    min="20"
+                    max="55"
+                    step="1"
+                    value={magMarginPct}
+                    onChange={(e) => setMagMarginPct(Number(e.target.value))}
+                    className="w-full accent-blue-600"
+                  />
+                  <div className="flex justify-between text-[10px] text-slate-400 mt-1">
+                    <span>20% (Мін)</span>
+                    <span>35% (Стандарт)</span>
+                    <span>55% (Преміум)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* RIGHT COLUMN: Results & Inspector (5 cols) */}
+          <div className="lg:col-span-5 flex flex-col gap-5">
+            {/* Main Price Card */}
+            <div className="ios-card bg-linear-to-br from-slate-900 via-slate-800 to-blue-950 text-white p-6 rounded-2xl shadow-lg border border-slate-700/60">
+              <div className="flex items-center justify-between text-xs text-slate-400 uppercase tracking-wider font-extrabold mb-1">
+                <span>Розрахована вартість накладу</span>
+                <span className="text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                  {magQuantity.toLocaleString('uk-UA')} шт
+                </span>
+              </div>
+
+              <div className="flex items-baseline gap-2 mt-2">
+                <span className="text-3xl sm:text-4xl font-black text-white tracking-tight">
+                  {currentCalc.finalPrice.toLocaleString('uk-UA')}
+                </span>
+                <span className="text-lg font-bold text-blue-300">грн</span>
+              </div>
+
+              <div className="flex items-center justify-between pt-3 mt-3 border-t border-slate-700/70 text-xs">
+                <span className="text-slate-300">Вартість за 1 журнал:</span>
+                <span className="text-base font-extrabold text-emerald-300">
+                  {currentCalc.unitPrice.toFixed(2)} грн / шт
+                </span>
+              </div>
+
+              {/* Action Buttons */}
+              <div className="grid grid-cols-2 gap-2.5 mt-5">
+                <button
+                  type="button"
+                  onClick={handleCopyCommercialQuote}
+                  className="w-full py-2.5 px-3 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-colors shadow-sm"
+                >
+                  <Send size={14} />
+                  <span>Копіювати КП</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setQuantity(magQuantity);
+                    setCategory('Журнали та каталоги');
+                    setStep('editor');
+                  }}
+                  className="w-full py-2.5 px-3 rounded-xl bg-white hover:bg-slate-100 text-slate-900 font-extrabold text-xs flex items-center justify-center gap-1.5 transition-colors shadow-sm"
+                >
+                  <Check size={14} />
+                  <span>В замовлення</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Engineering Specs Inspector */}
+            <div className="ios-card bg-white p-5" style={{ border: '1px solid #e2e8f0' }}>
+              <div className="flex items-center justify-between mb-3 border-b border-slate-100 pb-2">
+                <span className="text-xs font-black uppercase tracking-wider text-slate-800">
+                  ⚙️ Інженерні нормативи офсету
+                </span>
+                <span className="text-[11px] font-bold text-blue-600">
+                  Корінець: {spineMm} мм
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2 text-xs">
+                <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                  <div className="text-[10px] text-slate-400 font-bold uppercase">Зошитів у блоці</div>
+                  <div className="text-sm font-black text-slate-900 mt-0.5">
+                    {currentCalc.totalSignatures} зошити
+                  </div>
+                  <div className="text-[10px] text-slate-500">
+                    {currentCalc.full16Sig > 0 && `${currentCalc.full16Sig}×16 смуг`}
+                    {currentCalc.rem8Sig > 0 && ` + 1×8 смуг`}
+                    {currentCalc.rem4Sig > 0 && ` + 1×4 смуги`}
+                  </div>
+                </div>
+
+                <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                  <div className="text-[10px] text-slate-400 font-bold uppercase">Форми CTP (Пластини)</div>
+                  <div className="text-sm font-black text-blue-600 mt-0.5">
+                    {currentCalc.totalPlates} шт. B2
+                  </div>
+                  <div className="text-[10px] text-slate-500">
+                    {currentCalc.totalSignatures * 4} блок {isSeparateCover ? '+ 4 обкл.' : ''}
+                  </div>
+                </div>
+
+                <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                  <div className="text-[10px] text-slate-400 font-bold uppercase">Приладки машини</div>
+                  <div className="text-sm font-black text-slate-900 mt-0.5">
+                    {currentCalc.totalMakereadies} приладки
+                  </div>
+                  <div className="text-[10px] text-slate-500">
+                    {currentCalc.totalSignatures} на блок {isSeparateCover ? '+ 1 на обкл.' : ''}
+                  </div>
+                </div>
+
+                <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-100">
+                  <div className="text-[10px] text-slate-400 font-bold uppercase">Загальна вага паперу</div>
+                  <div className="text-sm font-black text-emerald-600 mt-0.5">
+                    {currentCalc.totalWeightKg} кг
+                  </div>
+                  <div className="text-[10px] text-slate-500">
+                    Блок {currentCalc.blockWeightKg} кг {isSeparateCover ? `+ Обкл. ${currentCalc.coverWeightKg} кг` : ''}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Detailed Cost Breakdown (Кошторис цеху) */}
+            {magShowCostDetails && (
+              <div className="ios-card bg-white p-5" style={{ border: '1px solid #e2e8f0' }}>
+                <div className="flex items-center justify-between mb-3 border-b border-slate-100 pb-2">
+                  <span className="text-xs font-black uppercase tracking-wider text-slate-800">
+                    📊 Деталізація собівартості (грн)
+                  </span>
+                  <span className="text-[11px] font-bold text-slate-400">Собівартість цеху</span>
+                </div>
+
+                <div className="space-y-1.5 text-xs">
+                  <div className="flex justify-between py-1 border-b border-slate-50">
+                    <span className="text-slate-600">1. Папір блоку ({currentCalc.blockWeightKg} кг):</span>
+                    <span className="font-bold text-slate-900">{currentCalc.blockPaperCost} грн</span>
+                  </div>
+                  {isSeparateCover && (
+                    <div className="flex justify-between py-1 border-b border-slate-50">
+                      <span className="text-slate-600">2. Папір обкладинки ({currentCalc.coverWeightKg} кг):</span>
+                      <span className="font-bold text-slate-900">{currentCalc.coverPaperCost} грн</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between py-1 border-b border-slate-50">
+                    <span className="text-slate-600">3. CTP-форми ({currentCalc.totalPlates} шт):</span>
+                    <span className="font-bold text-slate-900">{currentCalc.prepressCost} грн</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-50">
+                    <span className="text-slate-600">4. Приладки офсетної машини:</span>
+                    <span className="font-bold text-slate-900">{currentCalc.makereadyCost} грн</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-50">
+                    <span className="text-slate-600">5. Тиражний друк (прогони):</span>
+                    <span className="font-bold text-slate-900">{currentCalc.printingRunCost} грн</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-50">
+                    <span className="text-slate-600">6. Фальцювання ({currentCalc.totalSignatures} зош. × {magQuantity} шт):</span>
+                    <span className="font-bold text-slate-900">{currentCalc.foldingCost} грн</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-50">
+                    <span className="text-slate-600">7. Листопідбір блоку:</span>
+                    <span className="font-bold text-slate-900">{currentCalc.gatheringCost} грн</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-50">
+                    <span className="text-slate-600">8. Бігування обкладинки:</span>
+                    <span className="font-bold text-slate-900">{currentCalc.creasingCost} грн</span>
+                  </div>
+                  {currentCalc.laminationCost > 0 && (
+                    <div className="flex justify-between py-1 border-b border-slate-50">
+                      <span className="text-slate-600">9. Ламінація обкладинки:</span>
+                      <span className="font-bold text-slate-900">{currentCalc.laminationCost} грн</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between py-1 border-b border-slate-50">
+                    <span className="text-slate-600">10. Скріплення ({magBinding === 'staple' ? 'Скоба' : 'КБС'}):</span>
+                    <span className="font-bold text-slate-900">{currentCalc.bindingCost} грн</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-50">
+                    <span className="text-slate-600">11. Тристороннє підрізання блоку:</span>
+                    <span className="font-bold text-slate-900">{currentCalc.trimmingCost} грн</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-50">
+                    <span className="text-slate-600">12. Пакування та тара:</span>
+                    <span className="font-bold text-slate-900">{currentCalc.packagingCost} грн</span>
+                  </div>
+                  <div className="flex justify-between py-1 border-b border-slate-100 text-slate-500">
+                    <span>13. Загальновиробничі накладні (8%):</span>
+                    <span className="font-semibold">{currentCalc.overhead} грн</span>
+                  </div>
+
+                  <div className="flex justify-between py-2 mt-2 pt-2 border-t-2 border-slate-200 text-xs font-black">
+                    <span className="text-slate-800">Повна виробнича собівартість:</span>
+                    <span className="text-slate-900">{currentCalc.totalCost.toLocaleString('uk-UA')} грн</span>
+                  </div>
+                  <div className="flex justify-between py-1 text-xs font-bold text-blue-600">
+                    <span>Плановий прибуток друкарні ({magMarginPct}%):</span>
+                    <span>{(currentCalc.finalPrice - currentCalc.totalCost).toLocaleString('uk-UA')} грн</span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Quantity Price Matrix Grid */}
+        <div className="ios-card bg-white p-5" style={{ border: '1px solid #e2e8f0' }}>
+          <div className="flex items-center justify-between mb-3 border-b border-slate-100 pb-2">
+            <div>
+              <span className="text-xs font-black uppercase tracking-wider text-slate-800">
+                📈 Тиражна сітка (Порівняння ціни за одиницю при різних накладах)
+              </span>
+              <span className="text-[11px] text-slate-400 block mt-0.5">
+                Натисніть на будь-який тираж, щоб миттєво перерахувати замовлення
+              </span>
+            </div>
+            <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg border border-slate-200">
+              <button
+                type="button"
+                onClick={() => setMagPriceView('per_item')}
+                className={`text-[11px] font-bold px-2 py-1 rounded-md transition-all ${
+                  magPriceView === 'per_item' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-500 hover:text-slate-900'
+                }`}
+              >
+                Ціна за 1 шт
+              </button>
+              <button
+                type="button"
+                onClick={() => setMagPriceView('per_total')}
+                className={`text-[11px] font-bold px-2 py-1 rounded-md transition-all ${
+                  magPriceView === 'per_total' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-500 hover:text-slate-900'
+                }`}
+              >
+                За весь наклад
+              </button>
+            </div>
+          </div>
+
+          <div className="overflow-x-auto">
+            <table className="w-full text-center text-xs border-collapse">
+              <thead>
+                <tr className="bg-slate-800 text-white font-bold text-xs uppercase tracking-wider">
+                  <th className="py-2.5 px-3 text-left">Формат / Сторінок</th>
+                  <th className="py-2.5 px-2">Скріплення</th>
+                  {[100, 250, 500, 1000, 2000, 3000, 5000].map(tir => (
+                    <th key={tir} className="py-2.5 px-3 font-black">
+                      {tir} шт
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                <tr className="hover:bg-blue-50/40 transition-colors">
+                  <td className="py-2.5 px-3 text-left font-bold text-slate-800">
+                    {magFormat} ({pages} стор., {curBlockPaper.name.split(' ')[1] || '115г'})
+                  </td>
+                  <td className="py-2.5 px-2 font-bold text-blue-600">
+                    {magBinding === 'staple' ? 'Скоба' : 'КБС'}
+                  </td>
+                  {[100, 250, 500, 1000, 2000, 3000, 5000].map(tir => {
+                    const rowCalc = calculateMagazineRun(tir);
+                    const isSelected = magQuantity === tir;
+                    return (
+                      <td
+                        key={tir}
+                        onClick={() => setMagQuantity(tir)}
+                        className={`py-2.5 px-3 font-extrabold cursor-pointer transition-all ${
+                          isSelected
+                            ? 'bg-blue-600 text-white shadow-inner'
+                            : 'text-slate-900 hover:bg-blue-100 hover:text-blue-900'
+                        }`}
+                      >
+                        {magPriceView === 'per_item' ? `${rowCalc.unitPrice.toFixed(2)} ₴` : `${rowCalc.finalPrice.toLocaleString('uk-UA')} ₴`}
+                      </td>
+                    );
+                  })}
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+
   return (
     <div className="main-content" style={{ backgroundColor: 'var(--bg-system)', width: '100%', minHeight: '100%', padding: '24px 28px 48px 28px', overflowY: 'visible' }}>
       {step === 'catalog' ? (
@@ -5388,7 +6256,15 @@ export const Calculator: React.FC = () => {
                         icon: <Scissors size={28} style={{ color: 'var(--primary)' }} />,
                         metric: 'Готові штампи'
                       },
-                      { 
+                                            { 
+                        title: 'Журнали та каталоги', 
+                        badge: 'Офсетний розрахунок', 
+                        desc: 'Глянцеві журнали, фірмові каталоги, брошури на скобу або термоклей КБС/PUR. Повний розрахунок по зошитах.', 
+                        subTab: 'magazines', 
+                        icon: <BookOpen size={28} style={{ color: 'var(--primary)' }} />,
+                        metric: 'Зошити, CTP, скоба / КБС'
+                      },
+{ 
                         title: 'Багатосторінкова', 
                         badge: 'Брошурування', 
                         desc: 'Каталоги, журнали, брошури, блокноти на пружині, ресторанні меню…', 
@@ -8992,6 +9868,7 @@ export const Calculator: React.FC = () => {
               )}
 
               {/* OFFSET NOTEBOOKS CALCULATOR */}
+              {offsetSubTab === 'magazines' && renderMagazinesCalculator('offset')}
               {offsetSubTab === 'notebooks' && renderNotebooksCalculator('offset')}
             </div>
           )}
