@@ -1377,7 +1377,7 @@ export const Calculator: React.FC = () => {
     | 'Дипломи і палітурка' 
     | 'Логотипи виготовлення' 
     | 'Шкільні журнали'
-    | 'Журнали та каталоги' 
+    | 'Журнали' 
     | 'Етикетки'
     | 'Календарі'
     | 'Блокноти'
@@ -3972,9 +3972,9 @@ export const Calculator: React.FC = () => {
     const handleCopyCommercialQuote = () => {
       const bindingLabel = magBinding === 'staple' ? 'Скоба (2 шт.)' : magBinding === 'kbs' ? 'Термоклей (КБС)' : 'PUR-клей';
       const lamLabel = magCoverLam === 'none' ? 'без ламінації' : magCoverLam === 'matte' ? 'матова ламінація' : magCoverLam === 'gloss' ? 'глянцева ламінація' : 'Soft-touch ламінація';
-      const text = `📋 КОМЕРЦІЙНА ПРОПОЗИЦІЯ: ВИГОТОВЛЕННЯ ЖУРНАЛІВ
+      const text = `📋 КОМЕРЦІЙНА ПРОПОЗИЦІЯ: ДРУК ЖУРНАЛІВ
 --------------------------------------------------
-Виріб: Журнал / Каталог (${magFormat}, ${wMm}x${hMm} мм)
+Виріб: Журнал (${magFormat}, ${wMm}x${hMm} мм)
 Обсяг: ${pages} сторінок блоку + обкладинка
 Тираж: ${magQuantity.toLocaleString('uk-UA')} шт.
 Скріплення: ${bindingLabel} (корінець: ${spineMm} мм)
@@ -4011,7 +4011,7 @@ export const Calculator: React.FC = () => {
               <div className="flex items-center gap-2 text-[11px] font-extrabold uppercase tracking-wider text-slate-400">
                 <span>Офсетний друк</span>
                 <span>/</span>
-                <span className="text-blue-600 font-black">Журнали та каталоги</span>
+                <span className="text-blue-600 font-black">Журнали</span>
               </div>
               <span className="text-sm font-black text-slate-900 leading-tight">
                 Інженерний розрахунок багатосторінкових виробів по зошитах
@@ -4072,7 +4072,7 @@ export const Calculator: React.FC = () => {
                 }
               },
               {
-                title: 'Товстий каталог А4 (64 стор.)',
+                title: 'Товстий журнал А4 (64 стор., КБС)',
                 sub: 'Термоклей КБС • 130г блок • 250г + Soft-touch',
                 onClick: () => {
                   setMagFormat('A4');
@@ -4084,7 +4084,7 @@ export const Calculator: React.FC = () => {
                 }
               },
               {
-                title: 'Економ-брошура А5 (16 стор.)',
+                title: 'Економ-журнал А5 (16 стор.)',
                 sub: 'Своя обкладинка з блоку 115г • 2 скоби',
                 onClick: () => {
                   setMagFormat('A5');
@@ -4410,7 +4410,7 @@ export const Calculator: React.FC = () => {
                   type="button"
                   onClick={() => {
                     setQuantity(magQuantity);
-                    setCategory('Журнали та каталоги');
+                    setCategory('Журнали');
                     setStep('editor');
                   }}
                   className="w-full py-2.5 px-3 rounded-xl bg-white hover:bg-slate-100 text-slate-900 font-extrabold text-xs flex items-center justify-center gap-1.5 transition-colors shadow-sm"
@@ -4921,6 +4921,7 @@ export const Calculator: React.FC = () => {
                       { id: 'banners', title: 'БАНЕРИ', tab: 'wide', sub: 'banner' },
                       { id: 'blanks', title: 'БЛАНКИ, ОГОЛОШЕННЯ', tab: 'digital', sub: 'sheets' },
                       { id: 'notebooks', title: 'БЛОКНОТИ', tab: 'offset', sub: 'notebooks' },
+                      { id: 'magazines', title: 'ЖУРНАЛИ (ОФСЕТ)', tab: 'offset', sub: 'magazines' },
                       { id: 'brochures', title: 'БРОШУРИ, КАТАЛОГИ', tab: 'offset', sub: 'multipage' },
                       { id: 'booklets', title: 'БУКЛЕТИ, КАРТИ', tab: 'offset', sub: 'sheets' },
                       { id: 'tags', title: 'БІРКИ, ЦІННИКИ', tab: 'digital', sub: 'felling' },
@@ -5196,6 +5197,26 @@ export const Calculator: React.FC = () => {
                     )}
 
                     {/* 6. Booklets & Catalogs (БРОШУРИ, КАТАЛОГИ) */}
+                    {hoveredMegaProduct === 'magazines' && (
+                      <div className="flex flex-col items-center text-center animate-fadeIn">
+                        <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
+                          <rect x="55" y="20" width="90" height="110" rx="3" fill="#FFFFFF" stroke="#007AFF" strokeWidth="2.5"/>
+                          <path d="M55 20H66V130H55V20Z" fill="#007AFF" fillOpacity="0.25"/>
+                          <line x1="74" y1="40" x2="132" y2="40" stroke="#007AFF" strokeWidth="2.5" strokeLinecap="round"/>
+                          <line x1="74" y1="54" x2="118" y2="54" stroke="#94A3B8" strokeWidth="2" strokeLinecap="round"/>
+                          <line x1="74" y1="68" x2="134" y2="68" stroke="#CBD5E1" strokeWidth="1.5"/>
+                          <line x1="74" y1="80" x2="134" y2="80" stroke="#CBD5E1" strokeWidth="1.5"/>
+                          <line x1="74" y1="92" x2="120" y2="92" stroke="#CBD5E1" strokeWidth="1.5"/>
+                        </svg>
+                        <h4 style={{ fontSize: '13.5px', fontWeight: '800', color: '#1e293b', marginTop: '12px' }}>
+                          Журнали (Офсетний друк)
+                        </h4>
+                        <p style={{ fontSize: '11px', color: '#64748b', margin: '4px 0 0 0', maxWidth: '220px' }}>
+                          Глянцеві, наукові та періодичні видання. Автоматичний спуск смуг, розбивка на зошити та CTP-форми.
+                        </p>
+                      </div>
+                    )}
+
                     {hoveredMegaProduct === 'brochures' && (
                       <div className="flex flex-col items-center text-center animate-fadeIn">
                         <svg width="200" height="150" viewBox="0 0 200 150" fill="none">
@@ -6257,9 +6278,9 @@ export const Calculator: React.FC = () => {
                         metric: 'Готові штампи'
                       },
                                             { 
-                        title: 'Журнали та каталоги', 
+                        title: 'Журнали', 
                         badge: 'Офсетний розрахунок', 
-                        desc: 'Глянцеві журнали, фірмові каталоги, брошури на скобу або термоклей КБС/PUR. Повний розрахунок по зошитах.', 
+                        desc: 'Глянцеві, корпоративні, наукові та періодичні журнали на скобу або термоклей (КБС/PUR). Повний прорахунок по зошитах і CTP.', 
                         subTab: 'magazines', 
                         icon: <BookOpen size={28} style={{ color: 'var(--primary)' }} />,
                         metric: 'Зошити, CTP, скоба / КБС'
