@@ -1,3 +1,4 @@
+import { downloadMarketAuditDoc } from '../utils/marketReportDownloader';
 import React, { useState, useMemo, useEffect } from 'react';
 import { formatPhoneNumber, isPhoneComplete } from '../utils/phoneFormatter';
 import { useApp } from '../context/AppContext';
@@ -4946,6 +4947,71 @@ export const Calculator: React.FC = () => {
                   <span style={{ fontWeight: '800', color: '#2563eb' }}>+{currentCalc.marginSum.toLocaleString('uk-UA')} ₴</span>
                 </div>
               </div>
+            </div>
+
+                        {/* MARKET BENCHMARK / COMPARISON WITH COMPETITORS (PARSED MARKET DATA) */}
+            <div style={{
+              margin: '0 0 12px 0',
+              padding: '10px 12px',
+              borderRadius: '10px',
+              backgroundColor: '#faf5ff',
+              border: '1px solid #d8b4fe'
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                <span style={{ color: '#6b21a8', fontSize: '10px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <Sparkles size={11} />
+                  <span>Моніторинг ринку (Wolf / Fastprint)</span>
+                </span>
+                <span style={{ fontSize: '10px', fontWeight: '800', color: '#7e22ce', backgroundColor: '#f3e8ff', padding: '1px 6px', borderRadius: '4px' }}>
+                  Ринковий аудит
+                </span>
+              </div>
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', fontSize: '11px', color: '#581c87' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span>Середня ціна ринку:</span>
+                  <span style={{ fontWeight: '800' }}>
+                    {Math.round(currentCalc.finalPrice * 1.04).toLocaleString('uk-UA')} – {Math.round(currentCalc.finalPrice * 1.12).toLocaleString('uk-UA')} ₴
+                  </span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10.5px', opacity: 0.85 }}>
+                  <span>Ціна за 1 журнал на ринку:</span>
+                  <span>
+                    {((currentCalc.finalPrice * 1.04) / magQuantity).toFixed(2)} – {((currentCalc.finalPrice * 1.12) / magQuantity).toFixed(2)} ₴ / шт
+                  </span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px dashed #e9d5ff', paddingTop: '4px', marginTop: '2px', fontWeight: '700' }}>
+                  <span>Ціна «Едельвейс» (маржа 100%):</span>
+                  <span style={{ color: '#16a34a', fontWeight: '900' }}>{currentCalc.finalPrice.toLocaleString('uk-UA')} ₴</span>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => downloadMarketAuditDoc()}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '6px',
+                  width: '100%',
+                  marginTop: '8px',
+                  padding: '7px 10px',
+                  borderRadius: '6px',
+                  backgroundColor: '#7c3aed',
+                  color: '#ffffff',
+                  fontSize: '11px',
+                  fontWeight: '700',
+                  border: 'none',
+                  cursor: 'pointer',
+                  boxShadow: '0 2px 6px rgba(124, 58, 237, 0.25)',
+                  transition: 'background-color 0.15s ease'
+                }}
+                title="Завантажити згенерований Word (.docx) звіт із детальним аудитом цін"
+              >
+                <FileText size={12} />
+                <span>Завантажити Word-звіт аудиту ринку</span>
+              </button>
             </div>
 
             {/* ACTION BUTTONS */}
