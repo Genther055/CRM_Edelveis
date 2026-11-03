@@ -4130,7 +4130,7 @@ export const Calculator: React.FC = () => {
           {
             key: 'binding',
             num: 11,
-            name: `Скріплення (${magBinding === 'staple' ? 'Скоба 2 шт.' : magBinding === 'kbs' ? 'КБС термоклей' : 'Ниткошвейне скріплення'})`,
+            name: `Скріплення (${magBinding === 'staple' ? 'Скоба 2 шт.' : magBinding === 'kbs' ? 'Термоклей' : 'Ниткошвейне скріплення'})`,
             details: `Основна технологічна операція скріплення накладу`,
             tariff: tBinding,
             defTariff: defBindingTariff,
@@ -4201,7 +4201,7 @@ export const Calculator: React.FC = () => {
 
     // Commercial Proposal Copy
     const handleCopyCommercialQuote = () => {
-      const bLabel = magBinding === 'staple' ? 'Скоба (2 шт.)' : magBinding === 'kbs' ? 'Термоклей (КБС)' : 'Ниткошвейне скріплення';
+      const bLabel = magBinding === 'staple' ? 'Скоба (2 шт.)' : magBinding === 'kbs' ? 'Термоклей' : 'Ниткошвейне скріплення';
       const cTypeLabel = isHardcover ? 'Тверда палітурка (7БЦ)' : 'М’яка обкладинка';
       const lLabel = magCoverLam === 'none' ? 'без ламінації' : magCoverLam === 'matte' ? 'матова ламінація' : magCoverLam === 'gloss' ? 'глянцева ламінація' : magCoverLam === 'softtouch' ? 'Soft-touch ламінація' : 'двостороння ламінація';
       const colorLabel = magBlockColor === '4+4' ? '4+4 (повноколір)' : '1+1 (чорно-білий друк)';
@@ -4231,7 +4231,7 @@ export const Calculator: React.FC = () => {
 
     const bLabel = magBinding === 'staple' ? 'Скоба (2 шт.)' : magBinding === 'kbs' ? 'Термоклей (КБС)' : 'Ниткошвейне скріплення';
     const cTypeLabel = isHardcover ? 'Тверда палітурка (7БЦ)' : 'М’яка обкладинка';
-    const lLabel = magCoverLam === 'none' ? 'Без ламінації' : magCoverLam === 'matte' ? 'Матова 1+0' : magCoverLam === 'gloss' ? 'Глянцева 1+0' : magCoverLam === 'softtouch' ? 'Soft-touch' : magCoverLam === 'matte_duo' ? 'Матова 1+1' : 'Глянцева 1+1';
+    const lLabel = magCoverLam === 'none' ? 'Без ламінації' : magCoverLam === 'matte' ? 'Матова' : 'Глянцева';
 
     return (
       <div className="flex flex-col gap-4">
@@ -4253,7 +4253,7 @@ export const Calculator: React.FC = () => {
             <div className="flex items-center gap-2">
               <span style={{ color: 'var(--text-medium)', fontSize: '11px', fontWeight: '600' }}>Каталог / Офсет /</span>
               <span style={{ fontWeight: '800', fontSize: '13px', color: 'var(--text-dark)' }}>Журнали</span>
-              <span className="ios-badge ios-badge-blue" style={{ fontSize: '10px' }}>Тарифи 1С</span>
+              
               {hasCustomOverrides && (
                 <span className="ios-badge ios-badge-orange" style={{ fontSize: '10px' }}>
                   Ручні тарифи ({customTariffCount + customTotalCount})
@@ -4460,18 +4460,10 @@ export const Calculator: React.FC = () => {
 
             {/* CARD 2: PAGES COUNT & PRINT QUANTITY */}
             <div className="ios-card bg-white" style={{ padding: '14px 16px', border: '1px solid var(--border-light)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+              <div style={{ marginBottom: '10px' }}>
                 <span style={{ color: 'var(--text-medium)', fontSize: '10px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                   2. Обсяг блоку та наклад
                 </span>
-                <div className="flex items-center gap-1.5">
-                  <span className="ios-badge ios-badge-blue" style={{ fontSize: '10px' }}>
-                    {currentCalc.totalSignatures} зошити по 16 смуг (B2)
-                  </span>
-                  <span className="ios-badge ios-badge-purple" style={{ fontSize: '10px' }}>
-                    Корінець: {spineMm} мм
-                  </span>
-                </div>
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '14px' }}>
@@ -4582,12 +4574,9 @@ export const Calculator: React.FC = () => {
 
             {/* CARD 3: PAPERS & PRINTING */}
             <div className="ios-card bg-white" style={{ padding: '14px 16px', border: '1px solid var(--border-light)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+              <div style={{ marginBottom: '10px' }}>
                 <span style={{ color: 'var(--text-medium)', fontSize: '10px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                   3. Матеріали та колірність
-                </span>
-                <span style={{ fontSize: '10px', color: 'var(--text-medium)' }}>
-                  Крейда 66 грн/кг • Офсет 56 грн/кг
                 </span>
               </div>
 
@@ -4713,13 +4702,11 @@ export const Calculator: React.FC = () => {
                 <span style={{ color: 'var(--text-medium)', fontSize: '10px', fontWeight: '700', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>
                   Ламінація обкладинки:
                 </span>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: '6px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '6px' }}>
                   {[
                     { id: 'none', label: 'Без ламінації' },
-                    { id: 'matte', label: 'Матова 1+0' },
-                    { id: 'gloss', label: 'Глянцева 1+0' },
-                    { id: 'softtouch', label: 'Soft-touch' },
-                    { id: 'matte_duo', label: 'Матова 1+1' }
+                    { id: 'matte', label: 'Матова' },
+                    { id: 'gloss', label: 'Глянцева' }
                   ].map(lam => (
                     <button
                       key={lam.id}
@@ -4754,7 +4741,7 @@ export const Calculator: React.FC = () => {
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
                 {[
                   { id: 'staple', label: 'Скоба (2 шт.)' },
-                  { id: 'kbs', label: 'Термоклей (КБС)' },
+                  { id: 'kbs', label: 'Термоклей' },
                   { id: 'thread', label: 'Ниткошвейка' }
                 ].map(b => {
                   const isSel = magBinding === b.id;
@@ -4791,9 +4778,7 @@ export const Calculator: React.FC = () => {
                 <span style={{ color: 'var(--text-medium)', fontSize: '10px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                   СПЕЦИФІКАЦІЯ ЖУРНАЛУ
                 </span>
-                <span className="ios-badge ios-badge-blue" style={{ fontSize: '9px', padding: '1px 5px' }}>
-                  1С Офсет
-                </span>
+                
               </div>
               <div style={{ display: 'flex', gap: '4px' }}>
                 <button
