@@ -3842,11 +3842,7 @@ export const Calculator: React.FC = () => {
     const sheetsInBlock = pages / 2;
     const spineMm = Number((sheetsInBlock * curBlockPaper.caliper + (isHardcover ? 3.0 : isSeparateCover ? curCoverPaper.caliper * 2 : 0)).toFixed(2));
 
-    // Compatibility warnings
-    const isStapleWarning = magBinding === 'staple' && pages > 64;
-    const isKbsWarning = magBinding === 'kbs' && (spineMm < 2.0 || pages < 24);
-
-    // 4. Exact 1C Technology Rates Engine (Звірено з базою 1С Едельвейс від 02.11)
+    // 4. Exact 1C Technology Rates Engine
     const calculateMagazineRun = (qty: number) => {
       // A. Signatures decomposition (Зошити по 16 смуг)
       const sigCapacity = 16;
@@ -4203,80 +4199,6 @@ export const Calculator: React.FC = () => {
       setMagCustomTotals({});
     };
 
-    // Preset configurations
-    const presets = [
-      {
-        id: 'p1',
-        title: 'Глянцевий А4 (32 стор.)',
-        desc: 'Крейда 115г 4+4 • 250г + мат',
-        format: 'A4',
-        pages: 32,
-        coverPaper: 'coat_250',
-        coverPrint: '4+4',
-        blockPaper: 'coat_115',
-        lam: 'matte',
-        binding: 'staple',
-        coverType: 'soft',
-        color: '4+4'
-      },
-      {
-        id: 'p2',
-        title: 'Корпоративний А5 (48 стор.)',
-        desc: 'Крейда 115г 4+4 • 200г + глянець',
-        format: 'A5',
-        pages: 48,
-        coverPaper: 'coat_200',
-        coverPrint: '4+4',
-        blockPaper: 'coat_115',
-        lam: 'gloss',
-        binding: 'staple',
-        coverType: 'soft',
-        color: '4+4'
-      },
-      {
-        id: 'p3',
-        title: 'Товстий А4 (64 стор., КБС)',
-        desc: 'Крейда 130г • 250г + Soft-touch',
-        format: 'A4',
-        pages: 64,
-        coverPaper: 'coat_250',
-        coverPrint: '4+0',
-        blockPaper: 'coat_130',
-        lam: 'softtouch',
-        binding: 'kbs',
-        coverType: 'soft',
-        color: '4+4'
-      },
-      {
-        id: 'p4',
-        title: 'Науковий А5 (80 стор., 1+1)',
-        desc: 'Офсет 80г ч/б • 250г + мат',
-        format: 'A5',
-        pages: 80,
-        coverPaper: 'coat_250',
-        coverPrint: '4+0',
-        blockPaper: 'off_80',
-        lam: 'matte',
-        binding: 'kbs',
-        coverType: 'soft',
-        color: '1+1'
-      },
-      {
-        id: 'p5',
-        title: 'Преміум 7БЦ (80 стор.)',
-        desc: 'Тверда кришка • Ниткошвейка',
-        format: 'A4',
-        pages: 80,
-        coverPaper: 'coat_250',
-        coverPrint: '4+0',
-        blockPaper: 'coat_130',
-        lam: 'matte',
-        binding: 'thread',
-        coverType: 'hard',
-        color: '4+4'
-      }
-    ];
-
     // Commercial Proposal Copy
     const handleCopyCommercialQuote = () => {
       const bLabel = magBinding === 'staple' ? 'Скоба (2 шт.)' : magBinding === 'kbs' ? 'Термоклей (КБС)' : 'Ниткошвейне скріплення';
@@ -4284,7 +4206,7 @@ export const Calculator: React.FC = () => {
       const lLabel = magCoverLam === 'none' ? 'без ламінації' : magCoverLam === 'matte' ? 'матова ламінація' : magCoverLam === 'gloss' ? 'глянцева ламінація' : magCoverLam === 'softtouch' ? 'Soft-touch ламінація' : 'двостороння ламінація';
       const colorLabel = magBlockColor === '4+4' ? '4+4 (повноколір)' : '1+1 (чорно-білий друк)';
       const orientLabel = magOrientation === 'vert' ? 'книжкова (вертикальна)' : 'альбомна (горизонтальна)';
-      const text = `📋 КОМЕРЦІЙНА ПРОПОЗИЦІЯ: ДРУК ЖУРНАЛІВ
+      const text = `КОМЕРЦІЙНА ПРОПОЗИЦІЯ: ДРУК ЖУРНАЛІВ
 --------------------------------------------------
 Виріб: Журнал (${magFormat}, ${wMm}x${hMm} мм, ${orientLabel})
 Тип обкладинки: ${cTypeLabel}
@@ -4301,10 +4223,10 @@ export const Calculator: React.FC = () => {
 - Разом до сплати: ${currentCalc.finalPrice.toLocaleString('uk-UA')} ₴
 - Ціна за 1 журнал: ${currentCalc.unitPrice.toFixed(2)} ₴ / шт
 
-(Розраховано за нормативами 1С Едельвейс від 02.11)
+(Розраховано за нормативами 1С Едельвейс)
 --------------------------------------------------`;
       navigator.clipboard.writeText(text);
-      alert('📋 Комерційну пропозицію скопійовано в буфер обміну!');
+      alert('Комерційну пропозицію скопійовано в буфер обміну!');
     };
 
     const bLabel = magBinding === 'staple' ? 'Скоба (2 шт.)' : magBinding === 'kbs' ? 'Термоклей (КБС)' : 'Ниткошвейне скріплення';
@@ -4313,7 +4235,7 @@ export const Calculator: React.FC = () => {
 
     return (
       <div className="flex flex-col gap-4">
-        {/* TOP COMMAND & FILTER BAR (Clean CRM Style matching Image 2) */}
+        {/* TOP COMMAND & FILTER BAR */}
         <div className="ios-card bg-white" style={{ display: 'flex', gap: '12px', padding: '10px 16px', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', border: '1px solid var(--border-light)' }}>
           <div className="flex items-center gap-3">
             <button
@@ -4331,10 +4253,10 @@ export const Calculator: React.FC = () => {
             <div className="flex items-center gap-2">
               <span style={{ color: 'var(--text-medium)', fontSize: '11px', fontWeight: '600' }}>Каталог / Офсет /</span>
               <span style={{ fontWeight: '800', fontSize: '13px', color: 'var(--text-dark)' }}>Журнали</span>
-              <span className="ios-badge ios-badge-blue" style={{ fontSize: '10px' }}>Тарифи 1С (02.11)</span>
+              <span className="ios-badge ios-badge-blue" style={{ fontSize: '10px' }}>Тарифи 1С</span>
               {hasCustomOverrides && (
                 <span className="ios-badge ios-badge-orange" style={{ fontSize: '10px' }}>
-                  ✏️ Ручні тарифи ({customTariffCount + customTotalCount})
+                  Ручні тарифи ({customTariffCount + customTotalCount})
                 </span>
               )}
             </div>
@@ -4382,49 +4304,9 @@ export const Calculator: React.FC = () => {
           </div>
         </div>
 
-        {/* QUICK PRESETS STRIP (Compact Tags Style matching Image 2 "ТЕГИ") */}
-        <div className="ios-card bg-white" style={{ padding: '8px 14px', border: '1px solid var(--border-light)', display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-          <span style={{ color: 'var(--text-medium)', fontSize: '10px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'flex', alignItems: 'center', gap: '4px' }}>
-            <Bookmark size={11} /> Пресети:
-          </span>
-          <div className="flex items-center gap-2 flex-wrap flex-1">
-            {presets.map(p => (
-              <button
-                key={p.id}
-                type="button"
-                onClick={() => {
-                  setMagFormat(p.format as any);
-                  setMagBlockPages(p.pages);
-                  setMagCoverPaper(p.coverPaper);
-                  setMagCoverPrint(p.coverPrint as any);
-                  setMagBlockPaper(p.blockPaper);
-                  setMagCoverLam(p.lam as any);
-                  setMagBinding(p.binding as any);
-                  setMagCoverType(p.coverType as any);
-                  setMagBlockColor(p.color as any);
-                }}
-                className="ios-badge"
-                style={{
-                  fontSize: '11px',
-                  padding: '4px 10px',
-                  cursor: 'pointer',
-                  backgroundColor: magFormat === p.format && magBlockPages === p.pages && magBinding === p.binding ? '#eff6ff' : 'var(--bg-system)',
-                  color: magFormat === p.format && magBlockPages === p.pages && magBinding === p.binding ? '#1d4ed8' : 'var(--text-dark)',
-                  border: magFormat === p.format && magBlockPages === p.pages && magBinding === p.binding ? '1px solid #93c5fd' : '1px solid var(--border-light)',
-                  fontWeight: magFormat === p.format && magBlockPages === p.pages && magBinding === p.binding ? '800' : '600',
-                  transition: 'all 0.12s ease'
-                }}
-              >
-                <span>{p.title}</span>
-                <span style={{ fontSize: '9px', opacity: 0.7, marginLeft: '4px' }}>({p.desc})</span>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* MAIN SPLIT VIEW (Like Image 2: Grid 1fr 390px) */}
+        {/* MAIN SPLIT VIEW */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 390px', gap: '16px', alignItems: 'start' }}>
-          {/* LEFT COLUMN: PARAMETERS CONFIGURATOR IN CLEAN IOS-CARDS */}
+          {/* LEFT COLUMN: PARAMETERS CONFIGURATOR */}
           <div className="flex flex-col gap-3">
             {/* CARD 1: FORMAT & COVER TYPE */}
             <div className="ios-card bg-white" style={{ padding: '14px 16px', border: '1px solid var(--border-light)' }}>
@@ -4513,7 +4395,7 @@ export const Calculator: React.FC = () => {
                         cursor: 'pointer'
                       }}
                     >
-                      📄 Книжкова
+                      Книжкова
                     </button>
                     <button
                       type="button"
@@ -4529,7 +4411,7 @@ export const Calculator: React.FC = () => {
                         cursor: 'pointer'
                       }}
                     >
-                      📑 Альбомна
+                      Альбомна
                     </button>
                   </div>
                 </div>
@@ -4553,7 +4435,7 @@ export const Calculator: React.FC = () => {
                         cursor: 'pointer'
                       }}
                     >
-                      📘 М’яка
+                      М’яка
                     </button>
                     <button
                       type="button"
@@ -4569,7 +4451,7 @@ export const Calculator: React.FC = () => {
                         cursor: 'pointer'
                       }}
                     >
-                      📕 Тверда 7БЦ
+                      Тверда 7БЦ
                     </button>
                   </div>
                 </div>
@@ -4750,7 +4632,7 @@ export const Calculator: React.FC = () => {
                         cursor: 'pointer'
                       }}
                     >
-                      🌈 4+4 Колір
+                      4+4 Колір
                     </button>
                     <button
                       type="button"
@@ -4766,7 +4648,7 @@ export const Calculator: React.FC = () => {
                         cursor: 'pointer'
                       }}
                     >
-                      ⚫ 1+1 Ч/Б
+                      1+1 Ч/Б
                     </button>
                   </div>
                 </div>
@@ -4861,29 +4743,19 @@ export const Calculator: React.FC = () => {
               </div>
             </div>
 
-            {/* CARD 4: BINDING & FINISHING */}
+            {/* CARD 4: BINDING & FINISHING (CLEAN - WITHOUT EMOJIS, MINI DETAILS, OR WARNINGS) */}
             <div className="ios-card bg-white" style={{ padding: '14px 16px', border: '1px solid var(--border-light)' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' }}>
+              <div style={{ marginBottom: '10px' }}>
                 <span style={{ color: 'var(--text-medium)', fontSize: '10px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                   4. Скріплення та фінішна обробка
                 </span>
-                {isStapleWarning && (
-                  <span className="ios-badge ios-badge-orange" style={{ fontSize: '9px' }}>
-                    ⚠️ {pages} стор. краще на КБС або нитку
-                  </span>
-                )}
-                {isKbsWarning && (
-                  <span className="ios-badge ios-badge-yellow" style={{ fontSize: '9px' }}>
-                    ⚠️ Тонкий корінець ({spineMm} мм) для КБС
-                  </span>
-                )}
               </div>
 
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
                 {[
-                  { id: 'staple', label: 'Скоба (2 шт.)', desc: 'До 64 сторінок', icon: '📎' },
-                  { id: 'kbs', label: 'Термоклей (КБС)', desc: 'Від 32 сторінок', icon: '📕' },
-                  { id: 'thread', label: 'Ниткошвейка', desc: 'Преміум надійність', icon: '🧵' }
+                  { id: 'staple', label: 'Скоба (2 шт.)' },
+                  { id: 'kbs', label: 'Термоклей (КБС)' },
+                  { id: 'thread', label: 'Ниткошвейка' }
                 ].map(b => {
                   const isSel = magBinding === b.id;
                   return (
@@ -4892,18 +4764,18 @@ export const Calculator: React.FC = () => {
                       type="button"
                       onClick={() => setMagBinding(b.id as any)}
                       style={{
-                        padding: '8px 10px',
+                        padding: '10px 12px',
                         borderRadius: '10px',
                         border: isSel ? '1.5px solid #007AFF' : '1px solid var(--border-light)',
                         backgroundColor: isSel ? '#eff6ff' : '#ffffff',
                         color: isSel ? '#1d4ed8' : 'var(--text-dark)',
                         textAlign: 'center',
-                        cursor: 'pointer'
+                        cursor: 'pointer',
+                        fontWeight: '800',
+                        fontSize: '12px'
                       }}
                     >
-                      <div style={{ fontSize: '14px', marginBottom: '2px' }}>{b.icon}</div>
-                      <div style={{ fontWeight: '800', fontSize: '12px' }}>{b.label}</div>
-                      <div style={{ fontSize: '9px', color: isSel ? '#3b82f6' : 'var(--text-medium)', marginTop: '1px' }}>{b.desc}</div>
+                      {b.label}
                     </button>
                   );
                 })}
@@ -4911,7 +4783,7 @@ export const Calculator: React.FC = () => {
             </div>
           </div>
 
-          {/* RIGHT COLUMN: CALCULATION SPECIFICATION CARD (EXACT STYLE OF IMAGE 2 "КАРТКА ЗАПИТУ L-101") */}
+          {/* RIGHT COLUMN: CALCULATION SPECIFICATION CARD (WITHOUT TAGS) */}
           <div className="ios-card bg-white" style={{ padding: '16px', border: '1px solid var(--border-light)', position: 'sticky', top: '16px' }}>
             {/* Header of Drawer */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-light)', paddingBottom: '10px', marginBottom: '12px' }}>
@@ -4967,7 +4839,7 @@ export const Calculator: React.FC = () => {
               </p>
             </div>
 
-            {/* СПЕЦИФІКАЦІЯ КАЛЬКУЛЯТОРА BLOCK (Exact style from Image 2) */}
+            {/* СПЕЦИФІКАЦІЯ КАЛЬКУЛЯТОРА BLOCK */}
             <div style={{ backgroundColor: '#f8fafc', padding: '12px', borderRadius: '10px', border: '1px solid #e2e8f0', marginBottom: '12px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '8px' }}>
                 <span style={{ color: 'var(--text-medium)', fontSize: '10px', fontWeight: '800', textTransform: 'uppercase' }}>
@@ -4983,7 +4855,7 @@ export const Calculator: React.FC = () => {
                 <strong style={{ color: 'var(--text-dark)' }}>{currentCalc.unitPrice.toFixed(2)} ₴ / прим</strong>
               </div>
 
-              {/* 2-Column Key/Value Grid (Matching Image 2) */}
+              {/* 2-Column Key/Value Grid */}
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px 12px', fontSize: '11px' }}>
                 <div><span style={{ color: 'var(--text-medium)' }}>Формат:</span> <strong style={{ color: 'var(--text-dark)' }}>{magFormat} ({wMm}×{hMm})</strong></div>
                 <div><span style={{ color: 'var(--text-medium)' }}>Обсяг:</span> <strong style={{ color: 'var(--text-dark)' }}>{pages} стор.</strong></div>
@@ -4995,22 +4867,9 @@ export const Calculator: React.FC = () => {
                 <div><span style={{ color: 'var(--text-medium)' }}>Зошитів:</span> <strong style={{ color: 'var(--text-dark)' }}>{currentCalc.totalSignatures} зош. B2</strong></div>
               </div>
 
-              {/* Subtle Tag Box (like in Image 2) */}
+              {/* Subtle Tag Box */}
               <div style={{ fontSize: '10px', color: '#1e40af', backgroundColor: '#eff6ff', padding: '6px 8px', borderRadius: '6px', border: '1px solid #bfdbfe', marginTop: '10px' }}>
                 {cTypeLabel} • Ламінація {lLabel.toLowerCase()} • {currentCalc.totalPlates} CTP форм • {currentCalc.packagingPacks} пачок
-              </div>
-            </div>
-
-            {/* TAGS (Matching Image 2) */}
-            <div style={{ marginBottom: '12px' }}>
-              <span style={{ color: 'var(--text-medium)', fontSize: '10px', fontWeight: '700', textTransform: 'uppercase', display: 'flex', alignItems: 'center', gap: '4px', marginBottom: '4px' }}>
-                <Tag size={10} /> Теги
-              </span>
-              <div style={{ display: 'flex', gap: '4px', flexWrap: 'wrap' }}>
-                <span className="ios-badge ios-badge-purple">Калькулятор</span>
-                <span className="ios-badge ios-badge-purple">Журнали</span>
-                <span className="ios-badge ios-badge-blue">Офсет B2</span>
-                <span className="ios-badge ios-badge-green">1С Тарифи</span>
               </div>
             </div>
 
@@ -5100,12 +4959,12 @@ export const Calculator: React.FC = () => {
                 textAlign: 'center'
               }}
             >
-              📄 Відкрити розцінки за 1 операцію ↓
+              Відкрити розцінки за 1 операцію ↓
             </button>
           </div>
         </div>
 
-        {/* FULL-WIDTH 1C TECHNOLOGICAL SPECIFICATION TABLE (Styled like Left Table in Image 2) */}
+        {/* FULL-WIDTH 1C TECHNOLOGICAL SPECIFICATION TABLE (NO "База 02.11", NO BOTTOM DESCRIPTION) */}
         {magShowCostDetails && (
           <div id="mag-cost-table" className="ios-card bg-white" style={{ padding: '16px', border: '1px solid var(--border-light)', marginTop: '8px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-light)', paddingBottom: '10px', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
@@ -5114,16 +4973,12 @@ export const Calculator: React.FC = () => {
                   <span style={{ fontWeight: '800', fontSize: '13px', color: 'var(--text-dark)', textTransform: 'uppercase' }}>
                     Технологічний кошторис замовлення (Тарифи 1С)
                   </span>
-                  <span className="ios-badge ios-badge-green" style={{ fontSize: '10px' }}>База 02.11</span>
                   {hasCustomOverrides && (
                     <span className="ios-badge ios-badge-orange" style={{ fontSize: '10px' }}>
                       Введено ручні тарифи: {customTariffCount + customTotalCount}
                     </span>
                   )}
                 </div>
-                <p style={{ color: 'var(--text-medium)', fontSize: '11px', marginTop: '2px', marginBottom: 0 }}>
-                  Виріб: Журнал {magFormat} ({wMm}×{hMm} мм) • {pages} с. • {magQuantity.toLocaleString('uk-UA')} прим. • Тарифи за 1 операцію можна редагувати
-                </p>
               </div>
 
               <div className="flex items-center gap-2">
@@ -5149,7 +5004,7 @@ export const Calculator: React.FC = () => {
               </div>
             </div>
 
-            {/* Clean Data Table (Styled matching Table in Image 2) */}
+            {/* Clean Data Table */}
             <div style={{ overflowX: 'auto', borderRadius: '8px', border: '1px solid var(--border-light)' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px', textAlign: 'left' }}>
                 <thead>
