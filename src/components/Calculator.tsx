@@ -1072,6 +1072,9 @@ export const Calculator: React.FC = () => {
   const [magShowCostDetails, setMagShowCostDetails] = useState<boolean>(true);
   const [magCustomTariffs, setMagCustomTariffs] = useState<Record<string, number>>({});
   const [magCustomTotals, setMagCustomTotals] = useState<Record<string, number>>({});
+  const [magWastePerSig, setMagWastePerSig] = useState<number>(70); // Технічний відхід аркушів B2 на 1 зошит
+  const [magOverheadPct, setMagOverheadPct] = useState<number>(5); // 5% ЗВР (загальновиробничі витрати)
+  const [magPackCapacity, setMagPackCapacity] = useState<number>(25); // Кількість журналів у 1 пачці пакування
 
   const [multiInsertMaterial, setMultiInsertMaterial] = useState<string>('130');
   const [multiInsertColor, setMultiInsertColor] = useState<string>('2');
@@ -3865,13 +3868,13 @@ export const Calculator: React.FC = () => {
       const netBlockSheets = Math.ceil(qty * blockSheetsPerCopy);
       
       // Makeready waste: 70 big sheets per signature
-      const wasteBlockSheets = totalSignatures * 70;
+      const wasteBlockSheets = totalSignatures * Math.max(0, magWastePerSig);
       const grossBlockSheets = netBlockSheets + wasteBlockSheets;
 
       // Cover sheets (B2)
       const coversPerSheet = isA5 ? 4 : isA6 ? 8 : 2;
       const netCoverSheets = isSeparateCover ? Math.ceil(qty / coversPerSheet) : 0;
-      const wasteCoverSheets = isSeparateCover ? 50 : 0;
+      const wasteCoverSheets = isSeparateCover ? Math.max(20, Math.round(magWastePerSig * 0.7)) : 0;
       const grossCoverSheets = netCoverSheets + wasteCoverSheets;
       const totalGrossSheets = grossBlockSheets + grossCoverSheets;
 
@@ -3885,7 +3888,7 @@ export const Calculator: React.FC = () => {
       const laminationCount = (isSeparateCover && magCoverLam !== 'none') ? qty : 0;
       const bindingCount = qty;
       const trimmingCount = qty;
-      const packagingPacks = Math.ceil(qty / 25);
+      const packagingPacks = Math.ceil(qty / Math.max(1, magPackCapacity));
 
       // E. Default unit tariffs (Розділено прозоро: матеріали vs техпроцеси 1С)
       const defBlockPaperTariff = curBlockPaper.priceKg;
@@ -3966,7 +3969,7 @@ export const Calculator: React.FC = () => {
                          costGathering + costCreasing + costLamination + 
                          costBinding + costTrimming + costHardcover + costPackaging;
 
-      const overheadCost = Math.round(directCost * 0.05); // 5% ZVR
+      const overheadCost = Math.round(directCost * (Math.max(0, magOverheadPct) / 100));
       const totalCost = directCost + overheadCost;
 
       // I. Margin & Client Price
@@ -3981,16 +3984,33 @@ export const Calculator: React.FC = () => {
         blockPlates,
         coverPlates,
         totalMakereadies,
+        blockMakereadies,
+        coverMakereadies,
+        netBlockSheets,
+        wasteBlockSheets,
+        grossBlockSheets,
+        netCoverSheets,
+        wasteCoverSheets,
+        grossCoverSheets,
         totalGrossSheets,
         blockWeightKg,
         coverWeightKg,
+        foldsCount,
+        gatheringCount,
+        creasesCount,
+        laminationCount,
+        bindingCount,
+        trimmingCount,
+        packagingPacks,
         directCost,
         overheadCost,
+        overheadPct: magOverheadPct,
+        wastePerSig: magWastePerSig,
+        packCapacity: magPackCapacity,
         totalCost,
         marginSum,
         finalPrice,
         unitPrice,
-        packagingPacks,
         items: [
           {
             key: 'blockPaper',
@@ -5151,6 +5171,254 @@ export const Calculator: React.FC = () => {
                   </tr>
                 </tfoot>
               </table>
+            </div>
+
+            {/* INTERACTIVE FORMULAS & WORKSHOP COEFFICIENTS SECTION */}
+            <div style={{ marginTop: '20px', borderTop: '1px solid var(--border-light)', paddingTop: '16px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '8px' }}>
+                <div>
+                  <span style={{ fontWeight: '800', fontSize: '13px', color: 'var(--text-dark)', textTransform: 'uppercase' }}>
+                    Технологічні формули розрахунку та коефіцієнти цеху
+                  </span>
+                  <p style={{ color: 'var(--text-medium)', fontSize: '11px', marginTop: '2px', marginBottom: 0 }}>
+                    Повний математичний розпис поліграфічних формул із можливістю змінювати нормативи цеху
+                  </p>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMagWastePerSig(70);
+                    setMagOverheadPct(5);
+                    setMagPackCapacity(25);
+                    setMagMarginPct(100);
+                  }}
+                  className="ios-btn ios-btn-small"
+                  style={{ fontSize: '11px', padding: '4px 10px', backgroundColor: 'var(--bg-system)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
+                  title="Повернути базові заводські коефіцієнти (70 арк. відхід, 5% ЗВР, 25 шт. пачка, 100% маржа)"
+                >
+                  <RotateCcw size={11} />
+                  <span>Базові коефіцієнти</span>
+                </button>
+              </div>
+
+              {/* 1. INTERACTIVE WORKSHOP COEFFICIENTS GRID */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))', gap: '10px', marginBottom: '16px' }}>
+                {/* Coeff 1: Waste per signature */}
+                <div style={{ padding: '10px 12px', borderRadius: '10px', backgroundColor: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                  <span style={{ fontSize: '10px', color: 'var(--text-medium)', fontWeight: '700', textTransform: 'uppercase', display: 'block' }}>
+                    Техвідхід на 1 зошит (приладка):
+                  </span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px' }}>
+                    <input
+                      type="number"
+                      min="0"
+                      max="500"
+                      step="5"
+                      value={magWastePerSig}
+                      onChange={(e) => setMagWastePerSig(Math.max(0, Number(e.target.value)))}
+                      style={{ width: '70px', height: '26px', fontSize: '12px', fontWeight: '800', fontFamily: 'var(--font-mono)', padding: '2px 6px', textAlign: 'right', borderRadius: '6px', border: '1.5px solid #007AFF', backgroundColor: '#ffffff' }}
+                    />
+                    <span style={{ fontSize: '11px', fontWeight: '600', color: 'var(--text-dark)' }}>арк. B2 / зош</span>
+                  </div>
+                  <span style={{ fontSize: '10px', color: 'var(--text-medium)', display: 'block', marginTop: '3px' }}>
+                    Разом на {currentCalc.totalSignatures} зош. = <strong>{currentCalc.wasteBlockSheets} арк.</strong>
+                  </span>
+                </div>
+
+                {/* Coeff 2: Overhead % */}
+                <div style={{ padding: '10px 12px', borderRadius: '10px', backgroundColor: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                  <span style={{ fontSize: '10px', color: 'var(--text-medium)', fontWeight: '700', textTransform: 'uppercase', display: 'block' }}>
+                    Загальновиробничі витрати (ЗВР):
+                  </span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px' }}>
+                    <input
+                      type="number"
+                      min="0"
+                      max="50"
+                      step="1"
+                      value={magOverheadPct}
+                      onChange={(e) => setMagOverheadPct(Math.max(0, Number(e.target.value)))}
+                      style={{ width: '70px', height: '26px', fontSize: '12px', fontWeight: '800', fontFamily: 'var(--font-mono)', padding: '2px 6px', textAlign: 'right', borderRadius: '6px', border: '1.5px solid #007AFF', backgroundColor: '#ffffff' }}
+                    />
+                    <span style={{ fontSize: '11px', fontWeight: '600', color: 'var(--text-dark)' }}>% від прямих</span>
+                  </div>
+                  <span style={{ fontSize: '10px', color: 'var(--text-medium)', display: 'block', marginTop: '3px' }}>
+                    Сума ЗВР цеху = <strong>{currentCalc.overheadCost.toLocaleString('uk-UA')} ₴</strong>
+                  </span>
+                </div>
+
+                {/* Coeff 3: Pack capacity */}
+                <div style={{ padding: '10px 12px', borderRadius: '10px', backgroundColor: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                  <span style={{ fontSize: '10px', color: 'var(--text-medium)', fontWeight: '700', textTransform: 'uppercase', display: 'block' }}>
+                    Місткість однієї пачки:
+                  </span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px' }}>
+                    <input
+                      type="number"
+                      min="5"
+                      max="200"
+                      step="5"
+                      value={magPackCapacity}
+                      onChange={(e) => setMagPackCapacity(Math.max(1, Number(e.target.value)))}
+                      style={{ width: '70px', height: '26px', fontSize: '12px', fontWeight: '800', fontFamily: 'var(--font-mono)', padding: '2px 6px', textAlign: 'right', borderRadius: '6px', border: '1.5px solid #007AFF', backgroundColor: '#ffffff' }}
+                    />
+                    <span style={{ fontSize: '11px', fontWeight: '600', color: 'var(--text-dark)' }}>шт / пачку</span>
+                  </div>
+                  <span style={{ fontSize: '10px', color: 'var(--text-medium)', display: 'block', marginTop: '3px' }}>
+                    На весь наклад = <strong>{currentCalc.packagingPacks} пачок</strong>
+                  </span>
+                </div>
+
+                {/* Coeff 4: Margin % */}
+                <div style={{ padding: '10px 12px', borderRadius: '10px', backgroundColor: '#f8fafc', border: '1px solid #e2e8f0' }}>
+                  <span style={{ fontSize: '10px', color: 'var(--text-medium)', fontWeight: '700', textTransform: 'uppercase', display: 'block' }}>
+                    Комерційна націнка (маржа):
+                  </span>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px', marginTop: '4px' }}>
+                    <input
+                      type="number"
+                      min="0"
+                      max="500"
+                      step="5"
+                      value={magMarginPct}
+                      onChange={(e) => setMagMarginPct(Math.max(0, Number(e.target.value)))}
+                      style={{ width: '70px', height: '26px', fontSize: '12px', fontWeight: '800', fontFamily: 'var(--font-mono)', padding: '2px 6px', textAlign: 'right', borderRadius: '6px', border: '1.5px solid #007AFF', backgroundColor: '#ffffff' }}
+                    />
+                    <span style={{ fontSize: '11px', fontWeight: '600', color: 'var(--text-dark)' }}>% від собівартості</span>
+                  </div>
+                  <span style={{ fontSize: '10px', color: 'var(--text-medium)', display: 'block', marginTop: '3px' }}>
+                    Маржинальний дохід = <strong>{currentCalc.marginSum.toLocaleString('uk-UA')} ₴</strong>
+                  </span>
+                </div>
+              </div>
+
+              {/* 2. STEP-BY-STEP DETAILED PRODUCTION FORMULAS WITH LIVE DATA */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '12px', fontSize: '11px' }}>
+                {/* Formula Box 1: Signatures and Plates */}
+                <div style={{ padding: '12px 14px', borderRadius: '10px', border: '1px solid var(--border-light)', backgroundColor: '#ffffff' }}>
+                  <div style={{ fontWeight: '800', fontSize: '12px', color: 'var(--text-dark)', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span className="ios-badge ios-badge-blue" style={{ fontSize: '10px' }}>Формула 1</span>
+                    <span>Зошити та форми CTP</span>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', color: 'var(--text-medium)' }}>
+                    <div>
+                      • <strong>Кількість зошитів блоку B2:</strong><br />
+                      <code style={{ fontSize: '11px', color: '#1e40af', backgroundColor: '#eff6ff', padding: '1px 4px', borderRadius: '4px' }}>
+                        {pages} стор. / 16 смуг = <strong>{currentCalc.totalSignatures} зошити(ів)</strong>
+                      </code>
+                    </div>
+                    <div>
+                      • <strong>Форми блоку:</strong><br />
+                      <code style={{ fontSize: '11px', color: '#1e40af', backgroundColor: '#eff6ff', padding: '1px 4px', borderRadius: '4px' }}>
+                        {currentCalc.totalSignatures} зош. × {magBlockColor === '4+4' ? '4 фарби (CMYK)' : '1 фарба (Ч/Б)'} = <strong>{currentCalc.blockPlates} шт</strong>
+                      </code>
+                    </div>
+                    <div>
+                      • <strong>Форми обкладинки:</strong><br />
+                      <code style={{ fontSize: '11px', color: '#1e40af', backgroundColor: '#eff6ff', padding: '1px 4px', borderRadius: '4px' }}>
+                        {isSeparateCover ? `${magCoverPrint} зі своїм оборотом = ${currentCalc.coverPlates} шт` : 'Своя обкладинка (0 шт)'}
+                      </code>
+                    </div>
+                    <div style={{ borderTop: '1px dashed #e2e8f0', paddingTop: '4px', fontWeight: '700', color: 'var(--text-dark)' }}>
+                      Всього форм CTP B2: {currentCalc.blockPlates} + {currentCalc.coverPlates} = <strong>{currentCalc.totalPlates} шт</strong>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Formula Box 2: Sheets and Paper Weight */}
+                <div style={{ padding: '12px 14px', borderRadius: '10px', border: '1px solid var(--border-light)', backgroundColor: '#ffffff' }}>
+                  <div style={{ fontWeight: '800', fontSize: '12px', color: 'var(--text-dark)', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span className="ios-badge ios-badge-blue" style={{ fontSize: '10px' }}>Формула 2</span>
+                    <span>Аркуші B2 та вага паперу</span>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', color: 'var(--text-medium)' }}>
+                    <div>
+                      • <strong>Корисні аркуші блоку (net):</strong><br />
+                      <code style={{ fontSize: '11px', color: '#1e40af', backgroundColor: '#eff6ff', padding: '1px 4px', borderRadius: '4px' }}>
+                        {magQuantity.toLocaleString('uk-UA')} прим. × ({pages}/16) = <strong>{currentCalc.netBlockSheets.toLocaleString('uk-UA')} арк. B2</strong>
+                      </code>
+                    </div>
+                    <div>
+                      • <strong>Технічний відхід (приладка):</strong><br />
+                      <code style={{ fontSize: '11px', color: '#1e40af', backgroundColor: '#eff6ff', padding: '1px 4px', borderRadius: '4px' }}>
+                        {currentCalc.totalSignatures} зош. × {magWastePerSig} арк. = <strong>{currentCalc.wasteBlockSheets} арк. B2</strong>
+                      </code>
+                    </div>
+                    <div>
+                      • <strong>Вага паперу блоку (кг):</strong><br />
+                      <code style={{ fontSize: '11px', color: '#1e40af', backgroundColor: '#eff6ff', padding: '1px 4px', borderRadius: '4px' }}>
+                        (0.70 м × 1.00 м × {curBlockPaper.density} г/м² × {currentCalc.grossBlockSheets} арк.) / 1000 = <strong>{currentCalc.blockWeightKg} кг</strong>
+                      </code>
+                    </div>
+                    <div style={{ borderTop: '1px dashed #e2e8f0', paddingTop: '4px', fontWeight: '700', color: 'var(--text-dark)' }}>
+                      Всього листопрогонів машини: {currentCalc.grossBlockSheets} (блок) + {currentCalc.grossCoverSheets} (обкл) = <strong>{currentCalc.totalGrossSheets.toLocaleString('uk-UA')} прогонів</strong>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Formula Box 3: Postpress and Finishing */}
+                <div style={{ padding: '12px 14px', borderRadius: '10px', border: '1px solid var(--border-light)', backgroundColor: '#ffffff' }}>
+                  <div style={{ fontWeight: '800', fontSize: '12px', color: 'var(--text-dark)', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span className="ios-badge ios-badge-blue" style={{ fontSize: '10px' }}>Формула 3</span>
+                    <span>Постпрес та пакування</span>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', color: 'var(--text-medium)' }}>
+                    <div>
+                      • <strong>Фальцювання зошитів:</strong><br />
+                      <code style={{ fontSize: '11px', color: '#1e40af', backgroundColor: '#eff6ff', padding: '1px 4px', borderRadius: '4px' }}>
+                        {magQuantity.toLocaleString('uk-UA')} прим. × {currentCalc.totalSignatures} зош. = <strong>{currentCalc.foldsCount.toLocaleString('uk-UA')} згинів</strong>
+                      </code>
+                    </div>
+                    <div>
+                      • <strong>Листопідбір (збірка блоку):</strong><br />
+                      <code style={{ fontSize: '11px', color: '#1e40af', backgroundColor: '#eff6ff', padding: '1px 4px', borderRadius: '4px' }}>
+                        {magQuantity.toLocaleString('uk-UA')} прим. × {currentCalc.totalSignatures} зош. = <strong>{currentCalc.gatheringCount.toLocaleString('uk-UA')} зошитів</strong>
+                      </code>
+                    </div>
+                    <div>
+                      • <strong>Пакування у крафт-папір / гофрокороби:</strong><br />
+                      <code style={{ fontSize: '11px', color: '#1e40af', backgroundColor: '#eff6ff', padding: '1px 4px', borderRadius: '4px' }}>
+                        ⌈{magQuantity.toLocaleString('uk-UA')} прим. / {magPackCapacity} шт.⌉ = <strong>{currentCalc.packagingPacks} пачок</strong>
+                      </code>
+                    </div>
+                    <div style={{ borderTop: '1px dashed #e2e8f0', paddingTop: '4px', fontWeight: '700', color: 'var(--text-dark)' }}>
+                      Товщина корінця блоку: <strong>~{spineMm} мм</strong>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Formula Box 4: Financial Cost & Client Price */}
+                <div style={{ padding: '12px 14px', borderRadius: '10px', border: '1px solid #bfdbfe', backgroundColor: '#eff6ff' }}>
+                  <div style={{ fontWeight: '800', fontSize: '12px', color: '#1e40af', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <span className="ios-badge ios-badge-green" style={{ fontSize: '10px' }}>Формула 4</span>
+                    <span>Собівартість цеху та фінальна ціна</span>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', color: '#1e3a8a' }}>
+                    <div>
+                      • <strong>Прямі виробничі витрати:</strong><br />
+                      <code style={{ fontSize: '11px', color: '#1e40af', backgroundColor: '#ffffff', padding: '1px 4px', borderRadius: '4px' }}>
+                        Σ(Матеріали + CTP + Друк + Постпрес + Пакування) = <strong>{currentCalc.directCost.toLocaleString('uk-UA')} ₴</strong>
+                      </code>
+                    </div>
+                    <div>
+                      • <strong>Собівартість із ЗВР ({magOverheadPct}%):</strong><br />
+                      <code style={{ fontSize: '11px', color: '#1e40af', backgroundColor: '#ffffff', padding: '1px 4px', borderRadius: '4px' }}>
+                        {currentCalc.directCost.toLocaleString('uk-UA')} ₴ + {currentCalc.overheadCost.toLocaleString('uk-UA')} ₴ = <strong>{currentCalc.totalCost.toLocaleString('uk-UA')} ₴</strong>
+                      </code>
+                    </div>
+                    <div>
+                      • <strong>Разом клієнту з націнкою ({magMarginPct}%):</strong><br />
+                      <code style={{ fontSize: '11px', color: '#1e40af', backgroundColor: '#ffffff', padding: '1px 4px', borderRadius: '4px' }}>
+                        {currentCalc.totalCost.toLocaleString('uk-UA')} ₴ × (1 + {magMarginPct/100}) = <strong>{currentCalc.finalPrice.toLocaleString('uk-UA')} ₴</strong>
+                      </code>
+                    </div>
+                    <div style={{ borderTop: '1px dashed #93c5fd', paddingTop: '4px', fontWeight: '900', color: '#007AFF', fontSize: '12px' }}>
+                      Ціна за 1 журнал: {currentCalc.finalPrice.toLocaleString('uk-UA')} ₴ / {magQuantity.toLocaleString('uk-UA')} = {currentCalc.unitPrice.toFixed(2)} ₴ / прим
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         )}
