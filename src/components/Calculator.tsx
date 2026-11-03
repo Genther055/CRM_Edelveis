@@ -1059,10 +1059,10 @@ export const Calculator: React.FC = () => {
   const [magCustomHeight, setMagCustomHeight] = useState<number>(297);
   const [magBlockPages, setMagBlockPages] = useState<number>(32);
   const [magQuantity, setMagQuantity] = useState<number>(1000);
-  const [magBlockPaper, setMagBlockPaper] = useState<string>('coat_115');
+  const [magBlockPaper, setMagBlockPaper] = useState<string>('off_80');
   const [magBlockColor, setMagBlockColor] = useState<'4+4' | '1+1'>('4+4');
   const [magOrientation, setMagOrientation] = useState<'vert' | 'horiz'>('vert');
-  const [magCoverType, setMagCoverType] = useState<'soft' | 'hard'>('soft'); // 'soft' (М'яка), 'hard' (Тверда 7БЦ)
+  const [magCoverType, setMagCoverType] = useState<'soft' | 'hard'>('soft'); // 'soft' (М'яка), 'hard' (Тверда)
   const [magCoverPaper, setMagCoverPaper] = useState<string>('coat_250');
   const [magCoverPrint, setMagCoverPrint] = useState<'4+4' | '4+0' | '1+0' | '0+0'>('4+4');
   const [magCoverLam, setMagCoverLam] = useState<'none' | 'gloss' | 'matte' | 'softtouch' | 'gloss_duo' | 'matte_duo'>('matte');
@@ -3814,17 +3814,13 @@ export const Calculator: React.FC = () => {
 
     // 2. Paper Specs & Caliper
     const paperSpecs: Record<string, { name: string; density: number; caliper: number; priceKg: number }> = {
-      coat_90: { name: 'Крейда 90 г/м²', density: 90, caliper: 0.075, priceKg: 68 },
-      coat_115: { name: 'Крейда 115 г/м² (Стандарт)', density: 115, caliper: 0.090, priceKg: 66 },
-      coat_130: { name: 'Крейда 130 г/м²', density: 130, caliper: 0.105, priceKg: 65 },
-      coat_150: { name: 'Крейда 150 г/м²', density: 150, caliper: 0.125, priceKg: 67 },
       off_70: { name: 'Офсетний 70 г/м²', density: 70, caliper: 0.095, priceKg: 58 },
-      off_80: { name: 'Офсетний 80 г/м²', density: 80, caliper: 0.110, priceKg: 56 },
+      off_80: { name: 'Офсетний 80 г/м² (Стандарт)', density: 80, caliper: 0.110, priceKg: 56 },
       off_100: { name: 'Офсетний 100 г/м²', density: 100, caliper: 0.130, priceKg: 60 }
     };
 
     const coverSpecs: Record<string, { name: string; density: number; caliper: number; priceKg: number }> = {
-      self: { name: 'Своя обкладинка (папір блоку)', density: paperSpecs[magBlockPaper]?.density || 115, caliper: paperSpecs[magBlockPaper]?.caliper || 0.09, priceKg: paperSpecs[magBlockPaper]?.priceKg || 66 },
+      self: { name: 'Своя обкладинка (папір блоку)', density: paperSpecs[magBlockPaper]?.density || 80, caliper: paperSpecs[magBlockPaper]?.caliper || 0.11, priceKg: paperSpecs[magBlockPaper]?.priceKg || 56 },
       coat_170: { name: 'Крейда 170 г/м²', density: 170, caliper: 0.145, priceKg: 70 },
       coat_200: { name: 'Крейда 200 г/м²', density: 200, caliper: 0.170, priceKg: 71 },
       coat_250: { name: 'Крейда 250 г/м² (Стандарт)', density: 250, caliper: 0.220, priceKg: 72 },
@@ -3832,7 +3828,7 @@ export const Calculator: React.FC = () => {
       card_250: { name: 'Картон целюлозний 250 г/м²', density: 250, caliper: 0.330, priceKg: 85 }
     };
 
-    const curBlockPaper = paperSpecs[magBlockPaper] || paperSpecs['coat_115'];
+    const curBlockPaper = paperSpecs[magBlockPaper] || paperSpecs['off_80'];
     const curCoverPaper = coverSpecs[magCoverPaper] || coverSpecs['coat_250'];
     const isSeparateCover = magCoverPaper !== 'self';
     const isHardcover = magCoverType === 'hard';
@@ -3894,7 +3890,7 @@ export const Calculator: React.FC = () => {
       // E. Default unit tariffs (Розділено прозоро: матеріали vs техпроцеси 1С)
       const defBlockPaperTariff = curBlockPaper.priceKg;
       const defCoverPaperTariff = curCoverPaper.priceKg;
-      const defBoardTariff = 85.0; // Палітурний картон для 7БЦ
+      const defBoardTariff = 85.0; // Палітурний картон для твердої обкладинки
       const defCtpPlateTariff = 175.00; // Сама металева пластина CTP B2 (матеріал)
       const defCtpCopyTariff = 4.0000;  // 1С #1: Копіювання форм (експонування пластин)
       const defCtpMountTariff = 3.1200; // 1С #2: Монтаж плівок (лавсанових)
@@ -4196,7 +4192,7 @@ export const Calculator: React.FC = () => {
           {
             key: 'hardcover',
             num: 14,
-            name: 'Операції твердої палітурки 7БЦ (кришка + вставка)',
+            name: 'Операції твердої палітурки (кришка + вставка)',
             category: '1С #8,9,10',
             details: isHardcover ? 'Кришка (0.9427) + Обробка блоку (0.2517) + Вставка (0.5751)' : 'Тільки для твердої палітурки',
             tariff: tHardcover,
@@ -4242,7 +4238,7 @@ export const Calculator: React.FC = () => {
     // Commercial Proposal Copy
     const handleCopyCommercialQuote = () => {
       const bLabel = magBinding === 'staple' ? 'Скоба (2 шт.)' : magBinding === 'kbs' ? 'Термоклей' : 'Ниткошвейне скріплення';
-      const cTypeLabel = isHardcover ? 'Тверда палітурка (7БЦ)' : 'М’яка обкладинка';
+      const cTypeLabel = isHardcover ? 'Тверда палітурка' : 'М’яка обкладинка';
       const lLabel = magCoverLam === 'none' ? 'без ламінації' : magCoverLam === 'matte' ? 'матова ламінація' : 'глянцева ламінація';
       const colorLabel = magBlockColor === '4+4' ? '4+4 (повноколір)' : '1+1 (чорно-білий друк)';
       const orientLabel = magOrientation === 'vert' ? 'книжкова (вертикальна)' : 'альбомна (горизонтальна)';
@@ -4270,7 +4266,7 @@ export const Calculator: React.FC = () => {
     };
 
     const bLabel = magBinding === 'staple' ? 'Скоба (2 шт.)' : magBinding === 'kbs' ? 'Термоклей' : 'Ниткошвейне скріплення';
-    const cTypeLabel = isHardcover ? 'Тверда палітурка (7БЦ)' : 'М’яка обкладинка';
+    const cTypeLabel = isHardcover ? 'Тверда палітурка' : 'М’яка обкладинка';
     const lLabel = magCoverLam === 'none' ? 'Без ламінації' : magCoverLam === 'matte' ? 'Матова' : 'Глянцева';
 
     return (
@@ -4630,12 +4626,8 @@ export const Calculator: React.FC = () => {
                     onChange={(e) => setMagBlockPaper(e.target.value)}
                     style={{ height: '34px', width: '100%', fontSize: '12px', padding: '4px 8px' }}
                   >
-                    <option value="coat_90">Крейда 90 г/м²</option>
-                    <option value="coat_115">Крейда 115 г/м² (Стандарт)</option>
-                    <option value="coat_130">Крейда 130 г/м²</option>
-                    <option value="coat_150">Крейда 150 г/м²</option>
                     <option value="off_70">Офсетний 70 г/м²</option>
-                    <option value="off_80">Офсетний 80 г/м² (Книжковий)</option>
+                    <option value="off_80">Офсетний 80 г/м² (Стандарт)</option>
                     <option value="off_100">Офсетний 100 г/м²</option>
                   </select>
                 </div>
