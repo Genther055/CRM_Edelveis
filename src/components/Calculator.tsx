@@ -1070,8 +1070,8 @@ export const Calculator: React.FC = () => {
   const [magMarginPct, setMagMarginPct] = useState<number>(100); // 100% націнка згідно з технологічною карткою 02.11
   const [magPriceView, setMagPriceView] = useState<'per_item' | 'per_total'>('per_item');
   const [magShowCostDetails, setMagShowCostDetails] = useState<boolean>(true);
-  const [magCustomCosts, setMagCustomCosts] = useState<Record<string, number>>({});
-  const [isMagCostModalOpen, setIsMagCostModalOpen] = useState<boolean>(false);
+  const [magCustomTariffs, setMagCustomTariffs] = useState<Record<string, number>>({});
+  const [magCustomTotals, setMagCustomTotals] = useState<Record<string, number>>({});
 
   const [multiInsertMaterial, setMultiInsertMaterial] = useState<string>('130');
   const [multiInsertColor, setMultiInsertColor] = useState<string>('2');
@@ -3861,20 +3861,11 @@ export const Calculator: React.FC = () => {
       const blockPlates = totalSignatures * platesPerBlockSig;
       const coverPlates = isSeparateCover ? (magCoverPrint === '0+0' ? 0 : magCoverPrint === '1+0' ? 1 : 4) : 0;
       const totalPlates = blockPlates + coverPlates;
-      
-      // Тарифи: 175 грн пластина + копіювання 4.00 грн (1С #1) + монтаж 3.12 грн (1С #2)
-      const plateRate = 175 + 4.00 + 3.12; 
-      const autoPrepressCost = totalPlates * plateRate;
 
       // C. Press Makereadies & Print runs
       const blockMakereadies = totalSignatures;
       const coverMakereadies = isSeparateCover && magCoverPrint !== '0+0' ? 1 : 0;
       const totalMakereadies = blockMakereadies + coverMakereadies;
-      
-      // Приладка офсетної машини B2: 400 грн (4+4), 250 грн (1+1)
-      const blockMakereadyRate = magBlockColor === '1+1' ? 250 : 400;
-      const coverMakereadyRate = magCoverPrint === '1+0' ? 250 : 400;
-      const autoMakereadyCost = (blockMakereadies * blockMakereadyRate) + (coverMakereadies * coverMakereadyRate);
 
       // Print run (листопрогони B2)
       const pagesPerSheet = isA5 ? 32 : isA6 ? 64 : 16;
@@ -3890,92 +3881,109 @@ export const Calculator: React.FC = () => {
       const netCoverSheets = isSeparateCover ? Math.ceil(qty / coversPerSheet) : 0;
       const wasteCoverSheets = isSeparateCover ? 50 : 0;
       const grossCoverSheets = netCoverSheets + wasteCoverSheets;
+      const totalGrossSheets = grossBlockSheets + grossCoverSheets;
 
-      // Printing impression cost (прогони B2)
-      const blockPrintRate = magBlockColor === '1+1' ? 220 : 360; // грн за 1000 відбитків B2
-      const coverPrintRate = magCoverPrint === '1+0' ? 220 : 360;
-      const blockPrintCost = (grossBlockSheets / 1000) * blockPrintRate;
-      const coverPrintCost = isSeparateCover ? Math.max(180, (grossCoverSheets / 1000) * coverPrintRate) : 0;
-      const autoPrintingRunCost = blockPrintCost + coverPrintCost;
+      // D. Quantities of each operation
+      const blockWeightKg = Number(((700 * 1000 * curBlockPaper.density * grossBlockSheets) / 1e9).toFixed(1));
+      const coverWeightKg = isSeparateCover ? Number(((700 * 1000 * curCoverPaper.density * grossCoverSheets) / 1e9).toFixed(1)) : 0;
+      const boardCopies = isHardcover ? qty : 0;
+      const foldsCount = qty * totalSignatures;
+      const gatheringCount = qty * totalSignatures;
+      const creasesCount = qty * (magBinding === 'staple' ? 2 : 4);
+      const laminationCount = (isSeparateCover && magCoverLam !== 'none') ? qty : 0;
+      const bindingCopies = qty;
+      const trimmingCopies = qty;
+      const hardcoverCopies = isHardcover ? qty : 0;
+      const packagingPacks = Math.ceil(qty / 25);
 
-      // D. Materials (Папір за вагою із записів Notion 02.11)
-      const blockWeightKg = (700 * 1000 * curBlockPaper.density * grossBlockSheets) / 1e9;
-      const autoBlockPaperCost = blockWeightKg * curBlockPaper.priceKg;
+      // E. Default 1C unit tariffs (Ціни за 1 операцію)
+      // 1. Папір блоку: ціна за кг
+      const defBlockPaperTariff = curBlockPaper.priceKg;
+      // 2. Папір обкладинки: ціна за кг
+      const defCoverPaperTariff = curCoverPaper.priceKg;
+      // 3. Картон 7БЦ: за штуку
+      const defBoardTariff = 4.50;
+      // 4. Пластина CTP B2 (вивід 175 + 1С #1 копіювання 4.00 + 1С #2 монтаж 3.12 = 182.12 грн)
+      const defCtpTariff = 182.12;
+      // 5. Приладка машини B2: 400 грн (4+4), 250 грн (1+1)
+      const defMakereadyTariff = magBlockColor === '1+1' ? 250 : 400;
+      // 6. Прогін B2: 0.3600 грн (360 грн / 1000 відбитків), 0.2200 для 1+1
+      const defPrintRunTariff = magBlockColor === '1+1' ? 0.2200 : 0.3600;
+      // 7. Фальцювання (1С #7: Фальцовка 0.1200 грн / згин)
+      const defFoldingTariff = 0.1200;
+      // 8. Листопідбір / збірка зошитів: 0.1500 грн / зошит
+      const defGatheringTariff = 0.1500;
+      // 9. Бігування обкладинки (1С #6: Биговка 0.1231 грн / біг)
+      const defCreasingTariff = 0.1231;
+      // 10. Ламінування (1С #3: Ламинирование 0.5750 грн / арк)
+      const defLaminationTariff = (magCoverLam === 'softtouch' || magCoverLam === 'matte_duo' || magCoverLam === 'gloss_duo') ? 1.1500 : 0.5750;
+      // 11. Скріплення: 0.8500 грн (скоба), 2.8000 грн (КБС), (totalSignatures * 0.4000) нитка
+      const defBindingTariff = magBinding === 'staple' ? 0.8500 : magBinding === 'kbs' ? 2.8000 : Number((totalSignatures * 0.40).toFixed(2));
+      // 12. Фінішна обрізка (1С #11: Обрезка/прессовка 0.1660 грн)
+      const defTrimmingTariff = 0.1660;
+      // 13. Операції 7БЦ (Кришка 0.9427 + Блок 0.2517 + Вставка 0.5751 = 1.7695 грн)
+      const defHardcoverTariff = 1.7695;
+      // 14. Пакування: 15.00 грн / пачка
+      const defPackagingTariff = 15.00;
 
-      const coverWeightKg = isSeparateCover ? (700 * 1000 * curCoverPaper.density * grossCoverSheets) / 1e9 : 0;
-      const autoCoverPaperCost = coverWeightKg * curCoverPaper.priceKg;
-      
-      // Палітурний картон для твердої кришки
-      const autoBoardCost = isHardcover ? (qty * 4.50) : 0;
+      // Active Tariffs (use user override if modified, else default)
+      const tBlockPaper = magCustomTariffs.blockPaper !== undefined ? magCustomTariffs.blockPaper : defBlockPaperTariff;
+      const tCoverPaper = magCustomTariffs.coverPaper !== undefined ? magCustomTariffs.coverPaper : defCoverPaperTariff;
+      const tBoard = magCustomTariffs.board !== undefined ? magCustomTariffs.board : defBoardTariff;
+      const tCtp = magCustomTariffs.ctp !== undefined ? magCustomTariffs.ctp : defCtpTariff;
+      const tMakeready = magCustomTariffs.makeready !== undefined ? magCustomTariffs.makeready : defMakereadyTariff;
+      const tPrintRun = magCustomTariffs.printRun !== undefined ? magCustomTariffs.printRun : defPrintRunTariff;
+      const tFolding = magCustomTariffs.folding !== undefined ? magCustomTariffs.folding : defFoldingTariff;
+      const tGathering = magCustomTariffs.gathering !== undefined ? magCustomTariffs.gathering : defGatheringTariff;
+      const tCreasing = magCustomTariffs.creasing !== undefined ? magCustomTariffs.creasing : defCreasingTariff;
+      const tLamination = magCustomTariffs.lamination !== undefined ? magCustomTariffs.lamination : defLaminationTariff;
+      const tBinding = magCustomTariffs.binding !== undefined ? magCustomTariffs.binding : defBindingTariff;
+      const tTrimming = magCustomTariffs.trimming !== undefined ? magCustomTariffs.trimming : defTrimmingTariff;
+      const tHardcover = magCustomTariffs.hardcover !== undefined ? magCustomTariffs.hardcover : defHardcoverTariff;
+      const tPackaging = magCustomTariffs.packaging !== undefined ? magCustomTariffs.packaging : defPackagingTariff;
 
-      // E. Постпрес за точними розцінками 1С:
-      // 1. Фальцювання зошитів: 0.1200 грн (1С #7)
-      const autoFoldingCost = qty * totalSignatures * 0.1200;
+      // Default calculated sums
+      const autoBlockPaperSum = Math.round(blockWeightKg * tBlockPaper);
+      const autoCoverPaperSum = isSeparateCover ? Math.round(coverWeightKg * tCoverPaper) : 0;
+      const autoBoardSum = isHardcover ? Math.round(boardCopies * tBoard) : 0;
+      const autoCtpSum = Math.round(totalPlates * tCtp);
+      const autoMakereadySum = Math.round(totalMakereadies * tMakeready);
+      const autoPrintRunSum = Math.round(totalGrossSheets * tPrintRun);
+      const autoFoldingSum = Math.round(foldsCount * tFolding);
+      const autoGatheringSum = Math.round(gatheringCount * tGathering);
+      const autoCreasingSum = Math.round(creasesCount * tCreasing + 40);
+      const autoLaminationSum = laminationCount > 0 ? Math.round(laminationCount * tLamination + 80) : 0;
+      const autoBindingSum = Math.round(bindingCopies * tBinding + (magBinding === 'staple' ? 100 : magBinding === 'kbs' ? 200 : 250));
+      const autoTrimmingSum = Math.round(trimmingCopies * tTrimming + 60);
+      const autoHardcoverSum = isHardcover ? Math.round(hardcoverCopies * tHardcover + 200) : 0;
+      const autoPackagingSum = Math.round(packagingPacks * tPackaging + 80);
 
-      // 2. Листопідбір / Збірка блоку: 0.1500 грн / зошит
-      const autoGatheringCost = qty * totalSignatures * 0.1500;
+      // Effective sums (with optional user total overrides)
+      const costBlockPaper = magCustomTotals.blockPaper !== undefined ? magCustomTotals.blockPaper : autoBlockPaperSum;
+      const costCoverPaper = magCustomTotals.coverPaper !== undefined ? magCustomTotals.coverPaper : autoCoverPaperSum;
+      const costBoard = magCustomTotals.board !== undefined ? magCustomTotals.board : autoBoardSum;
+      const costCtp = magCustomTotals.ctp !== undefined ? magCustomTotals.ctp : autoCtpSum;
+      const costMakeready = magCustomTotals.makeready !== undefined ? magCustomTotals.makeready : autoMakereadySum;
+      const costPrintRun = magCustomTotals.printRun !== undefined ? magCustomTotals.printRun : autoPrintRunSum;
+      const costFolding = magCustomTotals.folding !== undefined ? magCustomTotals.folding : autoFoldingSum;
+      const costGathering = magCustomTotals.gathering !== undefined ? magCustomTotals.gathering : autoGatheringSum;
+      const costCreasing = magCustomTotals.creasing !== undefined ? magCustomTotals.creasing : autoCreasingSum;
+      const costLamination = magCustomTotals.lamination !== undefined ? magCustomTotals.lamination : autoLaminationSum;
+      const costBinding = magCustomTotals.binding !== undefined ? magCustomTotals.binding : autoBindingSum;
+      const costTrimming = magCustomTotals.trimming !== undefined ? magCustomTotals.trimming : autoTrimmingSum;
+      const costHardcover = magCustomTotals.hardcover !== undefined ? magCustomTotals.hardcover : autoHardcoverSum;
+      const costPackaging = magCustomTotals.packaging !== undefined ? magCustomTotals.packaging : autoPackagingSum;
 
-      // 3. Бігування обкладинки: 0.1231 грн / біг (1С #6)
-      const creasingPerCopy = magBinding === 'staple' ? (2 * 0.1231) : (4 * 0.1231);
-      const autoCreasingCost = (qty * creasingPerCopy) + 40;
+      const directMaterialsCost = costBlockPaper + costCoverPaper + costBoard;
+      const directPrepressCost = costCtp + costMakeready;
+      const directPrintingCost = costPrintRun;
+      const directPostpressCost = costFolding + costGathering + costCreasing + costLamination + costBinding + costTrimming + costHardcover + costPackaging;
 
-      // 4. Ламінування обкладинки: 0.5750 грн / аркуш (1С #3)
-      let lamCostPerSheet = 0.5750;
-      if (magCoverLam === 'softtouch') lamCostPerSheet = 1.1500;
-      else if (magCoverLam === 'matte_duo' || magCoverLam === 'gloss_duo') lamCostPerSheet = 1.1500;
-      const autoLaminationCost = (isSeparateCover && magCoverLam !== 'none') ? (qty * lamCostPerSheet + 80) : 0;
-
-      // 5. Скріплення блоку (Клей / Дріт / Нитка)
-      let autoBindingCost = 0;
-      if (magBinding === 'staple') {
-        autoBindingCost = qty * 0.85 + 100; // Дріт + шиття на 2 скоби
-      } else if (magBinding === 'kbs') {
-        autoBindingCost = qty * 2.80 + 200; // Гарячий термоклей
-      } else if (magBinding === 'thread') {
-        autoBindingCost = qty * (totalSignatures * 0.40) + 250; // Ниткошвейка КШБ
-      }
-
-      // 6. Фінішна обрізка / різка блоку: 0.1660 грн (1С #11)
-      const autoTrimmingCost = qty * 0.1660 + 60;
-
-      // 7. Операції твердої палітурки (якщо тверда кришка 7БЦ з 1С):
-      // - Виготовлення кришки: 0.9427 грн (1С #9)
-      // - Обробка блоку: 0.2517 грн (1С #10)
-      // - Вставка блоку в кришку: 0.5751 грн (1С #8)
-      const autoHardcoverOpsCost = isHardcover ? (qty * (0.9427 + 0.2517 + 0.5751) + 200) : 0;
-
-      // 8. Пакування та тара
-      const autoPackagingCost = Math.ceil(qty / 25) * 15 + 80;
-
-      // Apply User Custom Overrides if modified
-      const effBlockPaperCost = magCustomCosts.blockPaper !== undefined ? magCustomCosts.blockPaper : Math.round(autoBlockPaperCost);
-      const effCoverPaperCost = magCustomCosts.coverPaper !== undefined ? magCustomCosts.coverPaper : Math.round(autoCoverPaperCost);
-      const effBoardCost = magCustomCosts.board !== undefined ? magCustomCosts.board : Math.round(autoBoardCost);
-      const effTotalPaperCost = effBlockPaperCost + effCoverPaperCost + effBoardCost;
-
-      const effPrepressCost = magCustomCosts.prepress !== undefined ? magCustomCosts.prepress : Math.round(autoPrepressCost);
-      const effMakereadyCost = magCustomCosts.makeready !== undefined ? magCustomCosts.makeready : Math.round(autoMakereadyCost);
-      const effPrintingRunCost = magCustomCosts.printingRun !== undefined ? magCustomCosts.printingRun : Math.round(autoPrintingRunCost);
-
-      const effFoldingCost = magCustomCosts.folding !== undefined ? magCustomCosts.folding : Math.round(autoFoldingCost);
-      const effGatheringCost = magCustomCosts.gathering !== undefined ? magCustomCosts.gathering : Math.round(autoGatheringCost);
-      const effCreasingCost = magCustomCosts.creasing !== undefined ? magCustomCosts.creasing : Math.round(autoCreasingCost);
-      const effLaminationCost = magCustomCosts.lamination !== undefined ? magCustomCosts.lamination : Math.round(autoLaminationCost);
-      const effBindingCost = magCustomCosts.binding !== undefined ? magCustomCosts.binding : Math.round(autoBindingCost);
-      const effTrimmingCost = magCustomCosts.trimming !== undefined ? magCustomCosts.trimming : Math.round(autoTrimmingCost);
-      const effHardcoverOpsCost = magCustomCosts.hardcoverOps !== undefined ? magCustomCosts.hardcoverOps : Math.round(autoHardcoverOpsCost);
-      const effPackagingCost = magCustomCosts.packaging !== undefined ? magCustomCosts.packaging : Math.round(autoPackagingCost);
-
-      const postpressTotal = effFoldingCost + effGatheringCost + effCreasingCost + effLaminationCost + effBindingCost + effTrimmingCost + effHardcoverOpsCost + effPackagingCost;
-
-      // F. Формула собівартості з аркуша 02.11:
-      // Собівартість = Матеріали + Друк + Постпрес + Брак + Пакування
-      const directCost = effPrepressCost + effMakereadyCost + effPrintingRunCost + effTotalPaperCost + postpressTotal;
-      const overhead = Math.round(directCost * 0.05); // 5% накладні
+      const directCost = directMaterialsCost + directPrepressCost + directPrintingCost + directPostpressCost;
+      const overhead = Math.round(directCost * 0.05); // 5% накладні цеху
       const totalCost = directCost + overhead;
 
-      // Маржа = 100% (або обрана користувачем)
-      // При націнці 100%: Ціна = Собівартість * 2
+      // Маржа цеху (націнка %)
       const markupMultiplier = 1 + (magMarginPct / 100);
       const finalPrice = Math.round(totalCost * markupMultiplier);
       const unitPrice = Number((finalPrice / qty).toFixed(2));
@@ -3993,164 +4001,232 @@ export const Calculator: React.FC = () => {
         totalMakereadies,
         grossBlockSheets,
         grossCoverSheets,
-        blockWeightKg: Number(blockWeightKg.toFixed(1)),
-        coverWeightKg: Number(coverWeightKg.toFixed(1)),
+        totalGrossSheets,
+        blockWeightKg,
+        coverWeightKg,
         totalWeightKg: Number((blockWeightKg + coverWeightKg).toFixed(1)),
-        // Auto values
-        autoBlockPaperCost: Math.round(autoBlockPaperCost),
-        autoCoverPaperCost: Math.round(autoCoverPaperCost),
-        autoBoardCost: Math.round(autoBoardCost),
-        autoPrepressCost: Math.round(autoPrepressCost),
-        autoMakereadyCost: Math.round(autoMakereadyCost),
-        autoPrintingRunCost: Math.round(autoPrintingRunCost),
-        autoFoldingCost: Math.round(autoFoldingCost),
-        autoGatheringCost: Math.round(autoGatheringCost),
-        autoCreasingCost: Math.round(autoCreasingCost),
-        autoLaminationCost: Math.round(autoLaminationCost),
-        autoBindingCost: Math.round(autoBindingCost),
-        autoTrimmingCost: Math.round(autoTrimmingCost),
-        autoHardcoverOpsCost: Math.round(autoHardcoverOpsCost),
-        autoPackagingCost: Math.round(autoPackagingCost),
-        // Effective values (with user overrides)
-        blockPaperCost: effBlockPaperCost,
-        coverPaperCost: effCoverPaperCost,
-        boardCost: effBoardCost,
-        totalPaperCost: effTotalPaperCost,
-        prepressCost: effPrepressCost,
-        makereadyCost: effMakereadyCost,
-        printingRunCost: effPrintingRunCost,
-        foldingCost: effFoldingCost,
-        gatheringCost: effGatheringCost,
-        creasingCost: effCreasingCost,
-        laminationCost: effLaminationCost,
-        bindingCost: effBindingCost,
-        trimmingCost: effTrimmingCost,
-        hardcoverOpsCost: effHardcoverOpsCost,
-        packagingCost: effPackagingCost,
-        postpressTotal,
         directCost,
         overhead,
         totalCost,
         finalPrice,
         unitPrice,
-        marginSum
+        marginSum,
+        // Individual line data
+        items: [
+          {
+            key: 'blockPaper',
+            num: 1,
+            name: 'Папір внутрішнього блоку',
+            details: `${curBlockPaper.name}, ${grossBlockSheets} арк. B2`,
+            tariff: tBlockPaper,
+            defTariff: defBlockPaperTariff,
+            unit: 'грн / кг',
+            qty: `${blockWeightKg} кг`,
+            total: costBlockPaper,
+            autoTotal: autoBlockPaperSum,
+            isCustomTariff: magCustomTariffs.blockPaper !== undefined,
+            isCustomTotal: magCustomTotals.blockPaper !== undefined
+          },
+          {
+            key: 'coverPaper',
+            num: 2,
+            name: 'Папір обкладинки',
+            details: isSeparateCover ? `${curCoverPaper.name}, ${grossCoverSheets} арк. B2` : 'Своя обкладинка (з блоку)',
+            tariff: tCoverPaper,
+            defTariff: defCoverPaperTariff,
+            unit: 'грн / кг',
+            qty: isSeparateCover ? `${coverWeightKg} кг` : '—',
+            total: costCoverPaper,
+            autoTotal: autoCoverPaperSum,
+            isCustomTariff: magCustomTariffs.coverPaper !== undefined,
+            isCustomTotal: magCustomTotals.coverPaper !== undefined,
+            disabled: !isSeparateCover
+          },
+          {
+            key: 'board',
+            num: 3,
+            name: 'Палітурний картон (тверда палітурка 7БЦ)',
+            details: 'Палітурний картон 2 мм для кришки',
+            tariff: tBoard,
+            defTariff: defBoardTariff,
+            unit: 'грн / прим',
+            qty: isHardcover ? `${boardCopies} шт` : '—',
+            total: costBoard,
+            autoTotal: autoBoardSum,
+            isCustomTariff: magCustomTariffs.board !== undefined,
+            isCustomTotal: magCustomTotals.board !== undefined,
+            disabled: !isHardcover
+          },
+          {
+            key: 'ctp',
+            num: 4,
+            name: 'Форми CTP B2 (вивід + 1С #1 копіювання + 1С #2 монтаж)',
+            details: `${blockPlates} на блок (${magBlockColor}) ${isSeparateCover ? `+ ${coverPlates} обкл.` : ''}`,
+            tariff: tCtp,
+            defTariff: defCtpTariff,
+            unit: 'грн / форму',
+            qty: `${totalPlates} шт`,
+            total: costCtp,
+            autoTotal: autoCtpSum,
+            isCustomTariff: magCustomTariffs.ctp !== undefined,
+            isCustomTotal: magCustomTotals.ctp !== undefined
+          },
+          {
+            key: 'makeready',
+            num: 5,
+            name: 'Приладка офсетної машини B2',
+            details: `${blockMakereadies} на блок ${isSeparateCover ? '+ 1 на обкл.' : ''}`,
+            tariff: tMakeready,
+            defTariff: defMakereadyTariff,
+            unit: 'грн / приладку',
+            qty: `${totalMakereadies} шт`,
+            total: costMakeready,
+            autoTotal: autoMakereadySum,
+            isCustomTariff: magCustomTariffs.makeready !== undefined,
+            isCustomTotal: magCustomTotals.makeready !== undefined
+          },
+          {
+            key: 'printRun',
+            num: 6,
+            name: 'Тиражні листопрогони B2',
+            details: `Блок ${grossBlockSheets} ${isSeparateCover ? `+ обкл. ${grossCoverSheets}` : ''} відбитків`,
+            tariff: tPrintRun,
+            defTariff: defPrintRunTariff,
+            unit: 'грн / прогін',
+            qty: `${totalGrossSheets} відб.`,
+            total: costPrintRun,
+            autoTotal: autoPrintRunSum,
+            isCustomTariff: magCustomTariffs.printRun !== undefined,
+            isCustomTotal: magCustomTotals.printRun !== undefined
+          },
+          {
+            key: 'folding',
+            num: 7,
+            name: 'Фальцювання зошитів (1С #7: Фальцовка)',
+            details: `${qty} прим × ${totalSignatures} зошитів`,
+            tariff: tFolding,
+            defTariff: defFoldingTariff,
+            unit: 'грн / згин',
+            qty: `${foldsCount} згинів`,
+            total: costFolding,
+            autoTotal: autoFoldingSum,
+            isCustomTariff: magCustomTariffs.folding !== undefined,
+            isCustomTotal: magCustomTotals.folding !== undefined
+          },
+          {
+            key: 'gathering',
+            num: 8,
+            name: 'Збірка блоку (листопідбір зошитів у блок)',
+            details: 'Підбір зошитів під скріплення',
+            tariff: tGathering,
+            defTariff: defGatheringTariff,
+            unit: 'грн / зошит',
+            qty: `${gatheringCount} зошитів`,
+            total: costGathering,
+            autoTotal: autoGatheringSum,
+            isCustomTariff: magCustomTariffs.gathering !== undefined,
+            isCustomTotal: magCustomTotals.gathering !== undefined
+          },
+          {
+            key: 'creasing',
+            num: 9,
+            name: 'Бігування обкладинки (1С #6: Биговка)',
+            details: magBinding === 'staple' ? '2 біги' : '4 біги під корінець',
+            tariff: tCreasing,
+            defTariff: defCreasingTariff,
+            unit: 'грн / біг',
+            qty: `${creasesCount} бігів`,
+            total: costCreasing,
+            autoTotal: autoCreasingSum,
+            isCustomTariff: magCustomTariffs.creasing !== undefined,
+            isCustomTotal: magCustomTotals.creasing !== undefined
+          },
+          {
+            key: 'lamination',
+            num: 10,
+            name: 'Ламінування обкладинки (1С #3: Ламинирование)',
+            details: magCoverLam === 'none' ? 'Без ламінації' : `Ламінація ${magCoverLam}`,
+            tariff: tLamination,
+            defTariff: defLaminationTariff,
+            unit: 'грн / арк',
+            qty: laminationCount > 0 ? `${laminationCount} арк` : '—',
+            total: costLamination,
+            autoTotal: autoLaminationSum,
+            isCustomTariff: magCustomTariffs.lamination !== undefined,
+            isCustomTotal: magCustomTotals.lamination !== undefined,
+            disabled: laminationCount === 0 && magCustomTotals.lamination === undefined
+          },
+          {
+            key: 'binding',
+            num: 11,
+            name: `Скріплення блоку (${magBinding === 'staple' ? 'Скоба/дріт' : magBinding === 'kbs' ? 'Термоклей КБС' : 'Ниткошвейка КШБ'})`,
+            details: magBinding === 'staple' ? '2 скоби в корінець' : magBinding === 'kbs' ? 'Гарячий PUR клей' : 'Прошивання зошитів ниткою',
+            tariff: tBinding,
+            defTariff: defBindingTariff,
+            unit: 'грн / прим',
+            qty: `${bindingCopies} прим`,
+            total: costBinding,
+            autoTotal: autoBindingSum,
+            isCustomTariff: magCustomTariffs.binding !== undefined,
+            isCustomTotal: magCustomTotals.binding !== undefined
+          },
+          {
+            key: 'trimming',
+            num: 12,
+            name: 'Фінішна тристороння обрізка (1С #11: Обрезка/прессовка)',
+            details: 'Підрізання блоку з трьох сторін',
+            tariff: tTrimming,
+            defTariff: defTrimmingTariff,
+            unit: 'грн / прим',
+            qty: `${trimmingCopies} прим`,
+            total: costTrimming,
+            autoTotal: autoTrimmingSum,
+            isCustomTariff: magCustomTariffs.trimming !== undefined,
+            isCustomTotal: magCustomTotals.trimming !== undefined
+          },
+          {
+            key: 'hardcover',
+            num: 13,
+            name: 'Операції твердої кришки 7БЦ (1С #9 Кришка + #10 Блок + #8 Вставка)',
+            details: '0.9427 + 0.2517 + 0.5751 грн по 1С',
+            tariff: tHardcover,
+            defTariff: defHardcoverTariff,
+            unit: 'грн / прим',
+            qty: isHardcover ? `${hardcoverCopies} прим` : '—',
+            total: costHardcover,
+            autoTotal: autoHardcoverSum,
+            isCustomTariff: magCustomTariffs.hardcover !== undefined,
+            isCustomTotal: magCustomTotals.hardcover !== undefined,
+            disabled: !isHardcover && magCustomTotals.hardcover === undefined
+          },
+          {
+            key: 'packaging',
+            num: 14,
+            name: 'Пакування в крафт-папір / гофрокороби та маркування',
+            details: 'Пачки по 25 примірників',
+            tariff: tPackaging,
+            defTariff: defPackagingTariff,
+            unit: 'грн / пачку',
+            qty: `${packagingPacks} пачок`,
+            total: costPackaging,
+            autoTotal: autoPackagingSum,
+            isCustomTariff: magCustomTariffs.packaging !== undefined,
+            isCustomTotal: magCustomTotals.packaging !== undefined
+          }
+        ]
       };
     };
 
     const currentCalc = calculateMagazineRun(magQuantity);
-    const customOverridesCount = Object.keys(magCustomCosts).length;
-    const hasCustomOverrides = customOverridesCount > 0;
+    const customTariffCount = Object.keys(magCustomTariffs).length;
+    const customTotalCount = Object.keys(magCustomTotals).length;
+    const hasCustomOverrides = customTariffCount > 0 || customTotalCount > 0;
 
-    // Cost Items Definition for rendering & editing
-    const costLineItems = [
-      {
-        key: 'blockPaper',
-        title: `Папір блоку (${currentCalc.blockWeightKg} кг за вагою):`,
-        desc: `${curBlockPaper.name}, ${currentCalc.grossBlockSheets} арк. B2`,
-        autoVal: currentCalc.autoBlockPaperCost,
-        val: currentCalc.blockPaperCost,
-        isCustom: magCustomCosts.blockPaper !== undefined,
-      },
-      {
-        key: 'coverPaper',
-        title: `Папір обкладинки (${currentCalc.coverWeightKg} кг):`,
-        desc: isSeparateCover ? `${curCoverPaper.name}, ${currentCalc.grossCoverSheets} арк. B2` : 'Своя обкладинка з блоку',
-        autoVal: currentCalc.autoCoverPaperCost,
-        val: currentCalc.coverPaperCost,
-        isCustom: magCustomCosts.coverPaper !== undefined,
-        hide: !isSeparateCover && magCustomCosts.coverPaper === undefined
-      },
-      {
-        key: 'prepress',
-        title: `Форми CTP (${currentCalc.totalPlates} шт, вивід + 1С #1/#2):`,
-        desc: `${currentCalc.blockPlates} на блок (${magBlockColor}) ${isSeparateCover ? `+ ${currentCalc.coverPlates} обкл.` : ''}`,
-        autoVal: currentCalc.autoPrepressCost,
-        val: currentCalc.prepressCost,
-        isCustom: magCustomCosts.prepress !== undefined,
-      },
-      {
-        key: 'makeready',
-        title: `Приладки офсетної машини (${currentCalc.totalMakereadies} шт):`,
-        desc: `${currentCalc.totalSignatures} зошитів ${isSeparateCover ? '+ 1 обкл.' : ''}`,
-        autoVal: currentCalc.autoMakereadyCost,
-        val: currentCalc.makereadyCost,
-        isCustom: magCustomCosts.makeready !== undefined,
-      },
-      {
-        key: 'printingRun',
-        title: 'Тиражні прогони B2:',
-        desc: `${currentCalc.grossBlockSheets + currentCalc.grossCoverSheets} прогонів машини`,
-        autoVal: currentCalc.autoPrintingRunCost,
-        val: currentCalc.printingRunCost,
-        isCustom: magCustomCosts.printingRun !== undefined,
-      },
-      {
-        key: 'folding',
-        title: 'Фальцювання (0.1200 грн / згин по 1С):',
-        desc: `${magQuantity} прим. × ${currentCalc.totalSignatures} зошитів`,
-        autoVal: currentCalc.autoFoldingCost,
-        val: currentCalc.foldingCost,
-        isCustom: magCustomCosts.folding !== undefined,
-      },
-      {
-        key: 'gathering',
-        title: 'Збірка блоку (листопідбір зошитів):',
-        desc: '0.1500 грн / зошит цеху',
-        autoVal: currentCalc.autoGatheringCost,
-        val: currentCalc.gatheringCost,
-        isCustom: magCustomCosts.gathering !== undefined,
-      },
-      {
-        key: 'creasing',
-        title: 'Бігування (0.1231 грн / біг по 1С):',
-        desc: magBinding === 'staple' ? '2 біги на обкладинці' : '4 біги (корінець КБС)',
-        autoVal: currentCalc.autoCreasingCost,
-        val: currentCalc.creasingCost,
-        isCustom: magCustomCosts.creasing !== undefined,
-      },
-      {
-        key: 'lamination',
-        title: 'Ламінування (0.5750 грн / арк по 1С):',
-        desc: magCoverLam === 'none' ? 'Без ламінації' : `Ламінація ${magCoverLam}`,
-        autoVal: currentCalc.autoLaminationCost,
-        val: currentCalc.laminationCost,
-        isCustom: magCustomCosts.lamination !== undefined,
-        hide: (magCoverLam === 'none' || !isSeparateCover) && magCustomCosts.lamination === undefined
-      },
-      {
-        key: 'binding',
-        title: `Скріплення (${magBinding === 'staple' ? 'Скоба/дріт' : magBinding === 'kbs' ? 'Клей КБС' : 'Ниткошвейка'}):`,
-        desc: magBinding === 'staple' ? '2 скоби в корінець' : magBinding === 'kbs' ? 'Гарячий PUR клей' : 'Прошивання зошитів ниткою',
-        autoVal: currentCalc.autoBindingCost,
-        val: currentCalc.bindingCost,
-        isCustom: magCustomCosts.binding !== undefined,
-      },
-      {
-        key: 'trimming',
-        title: 'Різка / фінішна обрізка (0.1660 грн по 1С):',
-        desc: 'Тристороннє фінішне підрізання',
-        autoVal: currentCalc.autoTrimmingCost,
-        val: currentCalc.trimmingCost,
-        isCustom: magCustomCosts.trimming !== undefined,
-      },
-      {
-        key: 'hardcoverOps',
-        title: 'Операції 7БЦ (Кришка 0.9427 + Блок 0.2517 + Вставка 0.5751 грн):',
-        desc: 'Виготовлення твердої кришки та збірка книги',
-        autoVal: currentCalc.autoHardcoverOpsCost,
-        val: currentCalc.hardcoverOpsCost,
-        isCustom: magCustomCosts.hardcoverOps !== undefined,
-        hide: !isHardcover && magCustomCosts.hardcoverOps === undefined
-      },
-      {
-        key: 'packaging',
-        title: 'Пакування та тара:',
-        desc: 'Крафт-папір / гофрокороби',
-        autoVal: currentCalc.autoPackagingCost,
-        val: currentCalc.packagingCost,
-        isCustom: magCustomCosts.packaging !== undefined,
-      }
-    ].filter(item => !item.hide);
+    // Reset all custom overrides
+    const handleResetAllTo1C = () => {
+      setMagCustomTariffs({});
+      setMagCustomTotals({});
+    };
 
     // Copy Quote helper
     const handleCopyCommercialQuote = () => {
@@ -4169,7 +4245,7 @@ export const Calculator: React.FC = () => {
 Папір блоку: ${curBlockPaper.name} (${colorLabel})
 Обкладинка: ${curCoverPaper.name} (${magCoverPrint}), ${lamLabel}
 Виробнича схема: ${currentCalc.totalSignatures} зошитів офсетного друку B2, ${currentCalc.totalPlates} форм CTP
-${hasCustomOverrides ? '(Кошторис скориговано менеджером вручну)' : ''}
+${hasCustomOverrides ? '(Кошторис скориговано за індивідуальними тарифами)' : ''}
 
 ВАРТІСТЬ ЗАМОВЛЕННЯ:
 - Ціна за 1 екземпляр: ${currentCalc.unitPrice.toFixed(2)} грн
@@ -4214,36 +4290,25 @@ ${hasCustomOverrides ? '(Кошторис скориговано менедже�
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Dedicated КОШТОРИС Button */}
+            {/* Dedicated КОШТОРИС Button in Header */}
             <button
               type="button"
-              onClick={() => setIsMagCostModalOpen(true)}
-              className="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs flex items-center gap-2 transition-all shadow-sm cursor-pointer"
-              title="Відкрити інтерактивний кошторис для редагування цін"
+              onClick={() => {
+                setMagShowCostDetails(true);
+                setTimeout(() => {
+                  document.getElementById('mag-cost-table')?.scrollIntoView({ behavior: 'smooth' });
+                }, 50);
+              }}
+              className="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs flex items-center gap-2 transition-all shadow-sm cursor-pointer"
+              title="Перейти до розцінок за 1 операцію"
             >
               <FileSpreadsheet size={15} />
-              <span>Кошторис</span>
-              {hasCustomOverrides ? (
+              <span>Кошторис (Тарифи 1С)</span>
+              {hasCustomOverrides && (
                 <span className="bg-amber-400 text-slate-900 text-[10px] font-black px-1.5 py-0.5 rounded-md">
-                  Змінено ({customOverridesCount})
-                </span>
-              ) : (
-                <span className="bg-blue-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-md">
-                  1С
+                  Змінено ({customTariffCount + customTotalCount})
                 </span>
               )}
-            </button>
-
-            {/* Toggle Inline Cost Details */}
-            <button
-              type="button"
-              onClick={() => setMagShowCostDetails(!magShowCostDetails)}
-              className={`px-3 py-2 rounded-xl border text-xs font-bold flex items-center gap-1.5 transition-colors shadow-2xs cursor-pointer ${
-                magShowCostDetails ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-slate-50 border-slate-200 text-slate-700'
-              }`}
-            >
-              <Settings size={14} />
-              <span>{magShowCostDetails ? 'Сховати панель' : 'Показати панель'}</span>
             </button>
 
             <button
@@ -4266,7 +4331,7 @@ ${hasCustomOverrides ? '(Кошторис скориговано менедже�
           <div className="flex items-center gap-2">
             {hasCustomOverrides && (
               <span className="bg-amber-200 text-amber-950 font-black px-2 py-0.5 rounded text-[11px] border border-amber-300">
-                ✏️ Враховано {customOverridesCount} ручних коригувань
+                ✏️ Ручні тарифи ({customTariffCount + customTotalCount})
               </span>
             )}
             <div className="text-xs font-black text-amber-800 bg-amber-100/80 px-2.5 py-1 rounded-md border border-amber-300/60">
@@ -4782,7 +4847,7 @@ ${hasCustomOverrides ? '(Кошторис скориговано менедже�
             </div>
           </div>
 
-          {/* RIGHT COLUMN: Results & 1C Cost Breakdown (5 cols) */}
+          {/* RIGHT COLUMN: Results & Direct Action Cards (5 cols) */}
           <div className="lg:col-span-5 flex flex-col gap-5">
             {/* Main Price Card */}
             <div className="ios-card bg-linear-to-br from-slate-900 via-slate-800 to-blue-950 text-white p-6 rounded-2xl shadow-lg border border-slate-700/60">
@@ -4811,14 +4876,19 @@ ${hasCustomOverrides ? '(Кошторис скориговано менедже�
               <div className="mt-4 pt-3 border-t border-slate-700/50">
                 <button
                   type="button"
-                  onClick={() => setIsMagCostModalOpen(true)}
+                  onClick={() => {
+                    setMagShowCostDetails(true);
+                    setTimeout(() => {
+                      document.getElementById('mag-cost-table')?.scrollIntoView({ behavior: 'smooth' });
+                    }, 50);
+                  }}
                   className="w-full py-2.5 px-3 rounded-xl bg-blue-500/20 hover:bg-blue-500/30 text-blue-200 hover:text-white font-extrabold text-xs flex items-center justify-center gap-2 transition-colors border border-blue-400/30 cursor-pointer"
                 >
                   <FileSpreadsheet size={15} />
-                  <span>Відкрити та редагувати кошторис</span>
+                  <span>Відкрити тарифи 1С за 1 операцію</span>
                   {hasCustomOverrides && (
                     <span className="bg-amber-400 text-slate-900 text-[10px] font-black px-1.5 py-0.2 rounded-full">
-                      {customOverridesCount} змінено
+                      ручні тарифи
                     </span>
                   )}
                 </button>
@@ -4905,148 +4975,315 @@ ${hasCustomOverrides ? '(Кошторис скориговано менедже�
               </div>
             </div>
 
-            {/* Editable 1C Cost Breakdown (Кошторис за статтями 1С) */}
-            {magShowCostDetails && (
-              <div className="ios-card bg-white p-5" style={{ border: '1px solid #e2e8f0' }}>
-                <div className="flex items-center justify-between mb-3 border-b border-slate-100 pb-2">
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs font-black uppercase tracking-wider text-slate-800">
-                      📊 Кошторис за розцінками 1С
-                    </span>
-                    {hasCustomOverrides && (
-                      <span className="bg-amber-100 text-amber-800 border border-amber-300 text-[10px] font-bold px-1.5 py-0.2 rounded">
-                        Змінено
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    {hasCustomOverrides && (
-                      <button
-                        type="button"
-                        onClick={() => setMagCustomCosts({})}
-                        className="text-[10px] font-bold text-amber-700 hover:text-amber-900 bg-amber-50 hover:bg-amber-100 px-2 py-1 rounded border border-amber-200 transition-colors flex items-center gap-1 cursor-pointer"
-                        title="Скинути всі суми до розрахунків 1С"
-                      >
-                        <RotateCcw size={10} />
-                        <span>Скинути</span>
-                      </button>
-                    )}
-                    <button
-                      type="button"
-                      onClick={() => setIsMagCostModalOpen(true)}
-                      className="text-[11px] font-bold text-blue-600 hover:text-blue-700 bg-blue-50 px-2 py-1 rounded border border-blue-200 transition-colors flex items-center gap-1 cursor-pointer"
-                      title="Відкрити у великому модальному вікні"
-                    >
-                      <Layers size={11} />
-                      <span>Модально</span>
-                    </button>
-                  </div>
+            {/* Quick Cost Overview Card (Compact) */}
+            <div className="ios-card bg-white p-4" style={{ border: '1px solid #e2e8f0' }}>
+              <div className="flex items-center justify-between text-xs font-black text-slate-800 uppercase tracking-wider mb-2">
+                <span>Структура витрат накладу</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMagShowCostDetails(true);
+                    setTimeout(() => {
+                      document.getElementById('mag-cost-table')?.scrollIntoView({ behavior: 'smooth' });
+                    }, 50);
+                  }}
+                  className="text-[11px] font-bold text-blue-600 hover:text-blue-800 flex items-center gap-1 cursor-pointer"
+                >
+                  <span>Всі тарифи 1С ↓</span>
+                </button>
+              </div>
+              <div className="space-y-1 text-xs">
+                <div className="flex justify-between py-1 border-b border-slate-50">
+                  <span className="text-slate-600">Папір та картон:</span>
+                  <span className="font-bold text-slate-900">{(currentCalc.items[0].total + (currentCalc.items[1]?.total || 0) + (currentCalc.items[2]?.total || 0)).toLocaleString('uk-UA')} грн</span>
                 </div>
-
-                <div className="text-[11px] text-slate-500 mb-2.5">
-                  💡 <em>Ви можете змінити будь-яке число безпосередньо в полі вводу. Сума та собівартість перерахуються автоматично.</em>
+                <div className="flex justify-between py-1 border-b border-slate-50">
+                  <span className="text-slate-600">Форми CTP та приладки B2:</span>
+                  <span className="font-bold text-slate-900">{(currentCalc.items[3].total + currentCalc.items[4].total).toLocaleString('uk-UA')} грн</span>
                 </div>
-
-                {/* Editable Lines */}
-                <div className="space-y-1.5 text-xs max-h-[460px] overflow-y-auto pr-1">
-                  {costLineItems.map((item) => (
-                    <div
-                      key={item.key}
-                      className={`flex items-center justify-between py-1.5 px-2 rounded-lg border transition-colors ${
-                        item.isCustom
-                          ? 'bg-amber-50/90 border-amber-300'
-                          : 'bg-slate-50/40 border-slate-100 hover:bg-slate-50'
-                      }`}
-                    >
-                      <div className="flex flex-col pr-2 flex-1 min-w-0">
-                        <div className="flex items-center gap-1.5 flex-wrap">
-                          <span className="text-xs font-bold text-slate-800 truncate">{item.title}</span>
-                          {item.isCustom && (
-                            <span className="text-[9px] font-black bg-amber-200 text-amber-900 px-1 py-0.1 rounded">
-                              ручна сума
-                            </span>
-                          )}
-                        </div>
-                        <span className="text-[10px] text-slate-400 truncate">{item.desc}</span>
-                      </div>
-
-                      <div className="flex items-center gap-1.5 shrink-0">
-                        <input
-                          type="number"
-                          min="0"
-                          value={item.val}
-                          onChange={(e) => {
-                            const num = Number(e.target.value);
-                            setMagCustomCosts(prev => ({
-                              ...prev,
-                              [item.key]: isNaN(num) ? 0 : Math.max(0, num)
-                            }));
-                          }}
-                          className={`w-20 px-2 py-1 text-right font-black text-xs rounded-md border focus:outline-none transition-all ${
-                            item.isCustom
-                              ? 'border-amber-500 bg-white text-amber-950 ring-1 ring-amber-400 font-black'
-                              : 'border-slate-200 bg-white text-slate-900 focus:border-blue-500'
-                          }`}
-                        />
-                        <span className="text-[11px] font-bold text-slate-400 w-5">грн</span>
-                        {item.isCustom ? (
-                          <button
-                            type="button"
-                            title={`Скинути до авторозрахунку 1С (${item.autoVal} грн)`}
-                            onClick={() => {
-                              setMagCustomCosts(prev => {
-                                const next = { ...prev };
-                                delete next[item.key];
-                                return next;
-                              });
-                            }}
-                            className="w-5 h-5 flex items-center justify-center rounded text-[10px] text-amber-800 bg-amber-100 hover:bg-amber-200 cursor-pointer"
-                          >
-                            ↺
-                          </button>
-                        ) : (
-                          <span className="w-5" />
-                        )}
-                      </div>
-                    </div>
-                  ))}
+                <div className="flex justify-between py-1 border-b border-slate-50">
+                  <span className="text-slate-600">Друкарські прогони B2:</span>
+                  <span className="font-bold text-slate-900">{currentCalc.items[5].total.toLocaleString('uk-UA')} грн</span>
                 </div>
-
-                {/* Totals Summary */}
-                <div className="p-3 bg-slate-900 text-white rounded-xl mt-3 flex flex-col gap-2 shadow-sm">
-                  <div className="flex items-center justify-between text-xs font-bold">
-                    <span className="text-slate-300">Виробнича собівартість (Cost):</span>
-                    <span className="text-sm font-black text-white">{currentCalc.totalCost.toLocaleString('uk-UA')} грн</span>
-                  </div>
-                  
-                  <div className="flex items-center justify-between text-xs font-bold border-t border-slate-800 pt-2">
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-blue-300">Націнка ({magMarginPct}%):</span>
-                      <input
-                        type="number"
-                        min="0"
-                        max="300"
-                        value={magMarginPct}
-                        onChange={(e) => setMagMarginPct(Math.max(0, Number(e.target.value)))}
-                        className="w-12 px-1 py-0.5 rounded bg-slate-800 text-white border border-slate-700 text-xs font-black text-center"
-                      />
-                      <span className="text-slate-400 text-xs">%</span>
-                    </div>
-                    <span className="text-blue-300 font-black">{currentCalc.marginSum.toLocaleString('uk-UA')} грн</span>
-                  </div>
-
-                  <div className="flex items-center justify-between text-sm font-black border-t border-slate-700 pt-2 text-emerald-400">
-                    <span>РАЗОМ ДО СПЛАТИ:</span>
-                    <span className="text-base">{currentCalc.finalPrice.toLocaleString('uk-UA')} грн</span>
-                  </div>
-                  <div className="text-[11px] text-right text-slate-400">
-                    Ціна за 1 журнал: <strong className="text-white">{currentCalc.unitPrice.toFixed(2)} грн / шт</strong>
-                  </div>
+                <div className="flex justify-between py-1 border-b border-slate-50">
+                  <span className="text-slate-600">Постпрес (фальцовка, клей, ламінація...):</span>
+                  <span className="font-bold text-slate-900">{(currentCalc.directCost - (currentCalc.items[0].total + (currentCalc.items[1]?.total || 0) + (currentCalc.items[2]?.total || 0) + currentCalc.items[3].total + currentCalc.items[4].total + currentCalc.items[5].total)).toLocaleString('uk-UA')} грн</span>
+                </div>
+                <div className="flex justify-between py-1.5 pt-2 text-xs font-black text-slate-900">
+                  <span>Виробнича собівартість (Cost):</span>
+                  <span className="text-emerald-700">{currentCalc.totalCost.toLocaleString('uk-UA')} грн</span>
                 </div>
               </div>
-            )}
+            </div>
           </div>
         </div>
+
+        {/* FULL-WIDTH DEDICATED 1C TARIFF & CALCULATION SPECIFICATION SHEET */}
+        {magShowCostDetails && (
+          <div id="mag-cost-table" className="ios-card bg-white p-6 rounded-2xl shadow-sm border border-slate-200 mt-2">
+            {/* Header of 1C Table */}
+            <div className="flex items-center justify-between mb-4 border-b border-slate-200 pb-3 flex-wrap gap-2">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-200 text-blue-600 flex items-center justify-center shadow-2xs">
+                  <FileSpreadsheet size={22} />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-sm sm:text-base font-black text-slate-900 uppercase tracking-wide m-0">
+                      Технологічний кошторис замовлення (Тарифи 1С Едельвейс)
+                    </h3>
+                    <span className="text-emerald-700 bg-emerald-50 border border-emerald-200 text-[10px] font-black px-2 py-0.5 rounded">
+                      База 02.11
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500 m-0 mt-0.5">
+                    Виріб: <strong>Журнал {magFormat} ({wMm}×{hMm} мм)</strong> • Обсяг: <strong>{pages} сторінок</strong> • Наклад: <strong>{magQuantity.toLocaleString('uk-UA')} прим.</strong>
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                {hasCustomOverrides && (
+                  <button
+                    type="button"
+                    onClick={handleResetAllTo1C}
+                    className="px-3 py-1.5 rounded-xl border border-amber-300 bg-amber-50 hover:bg-amber-100 text-amber-900 text-xs font-black transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                    title="Скинути всі тарифи до початкових розцінок 1С"
+                  >
+                    <RotateCcw size={12} />
+                    <span>Скинути до тарифів 1С</span>
+                  </button>
+                )}
+                <button
+                  type="button"
+                  onClick={() => setMagShowCostDetails(false)}
+                  className="px-3 py-1.5 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 text-xs font-bold transition-colors cursor-pointer"
+                >
+                  ✕ Згорнути таблицю
+                </button>
+              </div>
+            </div>
+
+            <div className="text-xs text-slate-600 mb-3 bg-blue-50/60 p-2.5 rounded-xl border border-blue-100 flex items-center justify-between flex-wrap gap-2">
+              <div className="flex items-center gap-2">
+                <span className="text-base">💡</span>
+                <span>
+                  <strong>Тарифи за 1 операцію можна змінювати:</strong> введіть потрібну ціну за 1 згин, 1 форму чи 1 кг у стовпчику «Тариф за 1 операцію». Сума рядка та підсумкова вартість перерахуються автоматично.
+                </span>
+              </div>
+              {hasCustomOverrides && (
+                <span className="bg-amber-400 text-slate-950 font-black px-2 py-0.5 rounded text-[10px] shrink-0">
+                  Ручні тарифи: {customTariffCount + customTotalCount}
+                </span>
+              )}
+            </div>
+
+            {/* The 1C Styled Specification Table */}
+            <div className="overflow-x-auto rounded-xl border border-slate-200">
+              <table className="w-full text-xs text-left border-collapse">
+                <thead>
+                  <tr className="bg-slate-800 text-white font-black text-xs tracking-wider">
+                    <th className="py-2.5 px-3 w-10 text-center">№</th>
+                    <th className="py-2.5 px-3">Технологічна операція / Матеріал</th>
+                    <th className="py-2.5 px-3 w-44 text-right">Тариф за 1 операцію (грн)</th>
+                    <th className="py-2.5 px-3 w-28 text-center">Од. виміру</th>
+                    <th className="py-2.5 px-3 w-32 text-right">Кількість</th>
+                    <th className="py-2.5 px-3 w-36 text-right">Сума (грн)</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {currentCalc.items.map((item) => {
+                    if (item.disabled) return null;
+                    const isRowModified = item.isCustomTariff || item.isCustomTotal;
+                    return (
+                      <tr
+                        key={item.key}
+                        className={`transition-colors ${
+                          isRowModified ? 'bg-amber-50/70 hover:bg-amber-100/60' : 'hover:bg-blue-50/30'
+                        }`}
+                      >
+                        <td className="py-2.5 px-3 text-center font-bold text-slate-400">
+                          {item.num}
+                        </td>
+                        <td className="py-2.5 px-3">
+                          <div className="font-extrabold text-slate-900 flex items-center gap-1.5 flex-wrap">
+                            <span>{item.name}</span>
+                            {isRowModified && (
+                              <span className="text-[9px] font-black bg-amber-200 text-amber-900 px-1.5 py-0.2 rounded">
+                                змінено
+                              </span>
+                            )}
+                          </div>
+                          <div className="text-[10px] text-slate-500 mt-0.5">
+                            {item.details}
+                          </div>
+                        </td>
+                        {/* Column: Tariff per 1 operation (EDITABLE INPUT) */}
+                        <td className="py-2.5 px-3 text-right">
+                          <div className="inline-flex items-center gap-1 justify-end">
+                            <input
+                              type="number"
+                              step="0.0001"
+                              min="0"
+                              value={item.tariff}
+                              onChange={(e) => {
+                                const val = parseFloat(e.target.value);
+                                setMagCustomTariffs(prev => ({
+                                  ...prev,
+                                  [item.key]: isNaN(val) ? 0 : val
+                                }));
+                                // Clear direct total override so row computes from new tariff
+                                setMagCustomTotals(prev => {
+                                  const next = { ...prev };
+                                  delete next[item.key];
+                                  return next;
+                                });
+                              }}
+                              className={`w-24 px-2 py-1 text-right font-black font-mono text-xs rounded-lg border focus:outline-none transition-all ${
+                                item.isCustomTariff
+                                  ? 'border-amber-500 bg-white text-amber-950 ring-2 ring-amber-300 font-black'
+                                  : 'border-slate-200 bg-white text-slate-900 focus:border-blue-500'
+                              }`}
+                            />
+                            {item.isCustomTariff && (
+                              <button
+                                type="button"
+                                title={`Скинути тариф до нормативу 1С (${item.defTariff} грн)`}
+                                onClick={() => {
+                                  setMagCustomTariffs(prev => {
+                                    const next = { ...prev };
+                                    delete next[item.key];
+                                    return next;
+                                  });
+                                }}
+                                className="w-5 h-5 flex items-center justify-center rounded text-[11px] text-amber-800 bg-amber-200 hover:bg-amber-300 cursor-pointer"
+                              >
+                                ↺
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                        <td className="py-2.5 px-3 text-center font-semibold text-slate-500 font-mono text-[11px]">
+                          {item.unit}
+                        </td>
+                        <td className="py-2.5 px-3 text-right font-black text-slate-800 font-mono text-xs">
+                          {item.qty}
+                        </td>
+                        {/* Column: Total for this operation (EDITABLE) */}
+                        <td className="py-2.5 px-3 text-right">
+                          <div className="inline-flex items-center gap-1 justify-end">
+                            <input
+                              type="number"
+                              min="0"
+                              value={item.total}
+                              onChange={(e) => {
+                                const val = parseInt(e.target.value, 10);
+                                setMagCustomTotals(prev => ({
+                                  ...prev,
+                                  [item.key]: isNaN(val) ? 0 : val
+                                }));
+                              }}
+                              className={`w-24 px-2 py-1 text-right font-black font-mono text-xs rounded-lg border focus:outline-none transition-all ${
+                                item.isCustomTotal
+                                  ? 'border-amber-500 bg-white text-amber-950 ring-2 ring-amber-300 font-black'
+                                  : 'border-slate-200 bg-slate-50/80 text-slate-900 focus:border-blue-500'
+                              }`}
+                            />
+                            <span className="font-bold text-slate-400 text-[11px]">₴</span>
+                            {item.isCustomTotal && (
+                              <button
+                                type="button"
+                                title={`Скинути суму до розрахунку (${item.autoTotal} грн)`}
+                                onClick={() => {
+                                  setMagCustomTotals(prev => {
+                                    const next = { ...prev };
+                                    delete next[item.key];
+                                    return next;
+                                  });
+                                }}
+                                className="w-5 h-5 flex items-center justify-center rounded text-[11px] text-amber-800 bg-amber-200 hover:bg-amber-300 cursor-pointer"
+                              >
+                                ↺
+                              </button>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Comprehensive Financial Summary */}
+            <div className="mt-4 p-4 rounded-xl bg-slate-900 text-white flex flex-col md:flex-row items-center justify-between gap-4 shadow-sm">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs w-full md:w-auto">
+                <div className="p-2.5 rounded-lg bg-slate-800/80 border border-slate-700/60">
+                  <span className="text-[10px] text-slate-400 font-bold uppercase block">Прямі витрати (Direct):</span>
+                  <span className="text-sm font-black text-white">{currentCalc.directCost.toLocaleString('uk-UA')} грн</span>
+                </div>
+                <div className="p-2.5 rounded-lg bg-slate-800/80 border border-slate-700/60">
+                  <span className="text-[10px] text-slate-400 font-bold uppercase block">Накладні (5%):</span>
+                  <span className="text-sm font-black text-slate-300">{currentCalc.overhead.toLocaleString('uk-UA')} грн</span>
+                </div>
+                <div className="p-2.5 rounded-lg bg-slate-800/80 border border-slate-700/60">
+                  <span className="text-[10px] text-slate-400 font-bold uppercase block">Собівартість (Cost):</span>
+                  <span className="text-sm font-black text-amber-400">{currentCalc.totalCost.toLocaleString('uk-UA')} грн</span>
+                  <div className="text-[10px] text-slate-400 mt-0.5">{(currentCalc.totalCost / magQuantity).toFixed(2)} грн / шт</div>
+                </div>
+                <div className="p-2.5 rounded-lg bg-slate-800/80 border border-slate-700/60">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] text-blue-300 font-bold uppercase">Маржа ({magMarginPct}%):</span>
+                    <input
+                      type="number"
+                      min="0"
+                      max="300"
+                      value={magMarginPct}
+                      onChange={(e) => setMagMarginPct(Math.max(0, Number(e.target.value)))}
+                      className="w-12 px-1 py-0.5 rounded bg-slate-900 text-white border border-slate-600 text-xs font-black text-center"
+                    />
+                  </div>
+                  <span className="text-sm font-black text-blue-300 mt-1 block">{currentCalc.marginSum.toLocaleString('uk-UA')} грн</span>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-4 shrink-0">
+                <div className="text-right">
+                  <div className="text-[10px] uppercase tracking-wider text-emerald-400 font-bold">Разом до сплати клієнтом:</div>
+                  <div className="text-2xl font-black text-emerald-400 tracking-tight">
+                    {currentCalc.finalPrice.toLocaleString('uk-UA')} грн
+                  </div>
+                  <div className="text-[11px] text-slate-300 font-bold">
+                    Ціна за 1 журнал: <span className="text-white font-extrabold">{currentCalc.unitPrice.toFixed(2)} грн / шт</span>
+                  </div>
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <button
+                    type="button"
+                    onClick={handleCopyCommercialQuote}
+                    className="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                  >
+                    <Send size={13} />
+                    <span>Копіювати КП</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setQuantity(magQuantity);
+                      setCategory('Журнали');
+                      setStep('editor');
+                    }}
+                    className="px-3.5 py-2 rounded-xl bg-white hover:bg-slate-100 text-slate-900 font-black text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                  >
+                    <Check size={13} />
+                    <span>В замовлення</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Quantity Price Matrix Grid */}
         <div className="ios-card bg-white p-5" style={{ border: '1px solid #e2e8f0' }}>
@@ -5124,164 +5361,6 @@ ${hasCustomOverrides ? '(Кошторис скориговано менедже�
             </table>
           </div>
         </div>
-
-        {/* FULLSCREEN / DEDICATED MODAL FOR EDITING COST ESTIMATE */}
-        {isMagCostModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150">
-            <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
-              {/* Modal Header */}
-              <div className="p-4 px-6 border-b border-slate-100 flex items-center justify-between bg-slate-50">
-                <div className="flex items-center gap-2.5">
-                  <div className="w-9 h-9 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center">
-                    <FileSpreadsheet size={20} />
-                  </div>
-                  <div>
-                    <h3 className="text-sm font-black text-slate-900 leading-tight">
-                      Кошторис виготовлення журналу (Тарифи 1С)
-                    </h3>
-                    <p className="text-[11px] text-slate-500 m-0">
-                      {magFormat} ({wMm}×{hMm} мм) • {pages} сторінок • {magQuantity.toLocaleString('uk-UA')} прим.
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  {hasCustomOverrides && (
-                    <button
-                      type="button"
-                      onClick={() => setMagCustomCosts({})}
-                      className="px-3 py-1.5 rounded-lg text-xs font-bold text-amber-800 bg-amber-100 hover:bg-amber-200 transition-colors flex items-center gap-1.5 cursor-pointer"
-                    >
-                      <RotateCcw size={12} />
-                      <span>Скинути все до 1С</span>
-                    </button>
-                  )}
-                  <button
-                    type="button"
-                    onClick={() => setIsMagCostModalOpen(false)}
-                    className="w-8 h-8 rounded-lg bg-slate-200/70 hover:bg-red-100 hover:text-red-600 text-slate-600 text-sm font-bold flex items-center justify-center transition-colors cursor-pointer"
-                  >
-                    ✕
-                  </button>
-                </div>
-              </div>
-
-              {/* Modal Body: Editable Rows */}
-              <div className="p-6 overflow-y-auto flex-1 space-y-2">
-                <div className="p-3 bg-blue-50/70 border border-blue-200 rounded-xl text-xs text-blue-900 flex items-center justify-between mb-3">
-                  <span>
-                    ✍️ <strong>Редагування статей собівартості:</strong> введіть потрібну суму навпроти будь-якої операції.
-                  </span>
-                  {hasCustomOverrides && (
-                    <span className="font-extrabold bg-amber-400 text-slate-950 px-2 py-0.5 rounded text-[10px]">
-                      {customOverridesCount} ручних змін
-                    </span>
-                  )}
-                </div>
-
-                {costLineItems.map((item) => (
-                  <div
-                    key={item.key}
-                    className={`flex items-center justify-between py-2.5 px-3 rounded-xl border transition-colors ${
-                      item.isCustom
-                        ? 'bg-amber-50 border-amber-300'
-                        : 'bg-slate-50/60 border-slate-100 hover:bg-slate-100/50'
-                    }`}
-                  >
-                    <div className="flex flex-col pr-3 flex-1">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-slate-900">{item.title}</span>
-                        {item.isCustom && (
-                          <span className="text-[10px] font-black bg-amber-200 text-amber-900 px-1.5 py-0.2 rounded">
-                            змінено вручну
-                          </span>
-                        )}
-                      </div>
-                      <span className="text-[11px] text-slate-400 mt-0.5">{item.desc}</span>
-                    </div>
-
-                    <div className="flex items-center gap-2 shrink-0">
-                      <div className="relative">
-                        <input
-                          type="number"
-                          min="0"
-                          value={item.val}
-                          onChange={(e) => {
-                            const num = Number(e.target.value);
-                            setMagCustomCosts(prev => ({
-                              ...prev,
-                              [item.key]: isNaN(num) ? 0 : Math.max(0, num)
-                            }));
-                          }}
-                          className={`w-28 px-3 py-1.5 text-right font-black text-xs rounded-lg border focus:outline-none transition-all ${
-                            item.isCustom
-                              ? 'border-amber-500 bg-white text-amber-950 ring-2 ring-amber-300 shadow-xs'
-                              : 'border-slate-200 bg-white text-slate-900 focus:border-blue-500'
-                          }`}
-                        />
-                      </div>
-                      <span className="text-xs font-bold text-slate-500 w-6">грн</span>
-                      {item.isCustom ? (
-                        <button
-                          type="button"
-                          title={`Скинути до авторозрахунку (${item.autoVal} грн)`}
-                          onClick={() => {
-                            setMagCustomCosts(prev => {
-                              const next = { ...prev };
-                              delete next[item.key];
-                              return next;
-                            });
-                          }}
-                          className="w-6 h-6 flex items-center justify-center rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-800 text-xs font-black transition-colors cursor-pointer"
-                        >
-                          ↺
-                        </button>
-                      ) : (
-                        <span className="w-6" />
-                      )}
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Modal Footer */}
-              <div className="p-4 px-6 bg-slate-900 text-white border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div className="flex items-center gap-6 text-xs">
-                  <div>
-                    <span className="text-slate-400 block text-[10px] uppercase font-bold">Собівартість (Cost):</span>
-                    <span className="text-base font-black text-white">{currentCalc.totalCost.toLocaleString('uk-UA')} грн</span>
-                  </div>
-                  <div>
-                    <span className="text-slate-400 block text-[10px] uppercase font-bold">Націнка ({magMarginPct}%):</span>
-                    <span className="text-base font-black text-blue-300">{currentCalc.marginSum.toLocaleString('uk-UA')} грн</span>
-                  </div>
-                  <div>
-                    <span className="text-emerald-400 block text-[10px] uppercase font-bold">РАЗОМ:</span>
-                    <span className="text-xl font-black text-emerald-400">{currentCalc.finalPrice.toLocaleString('uk-UA')} грн</span>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={handleCopyCommercialQuote}
-                    className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs flex items-center gap-1.5 transition-colors border border-slate-700 cursor-pointer"
-                  >
-                    <Send size={13} />
-                    <span>Копіювати КП</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setIsMagCostModalOpen(false)}
-                    className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-black text-xs transition-colors shadow-sm cursor-pointer"
-                  >
-                    Застосувати
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
       </div>
     );
   };
@@ -6945,7 +7024,7 @@ ${hasCustomOverrides ? '(Кошторис скориговано менедже�
 { 
                         title: 'Багатосторінкова', 
                         badge: 'Брошурування', 
-                        desc: 'Каталоги, журнали, брошури, блокноти на пружині, ресторанні меню…', 
+                        desc: 'Каталоги, брошури, блокноти на пружині, ресторанні меню…', 
                         subTab: 'multipage', 
                         icon: <BookOpen size={28} style={{ color: 'var(--primary)' }} />,
                         metric: 'Скоба, PUR клей'
@@ -10583,7 +10662,7 @@ ${hasCustomOverrides ? '(Кошторис скориговано менедже�
                       {
                         title: 'Багатосторінкова',
                         badge: 'Брошурування',
-                        desc: 'Брошури, журнали, каталоги, книги, меню, прайс-листи, звіти…',
+                        desc: 'Брошури, каталоги, книги, меню, прайс-листи, звіти…',
                         icon: <BookOpen size={28} style={{ color: 'var(--primary)' }} />,
                         metric: 'Скоба, PUR клей',
                         onClick: () => setDigitalSubTab('multipage')
