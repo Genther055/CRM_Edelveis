@@ -3852,10 +3852,10 @@ export const Calculator: React.FC = () => {
       const rem4Sig = (remPages % 8) >= 4 ? 1 : 0;
       const totalSignatures = Math.max(1, full16Sig + rem8Sig + rem4Sig);
 
-      // B. Prepress & CTP Plates
+      // B. Prepress & CTP Plates (На B2 обкладинка 4+4 друкується зі своїм оборотом = 4 пластини)
       const platesPerBlockSig = magBlockColor === '1+1' ? 1 : 4;
       const blockPlates = totalSignatures * platesPerBlockSig;
-      const coverPlates = isSeparateCover ? (magCoverPrint === '0+0' ? 0 : magCoverPrint === '1+0' ? 1 : magCoverPrint === '4+0' ? 4 : 8) : 0;
+      const coverPlates = isSeparateCover ? (magCoverPrint === '0+0' ? 0 : magCoverPrint === '1+0' ? 1 : 4) : 0;
       const totalPlates = blockPlates + coverPlates;
 
       // C. Press Makereadies & Print runs
@@ -3891,27 +3891,31 @@ export const Calculator: React.FC = () => {
       const trimmingCount = qty;
       const packagingPacks = Math.ceil(qty / 25);
 
-      // E. Default unit tariffs from 1C
+      // E. Default unit tariffs (Розділено прозоро: матеріали vs техпроцеси 1С)
       const defBlockPaperTariff = curBlockPaper.priceKg;
       const defCoverPaperTariff = curCoverPaper.priceKg;
-      const defBoardTariff = 85.0;
-      const defCtpTariff = 182.12; // 4.00 kop + 3.12 mont + 175.00 plate
+      const defBoardTariff = 85.0; // Палітурний картон для 7БЦ
+      const defCtpPlateTariff = 175.00; // Сама металева пластина CTP B2 (матеріал)
+      const defCtpCopyTariff = 4.0000;  // 1С #1: Копіювання форм (експонування пластин)
+      const defCtpMountTariff = 3.1200; // 1С #2: Монтаж плівок (лавсанових)
       const defMakereadyTariff = magBlockColor === '1+1' ? 250.0 : 400.0;
       const defPrintRunTariff = magBlockColor === '1+1' ? 0.2200 : 0.3600;
-      const defFoldingTariff = 0.1200;
-      const defGatheringTariff = 0.1500;
-      const defCreasingTariff = 0.1231;
-      const defLaminationTariff = magCoverLam === 'softtouch' ? 1.2500 : (magCoverLam === 'matte_duo' || magCoverLam === 'gloss_duo') ? 1.1500 : 0.5750;
+      const defFoldingTariff = 0.1200;  // 1С #7: Фальцювання / додаткова біговка
+      const defGatheringTariff = 0.1500; // Листопідбір зошитів
+      const defCreasingTariff = 0.1231; // 1С #6: Бігування
+      const defLaminationTariff = 0.5750; // 1С #3: Ламінування
       const defBindingTariff = magBinding === 'staple' ? 0.1010 : magBinding === 'thread' ? 3.5000 : 2.0000;
-      const defTrimmingTariff = 0.1660;
-      const defHardcoverTariff = 1.7695; // 0.9427 kryshka + 0.2517 blok + 0.5751 vstavka
-      const defPackagingTariff = 15.00;
+      const defTrimmingTariff = 0.1660; // 1С #11: Фінішна обрізка / пресування
+      const defHardcoverTariff = 1.7695; // 1С #8,9,10: Кришка 0.9427 + Блок 0.2517 + Вставка 0.5751
+      const defPackagingTariff = 15.00; // Пакування та тара
 
-      // F. Effective unit tariffs
+      // F. Effective unit tariffs (with user custom overrides)
       const tBlockPaper = magCustomTariffs.blockPaper ?? defBlockPaperTariff;
       const tCoverPaper = magCustomTariffs.coverPaper ?? defCoverPaperTariff;
       const tBoard = magCustomTariffs.board ?? defBoardTariff;
-      const tCtp = magCustomTariffs.ctp ?? defCtpTariff;
+      const tCtpPlate = magCustomTariffs.ctpPlate ?? defCtpPlateTariff;
+      const tCtpCopy = magCustomTariffs.ctpCopy ?? defCtpCopyTariff;
+      const tCtpMount = magCustomTariffs.ctpMount ?? defCtpMountTariff;
       const tMakeready = magCustomTariffs.makeready ?? defMakereadyTariff;
       const tPrintRun = magCustomTariffs.printRun ?? defPrintRunTariff;
       const tFolding = magCustomTariffs.folding ?? defFoldingTariff;
@@ -3927,7 +3931,9 @@ export const Calculator: React.FC = () => {
       const autoBlockPaperSum = Math.round(blockWeightKg * tBlockPaper);
       const autoCoverPaperSum = Math.round(coverWeightKg * tCoverPaper);
       const autoBoardSum = Math.round(boardCopies * (0.15 * tBoard));
-      const autoCtpSum = Math.round(totalPlates * tCtp);
+      const autoCtpPlateSum = Math.round(totalPlates * tCtpPlate);
+      const autoCtpCopySum = Math.round(totalPlates * tCtpCopy);
+      const autoCtpMountSum = Math.round(totalPlates * tCtpMount);
       const autoMakereadySum = Math.round(totalMakereadies * tMakeready);
       const autoPrintRunSum = Math.round(totalGrossSheets * tPrintRun);
       const autoFoldingSum = Math.round(foldsCount * tFolding);
@@ -3943,7 +3949,9 @@ export const Calculator: React.FC = () => {
       const costBlockPaper = magCustomTotals.blockPaper ?? autoBlockPaperSum;
       const costCoverPaper = magCustomTotals.coverPaper ?? autoCoverPaperSum;
       const costBoard = magCustomTotals.board ?? autoBoardSum;
-      const costCtp = magCustomTotals.ctp ?? autoCtpSum;
+      const costCtpPlate = magCustomTotals.ctpPlate ?? autoCtpPlateSum;
+      const costCtpCopy = magCustomTotals.ctpCopy ?? autoCtpCopySum;
+      const costCtpMount = magCustomTotals.ctpMount ?? autoCtpMountSum;
       const costMakeready = magCustomTotals.makeready ?? autoMakereadySum;
       const costPrintRun = magCustomTotals.printRun ?? autoPrintRunSum;
       const costFolding = magCustomTotals.folding ?? autoFoldingSum;
@@ -3956,9 +3964,11 @@ export const Calculator: React.FC = () => {
       const costPackaging = magCustomTotals.packaging ?? autoPackagingSum;
 
       // H. Direct Cost & Overhead & Factory Cost
-      const directCost = costBlockPaper + costCoverPaper + costBoard + costCtp + costMakeready + 
-                         costPrintRun + costFolding + costGathering + costCreasing + 
-                         costLamination + costBinding + costTrimming + costHardcover + costPackaging;
+      const directCost = costBlockPaper + costCoverPaper + costBoard + 
+                         costCtpPlate + costCtpCopy + costCtpMount + 
+                         costMakeready + costPrintRun + costFolding + 
+                         costGathering + costCreasing + costLamination + 
+                         costBinding + costTrimming + costHardcover + costPackaging;
 
       const overheadCost = Math.round(directCost * 0.05); // 5% ZVR
       const totalCost = directCost + overheadCost;
@@ -3972,6 +3982,8 @@ export const Calculator: React.FC = () => {
         qty,
         totalSignatures,
         totalPlates,
+        blockPlates,
+        coverPlates,
         totalMakereadies,
         totalGrossSheets,
         blockWeightKg,
@@ -3988,6 +4000,7 @@ export const Calculator: React.FC = () => {
             key: 'blockPaper',
             num: 1,
             name: `Папір блоку (${curBlockPaper.name})`,
+            category: 'Матеріал',
             details: `${grossBlockSheets.toLocaleString('uk-UA')} арк. B2 • вага ${blockWeightKg} кг`,
             tariff: tBlockPaper,
             defTariff: defBlockPaperTariff,
@@ -4002,6 +4015,7 @@ export const Calculator: React.FC = () => {
             key: 'coverPaper',
             num: 2,
             name: `Папір обкладинки (${curCoverPaper.name})`,
+            category: 'Матеріал',
             details: isSeparateCover ? `${grossCoverSheets.toLocaleString('uk-UA')} арк. B2 • вага ${coverWeightKg} кг` : 'Використано папір блоку (своя обкладинка)',
             tariff: tCoverPaper,
             defTariff: defCoverPaperTariff,
@@ -4014,38 +4028,55 @@ export const Calculator: React.FC = () => {
             disabled: !isSeparateCover && magCustomTotals.coverPaper === undefined
           },
           {
-            key: 'board',
+            key: 'ctpPlate',
             num: 3,
-            name: 'Палітурний картон 2.0 мм (для 7БЦ)',
-            details: isHardcover ? `Палітурний картон на ${qty} кришок` : 'Тільки для твердої обкладинки',
-            tariff: tBoard,
-            defTariff: defBoardTariff,
-            unit: 'грн / м²',
-            qty: isHardcover ? `${qty} прим.` : '—',
-            total: costBoard,
-            autoTotal: autoBoardSum,
-            isCustomTariff: magCustomTariffs.board !== undefined,
-            isCustomTotal: magCustomTotals.board !== undefined,
-            disabled: !isHardcover && magCustomTotals.board === undefined
+            name: 'Офсетні пластини CTP B2',
+            category: 'Матеріал',
+            details: `Алюмінієві пластини B2: Блок (${blockPlates} шт.) + Обкладинка (${coverPlates} шт.)`,
+            tariff: tCtpPlate,
+            defTariff: defCtpPlateTariff,
+            unit: 'грн / шт',
+            qty: `${totalPlates} шт`,
+            total: costCtpPlate,
+            autoTotal: autoCtpPlateSum,
+            isCustomTariff: magCustomTariffs.ctpPlate !== undefined,
+            isCustomTotal: magCustomTotals.ctpPlate !== undefined
           },
           {
-            key: 'ctp',
+            key: 'ctpCopy',
             num: 4,
-            name: 'Вивід форм CTP B2 (копіювання + монтаж + пластина)',
-            details: `Блок (${blockPlates} шт.) + Обкладинка (${coverPlates} шт.)`,
-            tariff: tCtp,
-            defTariff: defCtpTariff,
+            name: 'Копіювання форм (експонування пластин)',
+            category: '1С #1',
+            details: 'Експонування та вивід зображення на CTP B2',
+            tariff: tCtpCopy,
+            defTariff: defCtpCopyTariff,
             unit: 'грн / форму',
             qty: `${totalPlates} форм`,
-            total: costCtp,
-            autoTotal: autoCtpSum,
-            isCustomTariff: magCustomTariffs.ctp !== undefined,
-            isCustomTotal: magCustomTotals.ctp !== undefined
+            total: costCtpCopy,
+            autoTotal: autoCtpCopySum,
+            isCustomTariff: magCustomTariffs.ctpCopy !== undefined,
+            isCustomTotal: magCustomTotals.ctpCopy !== undefined
+          },
+          {
+            key: 'ctpMount',
+            num: 5,
+            name: 'Монтаж плівок (лавсанових)',
+            category: '1С #2',
+            details: 'Монтаж та підготовка лавсану до друку',
+            tariff: tCtpMount,
+            defTariff: defCtpMountTariff,
+            unit: 'грн / форму',
+            qty: `${totalPlates} форм`,
+            total: costCtpMount,
+            autoTotal: autoCtpMountSum,
+            isCustomTariff: magCustomTariffs.ctpMount !== undefined,
+            isCustomTotal: magCustomTotals.ctpMount !== undefined
           },
           {
             key: 'makeready',
-            num: 5,
+            num: 6,
             name: 'Приладки офсетної машини B2',
+            category: 'Цех',
             details: `${blockMakereadies} на зошити блоку + ${coverMakereadies} на обкладинку`,
             tariff: tMakeready,
             defTariff: defMakereadyTariff,
@@ -4058,8 +4089,9 @@ export const Calculator: React.FC = () => {
           },
           {
             key: 'printRun',
-            num: 6,
+            num: 7,
             name: 'Тиражні листопрогони B2',
+            category: 'Цех',
             details: `${totalGrossSheets.toLocaleString('uk-UA')} загальних прогонів офсетної машини`,
             tariff: tPrintRun,
             defTariff: defPrintRunTariff,
@@ -4072,8 +4104,9 @@ export const Calculator: React.FC = () => {
           },
           {
             key: 'folding',
-            num: 7,
-            name: 'Фальцювання зошитів блоку (16 смуг)',
+            num: 8,
+            name: 'Фальцювання / додаткова біговка',
+            category: '1С #7',
             details: `${totalSignatures} зошити(ів) на примірник × ${qty} прим.`,
             tariff: tFolding,
             defTariff: defFoldingTariff,
@@ -4086,8 +4119,9 @@ export const Calculator: React.FC = () => {
           },
           {
             key: 'gathering',
-            num: 8,
+            num: 9,
             name: 'Листопідбір (збірка блоку з зошитів)',
+            category: '1С цех',
             details: `Комплектація ${totalSignatures} зошитів у блок`,
             tariff: tGathering,
             defTariff: defGatheringTariff,
@@ -4100,8 +4134,9 @@ export const Calculator: React.FC = () => {
           },
           {
             key: 'creasing',
-            num: 9,
+            num: 10,
             name: 'Бігування обкладинки',
+            category: '1С #6',
             details: `${magBinding === 'staple' ? '2 біги (по лінії корінця)' : '4 біги (корінець + розкриття)'}`,
             tariff: tCreasing,
             defTariff: defCreasingTariff,
@@ -4114,9 +4149,10 @@ export const Calculator: React.FC = () => {
           },
           {
             key: 'lamination',
-            num: 10,
-            name: `Ламінація обкладинки (${magCoverLam === 'matte' ? 'Матова 1+0' : magCoverLam === 'gloss' ? 'Глянцева 1+0' : magCoverLam === 'softtouch' ? 'Soft-Touch' : magCoverLam === 'matte_duo' ? 'Матова 1+1' : magCoverLam === 'gloss_duo' ? 'Глянцева 1+1' : 'Без'})`,
-            details: isSeparateCover && magCoverLam !== 'none' ? `Ламінування на весь тираж ${qty} прим.` : 'Без ламінації обкладинки',
+            num: 11,
+            name: `Ламінування (${magCoverLam === 'matte' ? 'Матова' : 'Глянцева'})`,
+            category: '1С #3',
+            details: isSeparateCover && magCoverLam !== 'none' ? `Ламінування обкладинок ${qty} прим.` : 'Без ламінації',
             tariff: tLamination,
             defTariff: defLaminationTariff,
             unit: 'грн / арк',
@@ -4129,9 +4165,10 @@ export const Calculator: React.FC = () => {
           },
           {
             key: 'binding',
-            num: 11,
+            num: 12,
             name: `Скріплення (${magBinding === 'staple' ? 'Скоба 2 шт.' : magBinding === 'kbs' ? 'Термоклей' : 'Ниткошвейне скріплення'})`,
-            details: `Основна технологічна операція скріплення накладу`,
+            category: '1С цех',
+            details: 'Основна технологічна операція скріплення накладу',
             tariff: tBinding,
             defTariff: defBindingTariff,
             unit: 'грн / прим',
@@ -4143,9 +4180,10 @@ export const Calculator: React.FC = () => {
           },
           {
             key: 'trimming',
-            num: 12,
-            name: 'Тристороннє фінішне обрізання блоку',
-            details: 'Підрізка готового журналу з трьох сторін',
+            num: 13,
+            name: 'Фінішна обрізка / пресування',
+            category: '1С #11',
+            details: 'Тристороннє фінішне обрізання блоку готового журналу',
             tariff: tTrimming,
             defTariff: defTrimmingTariff,
             unit: 'грн / прим',
@@ -4157,9 +4195,10 @@ export const Calculator: React.FC = () => {
           },
           {
             key: 'hardcover',
-            num: 13,
-            name: 'Операції твердої палітурки 7БЦ (кришка + вставка блоку)',
-            details: isHardcover ? 'Збирання кришки (0.9427) + блок (0.2517) + вставка (0.5751)' : 'Тільки для твердої палітурки',
+            num: 14,
+            name: 'Операції твердої палітурки 7БЦ (кришка + вставка)',
+            category: '1С #8,9,10',
+            details: isHardcover ? 'Кришка (0.9427) + Обробка блоку (0.2517) + Вставка (0.5751)' : 'Тільки для твердої палітурки',
             tariff: tHardcover,
             defTariff: defHardcoverTariff,
             unit: 'грн / прим',
@@ -4172,8 +4211,9 @@ export const Calculator: React.FC = () => {
           },
           {
             key: 'packaging',
-            num: 14,
+            num: 15,
             name: 'Пакування в крафт-папір / гофрокороби та маркування',
+            category: 'Склад',
             details: 'Пачки по 25 примірників',
             tariff: tPackaging,
             defTariff: defPackagingTariff,
@@ -4203,7 +4243,7 @@ export const Calculator: React.FC = () => {
     const handleCopyCommercialQuote = () => {
       const bLabel = magBinding === 'staple' ? 'Скоба (2 шт.)' : magBinding === 'kbs' ? 'Термоклей' : 'Ниткошвейне скріплення';
       const cTypeLabel = isHardcover ? 'Тверда палітурка (7БЦ)' : 'М’яка обкладинка';
-      const lLabel = magCoverLam === 'none' ? 'без ламінації' : magCoverLam === 'matte' ? 'матова ламінація' : magCoverLam === 'gloss' ? 'глянцева ламінація' : magCoverLam === 'softtouch' ? 'Soft-touch ламінація' : 'двостороння ламінація';
+      const lLabel = magCoverLam === 'none' ? 'без ламінації' : magCoverLam === 'matte' ? 'матова ламінація' : 'глянцева ламінація';
       const colorLabel = magBlockColor === '4+4' ? '4+4 (повноколір)' : '1+1 (чорно-білий друк)';
       const orientLabel = magOrientation === 'vert' ? 'книжкова (вертикальна)' : 'альбомна (горизонтальна)';
       const text = `КОМЕРЦІЙНА ПРОПОЗИЦІЯ: ДРУК ЖУРНАЛІВ
@@ -4229,7 +4269,7 @@ export const Calculator: React.FC = () => {
       alert('Комерційну пропозицію скопійовано в буфер обміну!');
     };
 
-    const bLabel = magBinding === 'staple' ? 'Скоба (2 шт.)' : magBinding === 'kbs' ? 'Термоклей (КБС)' : 'Ниткошвейне скріплення';
+    const bLabel = magBinding === 'staple' ? 'Скоба (2 шт.)' : magBinding === 'kbs' ? 'Термоклей' : 'Ниткошвейне скріплення';
     const cTypeLabel = isHardcover ? 'Тверда палітурка (7БЦ)' : 'М’яка обкладинка';
     const lLabel = magCoverLam === 'none' ? 'Без ламінації' : magCoverLam === 'matte' ? 'Матова' : 'Глянцева';
 
@@ -4253,7 +4293,6 @@ export const Calculator: React.FC = () => {
             <div className="flex items-center gap-2">
               <span style={{ color: 'var(--text-medium)', fontSize: '11px', fontWeight: '600' }}>Каталог / Офсет /</span>
               <span style={{ fontWeight: '800', fontSize: '13px', color: 'var(--text-dark)' }}>Журнали</span>
-              
               {hasCustomOverrides && (
                 <span className="ios-badge ios-badge-orange" style={{ fontSize: '10px' }}>
                   Ручні тарифи ({customTariffCount + customTotalCount})
@@ -4730,7 +4769,7 @@ export const Calculator: React.FC = () => {
               </div>
             </div>
 
-            {/* CARD 4: BINDING & FINISHING (CLEAN - WITHOUT EMOJIS, MINI DETAILS, OR WARNINGS) */}
+            {/* CARD 4: BINDING & FINISHING */}
             <div className="ios-card bg-white" style={{ padding: '14px 16px', border: '1px solid var(--border-light)' }}>
               <div style={{ marginBottom: '10px' }}>
                 <span style={{ color: 'var(--text-medium)', fontSize: '10px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
@@ -4770,7 +4809,7 @@ export const Calculator: React.FC = () => {
             </div>
           </div>
 
-          {/* RIGHT COLUMN: CALCULATION SPECIFICATION CARD (WITHOUT TAGS) */}
+          {/* RIGHT COLUMN: CALCULATION SPECIFICATION CARD */}
           <div className="ios-card bg-white" style={{ padding: '16px', border: '1px solid var(--border-light)', position: 'sticky', top: '16px' }}>
             {/* Header of Drawer */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-light)', paddingBottom: '10px', marginBottom: '12px' }}>
@@ -4778,7 +4817,6 @@ export const Calculator: React.FC = () => {
                 <span style={{ color: 'var(--text-medium)', fontSize: '10px', fontWeight: '700', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
                   СПЕЦИФІКАЦІЯ ЖУРНАЛУ
                 </span>
-                
               </div>
               <div style={{ display: 'flex', gap: '4px' }}>
                 <button
@@ -4858,11 +4896,11 @@ export const Calculator: React.FC = () => {
               </div>
             </div>
 
-            {/* FINANCIAL / COST BREAKDOWN (Clean & Compact) */}
+            {/* FINANCIAL / COST BREAKDOWN */}
             <div style={{ borderTop: '1px solid var(--border-light)', paddingTop: '10px', marginBottom: '12px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
                 <span style={{ color: 'var(--text-medium)', fontSize: '10px', fontWeight: '700', textTransform: 'uppercase' }}>
-                  Структура собівартості (1С)
+                  Структура собівартості
                 </span>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
                   <span style={{ fontSize: '10px', color: 'var(--text-medium)' }}>Націнка:</span>
@@ -4898,7 +4936,7 @@ export const Calculator: React.FC = () => {
               </div>
             </div>
 
-            {/* ACTION BUTTONS (Exact CRM Buttons) */}
+            {/* ACTION BUTTONS */}
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '8px' }}>
               <button
                 type="button"
@@ -4949,14 +4987,14 @@ export const Calculator: React.FC = () => {
           </div>
         </div>
 
-        {/* FULL-WIDTH 1C TECHNOLOGICAL SPECIFICATION TABLE (NO "База 02.11", NO BOTTOM DESCRIPTION) */}
+        {/* FULL-WIDTH 1C TECHNOLOGICAL SPECIFICATION TABLE WITH TRANSPARENT PROCESS SOURCES */}
         {magShowCostDetails && (
           <div id="mag-cost-table" className="ios-card bg-white" style={{ padding: '16px', border: '1px solid var(--border-light)', marginTop: '8px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--border-light)', paddingBottom: '10px', marginBottom: '12px', flexWrap: 'wrap', gap: '8px' }}>
               <div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <span style={{ fontWeight: '800', fontSize: '13px', color: 'var(--text-dark)', textTransform: 'uppercase' }}>
-                    Технологічний кошторис замовлення (Тарифи 1С)
+                    Технологічний кошторис замовлення
                   </span>
                   {hasCustomOverrides && (
                     <span className="ios-badge ios-badge-orange" style={{ fontSize: '10px' }}>
@@ -4996,6 +5034,7 @@ export const Calculator: React.FC = () => {
                   <tr style={{ backgroundColor: 'var(--bg-system)', borderBottom: '1px solid var(--border-light)', color: 'var(--text-medium)', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase' }}>
                     <th style={{ padding: '8px 10px', width: '36px', textAlign: 'center' }}>№</th>
                     <th style={{ padding: '8px 12px' }}>Технологічна операція / Матеріал</th>
+                    <th style={{ padding: '8px 10px', width: '90px', textAlign: 'center' }}>Джерело</th>
                     <th style={{ padding: '8px 12px', width: '170px', textAlign: 'right' }}>Тариф за 1 операцію (₴)</th>
                     <th style={{ padding: '8px 10px', width: '110px', textAlign: 'center' }}>Од. виміру</th>
                     <th style={{ padding: '8px 12px', width: '130px', textAlign: 'right' }}>Кількість</th>
@@ -5030,6 +5069,11 @@ export const Calculator: React.FC = () => {
                           <div style={{ fontSize: '10px', color: 'var(--text-medium)', marginTop: '1px' }}>
                             {item.details}
                           </div>
+                        </td>
+                        <td style={{ padding: '8px 10px', textAlign: 'center' }}>
+                          <span className={`ios-badge ${item.category.includes('1С') ? 'ios-badge-blue' : item.category.includes('Матеріал') ? 'ios-badge-green' : 'ios-badge-purple'}`} style={{ fontSize: '9px', padding: '1px 5px' }}>
+                            {item.category}
+                          </span>
                         </td>
                         {/* EDITABLE UNIT TARIFF INPUT (₴) */}
                         <td style={{ padding: '8px 12px', textAlign: 'right' }}>
@@ -5068,7 +5112,7 @@ export const Calculator: React.FC = () => {
                             {item.isCustomTariff && (
                               <button
                                 type="button"
-                                title={`Скинути тариф до нормативу 1С (${item.defTariff} ₴)`}
+                                title={`Скинути тариф до нормативу (${item.defTariff} ₴)`}
                                 onClick={() => {
                                   setMagCustomTariffs(prev => {
                                     const next = { ...prev };
@@ -5098,7 +5142,7 @@ export const Calculator: React.FC = () => {
                 </tbody>
                 <tfoot>
                   <tr style={{ backgroundColor: 'var(--bg-system)', borderTop: '2px solid var(--border-light)', fontWeight: '800' }}>
-                    <td colSpan={4} style={{ padding: '10px 12px', textAlign: 'right', color: 'var(--text-medium)' }}>
+                    <td colSpan={5} style={{ padding: '10px 12px', textAlign: 'right', color: 'var(--text-medium)' }}>
                       Виробнича собівартість (Cost) з ЗВР 5%:
                     </td>
                     <td colSpan={2} style={{ padding: '10px 12px', textAlign: 'right', color: '#15803d', fontSize: '13px', fontFamily: 'var(--font-mono)' }}>
@@ -5106,7 +5150,7 @@ export const Calculator: React.FC = () => {
                     </td>
                   </tr>
                   <tr style={{ backgroundColor: '#eff6ff', borderTop: '1px solid #bfdbfe', fontWeight: '900' }}>
-                    <td colSpan={4} style={{ padding: '10px 12px', textAlign: 'right', color: '#1e40af' }}>
+                    <td colSpan={5} style={{ padding: '10px 12px', textAlign: 'right', color: '#1e40af' }}>
                       Разом клієнту з націнкою ({magMarginPct}%):
                     </td>
                     <td colSpan={2} style={{ padding: '10px 12px', textAlign: 'right', color: '#007AFF', fontSize: '15px', fontFamily: 'var(--font-mono)' }}>
