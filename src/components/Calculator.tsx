@@ -1070,6 +1070,8 @@ export const Calculator: React.FC = () => {
   const [magMarginPct, setMagMarginPct] = useState<number>(100); // 100% націнка згідно з технологічною карткою 02.11
   const [magPriceView, setMagPriceView] = useState<'per_item' | 'per_total'>('per_item');
   const [magShowCostDetails, setMagShowCostDetails] = useState<boolean>(true);
+  const [magCustomCosts, setMagCustomCosts] = useState<Record<string, number>>({});
+  const [isMagCostModalOpen, setIsMagCostModalOpen] = useState<boolean>(false);
 
   const [multiInsertMaterial, setMultiInsertMaterial] = useState<string>('130');
   const [multiInsertColor, setMultiInsertColor] = useState<string>('2');
@@ -3862,7 +3864,7 @@ export const Calculator: React.FC = () => {
       
       // Тарифи: 175 грн пластина + копіювання 4.00 грн (1С #1) + монтаж 3.12 грн (1С #2)
       const plateRate = 175 + 4.00 + 3.12; 
-      const prepressCost = totalPlates * plateRate;
+      const autoPrepressCost = totalPlates * plateRate;
 
       // C. Press Makereadies & Print runs
       const blockMakereadies = totalSignatures;
@@ -3872,7 +3874,7 @@ export const Calculator: React.FC = () => {
       // Приладка офсетної машини B2: 400 грн (4+4), 250 грн (1+1)
       const blockMakereadyRate = magBlockColor === '1+1' ? 250 : 400;
       const coverMakereadyRate = magCoverPrint === '1+0' ? 250 : 400;
-      const makereadyCost = (blockMakereadies * blockMakereadyRate) + (coverMakereadies * coverMakereadyRate);
+      const autoMakereadyCost = (blockMakereadies * blockMakereadyRate) + (coverMakereadies * coverMakereadyRate);
 
       // Print run (листопрогони B2)
       const pagesPerSheet = isA5 ? 32 : isA6 ? 64 : 16;
@@ -3894,64 +3896,82 @@ export const Calculator: React.FC = () => {
       const coverPrintRate = magCoverPrint === '1+0' ? 220 : 360;
       const blockPrintCost = (grossBlockSheets / 1000) * blockPrintRate;
       const coverPrintCost = isSeparateCover ? Math.max(180, (grossCoverSheets / 1000) * coverPrintRate) : 0;
-      const printingRunCost = blockPrintCost + coverPrintCost;
+      const autoPrintingRunCost = blockPrintCost + coverPrintCost;
 
       // D. Materials (Папір за вагою із записів Notion 02.11)
       const blockWeightKg = (700 * 1000 * curBlockPaper.density * grossBlockSheets) / 1e9;
-      const blockPaperCost = blockWeightKg * curBlockPaper.priceKg;
+      const autoBlockPaperCost = blockWeightKg * curBlockPaper.priceKg;
 
       const coverWeightKg = isSeparateCover ? (700 * 1000 * curCoverPaper.density * grossCoverSheets) / 1e9 : 0;
-      const coverPaperCost = coverWeightKg * curCoverPaper.priceKg;
+      const autoCoverPaperCost = coverWeightKg * curCoverPaper.priceKg;
       
       // Палітурний картон для твердої кришки
-      const boardCost = isHardcover ? (qty * 4.50) : 0;
-      const totalPaperCost = blockPaperCost + coverPaperCost + boardCost;
+      const autoBoardCost = isHardcover ? (qty * 4.50) : 0;
 
       // E. Постпрес за точними розцінками 1С:
       // 1. Фальцювання зошитів: 0.1200 грн (1С #7)
-      const foldingCost = qty * totalSignatures * 0.1200;
+      const autoFoldingCost = qty * totalSignatures * 0.1200;
 
       // 2. Листопідбір / Збірка блоку: 0.1500 грн / зошит
-      const gatheringCost = qty * totalSignatures * 0.1500;
+      const autoGatheringCost = qty * totalSignatures * 0.1500;
 
       // 3. Бігування обкладинки: 0.1231 грн / біг (1С #6)
       const creasingPerCopy = magBinding === 'staple' ? (2 * 0.1231) : (4 * 0.1231);
-      const creasingCost = (qty * creasingPerCopy) + 40;
+      const autoCreasingCost = (qty * creasingPerCopy) + 40;
 
       // 4. Ламінування обкладинки: 0.5750 грн / аркуш (1С #3)
       let lamCostPerSheet = 0.5750;
       if (magCoverLam === 'softtouch') lamCostPerSheet = 1.1500;
       else if (magCoverLam === 'matte_duo' || magCoverLam === 'gloss_duo') lamCostPerSheet = 1.1500;
-      const laminationCost = (isSeparateCover && magCoverLam !== 'none') ? (qty * lamCostPerSheet + 80) : 0;
+      const autoLaminationCost = (isSeparateCover && magCoverLam !== 'none') ? (qty * lamCostPerSheet + 80) : 0;
 
       // 5. Скріплення блоку (Клей / Дріт / Нитка)
-      let bindingCost = 0;
+      let autoBindingCost = 0;
       if (magBinding === 'staple') {
-        bindingCost = qty * 0.85 + 100; // Дріт + шиття на 2 скоби
+        autoBindingCost = qty * 0.85 + 100; // Дріт + шиття на 2 скоби
       } else if (magBinding === 'kbs') {
-        bindingCost = qty * 2.80 + 200; // Гарячий термоклей
+        autoBindingCost = qty * 2.80 + 200; // Гарячий термоклей
       } else if (magBinding === 'thread') {
-        bindingCost = qty * (totalSignatures * 0.40) + 250; // Ниткошвейка КШБ
+        autoBindingCost = qty * (totalSignatures * 0.40) + 250; // Ниткошвейка КШБ
       }
 
       // 6. Фінішна обрізка / різка блоку: 0.1660 грн (1С #11)
-      const trimmingCost = qty * 0.1660 + 60;
+      const autoTrimmingCost = qty * 0.1660 + 60;
 
       // 7. Операції твердої палітурки (якщо тверда кришка 7БЦ з 1С):
       // - Виготовлення кришки: 0.9427 грн (1С #9)
       // - Обробка блоку: 0.2517 грн (1С #10)
       // - Вставка блоку в кришку: 0.5751 грн (1С #8)
-      const hardcoverOpsCost = isHardcover ? (qty * (0.9427 + 0.2517 + 0.5751) + 200) : 0;
+      const autoHardcoverOpsCost = isHardcover ? (qty * (0.9427 + 0.2517 + 0.5751) + 200) : 0;
 
       // 8. Пакування та тара
-      const packagingCost = Math.ceil(qty / 25) * 15 + 80;
+      const autoPackagingCost = Math.ceil(qty / 25) * 15 + 80;
 
-      const postpressTotal = foldingCost + gatheringCost + creasingCost + laminationCost + bindingCost + trimmingCost + hardcoverOpsCost + packagingCost;
+      // Apply User Custom Overrides if modified
+      const effBlockPaperCost = magCustomCosts.blockPaper !== undefined ? magCustomCosts.blockPaper : Math.round(autoBlockPaperCost);
+      const effCoverPaperCost = magCustomCosts.coverPaper !== undefined ? magCustomCosts.coverPaper : Math.round(autoCoverPaperCost);
+      const effBoardCost = magCustomCosts.board !== undefined ? magCustomCosts.board : Math.round(autoBoardCost);
+      const effTotalPaperCost = effBlockPaperCost + effCoverPaperCost + effBoardCost;
+
+      const effPrepressCost = magCustomCosts.prepress !== undefined ? magCustomCosts.prepress : Math.round(autoPrepressCost);
+      const effMakereadyCost = magCustomCosts.makeready !== undefined ? magCustomCosts.makeready : Math.round(autoMakereadyCost);
+      const effPrintingRunCost = magCustomCosts.printingRun !== undefined ? magCustomCosts.printingRun : Math.round(autoPrintingRunCost);
+
+      const effFoldingCost = magCustomCosts.folding !== undefined ? magCustomCosts.folding : Math.round(autoFoldingCost);
+      const effGatheringCost = magCustomCosts.gathering !== undefined ? magCustomCosts.gathering : Math.round(autoGatheringCost);
+      const effCreasingCost = magCustomCosts.creasing !== undefined ? magCustomCosts.creasing : Math.round(autoCreasingCost);
+      const effLaminationCost = magCustomCosts.lamination !== undefined ? magCustomCosts.lamination : Math.round(autoLaminationCost);
+      const effBindingCost = magCustomCosts.binding !== undefined ? magCustomCosts.binding : Math.round(autoBindingCost);
+      const effTrimmingCost = magCustomCosts.trimming !== undefined ? magCustomCosts.trimming : Math.round(autoTrimmingCost);
+      const effHardcoverOpsCost = magCustomCosts.hardcoverOps !== undefined ? magCustomCosts.hardcoverOps : Math.round(autoHardcoverOpsCost);
+      const effPackagingCost = magCustomCosts.packaging !== undefined ? magCustomCosts.packaging : Math.round(autoPackagingCost);
+
+      const postpressTotal = effFoldingCost + effGatheringCost + effCreasingCost + effLaminationCost + effBindingCost + effTrimmingCost + effHardcoverOpsCost + effPackagingCost;
 
       // F. Формула собівартості з аркуша 02.11:
       // Собівартість = Матеріали + Друк + Постпрес + Брак + Пакування
-      const directCost = prepressCost + makereadyCost + printingRunCost + totalPaperCost + postpressTotal;
-      const overhead = directCost * 0.05; // 5% накладні
+      const directCost = effPrepressCost + effMakereadyCost + effPrintingRunCost + effTotalPaperCost + postpressTotal;
+      const overhead = Math.round(directCost * 0.05); // 5% накладні
       const totalCost = directCost + overhead;
 
       // Маржа = 100% (або обрана користувачем)
@@ -3959,6 +3979,7 @@ export const Calculator: React.FC = () => {
       const markupMultiplier = 1 + (magMarginPct / 100);
       const finalPrice = Math.round(totalCost * markupMultiplier);
       const unitPrice = Number((finalPrice / qty).toFixed(2));
+      const marginSum = finalPrice - totalCost;
 
       return {
         qty,
@@ -3975,30 +3996,161 @@ export const Calculator: React.FC = () => {
         blockWeightKg: Number(blockWeightKg.toFixed(1)),
         coverWeightKg: Number(coverWeightKg.toFixed(1)),
         totalWeightKg: Number((blockWeightKg + coverWeightKg).toFixed(1)),
-        prepressCost: Math.round(prepressCost),
-        makereadyCost: Math.round(makereadyCost),
-        printingRunCost: Math.round(printingRunCost),
-        totalPaperCost: Math.round(totalPaperCost),
-        blockPaperCost: Math.round(blockPaperCost),
-        coverPaperCost: Math.round(coverPaperCost),
-        foldingCost: Math.round(foldingCost),
-        gatheringCost: Math.round(gatheringCost),
-        creasingCost: Math.round(creasingCost),
-        laminationCost: Math.round(laminationCost),
-        bindingCost: Math.round(bindingCost),
-        trimmingCost: Math.round(trimmingCost),
-        hardcoverOpsCost: Math.round(hardcoverOpsCost),
-        packagingCost: Math.round(packagingCost),
-        postpressTotal: Math.round(postpressTotal),
-        directCost: Math.round(directCost),
-        overhead: Math.round(overhead),
-        totalCost: Math.round(totalCost),
+        // Auto values
+        autoBlockPaperCost: Math.round(autoBlockPaperCost),
+        autoCoverPaperCost: Math.round(autoCoverPaperCost),
+        autoBoardCost: Math.round(autoBoardCost),
+        autoPrepressCost: Math.round(autoPrepressCost),
+        autoMakereadyCost: Math.round(autoMakereadyCost),
+        autoPrintingRunCost: Math.round(autoPrintingRunCost),
+        autoFoldingCost: Math.round(autoFoldingCost),
+        autoGatheringCost: Math.round(autoGatheringCost),
+        autoCreasingCost: Math.round(autoCreasingCost),
+        autoLaminationCost: Math.round(autoLaminationCost),
+        autoBindingCost: Math.round(autoBindingCost),
+        autoTrimmingCost: Math.round(autoTrimmingCost),
+        autoHardcoverOpsCost: Math.round(autoHardcoverOpsCost),
+        autoPackagingCost: Math.round(autoPackagingCost),
+        // Effective values (with user overrides)
+        blockPaperCost: effBlockPaperCost,
+        coverPaperCost: effCoverPaperCost,
+        boardCost: effBoardCost,
+        totalPaperCost: effTotalPaperCost,
+        prepressCost: effPrepressCost,
+        makereadyCost: effMakereadyCost,
+        printingRunCost: effPrintingRunCost,
+        foldingCost: effFoldingCost,
+        gatheringCost: effGatheringCost,
+        creasingCost: effCreasingCost,
+        laminationCost: effLaminationCost,
+        bindingCost: effBindingCost,
+        trimmingCost: effTrimmingCost,
+        hardcoverOpsCost: effHardcoverOpsCost,
+        packagingCost: effPackagingCost,
+        postpressTotal,
+        directCost,
+        overhead,
+        totalCost,
         finalPrice,
-        unitPrice
+        unitPrice,
+        marginSum
       };
     };
 
     const currentCalc = calculateMagazineRun(magQuantity);
+    const customOverridesCount = Object.keys(magCustomCosts).length;
+    const hasCustomOverrides = customOverridesCount > 0;
+
+    // Cost Items Definition for rendering & editing
+    const costLineItems = [
+      {
+        key: 'blockPaper',
+        title: `Папір блоку (${currentCalc.blockWeightKg} кг за вагою):`,
+        desc: `${curBlockPaper.name}, ${currentCalc.grossBlockSheets} арк. B2`,
+        autoVal: currentCalc.autoBlockPaperCost,
+        val: currentCalc.blockPaperCost,
+        isCustom: magCustomCosts.blockPaper !== undefined,
+      },
+      {
+        key: 'coverPaper',
+        title: `Папір обкладинки (${currentCalc.coverWeightKg} кг):`,
+        desc: isSeparateCover ? `${curCoverPaper.name}, ${currentCalc.grossCoverSheets} арк. B2` : 'Своя обкладинка з блоку',
+        autoVal: currentCalc.autoCoverPaperCost,
+        val: currentCalc.coverPaperCost,
+        isCustom: magCustomCosts.coverPaper !== undefined,
+        hide: !isSeparateCover && magCustomCosts.coverPaper === undefined
+      },
+      {
+        key: 'prepress',
+        title: `Форми CTP (${currentCalc.totalPlates} шт, вивід + 1С #1/#2):`,
+        desc: `${currentCalc.blockPlates} на блок (${magBlockColor}) ${isSeparateCover ? `+ ${currentCalc.coverPlates} обкл.` : ''}`,
+        autoVal: currentCalc.autoPrepressCost,
+        val: currentCalc.prepressCost,
+        isCustom: magCustomCosts.prepress !== undefined,
+      },
+      {
+        key: 'makeready',
+        title: `Приладки офсетної машини (${currentCalc.totalMakereadies} шт):`,
+        desc: `${currentCalc.totalSignatures} зошитів ${isSeparateCover ? '+ 1 обкл.' : ''}`,
+        autoVal: currentCalc.autoMakereadyCost,
+        val: currentCalc.makereadyCost,
+        isCustom: magCustomCosts.makeready !== undefined,
+      },
+      {
+        key: 'printingRun',
+        title: 'Тиражні прогони B2:',
+        desc: `${currentCalc.grossBlockSheets + currentCalc.grossCoverSheets} прогонів машини`,
+        autoVal: currentCalc.autoPrintingRunCost,
+        val: currentCalc.printingRunCost,
+        isCustom: magCustomCosts.printingRun !== undefined,
+      },
+      {
+        key: 'folding',
+        title: 'Фальцювання (0.1200 грн / згин по 1С):',
+        desc: `${magQuantity} прим. × ${currentCalc.totalSignatures} зошитів`,
+        autoVal: currentCalc.autoFoldingCost,
+        val: currentCalc.foldingCost,
+        isCustom: magCustomCosts.folding !== undefined,
+      },
+      {
+        key: 'gathering',
+        title: 'Збірка блоку (листопідбір зошитів):',
+        desc: '0.1500 грн / зошит цеху',
+        autoVal: currentCalc.autoGatheringCost,
+        val: currentCalc.gatheringCost,
+        isCustom: magCustomCosts.gathering !== undefined,
+      },
+      {
+        key: 'creasing',
+        title: 'Бігування (0.1231 грн / біг по 1С):',
+        desc: magBinding === 'staple' ? '2 біги на обкладинці' : '4 біги (корінець КБС)',
+        autoVal: currentCalc.autoCreasingCost,
+        val: currentCalc.creasingCost,
+        isCustom: magCustomCosts.creasing !== undefined,
+      },
+      {
+        key: 'lamination',
+        title: 'Ламінування (0.5750 грн / арк по 1С):',
+        desc: magCoverLam === 'none' ? 'Без ламінації' : `Ламінація ${magCoverLam}`,
+        autoVal: currentCalc.autoLaminationCost,
+        val: currentCalc.laminationCost,
+        isCustom: magCustomCosts.lamination !== undefined,
+        hide: (magCoverLam === 'none' || !isSeparateCover) && magCustomCosts.lamination === undefined
+      },
+      {
+        key: 'binding',
+        title: `Скріплення (${magBinding === 'staple' ? 'Скоба/дріт' : magBinding === 'kbs' ? 'Клей КБС' : 'Ниткошвейка'}):`,
+        desc: magBinding === 'staple' ? '2 скоби в корінець' : magBinding === 'kbs' ? 'Гарячий PUR клей' : 'Прошивання зошитів ниткою',
+        autoVal: currentCalc.autoBindingCost,
+        val: currentCalc.bindingCost,
+        isCustom: magCustomCosts.binding !== undefined,
+      },
+      {
+        key: 'trimming',
+        title: 'Різка / фінішна обрізка (0.1660 грн по 1С):',
+        desc: 'Тристороннє фінішне підрізання',
+        autoVal: currentCalc.autoTrimmingCost,
+        val: currentCalc.trimmingCost,
+        isCustom: magCustomCosts.trimming !== undefined,
+      },
+      {
+        key: 'hardcoverOps',
+        title: 'Операції 7БЦ (Кришка 0.9427 + Блок 0.2517 + Вставка 0.5751 грн):',
+        desc: 'Виготовлення твердої кришки та збірка книги',
+        autoVal: currentCalc.autoHardcoverOpsCost,
+        val: currentCalc.hardcoverOpsCost,
+        isCustom: magCustomCosts.hardcoverOps !== undefined,
+        hide: !isHardcover && magCustomCosts.hardcoverOps === undefined
+      },
+      {
+        key: 'packaging',
+        title: 'Пакування та тара:',
+        desc: 'Крафт-папір / гофрокороби',
+        autoVal: currentCalc.autoPackagingCost,
+        val: currentCalc.packagingCost,
+        isCustom: magCustomCosts.packaging !== undefined,
+      }
+    ].filter(item => !item.hide);
 
     // Copy Quote helper
     const handleCopyCommercialQuote = () => {
@@ -4017,6 +4169,7 @@ export const Calculator: React.FC = () => {
 Папір блоку: ${curBlockPaper.name} (${colorLabel})
 Обкладинка: ${curCoverPaper.name} (${magCoverPrint}), ${lamLabel}
 Виробнича схема: ${currentCalc.totalSignatures} зошитів офсетного друку B2, ${currentCalc.totalPlates} форм CTP
+${hasCustomOverrides ? '(Кошторис скориговано менеджером вручну)' : ''}
 
 ВАРТІСТЬ ЗАМОВЛЕННЯ:
 - Ціна за 1 екземпляр: ${currentCalc.unitPrice.toFixed(2)} грн
@@ -4036,7 +4189,7 @@ export const Calculator: React.FC = () => {
             <button
               type="button"
               onClick={() => { setMainCategoryTab('products'); setOffsetSubTab('overview'); }}
-              className="px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-xs flex items-center gap-1.5 transition-colors shadow-2xs"
+              className="px-3 py-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-xs flex items-center gap-1.5 transition-colors shadow-2xs cursor-pointer"
               title="Повернутися до Усіх Продуктів"
             >
               <ArrowLeft size={16} />
@@ -4061,20 +4214,42 @@ export const Calculator: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-2">
+            {/* Dedicated КОШТОРИС Button */}
+            <button
+              type="button"
+              onClick={() => setIsMagCostModalOpen(true)}
+              className="px-3.5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-extrabold text-xs flex items-center gap-2 transition-all shadow-sm cursor-pointer"
+              title="Відкрити інтерактивний кошторис для редагування цін"
+            >
+              <FileSpreadsheet size={15} />
+              <span>Кошторис</span>
+              {hasCustomOverrides ? (
+                <span className="bg-amber-400 text-slate-900 text-[10px] font-black px-1.5 py-0.5 rounded-md">
+                  Змінено ({customOverridesCount})
+                </span>
+              ) : (
+                <span className="bg-blue-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-md">
+                  1С
+                </span>
+              )}
+            </button>
+
+            {/* Toggle Inline Cost Details */}
             <button
               type="button"
               onClick={() => setMagShowCostDetails(!magShowCostDetails)}
-              className={`px-3 py-2 rounded-xl border text-xs font-bold flex items-center gap-1.5 transition-colors shadow-2xs ${
+              className={`px-3 py-2 rounded-xl border text-xs font-bold flex items-center gap-1.5 transition-colors shadow-2xs cursor-pointer ${
                 magShowCostDetails ? 'bg-blue-50 border-blue-200 text-blue-700' : 'bg-slate-50 border-slate-200 text-slate-700'
               }`}
             >
               <Settings size={14} />
-              <span>{magShowCostDetails ? 'Приховати статті 1С' : 'Деталізація 1С цеху'}</span>
+              <span>{magShowCostDetails ? 'Сховати панель' : 'Показати панель'}</span>
             </button>
+
             <button
               type="button"
               onClick={() => { setMainCategoryTab('products'); setOffsetSubTab('overview'); }}
-              className="w-8 h-8 rounded-xl border border-slate-200 bg-slate-50 hover:bg-red-50 hover:border-red-200 hover:text-red-600 text-slate-500 font-bold text-sm flex items-center justify-center transition-colors shadow-2xs"
+              className="w-8 h-8 rounded-xl border border-slate-200 bg-slate-50 hover:bg-red-50 hover:border-red-200 hover:text-red-600 text-slate-500 font-bold text-sm flex items-center justify-center transition-colors shadow-2xs cursor-pointer"
               title="Закрити"
             >
               ✕
@@ -4088,8 +4263,15 @@ export const Calculator: React.FC = () => {
             <span className="text-base">📝</span>
             <span>Формула цеху: <strong>Собівартість = Матеріали + Друк + Постпрес + Брак + Пакування</strong></span>
           </div>
-          <div className="text-xs font-black text-amber-800 bg-amber-100/80 px-2.5 py-1 rounded-md border border-amber-300/60">
-            Маржа цеху за замовчуванням = {magMarginPct}% (×{1 + magMarginPct/100})
+          <div className="flex items-center gap-2">
+            {hasCustomOverrides && (
+              <span className="bg-amber-200 text-amber-950 font-black px-2 py-0.5 rounded text-[11px] border border-amber-300">
+                ✏️ Враховано {customOverridesCount} ручних коригувань
+              </span>
+            )}
+            <div className="text-xs font-black text-amber-800 bg-amber-100/80 px-2.5 py-1 rounded-md border border-amber-300/60">
+              Маржа цеху = {magMarginPct}% (×{1 + magMarginPct/100})
+            </div>
           </div>
         </div>
 
@@ -4180,7 +4362,7 @@ export const Calculator: React.FC = () => {
                 key={idx}
                 type="button"
                 onClick={preset.onClick}
-                className="text-left p-3 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-blue-50/60 hover:border-blue-300 transition-all text-xs"
+                className="text-left p-3 rounded-xl border border-slate-200 bg-slate-50/70 hover:bg-blue-50/60 hover:border-blue-300 transition-all text-xs cursor-pointer"
               >
                 <div className="font-extrabold text-slate-800">{preset.title}</div>
                 <div className="text-[10px] text-slate-500 mt-0.5 leading-tight">{preset.sub}</div>
@@ -4214,7 +4396,7 @@ export const Calculator: React.FC = () => {
                     key={fmt.id}
                     type="button"
                     onClick={() => setMagFormat(fmt.id as any)}
-                    className={`py-2 px-2 rounded-xl border text-center transition-all ${
+                    className={`py-2 px-2 rounded-xl border text-center transition-all cursor-pointer ${
                       magFormat === fmt.id
                         ? 'border-blue-600 bg-blue-50 text-blue-700 font-extrabold shadow-2xs'
                         : 'border-slate-200 bg-white text-slate-700 font-bold hover:bg-slate-50'
@@ -4256,7 +4438,7 @@ export const Calculator: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setMagOrientation('vert')}
-                    className={`py-2 px-3 rounded-lg border text-xs font-bold text-center transition-all ${
+                    className={`py-2 px-3 rounded-lg border text-xs font-bold text-center transition-all cursor-pointer ${
                       magOrientation === 'vert' ? 'bg-blue-600 text-white border-blue-600 shadow-2xs' : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
                     }`}
                   >
@@ -4265,7 +4447,7 @@ export const Calculator: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setMagOrientation('horiz')}
-                    className={`py-2 px-3 rounded-lg border text-xs font-bold text-center transition-all ${
+                    className={`py-2 px-3 rounded-lg border text-xs font-bold text-center transition-all cursor-pointer ${
                       magOrientation === 'horiz' ? 'bg-blue-600 text-white border-blue-600 shadow-2xs' : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
                     }`}
                   >
@@ -4274,14 +4456,14 @@ export const Calculator: React.FC = () => {
                 </div>
               </div>
 
-              {/* Cover Type: М'яка vs Тверда (Згідно з заміткою менеджера) */}
+              {/* Cover Type */}
               <div>
                 <label className="text-xs font-semibold text-slate-600 block mb-1.5">Тип обкладинки журналу:</label>
                 <div className="grid grid-cols-2 gap-3">
                   <button
                     type="button"
                     onClick={() => setMagCoverType('soft')}
-                    className={`p-3 rounded-xl border text-left transition-all ${
+                    className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
                       magCoverType === 'soft'
                         ? 'border-blue-600 bg-blue-50/80 text-blue-900 shadow-2xs'
                         : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
@@ -4293,7 +4475,7 @@ export const Calculator: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setMagCoverType('hard')}
-                    className={`p-3 rounded-xl border text-left transition-all ${
+                    className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
                       magCoverType === 'hard'
                         ? 'border-blue-600 bg-blue-50/80 text-blue-900 shadow-2xs'
                         : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
@@ -4346,7 +4528,7 @@ export const Calculator: React.FC = () => {
                       key={p}
                       type="button"
                       onClick={() => setMagBlockPages(p)}
-                      className={`px-2.5 py-1 rounded-lg border text-xs font-bold transition-all ${
+                      className={`px-2.5 py-1 rounded-lg border text-xs font-bold transition-all cursor-pointer ${
                         pages === p
                           ? 'bg-blue-600 text-white border-blue-600 shadow-2xs'
                           : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
@@ -4387,7 +4569,7 @@ export const Calculator: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setMagBlockColor('4+4')}
-                      className={`py-2 px-2 rounded-lg border text-xs font-bold text-center transition-all ${
+                      className={`py-2 px-2 rounded-lg border text-xs font-bold text-center transition-all cursor-pointer ${
                         magBlockColor === '4+4'
                           ? 'bg-blue-600 text-white border-blue-600 shadow-2xs'
                           : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
@@ -4398,7 +4580,7 @@ export const Calculator: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setMagBlockColor('1+1')}
-                      className={`py-2 px-2 rounded-lg border text-xs font-bold text-center transition-all ${
+                      className={`py-2 px-2 rounded-lg border text-xs font-bold text-center transition-all cursor-pointer ${
                         magBlockColor === '1+1'
                           ? 'bg-blue-600 text-white border-blue-600 shadow-2xs'
                           : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
@@ -4450,7 +4632,7 @@ export const Calculator: React.FC = () => {
                         key={cp.id}
                         type="button"
                         onClick={() => setMagCoverPrint(cp.id as any)}
-                        className={`py-2 px-1 rounded-lg border text-[11px] font-bold text-center transition-all ${
+                        className={`py-2 px-1 rounded-lg border text-[11px] font-bold text-center transition-all cursor-pointer ${
                           magCoverPrint === cp.id ? 'bg-blue-600 text-white border-blue-600' : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
                         }`}
                       >
@@ -4475,7 +4657,7 @@ export const Calculator: React.FC = () => {
                       key={lam.id}
                       type="button"
                       onClick={() => setMagCoverLam(lam.id as any)}
-                      className={`p-2.5 rounded-xl border text-left transition-all ${
+                      className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
                         magCoverLam === lam.id
                           ? 'border-blue-600 bg-blue-50/80 text-blue-900 shadow-2xs font-extrabold'
                           : 'border-slate-200 bg-slate-50/70 text-slate-700 hover:bg-slate-100'
@@ -4511,7 +4693,7 @@ export const Calculator: React.FC = () => {
                     key={b.id}
                     type="button"
                     onClick={() => setMagBinding(b.id as any)}
-                    className={`p-3 rounded-xl border text-left transition-all ${
+                    className={`p-3 rounded-xl border text-left transition-all cursor-pointer ${
                       magBinding === b.id
                         ? 'border-blue-600 bg-blue-50/80 text-blue-900 shadow-2xs'
                         : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'
@@ -4566,7 +4748,7 @@ export const Calculator: React.FC = () => {
                         key={q}
                         type="button"
                         onClick={() => setMagQuantity(q)}
-                        className={`text-[10px] font-bold px-2 py-1 rounded border ${
+                        className={`text-[10px] font-bold px-2 py-1 rounded border cursor-pointer ${
                           magQuantity === q ? 'bg-blue-600 text-white border-blue-600' : 'bg-slate-100 text-slate-600 border-slate-200 hover:bg-slate-200'
                         }`}
                       >
@@ -4625,8 +4807,25 @@ export const Calculator: React.FC = () => {
                 </span>
               </div>
 
+              {/* Dedicated Button to open Cost Estimate */}
+              <div className="mt-4 pt-3 border-t border-slate-700/50">
+                <button
+                  type="button"
+                  onClick={() => setIsMagCostModalOpen(true)}
+                  className="w-full py-2.5 px-3 rounded-xl bg-blue-500/20 hover:bg-blue-500/30 text-blue-200 hover:text-white font-extrabold text-xs flex items-center justify-center gap-2 transition-colors border border-blue-400/30 cursor-pointer"
+                >
+                  <FileSpreadsheet size={15} />
+                  <span>Відкрити та редагувати кошторис</span>
+                  {hasCustomOverrides && (
+                    <span className="bg-amber-400 text-slate-900 text-[10px] font-black px-1.5 py-0.2 rounded-full">
+                      {customOverridesCount} змінено
+                    </span>
+                  )}
+                </button>
+              </div>
+
               {/* Action Buttons */}
-              <div className="grid grid-cols-2 gap-2.5 mt-5">
+              <div className="grid grid-cols-2 gap-2.5 mt-3">
                 <button
                   type="button"
                   onClick={handleCopyCommercialQuote}
@@ -4706,83 +4905,142 @@ export const Calculator: React.FC = () => {
               </div>
             </div>
 
-            {/* Detailed 1C Cost Breakdown (Кошторис за статтями 1С) */}
+            {/* Editable 1C Cost Breakdown (Кошторис за статтями 1С) */}
             {magShowCostDetails && (
               <div className="ios-card bg-white p-5" style={{ border: '1px solid #e2e8f0' }}>
                 <div className="flex items-center justify-between mb-3 border-b border-slate-100 pb-2">
-                  <span className="text-xs font-black uppercase tracking-wider text-slate-800">
-                    📊 Кошторис за розцінками 1С
-                  </span>
-                  <span className="text-[11px] font-bold text-emerald-600">Тарифи 02.11</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-black uppercase tracking-wider text-slate-800">
+                      📊 Кошторис за розцінками 1С
+                    </span>
+                    {hasCustomOverrides && (
+                      <span className="bg-amber-100 text-amber-800 border border-amber-300 text-[10px] font-bold px-1.5 py-0.2 rounded">
+                        Змінено
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    {hasCustomOverrides && (
+                      <button
+                        type="button"
+                        onClick={() => setMagCustomCosts({})}
+                        className="text-[10px] font-bold text-amber-700 hover:text-amber-900 bg-amber-50 hover:bg-amber-100 px-2 py-1 rounded border border-amber-200 transition-colors flex items-center gap-1 cursor-pointer"
+                        title="Скинути всі суми до розрахунків 1С"
+                      >
+                        <RotateCcw size={10} />
+                        <span>Скинути</span>
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setIsMagCostModalOpen(true)}
+                      className="text-[11px] font-bold text-blue-600 hover:text-blue-700 bg-blue-50 px-2 py-1 rounded border border-blue-200 transition-colors flex items-center gap-1 cursor-pointer"
+                      title="Відкрити у великому модальному вікні"
+                    >
+                      <Layers size={11} />
+                      <span>Модально</span>
+                    </button>
+                  </div>
                 </div>
 
-                <div className="space-y-1.5 text-xs">
-                  <div className="flex justify-between py-1 border-b border-slate-50">
-                    <span className="text-slate-600">Папір блоку ({currentCalc.blockWeightKg} кг за вагою):</span>
-                    <span className="font-bold text-slate-900">{currentCalc.blockPaperCost} грн</span>
-                  </div>
-                  {isSeparateCover && (
-                    <div className="flex justify-between py-1 border-b border-slate-50">
-                      <span className="text-slate-600">Папір обкладинки ({currentCalc.coverWeightKg} кг):</span>
-                      <span className="font-bold text-slate-900">{currentCalc.coverPaperCost} грн</span>
+                <div className="text-[11px] text-slate-500 mb-2.5">
+                  💡 <em>Ви можете змінити будь-яке число безпосередньо в полі вводу. Сума та собівартість перерахуються автоматично.</em>
+                </div>
+
+                {/* Editable Lines */}
+                <div className="space-y-1.5 text-xs max-h-[460px] overflow-y-auto pr-1">
+                  {costLineItems.map((item) => (
+                    <div
+                      key={item.key}
+                      className={`flex items-center justify-between py-1.5 px-2 rounded-lg border transition-colors ${
+                        item.isCustom
+                          ? 'bg-amber-50/90 border-amber-300'
+                          : 'bg-slate-50/40 border-slate-100 hover:bg-slate-50'
+                      }`}
+                    >
+                      <div className="flex flex-col pr-2 flex-1 min-w-0">
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <span className="text-xs font-bold text-slate-800 truncate">{item.title}</span>
+                          {item.isCustom && (
+                            <span className="text-[9px] font-black bg-amber-200 text-amber-900 px-1 py-0.1 rounded">
+                              ручна сума
+                            </span>
+                          )}
+                        </div>
+                        <span className="text-[10px] text-slate-400 truncate">{item.desc}</span>
+                      </div>
+
+                      <div className="flex items-center gap-1.5 shrink-0">
+                        <input
+                          type="number"
+                          min="0"
+                          value={item.val}
+                          onChange={(e) => {
+                            const num = Number(e.target.value);
+                            setMagCustomCosts(prev => ({
+                              ...prev,
+                              [item.key]: isNaN(num) ? 0 : Math.max(0, num)
+                            }));
+                          }}
+                          className={`w-20 px-2 py-1 text-right font-black text-xs rounded-md border focus:outline-none transition-all ${
+                            item.isCustom
+                              ? 'border-amber-500 bg-white text-amber-950 ring-1 ring-amber-400 font-black'
+                              : 'border-slate-200 bg-white text-slate-900 focus:border-blue-500'
+                          }`}
+                        />
+                        <span className="text-[11px] font-bold text-slate-400 w-5">грн</span>
+                        {item.isCustom ? (
+                          <button
+                            type="button"
+                            title={`Скинути до авторозрахунку 1С (${item.autoVal} грн)`}
+                            onClick={() => {
+                              setMagCustomCosts(prev => {
+                                const next = { ...prev };
+                                delete next[item.key];
+                                return next;
+                              });
+                            }}
+                            className="w-5 h-5 flex items-center justify-center rounded text-[10px] text-amber-800 bg-amber-100 hover:bg-amber-200 cursor-pointer"
+                          >
+                            ↺
+                          </button>
+                        ) : (
+                          <span className="w-5" />
+                        )}
+                      </div>
                     </div>
-                  )}
-                  <div className="flex justify-between py-1 border-b border-slate-50">
-                    <span className="text-slate-600">Форми CTP ({currentCalc.totalPlates} шт, вивід + 1С #1/#2):</span>
-                    <span className="font-bold text-slate-900">{currentCalc.prepressCost} грн</span>
+                  ))}
+                </div>
+
+                {/* Totals Summary */}
+                <div className="p-3 bg-slate-900 text-white rounded-xl mt-3 flex flex-col gap-2 shadow-sm">
+                  <div className="flex items-center justify-between text-xs font-bold">
+                    <span className="text-slate-300">Виробнича собівартість (Cost):</span>
+                    <span className="text-sm font-black text-white">{currentCalc.totalCost.toLocaleString('uk-UA')} грн</span>
                   </div>
-                  <div className="flex justify-between py-1 border-b border-slate-50">
-                    <span className="text-slate-600">Приладки офсетної машини ({currentCalc.totalMakereadies} шт):</span>
-                    <span className="font-bold text-slate-900">{currentCalc.makereadyCost} грн</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-slate-50">
-                    <span className="text-slate-600">Тиражні прогони B2:</span>
-                    <span className="font-bold text-slate-900">{currentCalc.printingRunCost} грн</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-slate-50">
-                    <span className="text-slate-600">Фальцювання (0.1200 грн / згин по 1С):</span>
-                    <span className="font-bold text-slate-900">{currentCalc.foldingCost} грн</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-slate-50">
-                    <span className="text-slate-600">Збірка блоку (листопідбір зошитів):</span>
-                    <span className="font-bold text-slate-900">{currentCalc.gatheringCost} грн</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-slate-50">
-                    <span className="text-slate-600">Бігування (0.1231 грн / біг по 1С):</span>
-                    <span className="font-bold text-slate-900">{currentCalc.creasingCost} грн</span>
-                  </div>
-                  {currentCalc.laminationCost > 0 && (
-                    <div className="flex justify-between py-1 border-b border-slate-50">
-                      <span className="text-slate-600">Ламінування (0.5750 грн / арк по 1С):</span>
-                      <span className="font-bold text-slate-900">{currentCalc.laminationCost} грн</span>
+                  
+                  <div className="flex items-center justify-between text-xs font-bold border-t border-slate-800 pt-2">
+                    <div className="flex items-center gap-1.5">
+                      <span className="text-blue-300">Націнка ({magMarginPct}%):</span>
+                      <input
+                        type="number"
+                        min="0"
+                        max="300"
+                        value={magMarginPct}
+                        onChange={(e) => setMagMarginPct(Math.max(0, Number(e.target.value)))}
+                        className="w-12 px-1 py-0.5 rounded bg-slate-800 text-white border border-slate-700 text-xs font-black text-center"
+                      />
+                      <span className="text-slate-400 text-xs">%</span>
                     </div>
-                  )}
-                  <div className="flex justify-between py-1 border-b border-slate-50">
-                    <span className="text-slate-600">Скріплення ({magBinding === 'staple' ? 'Скоба/дріт' : magBinding === 'kbs' ? 'Клей' : 'Ниткошвейка'}):</span>
-                    <span className="font-bold text-slate-900">{currentCalc.bindingCost} грн</span>
-                  </div>
-                  <div className="flex justify-between py-1 border-b border-slate-50">
-                    <span className="text-slate-600">Різка / фінішна обрізка (0.1660 грн по 1С):</span>
-                    <span className="font-bold text-slate-900">{currentCalc.trimmingCost} грн</span>
-                  </div>
-                  {isHardcover && (
-                    <div className="flex justify-between py-1 border-b border-slate-50 text-blue-700 bg-blue-50/50 px-1 rounded">
-                      <span>Операції 7БЦ (Кришка 0.9427 + Блок 0.2517 + Вставка 0.5751 грн):</span>
-                      <span className="font-bold">{currentCalc.hardcoverOpsCost} грн</span>
-                    </div>
-                  )}
-                  <div className="flex justify-between py-1 border-b border-slate-50">
-                    <span className="text-slate-600">Пакування та тара:</span>
-                    <span className="font-bold text-slate-900">{currentCalc.packagingCost} грн</span>
+                    <span className="text-blue-300 font-black">{currentCalc.marginSum.toLocaleString('uk-UA')} грн</span>
                   </div>
 
-                  <div className="flex justify-between py-2 mt-2 pt-2 border-t-2 border-slate-200 text-xs font-black">
-                    <span className="text-slate-800">Виробнича собівартість (Cost):</span>
-                    <span className="text-slate-900">{currentCalc.totalCost.toLocaleString('uk-UA')} грн</span>
+                  <div className="flex items-center justify-between text-sm font-black border-t border-slate-700 pt-2 text-emerald-400">
+                    <span>РАЗОМ ДО СПЛАТИ:</span>
+                    <span className="text-base">{currentCalc.finalPrice.toLocaleString('uk-UA')} грн</span>
                   </div>
-                  <div className="flex justify-between py-1 text-xs font-bold text-blue-600">
-                    <span>Націнка ({magMarginPct}%):</span>
-                    <span>{(currentCalc.finalPrice - currentCalc.totalCost).toLocaleString('uk-UA')} грн</span>
+                  <div className="text-[11px] text-right text-slate-400">
+                    Ціна за 1 журнал: <strong className="text-white">{currentCalc.unitPrice.toFixed(2)} грн / шт</strong>
                   </div>
                 </div>
               </div>
@@ -4805,7 +5063,7 @@ export const Calculator: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setMagPriceView('per_item')}
-                className={`text-[11px] font-bold px-2 py-1 rounded-md transition-all ${
+                className={`text-[11px] font-bold px-2 py-1 rounded-md transition-all cursor-pointer ${
                   magPriceView === 'per_item' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-500 hover:text-slate-900'
                 }`}
               >
@@ -4814,7 +5072,7 @@ export const Calculator: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setMagPriceView('per_total')}
-                className={`text-[11px] font-bold px-2 py-1 rounded-md transition-all ${
+                className={`text-[11px] font-bold px-2 py-1 rounded-md transition-all cursor-pointer ${
                   magPriceView === 'per_total' ? 'bg-white text-slate-900 shadow-2xs' : 'text-slate-500 hover:text-slate-900'
                 }`}
               >
@@ -4866,6 +5124,164 @@ export const Calculator: React.FC = () => {
             </table>
           </div>
         </div>
+
+        {/* FULLSCREEN / DEDICATED MODAL FOR EDITING COST ESTIMATE */}
+        {isMagCostModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs animate-in fade-in duration-150">
+            <div className="bg-white rounded-2xl shadow-2xl border border-slate-200 w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden">
+              {/* Modal Header */}
+              <div className="p-4 px-6 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-9 h-9 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center">
+                    <FileSpreadsheet size={20} />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-black text-slate-900 leading-tight">
+                      Кошторис виготовлення журналу (Тарифи 1С)
+                    </h3>
+                    <p className="text-[11px] text-slate-500 m-0">
+                      {magFormat} ({wMm}×{hMm} мм) • {pages} сторінок • {magQuantity.toLocaleString('uk-UA')} прим.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  {hasCustomOverrides && (
+                    <button
+                      type="button"
+                      onClick={() => setMagCustomCosts({})}
+                      className="px-3 py-1.5 rounded-lg text-xs font-bold text-amber-800 bg-amber-100 hover:bg-amber-200 transition-colors flex items-center gap-1.5 cursor-pointer"
+                    >
+                      <RotateCcw size={12} />
+                      <span>Скинути все до 1С</span>
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => setIsMagCostModalOpen(false)}
+                    className="w-8 h-8 rounded-lg bg-slate-200/70 hover:bg-red-100 hover:text-red-600 text-slate-600 text-sm font-bold flex items-center justify-center transition-colors cursor-pointer"
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
+
+              {/* Modal Body: Editable Rows */}
+              <div className="p-6 overflow-y-auto flex-1 space-y-2">
+                <div className="p-3 bg-blue-50/70 border border-blue-200 rounded-xl text-xs text-blue-900 flex items-center justify-between mb-3">
+                  <span>
+                    ✍️ <strong>Редагування статей собівартості:</strong> введіть потрібну суму навпроти будь-якої операції.
+                  </span>
+                  {hasCustomOverrides && (
+                    <span className="font-extrabold bg-amber-400 text-slate-950 px-2 py-0.5 rounded text-[10px]">
+                      {customOverridesCount} ручних змін
+                    </span>
+                  )}
+                </div>
+
+                {costLineItems.map((item) => (
+                  <div
+                    key={item.key}
+                    className={`flex items-center justify-between py-2.5 px-3 rounded-xl border transition-colors ${
+                      item.isCustom
+                        ? 'bg-amber-50 border-amber-300'
+                        : 'bg-slate-50/60 border-slate-100 hover:bg-slate-100/50'
+                    }`}
+                  >
+                    <div className="flex flex-col pr-3 flex-1">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold text-slate-900">{item.title}</span>
+                        {item.isCustom && (
+                          <span className="text-[10px] font-black bg-amber-200 text-amber-900 px-1.5 py-0.2 rounded">
+                            змінено вручну
+                          </span>
+                        )}
+                      </div>
+                      <span className="text-[11px] text-slate-400 mt-0.5">{item.desc}</span>
+                    </div>
+
+                    <div className="flex items-center gap-2 shrink-0">
+                      <div className="relative">
+                        <input
+                          type="number"
+                          min="0"
+                          value={item.val}
+                          onChange={(e) => {
+                            const num = Number(e.target.value);
+                            setMagCustomCosts(prev => ({
+                              ...prev,
+                              [item.key]: isNaN(num) ? 0 : Math.max(0, num)
+                            }));
+                          }}
+                          className={`w-28 px-3 py-1.5 text-right font-black text-xs rounded-lg border focus:outline-none transition-all ${
+                            item.isCustom
+                              ? 'border-amber-500 bg-white text-amber-950 ring-2 ring-amber-300 shadow-xs'
+                              : 'border-slate-200 bg-white text-slate-900 focus:border-blue-500'
+                          }`}
+                        />
+                      </div>
+                      <span className="text-xs font-bold text-slate-500 w-6">грн</span>
+                      {item.isCustom ? (
+                        <button
+                          type="button"
+                          title={`Скинути до авторозрахунку (${item.autoVal} грн)`}
+                          onClick={() => {
+                            setMagCustomCosts(prev => {
+                              const next = { ...prev };
+                              delete next[item.key];
+                              return next;
+                            });
+                          }}
+                          className="w-6 h-6 flex items-center justify-center rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-800 text-xs font-black transition-colors cursor-pointer"
+                        >
+                          ↺
+                        </button>
+                      ) : (
+                        <span className="w-6" />
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Modal Footer */}
+              <div className="p-4 px-6 bg-slate-900 text-white border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div className="flex items-center gap-6 text-xs">
+                  <div>
+                    <span className="text-slate-400 block text-[10px] uppercase font-bold">Собівартість (Cost):</span>
+                    <span className="text-base font-black text-white">{currentCalc.totalCost.toLocaleString('uk-UA')} грн</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 block text-[10px] uppercase font-bold">Націнка ({magMarginPct}%):</span>
+                    <span className="text-base font-black text-blue-300">{currentCalc.marginSum.toLocaleString('uk-UA')} грн</span>
+                  </div>
+                  <div>
+                    <span className="text-emerald-400 block text-[10px] uppercase font-bold">РАЗОМ:</span>
+                    <span className="text-xl font-black text-emerald-400">{currentCalc.finalPrice.toLocaleString('uk-UA')} грн</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleCopyCommercialQuote}
+                    className="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs flex items-center gap-1.5 transition-colors border border-slate-700 cursor-pointer"
+                  >
+                    <Send size={13} />
+                    <span>Копіювати КП</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsMagCostModalOpen(false)}
+                    className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-500 text-white font-black text-xs transition-colors shadow-sm cursor-pointer"
+                  >
+                    Застосувати
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     );
   };
