@@ -355,77 +355,147 @@ export function calculateWolf(p: CompetitorInputParams): CompetitorCalculationRe
 }
 
 // ---------------------------------------------------------------------------
-// 3. ПОЛІГРАФІКА / POLIGRAFIKA.COM.UA — Цифровий друк (Konica Minolta AccurioPress)
+// 3. ПОЛІГРАФІКА / POLIGRAFIKA.COM.UA — Цифровий друк журналів (Konica Minolta AccurioPress)
 // ---------------------------------------------------------------------------
 export function calculatePoligrafika(p: CompetitorInputParams): CompetitorCalculationResult {
   const isA4 = p.format === 'A4';
   const q = p.quantity;
-  const blockP = p.blockPages || (p.totalPages - 4);
-  const spreads = Math.max(1, Math.ceil(blockP / 4)); // розвороти по 4 с.
+  const rawBlockP = p.blockPages || (p.totalPages - 4);
+  // На сторінці /uk/druk-zurnaliv мінімальна кількість сторінок у формі = 60, крок 2 (діапазон 60..188)
+  const rawEven = rawBlockP % 2 === 0 ? rawBlockP : rawBlockP + 1;
+  const polPages = Math.max(60, Math.min(188, rawEven));
 
-  // Калібровано за Nuxt 3 станом гідратації (__NUXT_DATA__)
-  // На 1000 шт: базова сітка 4 с. = 27 070 ₴. Кожен дод. розворот = 13 563 ₴. Ламінація = 9 139 ₴ (9.14 ₴/прим)
-  // Разом для 32 с. блоку (8 розворотів) = 27 070 + 7 * 13 563 + 9 139 = 131 150 ₴
-  const baseGrid_1000 = isA4 ? 27070 : 15800;
-  const addSpread_1000 = isA4 ? 13563 : 7900;
-  const lamCost_1000 = isA4 ? 9139 : 5200;
+  // Калібровано по живому API poligrafika.com.ua/uk/druk-zurnaliv (productId=4307, component=8846 А4, КБС):
+  // 1000 шт, обкл. Крейда 250 г матова (363002) + блок Офсет 80 г (363102) 4+4:
+  // Без ламінації (363216): базова база (обкл+КБС) = 25 790 ₴ + 3 240 ₴/стор. → 60 с. = 220 190 ₴ (40 с. API = 155 390 ₴)
+  // Ламінація лицьова глянець (363214): +5 250 ₴ → 60 с. = 225 440 ₴ (225 ₴/шт)
+  // Ламінація лицьова матова (363215): +5 570 ₴ → 60 с. = 225 760 ₴ (226 ₴/шт)
+  // Обкл. офсет 150 г (362992) замість крейди 250 г (363002): -8 050 ₴ → 217 390 ₴
+  const formatScale = isA4 ? 1.0 : 0.483; // A5 (8848) ~108 840 ₴ проти 225 440 ₴ на 1000 шт
+  const baseCoverBind_1000 = 25790;
+  const blockColorFactor = p.blockColor === '1+1' ? 0.48 : 1.0;
+  const perPage_1000 = 3240 * blockColorFactor;
 
-  // Масштабування за накладом у цифровій поаркушній машині
+  let coverDelta_1000 = 0;
+  if (p.coverPaperType === 'offset') {
+    coverDelta_1000 = p.coverPaperDensity <= 170 ? -8050 : -3800;
+  } else if (p.coverPaperDensity <= 150) {
+    coverDelta_1000 = -4800;
+  } else if (p.coverPaperDensity <= 200) {
+    coverDelta_1000 = -2800;
+  } else if (p.coverPaperDensity >= 300) {
+    coverDelta_1000 = 3200;
+  }
+
+  let lam_1000 = 0;
+  if (p.coverLamination === 'gloss') lam_1000 = 5250;
+  else if (p.coverLamination === 'matte' || p.coverLamination === 'softtouch') lam_1000 = 5570;
+
+  const full1000 = (baseCoverBind_1000 + polPages * perPage_1000 + coverDelta_1000 + lam_1000) * formatScale;
+
+  // Перевірена тиражна крива (/api2/products/price на А4 60 с. 250г + глянець):
+  // 100 шт = 23 362 ₴ (0.103628), 500 шт = 112 760 ₴ (0.500177), 1000 шт = 225 440 ₴ (1.0000)
   let qtyMultiplier = 1.0;
-  if (q <= 50) qtyMultiplier = 0.105;
-  else if (q <= 100) qtyMultiplier = 0.1575; // 20 660 ₴ за 100 шт
-  else if (q <= 200) qtyMultiplier = 0.2868; // 37 620 ₴ за 200 шт
-  else if (q <= 500) qtyMultiplier = 0.6164; // 80 840 ₴ за 500 шт
-  else if (q <= 1000) qtyMultiplier = 1.0000; // 131 150 ₴ за 1000 шт
-  else qtyMultiplier = 1.0 + (q - 1000) * 0.00095; // поаркушна цифра не дає глибокої знижки
+  if (q <= 100) {
+    qtyMultiplier = (q / 100) * 0.103628;
+  } else if (q <= 500) {
+    qtyMultiplier = 0.103628 + ((q - 100) / 400) * (0.500177 - 0.103628);
+  } else if (q <= 1000) {
+    qtyMultiplier = 0.500177 + ((q - 500) / 500) * (1.0 - 0.500177);
+  } else {
+    qtyMultiplier = 1.0 + (q - 1000) * 0.000995;
+  }
 
-  const hasLam = p.coverLamination !== 'none';
-  const full1000 = baseGrid_1000 + (spreads - 1) * addSpread_1000 + (hasLam ? lamCost_1000 : 0);
   const totalMin = Math.round(full1000 * qtyMultiplier);
   const totalMax = totalMin;
   const unitMin = +(totalMin / q).toFixed(2);
   const unitMax = unitMin;
 
-  const polCompId = isA4 ? '8852' : '8854';
-  const polPages = Math.max(4, Math.min(64, blockP));
-  const polCoverPrintId = p.coverColor === '1+0' ? '364428' : '364426';
-  const polBlockPrintId = p.blockColor === '1+1' ? '364432' : '364430';
-  const polCoverPaperId = p.coverPaperDensity >= 200 ? '364449' : '364448';
-  const polBlockPaperId = p.blockPaperDensity >= 100 ? '364548' : '364547';
-  const polLamOptionId = p.coverLamination === 'matte' ? '364657' : p.coverLamination === 'gloss' ? '364656' : '0';
+  const polCompId = isA4 ? '8846' : '8848';
 
-  const directUrl = `https://poligrafika.com.ua/uk/brosura-na-skobi?params[productComponentId]=${polCompId}&params[quantity]=${q}&params[options][59356]=${polPages}&params[options][59357]=${polCoverPrintId}&params[options][59358]=${polBlockPrintId}&params[options][59359]=${polCoverPaperId}&params[options][59360]=364543&params[options][59361]=${polBlockPaperId}&params[options][59362]=364653&params[options][59363]=364654&params[options][59364]=364655&params[options][59365]=${polLamOptionId}&params[options][59367]=364674&params[options][59368]=364679&params[options][59369]=364680&params[options][59370]=364681&params[options][59372]=364684&params[options][59375]=364693`;
+  // ID опцій для А4 (8846) із живого конфігуратора /uk/druk-zurnaliv
+  let polCoverPaperId = '363002'; // Крейдований 250 г/м², Матовий
+  if (p.coverPaperType === 'offset') {
+    polCoverPaperId = p.coverPaperDensity <= 170 ? '362992' : '362994';
+  } else if (p.coverPaperDensity <= 150) {
+    polCoverPaperId = '362998';
+  } else if (p.coverPaperDensity <= 200) {
+    polCoverPaperId = '363000';
+  } else if (p.coverPaperDensity <= 250) {
+    polCoverPaperId = '363002';
+  } else if (p.coverPaperDensity <= 300) {
+    polCoverPaperId = '363004';
+  } else {
+    polCoverPaperId = '363005';
+  }
+
+  const polCoverPrintId =
+    p.coverColor === '4+0' ? '363097' :
+    p.coverColor === '1+0' ? '363098' :
+    '363096'; // 4+4
+
+  let polBlockPaperId = '363102'; // Офсетний 80 г/м²
+  if (p.blockPaperType === 'offset') {
+    if (p.blockPaperDensity <= 70) polBlockPaperId = '363101';
+    else if (p.blockPaperDensity <= 80) polBlockPaperId = '363102';
+    else if (p.blockPaperDensity <= 100) polBlockPaperId = '363103';
+    else if (p.blockPaperDensity <= 120) polBlockPaperId = '363104';
+    else polBlockPaperId = '363105';
+  } else {
+    if (p.blockPaperDensity <= 90) polBlockPaperId = '363108';
+    else if (p.blockPaperDensity <= 115) polBlockPaperId = '363110';
+    else if (p.blockPaperDensity <= 130) polBlockPaperId = '363112';
+    else if (p.blockPaperDensity <= 150) polBlockPaperId = '363114';
+    else if (p.blockPaperDensity <= 170) polBlockPaperId = '363116';
+    else if (p.blockPaperDensity <= 200) polBlockPaperId = '363118';
+    else polBlockPaperId = '363120';
+  }
+
+  const polBlockPrintId = p.blockColor === '1+1' ? '363210' : '363209';
+  const polLamOptionId =
+    p.coverLamination === 'gloss' ? '363214' :
+    (p.coverLamination === 'matte' || p.coverLamination === 'softtouch') ? '363215' :
+    '363216'; // Ні (без ламінації)
+
+  const directUrl = isA4
+    ? `https://poligrafika.com.ua/uk/druk-zurnaliv?params[productComponentId]=8846&params[options][59259]=${polPages}&params[options][59260]=${polCoverPaperId}&params[options][59261]=${polCoverPrintId}&params[options][59262]=${polBlockPaperId}&params[options][59263]=${polBlockPrintId}&params[options][59264]=363213&params[options][59265]=${polLamOptionId}&params[options][59266]=363224&params[options][59268]=363227&params[options][59269]=363232&params[options][59270]=363233&params[options][59271]=363234&params[options][59272]=363235&params[options][59275]=363244&params[quantity]=${q}`
+    : `https://poligrafika.com.ua/uk/druk-zurnaliv?params[productComponentId]=8848&params[options][59294]=${polPages}&params[options][59295]=363522&params[options][59296]=363615&params[options][59297]=363631&params[options][59298]=363728&params[options][59299]=363732&params[options][59300]=363733&params[options][59301]=363734&params[options][59303]=363746&params[options][59304]=363751&params[options][59305]=363752&params[options][59306]=363753&params[options][59307]=363754&params[options][59310]=363763&params[quantity]=${q}`;
 
   const parsedParams: CompetitorParsedParam[] = [
-    { label: 'ID компонента', fieldCode: 'productComponentId', value: polCompId, displayValue: `Брошура ${p.format}` },
+    { label: 'ID компонента', fieldCode: 'productComponentId', value: polCompId, displayValue: `Друк журналів ${p.format} (КБС)` },
     { label: 'Наклад', fieldCode: 'quantity', value: q, displayValue: `${q.toLocaleString('uk-UA')} шт` },
-    { label: 'Кількість сторінок', fieldCode: 'options[59356]', value: polPages, displayValue: `${polPages} с.` },
-    { label: 'Друк обкладинки', fieldCode: 'options[59357]', value: polCoverPrintId, displayValue: p.coverColor },
-    { label: 'Друк блоку', fieldCode: 'options[59358]', value: polBlockPrintId, displayValue: p.blockColor },
-    { label: 'Папір обкладинки', fieldCode: 'options[59359]', value: polCoverPaperId, displayValue: `${p.coverPaperDensity} г/м²` },
-    { label: 'Папір блоку', fieldCode: 'options[59361]', value: polBlockPaperId, displayValue: `${p.blockPaperDensity} г/м²` },
-    { label: 'Ламінація обкладинки', fieldCode: 'options[59365]', value: polLamOptionId, displayValue: p.coverLamination === 'matte' ? 'Матова 1+0' : p.coverLamination === 'gloss' ? 'Глянцева 1+0' : 'Без ламінації' }
+    { label: 'Сторінок блоку', fieldCode: isA4 ? 'options[59259]' : 'options[59294]', value: polPages, displayValue: rawBlockP < 60 ? `${polPages} с. (мінімум форми замість ${rawBlockP} с.)` : `${polPages} с.` },
+    { label: 'Папір обкладинки', fieldCode: isA4 ? 'options[59260]' : 'options[59295]', value: polCoverPaperId, displayValue: `${p.coverPaperDensity} г/м²` },
+    { label: 'Друк обкладинки', fieldCode: isA4 ? 'options[59261]' : 'options[59296]', value: polCoverPrintId, displayValue: p.coverColor },
+    { label: 'Папір блоку', fieldCode: isA4 ? 'options[59262]' : 'options[59297]', value: polBlockPaperId, displayValue: `${p.blockPaperDensity} г/м²` },
+    { label: 'Друк блоку', fieldCode: isA4 ? 'options[59263]' : 'options[59298]', value: polBlockPrintId, displayValue: p.blockColor },
+    { label: 'Ламінація обкладинки', fieldCode: isA4 ? 'options[59265]' : 'options[59300]', value: polLamOptionId, displayValue: p.coverLamination === 'matte' ? 'Лицьова матова' : p.coverLamination === 'gloss' ? 'Лицьова глянець' : 'Ні (без ламінації)' }
   ];
+
+  const isExactSpec = rawBlockP >= 60 && p.binding === 'kbs';
+  const lamRealCost = Math.round(lam_1000 * formatScale * qtyMultiplier);
 
   return {
     id: 'poligrafika',
     name: 'Поліграфіка (Poligrafika.com.ua)',
     shortName: 'Poligrafika',
     city: 'Чернівці / Київ',
-    techType: 'Поаркушний цифровий друк',
+    techType: 'Поаркушний цифровий друк (КБС)',
     equipment: 'Konica Minolta AccurioPress',
     unitMin,
     unitMax,
     totalMin,
     totalMax,
-    weightKg: Math.ceil(q * (blockP * 0.0025 + 0.031)),
+    weightKg: Math.ceil(q * (polPages * 0.0025 + 0.031) * (isA4 ? 1 : 0.5)),
     directUrl,
-    statusBadge: 'Цифровий друк (KM)',
-    isFullSpecMatch: true,
+    statusBadge: isExactSpec ? 'Цифровий друк (КБС, KM)' : 'Цифровий друк (від 60 с., КБС)',
+    isFullSpecMatch: isExactSpec,
     parsedParams,
-    formulaNote: `Nuxt 3 конфігуратор: базова сітка + ${spreads - 1} додаткових розворотів блоку + ламінація 9.14 ₴/прим.`,
+    formulaNote: rawBlockP < 60 || p.binding !== 'kbs'
+      ? `Калькулятор /uk/druk-zurnaliv (має обкладинку ${p.coverPaperDensity} г/м², КБС, мінімум форми 60 с.): 25 790 ₴ база + ${polPages}×3 240 ₴/с.${lam_1000 > 0 ? ` + ${lam_1000.toLocaleString('uk-UA')} ₴ лам.` : ''}. (Для ${rawBlockP} с. скобою на сайті в обкл. лише до 200г).`
+      : `Верифіковано /api2/products/price (/uk/druk-zurnaliv): 25 790 ₴ база + ${polPages}×3 240 ₴/с.${lam_1000 > 0 ? ` + ${lam_1000.toLocaleString('uk-UA')} ₴ ламінація` : ''}.`,
     breakdown: {
-      laminationCost: Math.round(q * 9.14)
+      laminationCost: lamRealCost
     }
   };
 }

@@ -4480,38 +4480,51 @@ export const Calculator: React.FC = () => {
         ? `https://wolf.ua/uk/digit-calc-saddle-stiched/?&params=${wolfHash}`
         : 'https://wolf.ua/uk/digit-calc-saddle-stiched/';
 
-    const polCompId = magFormat === 'A5' ? '8854' : '8852';
-    // Poligrafika options[59356] represents the exact chosen brochure pages (e.g. 32 for 32-page brochure)
-    const polPages = Math.max(4, Math.min(64, totalPages));
+    const poligrafikaEntry = compCurrent.results?.find(r => r.id === 'poligrafika');
+    const polPages = Math.max(60, Math.min(188, blockPages % 2 === 0 ? blockPages : blockPages + 1));
 
-    let polBlockPaperId = '364547'; // 80g offset
-    if (magBlockPaper.startsWith('off')) {
-      if (curBlockPaper.density >= 100) polBlockPaperId = '364548';
-      else polBlockPaperId = '364547';
-    } else {
-      if (curBlockPaper.density <= 90) polBlockPaperId = '364553';
-      else if (curBlockPaper.density <= 115) polBlockPaperId = '364555';
-      else if (curBlockPaper.density <= 130) polBlockPaperId = '364556';
-      else polBlockPaperId = '364544'; // 150g coated mat
-    }
-
-    let polCoverPaperId = '364449'; // 200/250g coated mat
-    if (!isSeparateCover) {
-      polCoverPaperId = polBlockPaperId === '364547' ? '364437' : '364443';
+    let polCoverPaperId = '363002'; // Крейдований 250 г/м², Матовий
+    if (!isSeparateCover && magBlockPaper.startsWith('off')) {
+      polCoverPaperId = '362992';
     } else if (magCoverPaper.startsWith('off')) {
-      polCoverPaperId = '364437';
+      polCoverPaperId = curCoverPaper.density <= 170 ? '362992' : '362994';
+    } else if (curCoverPaper.density <= 150) {
+      polCoverPaperId = '362998';
+    } else if (curCoverPaper.density <= 200) {
+      polCoverPaperId = '363000';
+    } else if (curCoverPaper.density <= 250) {
+      polCoverPaperId = '363002';
+    } else if (curCoverPaper.density <= 300) {
+      polCoverPaperId = '363004';
     } else {
-      polCoverPaperId = curCoverPaper.density >= 200 ? '364449' : '364448';
+      polCoverPaperId = '363005';
     }
 
-    const polCoverPrintId = isSeparateCover && (magCoverPrint === '1+0' || magCoverPrint === '0+0') ? '364428' : '364426';
-    const polBlockPrintId = magBlockColor === '1+1' ? '364432' : '364430';
-    // 364657: Лицьова сторона матова, 364656: Лицьова сторона глянцева, 0: без ламінації
-    const polLamOptionId = magCoverLam === 'matte' ? '364657' : magCoverLam === 'gloss' ? '364656' : '0';
+    let polBlockPaperId = '363102'; // Офсетний 80 г/м²
+    if (magBlockPaper.startsWith('off')) {
+      if (curBlockPaper.density <= 70) polBlockPaperId = '363101';
+      else if (curBlockPaper.density <= 80) polBlockPaperId = '363102';
+      else if (curBlockPaper.density <= 100) polBlockPaperId = '363103';
+      else if (curBlockPaper.density <= 120) polBlockPaperId = '363104';
+      else polBlockPaperId = '363105';
+    } else {
+      if (curBlockPaper.density <= 90) polBlockPaperId = '363108';
+      else if (curBlockPaper.density <= 115) polBlockPaperId = '363110';
+      else if (curBlockPaper.density <= 130) polBlockPaperId = '363112';
+      else if (curBlockPaper.density <= 150) polBlockPaperId = '363114';
+      else if (curBlockPaper.density <= 170) polBlockPaperId = '363116';
+      else if (curBlockPaper.density <= 200) polBlockPaperId = '363118';
+      else polBlockPaperId = '363120';
+    }
 
-    const poligrafikaUrl = isStaple
-      ? `https://poligrafika.com.ua/uk/brosura-na-skobi?params[productComponentId]=${polCompId}&params[quantity]=${qty}&params[options][59356]=${polPages}&params[options][59357]=${polCoverPrintId}&params[options][59358]=${polBlockPrintId}&params[options][59359]=${polCoverPaperId}&params[options][59360]=364543&params[options][59361]=${polBlockPaperId}&params[options][59362]=364653&params[options][59363]=364654&params[options][59364]=364655&params[options][59365]=${polLamOptionId}&params[options][59367]=364674&params[options][59368]=364679&params[options][59369]=364680&params[options][59370]=364681&params[options][59372]=364684&params[options][59375]=364693`
-      : 'https://poligrafika.com.ua/uk/druk-katalogiv';
+    const polCoverPrintId = !isSeparateCover ? '363096' : magCoverPrint === '4+0' ? '363097' : magCoverPrint === '1+0' ? '363098' : magCoverPrint === '0+0' ? '363100' : '363096';
+    const polBlockPrintId = magBlockColor === '1+1' ? '363210' : '363209';
+    // 363214: Лицьова сторона (глянець), 363215: Лицьова сторона (матова), 363216: Ні (без ламінації)
+    const polLamOptionId = magCoverLam === 'gloss' ? '363214' : (magCoverLam === 'matte' || magCoverLam === 'softtouch') ? '363215' : '363216';
+
+    const poligrafikaUrl = poligrafikaEntry?.directUrl || (magFormat === 'A5'
+      ? `https://poligrafika.com.ua/uk/druk-zurnaliv?params[productComponentId]=8848&params[options][59294]=${polPages}&params[options][59295]=363522&params[options][59296]=363615&params[options][59297]=363631&params[options][59298]=363728&params[options][59299]=363732&params[options][59300]=363733&params[options][59301]=363734&params[options][59303]=363746&params[options][59304]=363751&params[options][59305]=363752&params[options][59306]=363753&params[options][59307]=363754&params[options][59310]=363763&params[quantity]=${qty}`
+      : `https://poligrafika.com.ua/uk/druk-zurnaliv?params[productComponentId]=8846&params[options][59259]=${polPages}&params[options][59260]=${polCoverPaperId}&params[options][59261]=${polCoverPrintId}&params[options][59262]=${polBlockPaperId}&params[options][59263]=${polBlockPrintId}&params[options][59264]=363213&params[options][59265]=${polLamOptionId}&params[options][59266]=363224&params[options][59268]=363227&params[options][59269]=363232&params[options][59270]=363233&params[options][59271]=363234&params[options][59272]=363235&params[options][59275]=363244&params[quantity]=${qty}`);
 
     const apFormatSlug = magFormat === 'A5' ? 'a4-in-a5' : magFormat === 'A6' ? 'a5-in-a6' : 'a3-in-a4';
     const artpressUrl = isHard
@@ -4553,7 +4566,7 @@ export const Calculator: React.FC = () => {
       : [
           { name: 'PrintStore Group', sub: 'Київ', min: printstoreMin, max: printstoreMax, url: printstoreUrl, note: 'Офсет B1 (Еталон)', equipment: 'Heidelberg CD 102 / Roland 74', weightKg: 114, formulaNote: 'Комерційний офсет PrintStore (100% парсинг API)', isFullSpecMatch: true, parsedParams: undefined, breakdown: {} },
           { name: 'Wolf.ua', sub: 'Київ', min: wolfMin, max: wolfMax, url: wolfUrl, note: 'Збірний офсет B1', equipment: 'Speedmaster XL 106', weightKg: 114, formulaNote: 'Тиражна сітка Wolf (hash pYpLm)', isFullSpecMatch: true, parsedParams: undefined, breakdown: {} },
-          { name: 'Poligrafika.com.ua', sub: 'Чернівці', min: poligrafikaMin, max: poligrafikaMax, url: poligrafikaUrl, note: 'Цифровий аркушевий', equipment: 'Konica Minolta AccurioPress', weightKg: 114, formulaNote: 'API brosura-na-skobi', isFullSpecMatch: true, parsedParams: undefined, breakdown: {} },
+          { name: 'Poligrafika.com.ua', sub: 'Чернівці', min: poligrafikaMin, max: poligrafikaMax, url: poligrafikaUrl, note: 'Цифровий друк (КБС, від 60 с.)', equipment: 'Konica Minolta AccurioPress', weightKg: 114, formulaNote: 'API druk-zurnaliv', isFullSpecMatch: false, parsedParams: undefined, breakdown: {} },
           { name: 'Printto (Printto.ua)', sub: 'Київ', min: printtoMin, max: printtoMax, url: printtoUrl, note: 'Print-on-Demand', equipment: 'Xerox / Ricoh High-Speed', weightKg: 114, formulaNote: 'POST /prices (від 1 примірника)', isFullSpecMatch: true, parsedParams: undefined, breakdown: {} },
           { name: 'Гнозіс (Gnozis)', sub: 'Київ', min: gnozisMin, max: gnozisMax, url: gnozisUrl, note: 'Офсет (КБС біндер)', equipment: 'Heidelberg / Komori', weightKg: 114, formulaNote: 'CatalogStrategy pglight', isFullSpecMatch: false, parsedParams: undefined, breakdown: {} },
           { name: 'Арт-Прес (Art-Press)', sub: 'Дніпро', min: artpressMin, max: artpressMax, url: artpressUrl, note: 'Листовий офсет', equipment: 'Heidelberg Speedmaster B1/B2', weightKg: 105, formulaNote: 'Self-cover без окремої обкладинки', isFullSpecMatch: false, parsedParams: undefined, breakdown: {} },

@@ -371,7 +371,7 @@ function updateDocumentXml(xml: string, d: MarketAuditData): string {
     buildDocxRow(`«Едельвейс» (Прайс +${d.marginPct}%)`, `${d.finalPrice.toLocaleString('uk-UA')} ₴`, `${d.unitPrice.toFixed(2)} ₴ / шт`, `Комерційна відпускна ціна (маржа ${d.marginPct}%)`, 'Прайс продажу', false, false, true),
     buildDocxRow('PrintStore Group (Київ)', psTotalStr, psUnitStr, 'Комерційний офсет B1 (Roland 74 / Heidelberg CD 102)', 'PrintStore (Онлайн) ↗'),
     buildDocxRow('Друкарня Wolf (Wolf.ua)', wolfTotalStr, wolfUnitStr, 'Збірний офсет B1 (Heidelberg Speedmaster XL 106)', 'Wolf (Вибрані опції) ↗'),
-    buildDocxRow('Poligrafika.com.ua (Чернівці / Київ)', polTotalStr, polUnitStr, 'Поаркушний цифровий друк (Konica Minolta AccurioPress)', 'Poligrafika ↗'),
+    buildDocxRow('Poligrafika.com.ua (Чернівці / Київ)', polTotalStr, polUnitStr, 'Поаркушний цифровий друк (Друк журналів КБС, від 60 с.)', 'Poligrafika ↗'),
     buildDocxRow('Прінтто (Printto.ua, Київ)', ptTotalStr, ptUnitStr, 'Цифровий On-Demand (лазерні системи Canon/Xerox)', 'Printto.ua ↗'),
     buildDocxRow('Гнозіс (Gnozis, Київ)', gnTotalStr, gnUnitStr, 'Офсетний друк (Heidelberg SM 74 / Komori Lithrone)', 'Гнозіс ↗'),
     buildDocxRow('Арт-Прес (Art-Press, Дніпро)', apTotalStr, apUnitStr, 'Листовий офсет (self-cover, суцільний блок без окремої обкл.)', 'Арт-Прес ↗')
@@ -386,7 +386,7 @@ function updateDocumentXml(xml: string, d: MarketAuditData): string {
     buildDocxRow(`«Едельвейс» (Прайс +${d.marginPct}%)`, `${(20652 * (1 + d.marginPct / 100)).toFixed(0)} ₴`, `${(20.65 * (1 + d.marginPct / 100)).toFixed(2)} ₴ / шт`, `Комерційна відпускна ціна замовнику (+${d.marginPct}%)`, 'Прайс продажу', false, false, true),
     buildDocxRow('PrintStore Group (Київ)', '53 130 ₴', '53,13 ₴ / шт', 'Комерційний офсет B1 (Roland 74 / CD 102, 114 кг)', 'PrintStore ↗'),
     buildDocxRow('Друкарня Wolf (Wolf.ua)', '70 543 – 71 863 ₴', '70,54 – 71,86 ₴ / шт', 'Збірний офсет B1 (Speedmaster XL 106, з ПЕТ-упаковкою)', 'Wolf.ua ↗'),
-    buildDocxRow('Poligrafika.com.ua (Чернівці / Київ)', '144 714 – 145 865 ₴', '144,71 ₴ / шт', 'Поаркушний цифровий друк (Konica Minolta AccurioPress)', 'Poligrafika ↗'),
+    buildDocxRow('Poligrafika.com.ua (Чернівці / Київ)', '225 440 – 225 760 ₴', '225,44 – 225,76 ₴ / шт', 'Цифровий друк журналів (КБС, 60 с., обкл. 250г)', 'Poligrafika ↗'),
     buildDocxRow('Прінтто (Printto.ua, Київ)', '73 385 – 75 815 ₴', '73,38 ₴ / шт', 'Цифровий On-Demand (максимальна оптова знижка 55%)', 'Printto ↗'),
     buildDocxRow('Гнозіс (Gnozis, Київ)', '13 845 – 14 224 ₴', '13,85 ₴ / шт', 'Офсетні каталоги (онлайн-робота без вартості паперу)', 'Гнозіс ↗'),
     buildDocxRow('Арт-Прес (Art-Press, Дніпро)', '41 317 ₴', '41,32 ₴ / шт', 'Листовий офсет (self-cover, єдиний матеріал 80г)', 'Арт-Прес ↗')
@@ -406,7 +406,7 @@ function updateDocumentXml(xml: string, d: MarketAuditData): string {
   const linkWolfDesc = d.wolfUrl.includes('params=')
     ? `із закодованими параметрами (${d.format}, ${pStr} стор., блок ${d.blockPaperName}, обкладинка ${d.coverPaperName} з ${d.coverLam}, ПЕТ-упаковка)`
     : `онлайн-калькулятор Wolf.ua (${d.binding}, ${d.format}, ${pStr} с., наклад ${qStr} шт.)`;
-  const linkPoligrafikaDesc = `онлайн-конфігуратор Poligrafika.com.ua (${d.format}, ${d.binding}, ${pStr} с., папір блоку ${d.blockPaperName}, ламінація ${d.coverLam}, наклад ${qStr} шт.)`;
+  const linkPoligrafikaDesc = `онлайн-конфігуратор Poligrafika.com.ua /uk/druk-zurnaliv (${d.format}, КБС мін. 60 с., папір блоку ${d.blockPaperName}, обкл. ${d.coverPaperName}, ламінація ${d.coverLam}, наклад ${qStr} шт.)`;
   const linkPrinttoDesc = `сервіс On-Demand друку Printto.ua (${d.format}, ${d.binding}, ${pStr} с., наклад ${qStr} шт., розрахунок POST /prices)`;
   const linkGnozisDesc = `офсетний калькулятор каталогів Gnozis.com.ua (CatalogStrategy pglight, ${d.format}, ${pStr} с., наклад ${qStr} шт.)`;
   const linkArtPressDesc = `листовий офсет брошур Art-Press.com.ua (${d.format}, ${pStr} с., self-cover, наклад ${qStr} шт.)`;
@@ -421,7 +421,7 @@ function updateDocumentXml(xml: string, d: MarketAuditData): string {
     `<w:p><w:pPr><w:spacing w:before="120" w:after="40" w:line="276" w:lineRule="auto"/></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI"/><w:b/><w:color w:val="0F172A"/><w:sz w:val="19"/></w:rPr><w:t>2. Wolf.ua — Каталог на скобу з вибраними опціями: </w:t></w:r><w:r><w:rPr><w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI"/><w:color w:val="007AFF"/><w:u w:val="single"/><w:sz w:val="17"/></w:rPr><w:t>${escapeXml(d.wolfUrl)}</w:t></w:r></w:p>` +
     `<w:p><w:pPr><w:ind w:left="360"/><w:spacing w:after="80" w:line="240" w:lineRule="auto"/></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI"/><w:color w:val="475569"/><w:sz w:val="16"/></w:rPr><w:t>• ${escapeXml(linkWolfDesc)}.</w:t></w:r></w:p>` +
     // 3. Poligrafika.com.ua
-    `<w:p><w:pPr><w:spacing w:before="120" w:after="40" w:line="276" w:lineRule="auto"/></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI"/><w:b/><w:color w:val="0F172A"/><w:sz w:val="19"/></w:rPr><w:t>3. Poligrafika.com.ua — Точний розрахунок брошури на скобі: </w:t></w:r><w:r><w:rPr><w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI"/><w:color w:val="007AFF"/><w:u w:val="single"/><w:sz w:val="17"/></w:rPr><w:t>${escapeXml(d.poligrafikaUrl || 'https://poligrafika.com.ua/uk/brosura-na-skobi')}</w:t></w:r></w:p>` +
+    `<w:p><w:pPr><w:spacing w:before="120" w:after="40" w:line="276" w:lineRule="auto"/></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI"/><w:b/><w:color w:val="0F172A"/><w:sz w:val="19"/></w:rPr><w:t>3. Poligrafika.com.ua — Друк журналів (онлайн-калькулятор): </w:t></w:r><w:r><w:rPr><w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI"/><w:color w:val="007AFF"/><w:u w:val="single"/><w:sz w:val="17"/></w:rPr><w:t>${escapeXml(d.poligrafikaUrl || 'https://poligrafika.com.ua/uk/druk-zurnaliv')}</w:t></w:r></w:p>` +
     `<w:p><w:pPr><w:ind w:left="360"/><w:spacing w:after="80" w:line="240" w:lineRule="auto"/></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI"/><w:color w:val="475569"/><w:sz w:val="16"/></w:rPr><w:t>• ${escapeXml(linkPoligrafikaDesc)}.</w:t></w:r></w:p>` +
     // 4. Printto.ua
     `<w:p><w:pPr><w:spacing w:before="120" w:after="40" w:line="276" w:lineRule="auto"/></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI"/><w:b/><w:color w:val="0F172A"/><w:sz w:val="19"/></w:rPr><w:t>4. Printto.ua — Друк журналів On-Demand: </w:t></w:r><w:r><w:rPr><w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI"/><w:color w:val="007AFF"/><w:u w:val="single"/><w:sz w:val="17"/></w:rPr><w:t>${escapeXml(d.printtoUrl || 'https://printto.ua/services/printing-magazines')}</w:t></w:r></w:p>` +
