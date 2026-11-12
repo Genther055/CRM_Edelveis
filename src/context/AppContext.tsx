@@ -13,7 +13,11 @@ import type {
   TaskItem,
   NoteItem,
   NoteReply,
-  Lead
+  Lead,
+  WarehouseMovement,
+  WarehouseMovementType,
+  WalletAccount,
+  FinanceEntry
 } from '../types';
 import { isUserBlocked } from '../utils/security';
 
@@ -86,6 +90,32 @@ interface AppContextType {
   isDbConnected: boolean;
   lastSyncedAt: Date | null;
   refreshSync: () => Promise<void>;
+  warehouseMovements: WarehouseMovement[];
+  recordWarehouseMovement: (params: {
+    type: WarehouseMovementType;
+    materialId: string;
+    quantity: number;
+    unitPrice?: number;
+    warehouseFrom?: string;
+    warehouseTo?: string;
+    party?: string;
+    dealId?: string;
+    dealName?: string;
+    reason?: string;
+    createFinanceRecord?: boolean;
+    financePaidImmediately?: boolean;
+    walletId?: string;
+  }) => void;
+  reconcileWarehouseStock: (
+    items: Array<{ materialId: string; actualQty: number; reason?: string }>
+  ) => void;
+  wallets: WalletAccount[];
+  financeEntries: FinanceEntry[];
+  addFinanceEntry: (
+    entry: Omit<FinanceEntry, 'id' | 'user' | 'wallet'> & { wallet?: string }
+  ) => FinanceEntry;
+  markFinanceEntryPaid: (entryId: string) => void;
+  deleteFinanceEntry: (entryId: string) => void;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -769,6 +799,119 @@ export const initialLeadsData: Lead[] = [
   }
 ];
 
+const initialWallets: WalletAccount[] = [
+  { id: 'W-1', code: '31101', name: 'ПриватБанк ФОП (Основний)', balance: 142500, currency: 'UAH', accountType: 'bank' },
+  { id: 'W-2', code: '31102', name: 'Монобанк ФОП', balance: 48300, currency: 'UAH', accountType: 'bank' },
+  { id: 'W-3', code: '30101', name: 'Готівкова каса друкарні', balance: 18450, currency: 'UAH', accountType: 'cash' },
+  { id: 'W-4', code: '31301', name: 'Термінал POS Checkbox', balance: 12900, currency: 'UAH', accountType: 'pos' }
+];
+
+const initialFinanceEntries: FinanceEntry[] = [
+  { id: 'FIN-1001', date: getRelativeDateStr(0), dt: '31101 (ПриватБанк)', kt: '361 (Замовники)', sum: 72000, type: 'income', status: 'posted', description: 'Оплата рахунку за тираж бланки А4 1000 шт', document: 'Банківська виписка №142', party: 'Feeling Good', user: 'Анна', category: 'Продаж продукції', walletId: 'W-1', wallet: 'ПриватБанк ФОП (Основний)' },
+  { id: 'FIN-1002', date: getRelativeDateStr(-1), dt: '31101 (ПриватБанк)', kt: '361 (Замовники)', sum: 65000, type: 'income', status: 'posted', description: 'Передплата за виготовлення брошур', document: 'Банківська виписка №143', party: 'Марина Губенко', user: 'Анна', category: 'Продаж продукції', walletId: 'W-1', wallet: 'ПриватБанк ФОП (Основний)' },
+  { id: 'FIN-1003', date: getRelativeDateStr(-1), dt: '31102 (Монобанк)', kt: '361 (Замовники)', sum: 70000, type: 'income', status: 'posted', description: 'Оплата за поліграфічні послуги', document: 'Банківська виписка №144', party: 'Петро Петренко', user: 'Анна', category: 'Продаж продукції', walletId: 'W-2', wallet: 'Монобанк ФОП' },
+  { id: 'FIN-1004', date: getRelativeDateStr(-2), dt: '201 (Сировина)', kt: '631 (Постачальники)', sum: 12750, type: 'expense', status: 'posted', description: 'Закупівля крейдованого паперу 130г (1 500 арк.)', document: 'Накладна №П-884', party: 'ТОВ Папір-Світ', user: 'Іван', category: 'Закупівля паперу та витратників', walletId: 'W-3', wallet: 'Готівкова каса друкарні' },
+  { id: 'FIN-1005', date: getRelativeDateStr(-3), dt: '92 (Адмінвитрати)', kt: '631 (Постачальники)', sum: 24500, type: 'expense', status: 'posted', description: 'Сервіс та лізинг ЦПМ Canon / Heidelberg', document: 'Акт №А-12', party: 'ТОВ Сервіс-Принт', user: 'Іван', category: 'Обслуговування обладнання', walletId: 'W-1', wallet: 'ПриватБанк ФОП (Основний)' },
+  { id: 'FIN-1006', date: getRelativeDateStr(-4), dt: '30101 (Каса)', kt: '702 (Дохід роздріб)', sum: 5000, type: 'income', status: 'posted', description: 'Роздрібний продаж поліграфії', document: 'ПКО №332', party: 'Світлана', user: 'Іван', category: 'Роздрібний продаж', walletId: 'W-3', wallet: 'Готівкова каса друкарні' },
+  { id: 'FIN-1007', date: getRelativeDateStr(2), dt: '201 (Сировина)', kt: '631 (Постачальники)', sum: 18400, type: 'expense', status: 'planned', description: 'Планова оплата постачальнику за папір В2 офсет 80г', document: 'Рахунок №ПС-412', party: 'ТОВ Друк-Папір', user: 'Марія', category: 'Закупівля паперу та витратників', walletId: 'W-1', wallet: 'ПриватБанк ФОП (Основний)' }
+];
+
+const initialWarehouseMovements: WarehouseMovement[] = [
+  {
+    id: 'WM-101',
+    date: getRelativeDateStr(-2),
+    type: 'receipt',
+    materialId: '3',
+    materialName: 'Крейдований папір 130г (A1)',
+    quantityChange: 1500,
+    quantity: 1500,
+    quantityAfter: 3000,
+    unit: 'арк.',
+    unitPrice: 0.85,
+    totalSum: 1275,
+    warehouseTo: 'Головний склад Вінниця',
+    party: 'ТОВ Папір-Світ',
+    reason: 'Прихід по накладній №П-884',
+    employee: 'Іван'
+  },
+  {
+    id: 'WM-102',
+    date: getRelativeDateStr(-1),
+    type: 'writeoff',
+    materialId: '1',
+    materialName: 'Офсетний папір 70г (A1)',
+    quantityChange: -750,
+    quantity: 750,
+    quantityAfter: 5000,
+    unit: 'арк.',
+    unitPrice: 0.35,
+    totalSum: 262.5,
+    warehouseFrom: 'Головний склад Вінниця',
+    warehouseTo: 'Друкарський цех',
+    dealId: '1',
+    dealName: 'Бланки А5',
+    reason: 'Видано у друк по угоді #1',
+    employee: 'Працівник Б'
+  },
+  {
+    id: 'WM-103',
+    date: getRelativeDateStr(0),
+    type: 'relocate',
+    materialId: '4',
+    materialName: 'Офсетний папір 80г (A1)',
+    quantityChange: 0,
+    quantity: 1000,
+    quantityAfter: 12000,
+    unit: 'арк.',
+    unitPrice: 0.40,
+    totalSum: 400,
+    warehouseFrom: 'Головний склад Вінниця',
+    warehouseTo: 'Друкарський цех',
+    reason: 'Переміщення під офсетний тираж',
+    employee: 'Вікторія'
+  }
+];
+
+export const getDefaultMaterialPrice = (m?: Partial<Material>): number => {
+  if (typeof m?.price === 'number' && !Number.isNaN(m.price)) return m.price;
+  const name = (m?.name || '').toLowerCase();
+  if (name.includes('тонер')) return 850;
+  if (name.includes('плівк')) return 420;
+  if (name.includes('пружин')) return 0.45;
+  if (name.includes('картон')) return 2.8;
+  if (name.includes('самоклейк')) return 1.2;
+  if (m?.type === 'coated') return 0.65;
+  if (m?.type === 'offset') return 0.38;
+  return 0.22;
+};
+
+const findTargetMaterialForOrder = (
+  materialsList: Material[],
+  orderData: { materialId?: string; paperType: string; paperName?: string }
+): Material | undefined => {
+  if (orderData.materialId) {
+    const exact = materialsList.find(m => m.id === orderData.materialId);
+    if (exact) return exact;
+  }
+  const paperOnly = materialsList.filter(m => {
+    const n = m.name.toLowerCase();
+    return !n.includes('тонер') && !n.includes('плівк') && !n.includes('пружин');
+  });
+  if (orderData.paperName) {
+    const targetName = orderData.paperName.toLowerCase();
+    const densityMatch = targetName.match(/\d{2,3}/)?.[0];
+    if (densityMatch) {
+      const byDensity = paperOnly.find(m => m.name.toLowerCase().includes(densityMatch));
+      if (byDensity) return byDensity;
+    }
+    if (targetName.includes('самоклейк')) {
+      const sticker = paperOnly.find(m => m.name.toLowerCase().includes('самоклейк'));
+      if (sticker) return sticker;
+    }
+  }
+  return paperOnly.find(m => m.type === orderData.paperType) || materialsList.find(m => m.type === orderData.paperType);
+};
+
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(() => {
     if (typeof window !== 'undefined') {
@@ -941,6 +1084,41 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     return saved ? JSON.parse(saved) : false;
   });
 
+  const [warehouseMovements, setWarehouseMovements] = useState<WarehouseMovement[]>(() => {
+    const saved = localStorage.getItem('crm_warehouse_movements');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      } catch {}
+    }
+    return initialWarehouseMovements;
+  });
+
+  const [wallets, setWallets] = useState<WalletAccount[]>(() => {
+    const saved = localStorage.getItem('crm_wallets');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      } catch {}
+    }
+    return initialWallets;
+  });
+
+  const [financeEntries, setFinanceEntries] = useState<FinanceEntry[]>(() => {
+    const saved = localStorage.getItem('crm_finance_records');
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0 && parsed[0]?.dt) {
+          return parsed;
+        }
+      } catch {}
+    }
+    return initialFinanceEntries;
+  });
+
   const [notifications, setNotifications] = useState<string[]>([]);
 
   const [theme, setTheme] = useState<'light' | 'dark'>(() => {
@@ -1078,6 +1256,18 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   }, [novaPoshtaAccounts]);
 
   useEffect(() => {
+    localStorage.setItem('crm_warehouse_movements', JSON.stringify(warehouseMovements));
+  }, [warehouseMovements]);
+
+  useEffect(() => {
+    localStorage.setItem('crm_wallets', JSON.stringify(wallets));
+  }, [wallets]);
+
+  useEffect(() => {
+    localStorage.setItem('crm_finance_records', JSON.stringify(financeEntries));
+  }, [financeEntries]);
+
+  useEffect(() => {
     localStorage.setItem('crm_np_vol_calc', JSON.stringify(npVolumeCalcEnabled));
   }, [npVolumeCalcEnabled]);
 
@@ -1152,35 +1342,281 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setNotifications(prev => [message, ...prev].slice(0, 30));
   };
 
+  const applyWalletDelta = (
+    walletList: WalletAccount[],
+    entry: Pick<FinanceEntry, 'type' | 'status' | 'sum' | 'walletId' | 'targetWalletId'>,
+    multiplier: 1 | -1
+  ): WalletAccount[] => {
+    if (entry.status === 'planned') return walletList;
+    const delta = entry.sum * multiplier;
+    return walletList.map(w => {
+      if (entry.type === 'income' && w.id === entry.walletId) {
+        return { ...w, balance: w.balance + delta };
+      }
+      if (entry.type === 'expense' && w.id === entry.walletId) {
+        return { ...w, balance: w.balance - delta };
+      }
+      if (entry.type === 'transfer') {
+        if (w.id === entry.walletId) return { ...w, balance: w.balance - delta };
+        if (w.id === entry.targetWalletId) return { ...w, balance: w.balance + delta };
+      }
+      return w;
+    });
+  };
+
+  const addFinanceEntry = (
+    entryData: Omit<FinanceEntry, 'id' | 'user' | 'wallet'> & { wallet?: string }
+  ): FinanceEntry => {
+    const sourceWallet = wallets.find(w => w.id === entryData.walletId) || wallets[0];
+    const newEntry: FinanceEntry = {
+      ...entryData,
+      id: `FIN-${Date.now().toString().slice(-5)}`,
+      status: entryData.status || 'posted',
+      user: currentUser?.name || 'Система',
+      walletId: sourceWallet?.id || entryData.walletId,
+      wallet: entryData.wallet || sourceWallet?.name || 'Основний рахунок'
+    };
+
+    setFinanceEntries(prev => [newEntry, ...prev]);
+    if (newEntry.status === 'posted') {
+      setWallets(prev => applyWalletDelta(prev, newEntry, 1));
+    }
+
+    if (newEntry.dealId && newEntry.type === 'income' && newEntry.status === 'posted') {
+      const targetOrder = orders.find(o => o.id === newEntry.dealId);
+      if (targetOrder) {
+        const updatedPaid = (targetOrder.prepayment || 0) + newEntry.sum;
+        const nextStatus: Order['paymentStatus'] =
+          updatedPaid >= targetOrder.finalPrice - 0.5 ? 'paid' : updatedPaid > 0 ? 'partial' : 'unpaid';
+        updateOrderPayment(targetOrder.id, nextStatus, Math.round(updatedPaid * 100) / 100);
+      }
+    }
+
+    return newEntry;
+  };
+
+  const markFinanceEntryPaid = (entryId: string) => {
+    const target = financeEntries.find(e => e.id === entryId);
+    if (!target || target.status === 'posted') return;
+    const postedEntry: FinanceEntry = { ...target, status: 'posted' };
+    setFinanceEntries(prev => prev.map(e => e.id === entryId ? postedEntry : e));
+    setWallets(prev => applyWalletDelta(prev, postedEntry, 1));
+    if (postedEntry.dealId && postedEntry.type === 'income') {
+      const targetOrder = orders.find(o => o.id === postedEntry.dealId);
+      if (targetOrder) {
+        const updatedPaid = (targetOrder.prepayment || 0) + postedEntry.sum;
+        const nextStatus: Order['paymentStatus'] =
+          updatedPaid >= targetOrder.finalPrice - 0.5 ? 'paid' : updatedPaid > 0 ? 'partial' : 'unpaid';
+        updateOrderPayment(targetOrder.id, nextStatus, Math.round(updatedPaid * 100) / 100);
+      }
+    }
+    addSystemNotification(`Проведено плановий платіж ${postedEntry.document} на суму ${postedEntry.sum.toLocaleString('uk-UA')} грн`);
+  };
+
+  const deleteFinanceEntry = (entryId: string) => {
+    const target = financeEntries.find(e => e.id === entryId);
+    if (!target) return;
+    setFinanceEntries(prev => prev.filter(e => e.id !== entryId));
+    if (target.status !== 'planned') {
+      setWallets(prev => applyWalletDelta(prev, target, -1));
+    }
+  };
+
+  const recordWarehouseMovement = (params: {
+    type: WarehouseMovementType;
+    materialId: string;
+    quantity: number;
+    unitPrice?: number;
+    warehouseFrom?: string;
+    warehouseTo?: string;
+    party?: string;
+    dealId?: string;
+    dealName?: string;
+    reason?: string;
+    createFinanceRecord?: boolean;
+    financePaidImmediately?: boolean;
+    walletId?: string;
+  }) => {
+    const mat = materials.find(m => m.id === params.materialId);
+    if (!mat) return;
+
+    const absQty = Math.max(0, Number(params.quantity) || 0);
+    if (absQty === 0 && params.type !== 'reconciliation') return;
+
+    const unitPrice = params.unitPrice && params.unitPrice > 0 ? params.unitPrice : getDefaultMaterialPrice(mat);
+    const totalSum = Math.round(absQty * unitPrice * 100) / 100;
+    const todayStr = new Date().toISOString().split('T')[0];
+    const employeeName = currentUser?.name || 'Менеджер складу';
+
+    let quantityChange = 0;
+    let nextQty = mat.quantity;
+    let nextReserved = mat.reserved;
+
+    if (params.type === 'receipt') {
+      quantityChange = absQty;
+      nextQty = mat.quantity + absQty;
+    } else if (params.type === 'writeoff' || params.type === 'return') {
+      quantityChange = -absQty;
+      nextQty = Math.max(0, mat.quantity - absQty);
+      if (params.dealId) {
+        nextReserved = Math.max(0, mat.reserved - absQty);
+      }
+    } else if (params.type === 'reserve') {
+      nextReserved = mat.reserved + absQty;
+    } else if (params.type === 'release') {
+      nextReserved = Math.max(0, mat.reserved - absQty);
+    }
+
+    const updatedSalesLog =
+      params.type === 'writeoff'
+        ? [
+            {
+              id: `SL-${Date.now()}-${Math.floor(Math.random() * 1000)}`,
+              date: todayStr,
+              employee: employeeName,
+              quantity: absQty,
+              dealId: params.dealId,
+              dealName: params.dealName || params.reason || 'Списання зі складу'
+            },
+            ...(mat.salesLog || [])
+          ]
+        : mat.salesLog;
+
+    setMaterials(prev =>
+      prev.map(m =>
+        m.id === mat.id
+          ? {
+              ...m,
+              quantity: nextQty,
+              reserved: nextReserved,
+              price: params.type === 'receipt' && params.unitPrice && params.unitPrice > 0 ? params.unitPrice : m.price,
+              supplier: params.type === 'receipt' && params.party ? params.party : m.supplier,
+              salesLog: updatedSalesLog
+            }
+          : m
+      )
+    );
+
+    const movement: WarehouseMovement = {
+      id: `WM-${Date.now().toString().slice(-6)}-${Math.floor(Math.random() * 90 + 10)}`,
+      date: todayStr,
+      type: params.type,
+      materialId: mat.id,
+      materialName: mat.name,
+      quantityChange,
+      quantity: absQty,
+      quantityAfter: nextQty,
+      unit: mat.unit,
+      unitPrice,
+      totalSum,
+      warehouseFrom: params.warehouseFrom,
+      warehouseTo: params.warehouseTo,
+      party: params.party,
+      dealId: params.dealId,
+      dealName: params.dealName,
+      reason: params.reason,
+      employee: employeeName
+    };
+
+    setWarehouseMovements(prev => [movement, ...prev]);
+    syncServer('update_material_stock', { materialId: mat.id, quantity: nextQty });
+
+    if (params.createFinanceRecord && params.type === 'receipt' && totalSum > 0) {
+      const targetWalletId = params.walletId || wallets[0]?.id || 'W-1';
+      addFinanceEntry({
+        date: todayStr,
+        dt: '201 (Сировина і матеріали)',
+        kt: params.financePaidImmediately ? '311/301 (Оплата)' : '631 (Постачальники)',
+        sum: totalSum,
+        type: 'expense',
+        status: params.financePaidImmediately ? 'posted' : 'planned',
+        description: `Закупівля: ${mat.name} (${absQty} ${mat.unit})`,
+        document: `Прихід ${movement.id}`,
+        party: params.party || mat.supplier || 'Постачальник',
+        category: 'Закупівля паперу та витратників',
+        walletId: targetWalletId,
+        materialMovementId: movement.id
+      });
+    }
+  };
+
+  const reconcileWarehouseStock = (
+    items: Array<{ materialId: string; actualQty: number; reason?: string }>
+  ) => {
+    const todayStr = new Date().toISOString().split('T')[0];
+    const employeeName = currentUser?.name || 'Комірник';
+    const createdMovements: WarehouseMovement[] = [];
+    const updatesMap = new Map<string, number>();
+
+    items.forEach(item => {
+      const mat = materials.find(m => m.id === item.materialId);
+      if (!mat) return;
+      const diff = item.actualQty - mat.quantity;
+      if (diff === 0) return;
+
+      const unitPrice = getDefaultMaterialPrice(mat);
+      updatesMap.set(mat.id, Math.max(0, item.actualQty));
+
+      createdMovements.push({
+        id: `INV-${Date.now().toString().slice(-5)}-${mat.id}`,
+        date: todayStr,
+        type: 'reconciliation',
+        materialId: mat.id,
+        materialName: mat.name,
+        quantityChange: diff,
+        quantity: Math.abs(diff),
+        quantityAfter: Math.max(0, item.actualQty),
+        unit: mat.unit,
+        unitPrice,
+        totalSum: Math.round(Math.abs(diff) * unitPrice * 100) / 100,
+        warehouseFrom: 'Головний склад Вінниця',
+        reason: item.reason || (diff > 0 ? 'Інвентаризація: виявлено надлишок' : 'Інвентаризація: списання нестачі'),
+        employee: employeeName
+      });
+    });
+
+    if (createdMovements.length === 0) return;
+
+    setMaterials(prev =>
+      prev.map(m => (updatesMap.has(m.id) ? { ...m, quantity: updatesMap.get(m.id)! } : m))
+    );
+    setWarehouseMovements(prev => [...createdMovements, ...prev]);
+    addSystemNotification(`Проведено інвентаризацію складу: оновлено ${createdMovements.length} позицій.`);
+  };
+
   const handleBotPaymentCheck = (order: Order, status: Order['status']) => {
     const matchingTrigger = autoPaymentTriggers.find(t => t.dealStage === status && t.active);
     if (matchingTrigger) {
-      const amountToPay = order.finalPrice * (matchingTrigger.percentage / 100);
-      const savedFinance = localStorage.getItem('crm_finance_records');
-      const currentFinance = savedFinance ? JSON.parse(savedFinance) : [];
+      const amountToPay = Math.round(order.finalPrice * (matchingTrigger.percentage / 100) * 100) / 100;
+      const matchedWallet = wallets.find(w => w.name.includes(matchingTrigger.wallet)) || wallets[0];
+      const client = clients.find(c => c.id === order.clientId);
 
-      const newRec = {
-        id: `F-BOT-${Date.now()}`,
-        type: 'income',
-        amount: amountToPay,
-        wallet: matchingTrigger.wallet,
-        category: matchingTrigger.category,
-        description: `Автоматична оплата (Keepin Bot) по угоді ${order.id} (${order.name})`,
+      addFinanceEntry({
         date: new Date().toISOString().split('T')[0],
+        dt: `${matchedWallet?.code || '311'} (${matchedWallet?.name || matchingTrigger.wallet})`,
+        kt: '361 (Розрахунки з покупцями)',
+        sum: amountToPay,
+        type: 'income',
+        status: 'posted',
+        description: `Автоматична оплата (Keepin Bot) по угоді ${order.id} (${order.name})`,
+        document: `Тригер #${order.id}`,
+        party: client?.name || 'Клієнт',
+        category: matchingTrigger.category || 'Продаж продукції',
+        walletId: matchedWallet?.id || 'W-1',
+        wallet: matchedWallet?.name || matchingTrigger.wallet,
         dealId: order.id
-      };
-
-      localStorage.setItem('crm_finance_records', JSON.stringify([newRec, ...currentFinance]));
-      updateOrderPayment(order.id, 'paid', amountToPay);
-      addSystemNotification(`🤖 Keepin Bot провів автоматичну оплату ${amountToPay.toFixed(2)} грн по замовленню ${order.id}`);
+      });
+      addSystemNotification(`Keepin Bot провів автоматичну оплату ${amountToPay.toFixed(2)} грн по замовленню ${order.id}`);
     }
   };
 
   const addOrder = (orderData: Omit<Order, 'id' | 'createdAt' | 'createdBy' | 'status'> & { id?: string }): Order => {
     const orderId = orderData.id || String(orders.length + 1);
+    const targetMaterial = findTargetMaterialForOrder(materials, orderData);
     const newOrder: Order = {
       ...orderData,
       id: orderId,
+      materialId: targetMaterial?.id || orderData.materialId,
       status: 'design',
       createdAt: new Date().toISOString(),
       createdBy: currentUser?.name || 'Система',
@@ -1189,17 +1625,35 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       stageChangedAt: { 'design': new Date().toISOString() }
     };
 
-    setMaterials(prev => prev.map(m => {
-      if (m.type === orderData.paperType) {
-        const qtyNeeded = newOrder.physicalSheets;
-        return {
-          ...m,
-          quantity: Math.max(0, m.quantity - qtyNeeded),
-          reserved: m.reserved + qtyNeeded
-        };
-      }
-      return m;
-    }));
+    if (targetMaterial && newOrder.physicalSheets > 0) {
+      const qtyNeeded = newOrder.physicalSheets;
+      setMaterials(prev => prev.map(m =>
+        m.id === targetMaterial.id
+          ? { ...m, reserved: m.reserved + qtyNeeded }
+          : m
+      ));
+      const unitPrice = getDefaultMaterialPrice(targetMaterial);
+      setWarehouseMovements(prev => [
+        {
+          id: `RES-${Date.now().toString().slice(-6)}`,
+          date: new Date().toISOString().split('T')[0],
+          type: 'reserve',
+          materialId: targetMaterial.id,
+          materialName: targetMaterial.name,
+          quantityChange: 0,
+          quantity: qtyNeeded,
+          quantityAfter: targetMaterial.quantity,
+          unit: targetMaterial.unit,
+          unitPrice,
+          totalSum: Math.round(qtyNeeded * unitPrice * 100) / 100,
+          dealId: orderId,
+          dealName: newOrder.name,
+          reason: `Авторезерв паперу під замовлення #${orderId}`,
+          employee: currentUser?.name || 'Система'
+        },
+        ...prev
+      ]);
+    }
 
     setOrders(prev => [newOrder, ...prev]);
 
@@ -1226,34 +1680,71 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const updateOrderStatus = (orderId: string, status: Order['status']) => {
-    setOrders(prev => prev.map(o => {
-      if (o.id === orderId) {
-        if (status === 'ready' && o.status !== 'ready') {
-          setMaterials(materialsPrev => materialsPrev.map(m => {
-            if (m.type === o.paperType) {
-              return { ...m, reserved: Math.max(0, m.reserved - o.physicalSheets) };
-            }
-            return m;
-          }));
-        }
-        else if (status !== 'ready' && o.status === 'ready') {
-          setMaterials(materialsPrev => materialsPrev.map(m => {
-            if (m.type === o.paperType) {
-              return { ...m, reserved: m.reserved + o.physicalSheets };
-            }
-            return m;
-          }));
-        }
+    const existing = orders.find(o => o.id === orderId);
+    if (!existing) return;
 
-        const now = new Date().toISOString();
-        const stageChangedAt = { ...(o.stageChangedAt || {}), [status]: now };
-        const updated = { ...o, status, stageChangedAt };
-        handleBotPaymentCheck(updated, status);
-        syncServer('save_order', updated);
-        return updated;
+    const targetMat = findTargetMaterialForOrder(materials, existing);
+    if (targetMat && existing.physicalSheets > 0) {
+      const sheets = existing.physicalSheets;
+      if (status === 'ready' && existing.status !== 'ready') {
+        const unitPrice = getDefaultMaterialPrice(targetMat);
+        const nextQty = Math.max(0, targetMat.quantity - sheets);
+        setMaterials(prev => prev.map(m =>
+          m.id === targetMat.id
+            ? {
+                ...m,
+                quantity: nextQty,
+                reserved: Math.max(0, m.reserved - sheets),
+                salesLog: [
+                  {
+                    id: `SL-${Date.now()}`,
+                    date: new Date().toISOString().split('T')[0],
+                    employee: currentUser?.name || 'Цех',
+                    quantity: sheets,
+                    dealId: existing.id,
+                    dealName: existing.name
+                  },
+                  ...(m.salesLog || [])
+                ]
+              }
+            : m
+        ));
+        setWarehouseMovements(prev => [
+          {
+            id: `OUT-${Date.now().toString().slice(-6)}`,
+            date: new Date().toISOString().split('T')[0],
+            type: 'writeoff',
+            materialId: targetMat.id,
+            materialName: targetMat.name,
+            quantityChange: -sheets,
+            quantity: sheets,
+            quantityAfter: nextQty,
+            unit: targetMat.unit,
+            unitPrice,
+            totalSum: Math.round(sheets * unitPrice * 100) / 100,
+            warehouseFrom: 'Друкарський цех',
+            dealId: existing.id,
+            dealName: existing.name,
+            reason: `Автосписання при випуску замовлення #${existing.id}`,
+            employee: currentUser?.name || 'Цех'
+          },
+          ...prev
+        ]);
+      } else if (status !== 'ready' && existing.status === 'ready') {
+        setMaterials(prev => prev.map(m =>
+          m.id === targetMat.id
+            ? { ...m, quantity: m.quantity + sheets, reserved: m.reserved + sheets }
+            : m
+        ));
       }
-      return o;
-    }));
+    }
+
+    const now = new Date().toISOString();
+    const stageChangedAt = { ...(existing.stageChangedAt || {}), [status]: now };
+    const updated = { ...existing, status, stageChangedAt };
+    setOrders(prev => prev.map(o => o.id === orderId ? updated : o));
+    handleBotPaymentCheck(updated, status);
+    syncServer('save_order', updated);
   };
 
   const updateOrderPayment = (orderId: string, paymentStatus: Order['paymentStatus'], prepayment: number) => {
@@ -1622,7 +2113,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         toggleTheme,
         isDbConnected,
         lastSyncedAt,
-        refreshSync: fetchServerSync
+        refreshSync: fetchServerSync,
+        warehouseMovements,
+        recordWarehouseMovement,
+        reconcileWarehouseStock,
+        wallets,
+        financeEntries,
+        addFinanceEntry,
+        markFinanceEntryPaid,
+        deleteFinanceEntry
       }}
     >
       {children}

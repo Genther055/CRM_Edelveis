@@ -1,528 +1,1174 @@
-import React, { useState, useMemo } from 'react';
-import { useApp } from '../context/AppContext';
-import { 
-  History,
-  ArrowLeftRight,
-  Copy,
-  FolderOpen,
+import React, { useMemo, useState } from 'react';
+import {
   Search,
-  CheckSquare,
   Plus,
-  Trash
+  RefreshCw,
+  Download,
+  ChevronRight,
+  ChevronLeft,
+  ChevronsLeft,
+  ChevronsRight,
+  Info,
+  X,
+  ArrowDownToLine,
+  ArrowUpFromLine,
+  ArrowLeftRight,
+  ClipboardCheck,
+  RotateCcw,
+  Package,
+  AlertTriangle,
+  Wallet
 } from 'lucide-react';
-import type { Material } from '../types';
+import { useApp, getDefaultMaterialPrice } from '../context/AppContext';
+import type { Material, WarehouseMovementType } from '../types';
+
+type TopTab =
+  | 'zalyshki'
+  | 'vyroby'
+  | 'oprybutkuvannya'
+  | 'spysannya'
+  | 'peremishchennya'
+  | 'inventaryzatsii'
+  | 'povernennya'
+  | 'tovary';
+
+interface AssemblySpec {
+  id: string;
+  name: string;
+  article: string;
+  format: string;
+  componentsSummary: string;
+  baseCost: number;
+  unit: string;
+}
+
+const ASSEMBLY_SPECS: AssemblySpec[] = [
+  {
+    id: 'BOM-01',
+    name: 'Журнал А4, крейда 115 г/м² (блок + обкл. 250 г/м²)',
+    article: 'SPEC-JRN-A4',
+    format: '210×297 мм (А4)',
+    componentsSummary: 'Крейда глянцева 115 + Крейда 250 + Термоклей EVA + Матова ламінація',
+    baseCost: 24.5,
+    unit: 'прим.'
+  },
+  {
+    id: 'BOM-02',
+    name: 'Книга тверда обкладинка, офсет 80 г/м²',
+    article: 'SPEC-BK-HC',
+    format: '148×210 мм (А5)',
+    componentsSummary: 'Офсетний папір 80 + Палітурний картон 2 мм + Каптал + Ниткошвейне зшивання',
+    baseCost: 78.0,
+    unit: 'прим.'
+  },
+  {
+    id: 'BOM-03',
+    name: 'Каталог скоба А4, 64 стор.',
+    article: 'SPEC-CAT-64',
+    format: '210×297 мм (А4)',
+    componentsSummary: 'Крейда матова 130 + Обкл. Крейда 300 + 2 металеві скоби',
+    baseCost: 34.2,
+    unit: 'прим.'
+  },
+  {
+    id: 'BOM-04',
+    name: 'Пакувальний короб 450×320×250 мм (гофрокартон Т-23)',
+    article: 'SPEC-BOX-M',
+    format: '450×320×250 мм',
+    componentsSummary: 'Пятишаровий гофрокартон + стрічка пакувальна армована',
+    baseCost: 28.0,
+    unit: 'шт.'
+  }
+];
+
+const WAREHOUSE_ZONES = [
+  'Основний склад',
+  'Секція А1-А3 (Листи)',
+  'Секція B1-B2 (Блоковий папір)',
+  'Секція C1-C3 (Обкладинки та картон)',
+  'Секція D1-D2 (Палітурні та витратні)',
+  'Цех друку (Оперативний)',
+  'Дільниця упаковки'
+];
+
+const MATERIAL_TYPE_LABEL: Record<Material['type'], string> = {
+  coated: 'Крейдований',
+  offset: 'Офсетний / Картон',
+  gazetka: 'Газетний / Спец.'
+};
+
+const MOVEMENT_LABELS: Record<WarehouseMovementType, { label: string; color: string; bg: string }> = {
+  receipt: { label: 'Оприбуткування', color: '#059669', bg: 'rgba(16, 185, 129, 0.12)' },
+  writeoff: { label: 'Списання у виробництво', color: '#dc2626', bg: 'rgba(239, 68, 68, 0.12)' },
+  relocate: { label: 'Переміщення', color: '#2563eb', bg: 'rgba(59, 130, 246, 0.12)' },
+  reconciliation: { label: 'Інвентаризація', color: '#7c3aed', bg: 'rgba(124, 58, 237, 0.12)' },
+  return: { label: 'Повернення', color: '#d97706', bg: 'rgba(245, 158, 11, 0.14)' },
+  reserve: { label: 'Резерв під замовлення', color: '#0284c7', bg: 'rgba(2, 132, 199, 0.12)' },
+  release: { label: 'Зняття резерву', color: '#6b7280', bg: 'rgba(107, 114, 128, 0.12)' }
+};
+
+const formatMoney = (n: number) =>
+  `${n.toLocaleString('uk-UA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} ₴`;
 
 export const Warehouse: React.FC = () => {
-  const { materials, updateMaterialStock, addMaterial, addSystemNotification } = useApp();
-  const [activeTab, setActiveTab] = useState<'zalyshki' | 'vyroby' | 'oprybutkuvannya' | 'spysannya' | 'peremishchennya' | 'inventaryzatsii' | 'povernennya' | 'tovary'>('zalyshki');
-  const [selectedCategory, setSelectedCategory] = useState<string>('all');
-  const [selectedStockFilter, setSelectedStockFilter] = useState<'all' | 'instock' | 'lowstock'>('all');
-  const [selectedMaterialForLog, setSelectedMaterialForLog] = useState<Material | null>(null);
-  
-  // Search state
+  const {
+    materials,
+    orders,
+    clients,
+    wallets,
+    warehouseMovements,
+    addMaterial,
+    recordWarehouseMovement,
+    reconcileWarehouseStock,
+    addSystemNotification
+  } = useApp();
+
+  const [activeTab, setActiveTab] = useState<TopTab>('zalyshki');
   const [searchQuery, setSearchQuery] = useState('');
+  const [warehouseFilter, setWarehouseFilter] = useState('all');
+  const [typeFilter, setTypeFilter] = useState<'all' | Material['type']>('all');
+  const [presetFilter, setPresetFilter] = useState<'all' | 'in_stock' | 'low_stock' | 'reserved'>('all');
+  const [pageSize, setPageSize] = useState<number>(20);
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
-  // Bulk operation states
-  const [selectedMaterials, setSelectedMaterials] = useState<string[]>([]);
-  const [bulkFolderTarget, setBulkFolderTarget] = useState('Папір');
+  // Detail modal
+  const [detailMaterial, setDetailMaterial] = useState<Material | null>(null);
 
-  // Relocation Form State
-  const [showRelocateModal, setShowRelocateModal] = useState(false);
-  const [relocateMaterialId, setRelocateMaterialId] = useState(materials[0]?.id || '');
-  const [relocateQty, setRelocateQty] = useState(100);
-  const [relocateFrom, setRelocateFrom] = useState('Головний склад Вінниця');
-  const [relocateTo, setRelocateTo] = useState('Друкарський цех');
+  // Add material modal
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newMatForm, setNewMatForm] = useState<{
+    name: string;
+    type: Material['type'];
+    quantity: number;
+    minStock: number;
+    price: number;
+    location: string;
+    supplier: string;
+    unit: string;
+  }>({
+    name: '',
+    type: 'coated',
+    quantity: 5000,
+    minStock: 1000,
+    price: 0.65,
+    location: 'Основний склад',
+    supplier: 'ПапірТрейд',
+    unit: 'листів'
+  });
 
-  // Multi-receipt Form States
-  const [showMultiReceiptModal, setShowMultiReceiptModal] = useState(false);
-  const [multiReceiptSupplier, setMultiReceiptSupplier] = useState('ТОВ Папір-Світ');
-  const [multiReceiptRows, setMultiReceiptRows] = useState<Array<{ materialId: string; quantity: number; price: number }>>([
-    { materialId: materials[0]?.id || '', quantity: 100, price: 0 }
-  ]);
+  // Multi-receipt modal
+  const [showReceiptModal, setShowReceiptModal] = useState(false);
+  const [receiptForm, setReceiptForm] = useState({
+    warehouse: 'Основний склад',
+    supplier: 'ПапірТрейд',
+    docNote: '',
+    createFinanceRecord: true,
+    financePaidImmediately: false,
+    walletId: wallets[0]?.id || 'w-bank-1',
+    items: [{ materialId: materials[0]?.id || '1', quantity: 5000, unitPrice: getDefaultMaterialPrice(materials[0]) }]
+  });
 
-  // Add New Material Form State
-  const [showAddMaterialModal, setShowAddMaterialModal] = useState(false);
-  const [newMatName, setNewMatName] = useState('');
-  const [newMatType, setNewMatType] = useState<'offset' | 'gazetka' | 'coated'>('coated');
-  const [newMatUnit, setNewMatUnit] = useState('арк.');
-  const [newMatQty, setNewMatQty] = useState<number>(1000);
-  const [newMatPrice, setNewMatPrice] = useState<number>(0.60);
-  const [newMatSupplier, setNewMatSupplier] = useState('ТОВ Папір-Світ');
-  const [newMatMinStock, setNewMatMinStock] = useState<number>(500);
-  const [newMatLocation, setNewMatLocation] = useState('Стелаж А-1 (Папір)');
+  // Relocate modal
+  const [relocateTarget, setRelocateTarget] = useState<Material | null>(null);
+  const [relocateQty, setRelocateQty] = useState(500);
+  const [relocateTo, setRelocateTo] = useState('Цех друку (Оперативний)');
+  const [relocateReason, setRelocateReason] = useState('Передача матеріалу у виробничий цех');
 
-  // Sub-Tab Mock Datasets
-  const assemblies = [
-    { sku: 'V-501', name: 'Меню А4 з двосторонньою ламінацією', components: 'Крейдований папір 130г (3 шт) + Плівка A3 (2 шт)', price: '95 ₴', speed: '10 хв/шт' },
-    { sku: 'V-502', name: 'Книга А5 в м\'якій палітурці', components: 'Офсетний папір 70г (20 шт) + Клей (10г) + Картон 300г (1 шт)', price: '180 ₴', speed: '15 хв/шт' },
-    { sku: 'V-503', name: 'Візитки 100 шт на 350г папері', components: 'Папір 350г (2 шт) + пластиковий бокс (1 шт)', price: '250 ₴', speed: '5 хв/уп' }
-  ];
+  // Inline write-off form (in Spysannya tab)
+  const [writeoffForm, setWriteoffForm] = useState({
+    materialId: materials[0]?.id || '1',
+    quantity: 500,
+    dealId: '',
+    reason: 'Витрата паперу на приладку та тираж'
+  });
 
-  const receipts = [
-    { date: '2026-07-24', supplier: 'ТОВ Папір-Світ', item: 'Крейдований папір 130г (A1)', qty: '+1,500 шт', total: '1,275 ₴', status: 'Проведено' },
-    { date: '2026-07-23', supplier: 'Хімікалії та Тонери Вінниця', item: 'Тонер Canon C-EXV 21', qty: '+5 шт', total: '3,250 ₴', status: 'Проведено' }
-  ];
+  // Inline relocation form (in Peremishchennya tab)
+  const [inlineRelocateForm, setInlineRelocateForm] = useState({
+    materialId: materials[0]?.id || '1',
+    quantity: 500,
+    warehouseTo: 'Цех друку (Оперативний)',
+    reason: 'Внутрішнє переміщення по складу'
+  });
 
-  const getFolderForMaterial = (type?: string) => {
-    switch (type) {
-      case 'offset':
-      case 'gazetka':
-      case 'coated':
-        return 'Папір';
-      default:
-        return 'Інші товари';
-    }
-  };
+  // Return form (in Povernennya tab)
+  const [returnForm, setReturnForm] = useState({
+    mode: 'from_production' as 'from_production' | 'to_supplier',
+    materialId: materials[0]?.id || '1',
+    quantity: 250,
+    party: 'Цех друку №1',
+    reason: 'Повернення невикористаних листів після замовлення'
+  });
 
-  const categories = useMemo(() => [
-    { name: 'Папір', itemsCount: (materials || []).filter(m => getFolderForMaterial(m?.type) === 'Папір').length, location: 'Головний склад (Стелаж А)', manager: 'Вікторія' },
-    { name: 'Фарби та Тонери', itemsCount: (materials || []).filter(m => (m?.name || '').toLowerCase().includes('тонер')).length || 2, location: 'Склад фарб (Шафа Б)', manager: 'Сергій' },
-    { name: 'Форми та Майстер-плівки', itemsCount: 1, location: 'Шафа обладнання цеху', manager: 'Іван' },
-    { name: 'Палітурні матеріали', itemsCount: (materials || []).filter(m => (m?.name || '').toLowerCase().includes('пружина') || (m?.name || '').toLowerCase().includes('картон')).length || 2, location: 'Зона післядрукарської обробки', manager: 'Іван' }
-  ], [materials]);
+  // Stock reconciliation editable counts (map materialId -> string value)
+  const [countsMap, setCountsMap] = useState<Record<string, string>>({});
+  const [reconcileReason, setReconcileReason] = useState('Планова інвентаризація складу');
 
-  // Presets for fast 1-click material creation
-  const presets = [
-    {
-      title: '📄 Крейдований папір 150г',
-      name: 'Крейдований папір 150г (A1)',
-      type: 'coated' as const,
-      unit: 'арк.',
-      qty: 3000,
-      price: 0.65,
-      supplier: 'ТОВ Папір-Світ',
-      minStock: 1000,
-      location: 'Стелаж А-1 (Папір)'
-    },
-    {
-      title: '📜 Офсетний папір 80г',
-      name: 'Офсетний папір 80г (A1)',
-      type: 'offset' as const,
-      unit: 'арк.',
-      qty: 5000,
-      price: 0.35,
-      supplier: 'ТОВ Друк-Папір',
-      minStock: 2000,
-      location: 'Стелаж А-3 (Папір)'
-    },
-    {
-      title: '🏷️ Самоклейка Рафлатак',
-      name: 'Самоклейка Рафлатак матова (A1)',
-      type: 'coated' as const,
-      unit: 'арк.',
-      qty: 1500,
-      price: 1.20,
-      supplier: 'Рафлатак Україна',
-      minStock: 500,
-      location: 'Стелаж Б-1 (Стікери)'
-    },
-    {
-      title: '🖨️ Тонер Canon C-EXV',
-      name: 'Тонер Canon C-EXV чорний',
-      type: 'coated' as const,
-      unit: 'шт.',
-      qty: 10,
-      price: 850,
-      supplier: 'Канон Україна',
-      minStock: 3,
-      location: 'Шафа В-2 (Тонери)'
-    },
-    {
-      title: '✨ Плівка ламінації 30мкм',
-      name: 'Плівка для ламінації матова 30мкм',
-      type: 'coated' as const,
-      unit: 'рулон',
-      qty: 20,
-      price: 420,
-      supplier: 'Хім-Палітурка',
-      minStock: 5,
-      location: 'Зона ламінації'
-    },
-    {
-      title: '🌀 Пружина металева 6.4мм',
-      name: 'Пружина металева 6.4мм біла',
-      type: 'offset' as const,
-      unit: 'шт.',
-      qty: 3000,
-      price: 0.45,
-      supplier: 'Палітур-Сервіс',
-      minStock: 1000,
-      location: 'Зона післядруку'
-    }
-  ];
+  const getMinStock = (m: Material) => m.minStock ?? 500;
+  const getLocation = (m: Material) => m.location || 'Основний склад';
+  const getSupplier = (m: Material) => m.supplier || 'ПапірТрейд';
 
-  const applyPreset = (preset: typeof presets[0]) => {
-    setNewMatName(preset.name);
-    setNewMatType(preset.type);
-    setNewMatUnit(preset.unit);
-    setNewMatQty(preset.qty);
-    setNewMatPrice(preset.price);
-    setNewMatSupplier(preset.supplier);
-    setNewMatMinStock(preset.minStock);
-    setNewMatLocation(preset.location);
-  };
+  // KPIs
+  const kpis = useMemo(() => {
+    const totalValuation = materials.reduce((sum, m) => sum + m.quantity * getDefaultMaterialPrice(m), 0);
+    const totalReservedValue = materials.reduce((sum, m) => sum + m.reserved * getDefaultMaterialPrice(m), 0);
+    const lowStockCount = materials.filter(m => m.quantity - m.reserved <= getMinStock(m)).length;
+    const movementsCount = warehouseMovements.length;
+    return { totalValuation, totalReservedValue, lowStockCount, movementsCount };
+  }, [materials, warehouseMovements]);
 
-  const handleCreateMaterial = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newMatName.trim()) return;
-
-    addMaterial({
-      name: newMatName,
-      type: newMatType,
-      quantity: Number(newMatQty) || 0,
-      reserved: 0,
-      unit: newMatUnit,
-      price: Number(newMatPrice) || 0,
-      supplier: newMatSupplier,
-      minStock: Number(newMatMinStock) || 500,
-      location: newMatLocation,
-      salesLog: []
-    });
-
-    setShowAddMaterialModal(false);
-    // Reset form
-    setNewMatName('');
-    setNewMatQty(1000);
-    setNewMatPrice(0.60);
-  };
-
-  const handleDuplicate = (id: string, folderName: string) => {
-    const mat = materials.find(m => m.id === id);
-    if (!mat) return;
-    alert(`Товар "${mat.name}" успішно скопійовано до папки "${folderName}"`);
-  };
-
-  const handleBulkDuplicate = () => {
-    if (selectedMaterials.length === 0) {
-      alert('Будь ласка, оберіть товари для дублювання!');
-      return;
-    }
-    selectedMaterials.forEach(id => {
-      handleDuplicate(id, bulkFolderTarget);
-    });
-    setSelectedMaterials([]);
-    alert(`Здубльовано ${selectedMaterials.length} товарів у папку "${bulkFolderTarget}"`);
-  };
-
-  const handleSelectMaterial = (id: string) => {
-    if (selectedMaterials.includes(id)) {
-      setSelectedMaterials(selectedMaterials.filter(m => m !== id));
-    } else {
-      setSelectedMaterials([...selectedMaterials, id]);
-    }
-  };
-
-  const handleRelocateStock = (e: React.FormEvent) => {
-    e.preventDefault();
-    const material = materials.find(m => m.id === relocateMaterialId);
-    if (!material) return;
-
-    if (material.quantity < relocateQty) {
-      alert('Недостатньо матеріалу на складі відправника!');
-      return;
-    }
-
-    updateMaterialStock(relocateMaterialId, material.quantity - relocateQty);
-
-    const notificationMessage = `Переміщення товару: "${material.name}", кількість: ${relocateQty} ${material.unit}, надійшов з філіалу "${relocateFrom}" до "${relocateTo}"`;
-    addSystemNotification(notificationMessage);
-    alert('Переміщення успішно проведено та додано до журналу!');
-    setShowRelocateModal(false);
-  };
-
-  const handleRegisterMultiReceipt = (e: React.FormEvent) => {
-    e.preventDefault();
-    let loggedCount = 0;
-    multiReceiptRows.forEach(row => {
-      if (!row.materialId || row.quantity <= 0) return;
-      const mat = materials.find(m => m.id === row.materialId);
-      if (mat) {
-        updateMaterialStock(row.materialId, mat.quantity + row.quantity);
-        loggedCount += row.quantity;
-      }
-    });
-
-    if (loggedCount > 0) {
-      addSystemNotification(`Мультиприхід товарів від постачальника "${multiReceiptSupplier}": оприбутковано товари.`);
-      alert('Мультиприхід успішно проведено на склад!');
-    }
-    setShowMultiReceiptModal(false);
-    setMultiReceiptRows([{ materialId: materials[0]?.id || '', quantity: 100, price: 0 }]);
-  };
-
-  const addMultiReceiptRow = () => {
-    setMultiReceiptRows([...multiReceiptRows, { materialId: materials[0]?.id || '', quantity: 100, price: 0 }]);
-  };
-
-  const removeMultiReceiptRow = (idx: number) => {
-    if (multiReceiptRows.length > 1) {
-      setMultiReceiptRows(multiReceiptRows.filter((_, i) => i !== idx));
-    }
-  };
+  const warehousesList = useMemo(() => {
+    const set = new Set<string>(WAREHOUSE_ZONES);
+    materials.forEach(m => { if (m.location) set.add(m.location); });
+    return Array.from(set);
+  }, [materials]);
 
   const filteredMaterials = useMemo(() => {
-    return (materials || []).filter(m => {
-      const name = m?.name || '';
-      const id = m?.id || '';
-      const matchesSearch = name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                            id.toLowerCase().includes(searchQuery.toLowerCase());
-      
-      const matchesCategory = selectedCategory === 'all' || m?.type === selectedCategory;
-      
-      const minStock = m?.minStock || 1000;
-      const qty = m?.quantity || 0;
-      const matchesStock = selectedStockFilter === 'all' || 
-                           (selectedStockFilter === 'instock' && qty > minStock) ||
-                           (selectedStockFilter === 'lowstock' && qty <= minStock);
-      
-      return matchesSearch && matchesCategory && matchesStock;
+    return materials.filter(m => {
+      const q = searchQuery.toLowerCase();
+      const loc = getLocation(m);
+      const sup = getSupplier(m);
+      const matchSearch =
+        !q ||
+        m.name.toLowerCase().includes(q) ||
+        sup.toLowerCase().includes(q) ||
+        loc.toLowerCase().includes(q) ||
+        MATERIAL_TYPE_LABEL[m.type].toLowerCase().includes(q);
+      const matchWh = warehouseFilter === 'all' || loc === warehouseFilter;
+      const matchType = typeFilter === 'all' || m.type === typeFilter;
+      const free = m.quantity - m.reserved;
+      let matchPreset = true;
+      if (presetFilter === 'in_stock') matchPreset = free > 0;
+      else if (presetFilter === 'low_stock') matchPreset = free <= getMinStock(m);
+      else if (presetFilter === 'reserved') matchPreset = m.reserved > 0;
+      return matchSearch && matchWh && matchType && matchPreset;
     });
-  }, [materials, searchQuery, selectedCategory, selectedStockFilter]);
+  }, [materials, searchQuery, warehouseFilter, typeFilter, presetFilter]);
+
+  const totalPages = Math.max(1, Math.ceil(filteredMaterials.length / pageSize));
+  const safePage = Math.min(currentPage, totalPages);
+  const paginatedMaterials = filteredMaterials.slice((safePage - 1) * pageSize, safePage * pageSize);
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => (prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]));
+  };
+
+  const toggleSelectAll = () => {
+    const visibleIds = paginatedMaterials.map(m => m.id);
+    const allSelected = visibleIds.length > 0 && visibleIds.every(id => selectedIds.includes(id));
+    if (allSelected) {
+      setSelectedIds(prev => prev.filter(id => !visibleIds.includes(id)));
+    } else {
+      setSelectedIds(prev => Array.from(new Set([...prev, ...visibleIds])));
+    }
+  };
+
+  const handleExportCsv = () => {
+    const header = ['Код', 'Назва матеріалу', 'Група', 'Склад / Секція', 'Факт', 'Резерв', 'Доступно', 'Мін. поріг', 'Од.', 'Ціна ₴', 'Вартість ₴', 'Постачальник'];
+    const rows = filteredMaterials.map(m => {
+      const price = getDefaultMaterialPrice(m);
+      const free = m.quantity - m.reserved;
+      return [
+        `MAT-${m.id.padStart(3, '0')}`,
+        m.name,
+        MATERIAL_TYPE_LABEL[m.type],
+        getLocation(m),
+        String(m.quantity),
+        String(m.reserved),
+        String(free),
+        String(getMinStock(m)),
+        m.unit,
+        price.toFixed(2),
+        (m.quantity * price).toFixed(2),
+        getSupplier(m)
+      ];
+    });
+    const csv = '\uFEFF' + [header, ...rows].map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(';')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `sklad-zalyshky-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+    addSystemNotification('Експорт складу виконано у CSV');
+  };
+
+  const handleAddMaterialSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newMatForm.name.trim()) return;
+    addMaterial({
+      name: newMatForm.name.trim(),
+      type: newMatForm.type,
+      quantity: newMatForm.quantity,
+      reserved: 0,
+      unit: newMatForm.unit,
+      price: newMatForm.price,
+      supplier: newMatForm.supplier,
+      minStock: newMatForm.minStock,
+      location: newMatForm.location
+    });
+    setShowAddModal(false);
+    setNewMatForm({
+      name: '',
+      type: 'coated',
+      quantity: 5000,
+      minStock: 1000,
+      price: 0.65,
+      location: 'Основний склад',
+      supplier: 'ПапірТрейд',
+      unit: 'листів'
+    });
+  };
+
+  const handleMultiReceiptSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const validItems = receiptForm.items.filter(it => it.materialId && it.quantity > 0);
+    if (validItems.length === 0) return;
+
+    validItems.forEach(item => {
+      recordWarehouseMovement({
+        type: 'receipt',
+        materialId: item.materialId,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+        warehouseTo: receiptForm.warehouse,
+        party: receiptForm.supplier,
+        reason: receiptForm.docNote.trim() || `Надходження від ${receiptForm.supplier}`,
+        createFinanceRecord: receiptForm.createFinanceRecord,
+        financePaidImmediately: receiptForm.financePaidImmediately,
+        walletId: receiptForm.walletId
+      });
+    });
+
+    setShowReceiptModal(false);
+    setReceiptForm({
+      warehouse: 'Основний склад',
+      supplier: 'ПапірТрейд',
+      docNote: '',
+      createFinanceRecord: true,
+      financePaidImmediately: false,
+      walletId: wallets[0]?.id || 'w-bank-1',
+      items: [{ materialId: materials[0]?.id || '1', quantity: 5000, unitPrice: getDefaultMaterialPrice(materials[0]) }]
+    });
+  };
+
+  const handleRelocateSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!relocateTarget || relocateQty <= 0) return;
+    recordWarehouseMovement({
+      type: 'relocate',
+      materialId: relocateTarget.id,
+      quantity: relocateQty,
+      warehouseFrom: getLocation(relocateTarget),
+      warehouseTo: relocateTo,
+      reason: relocateReason
+    });
+    setRelocateTarget(null);
+  };
+
+  const handleInlineWriteoff = (e: React.FormEvent) => {
+    e.preventDefault();
+    const linkedOrder = orders.find(o => o.id === writeoffForm.dealId);
+    recordWarehouseMovement({
+      type: 'writeoff',
+      materialId: writeoffForm.materialId,
+      quantity: writeoffForm.quantity,
+      dealId: linkedOrder?.id,
+      dealName: linkedOrder ? `${linkedOrder.id} — ${linkedOrder.name}` : undefined,
+      reason: writeoffForm.reason
+    });
+    setWriteoffForm(prev => ({ ...prev, quantity: 500 }));
+  };
+
+  const handleInlineRelocate = (e: React.FormEvent) => {
+    e.preventDefault();
+    const mat = materials.find(m => m.id === inlineRelocateForm.materialId);
+    if (!mat) return;
+    recordWarehouseMovement({
+      type: 'relocate',
+      materialId: inlineRelocateForm.materialId,
+      quantity: inlineRelocateForm.quantity,
+      warehouseFrom: getLocation(mat),
+      warehouseTo: inlineRelocateForm.warehouseTo,
+      reason: inlineRelocateForm.reason
+    });
+  };
+
+  const handleReturnSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    const mat = materials.find(m => m.id === returnForm.materialId);
+    if (!mat || returnForm.quantity <= 0) return;
+    if (returnForm.mode === 'from_production') {
+      recordWarehouseMovement({
+        type: 'return',
+        materialId: returnForm.materialId,
+        quantity: returnForm.quantity,
+        warehouseTo: getLocation(mat),
+        party: returnForm.party || 'Виробництво',
+        reason: `Повернення на склад з виробництва: ${returnForm.reason}`
+      });
+    } else {
+      recordWarehouseMovement({
+        type: 'writeoff',
+        materialId: returnForm.materialId,
+        quantity: returnForm.quantity,
+        party: returnForm.party || getSupplier(mat),
+        reason: `Повернення браку постачальнику (${returnForm.party || getSupplier(mat)}): ${returnForm.reason}`
+      });
+    }
+  };
+
+  const handleSaveReconciliation = () => {
+    const items = Object.entries(countsMap)
+      .filter(([, val]) => val !== '' && !Number.isNaN(Number(val)))
+      .map(([materialId, val]) => ({
+        materialId,
+        actualQty: Math.max(0, Number(val)),
+        reason: reconcileReason
+      }));
+    if (items.length === 0) return;
+    reconcileWarehouseStock(items);
+    setCountsMap({});
+  };
+
+  const topTabs: Array<{ id: TopTab; label: string; count?: number }> = [
+    { id: 'zalyshki', label: 'Залишки', count: materials.length },
+    { id: 'oprybutkuvannya', label: 'Оприбуткування', count: warehouseMovements.filter(m => m.type === 'receipt').length },
+    { id: 'spysannya', label: 'Списання', count: warehouseMovements.filter(m => m.type === 'writeoff').length },
+    { id: 'peremishchennya', label: 'Переміщення', count: warehouseMovements.filter(m => m.type === 'relocate').length },
+    { id: 'inventaryzatsii', label: 'Інвентаризації', count: warehouseMovements.filter(m => m.type === 'reconciliation').length },
+    { id: 'povernennya', label: 'Потреби та повернення', count: kpis.lowStockCount },
+    { id: 'vyroby', label: 'Специфікації (BOM)', count: ASSEMBLY_SPECS.length },
+    { id: 'tovary', label: 'Зони зберігання' }
+  ];
+
+  const receiptTotalPreview = receiptForm.items.reduce((s, it) => s + (Number(it.quantity) || 0) * (Number(it.unitPrice) || 0), 0);
+
+  const renderMovementTable = (filterType?: WarehouseMovementType) => {
+    const list = filterType
+      ? warehouseMovements.filter(m => m.type === filterType)
+      : warehouseMovements;
+    const searched = list.filter(m => {
+      if (!searchQuery) return true;
+      const q = searchQuery.toLowerCase();
+      return (
+        m.materialName.toLowerCase().includes(q) ||
+        (m.party && m.party.toLowerCase().includes(q)) ||
+        (m.dealName && m.dealName.toLowerCase().includes(q)) ||
+        (m.reason && m.reason.toLowerCase().includes(q))
+      );
+    });
+
+    return (
+      <div className="ios-table-container">
+        <table className="ios-table">
+          <thead>
+            <tr>
+              <th>Дата / Док</th>
+              <th>Тип операції</th>
+              <th>Матеріал</th>
+              <th style={{ textAlign: 'right' }}>Зміна / К-ть</th>
+              <th style={{ textAlign: 'right' }}>Сума</th>
+              <th>Контрагент / Угода / Секція</th>
+              <th>Коментар</th>
+              <th>Відповідальний</th>
+            </tr>
+          </thead>
+          <tbody>
+            {searched.length === 0 ? (
+              <tr>
+                <td colSpan={8} style={{ textAlign: 'center', padding: '28px', color: 'var(--text-medium)' }}>
+                  Немає записів за обраним фільтром
+                </td>
+              </tr>
+            ) : (
+              searched.map(mov => {
+                const badge = MOVEMENT_LABELS[mov.type] || MOVEMENT_LABELS.receipt;
+                const displayDelta = mov.quantityChange !== 0 ? mov.quantityChange : mov.quantity;
+                const isNegative = mov.quantityChange < 0 || mov.type === 'writeoff';
+                return (
+                  <tr key={mov.id}>
+                    <td>
+                      <div style={{ fontWeight: 600, fontSize: '12px' }}>{mov.id}</div>
+                      <div style={{ fontSize: '11px', color: 'var(--text-medium)' }}>{mov.date}</div>
+                    </td>
+                    <td>
+                      <span
+                        className="ios-badge"
+                        style={{ backgroundColor: badge.bg, color: badge.color, fontWeight: 600 }}
+                      >
+                        {badge.label}
+                      </span>
+                    </td>
+                    <td style={{ fontWeight: 600 }}>{mov.materialName}</td>
+                    <td
+                      style={{
+                        textAlign: 'right',
+                        fontFamily: 'var(--font-mono)',
+                        fontWeight: 700,
+                        color: isNegative ? '#dc2626' : '#059669'
+                      }}
+                    >
+                      {displayDelta > 0 ? `+${displayDelta.toLocaleString('uk-UA')}` : displayDelta.toLocaleString('uk-UA')} {mov.unit}
+                    </td>
+                    <td style={{ textAlign: 'right', fontFamily: 'var(--font-mono)' }}>
+                      {formatMoney(mov.totalSum)}
+                    </td>
+                    <td style={{ fontSize: '12px' }}>
+                      {mov.dealName && <div style={{ fontWeight: 600, color: 'var(--primary)' }}>{mov.dealName}</div>}
+                      {mov.party && <div>{mov.party}</div>}
+                      {(mov.warehouseFrom || mov.warehouseTo) && (
+                        <div style={{ color: 'var(--text-medium)' }}>
+                          {mov.warehouseFrom ? `${mov.warehouseFrom} -> ` : ''}
+                          {mov.warehouseTo || ''}
+                        </div>
+                      )}
+                    </td>
+                    <td style={{ fontSize: '12px', color: 'var(--text-medium)', maxWidth: '240px' }}>{mov.reason}</td>
+                    <td style={{ fontSize: '12px' }}>{mov.employee}</td>
+                  </tr>
+                );
+              })
+            )}
+          </tbody>
+        </table>
+      </div>
+    );
+  };
 
   return (
-    <div className="main-content" style={{ backgroundColor: 'var(--bg-system)' }}>
-      <div className="header-title-container">
+    <div className="main-content" style={{ paddingBottom: '40px' }}>
+      <div className="header-title-container" style={{ marginBottom: '16px' }}>
         <div>
-          <h1 className="page-title">Склад матеріалів та номенклатури</h1>
-          <p className="subtitle">Повний контроль залишків, резервів, цін закупівлі та складських комірок</p>
+          <h1 className="page-title" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            Складський облік та ТМЦ
+          </h1>
+          <p className="subtitle">
+            Оцінка залишків, облік резервів під замовлення, рух матеріалів, списання та інвентаризація
+          </p>
+        </div>
+        <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+          <button
+            className="ios-btn ios-btn-secondary"
+            onClick={() => setShowReceiptModal(true)}
+            style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+          >
+            <ArrowDownToLine size={16} /> Оприбуткувати партію
+          </button>
+          <button
+            className="ios-btn ios-btn-primary"
+            onClick={() => setShowAddModal(true)}
+            style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+          >
+            <Plus size={16} /> Нова номенклатура
+          </button>
+          <button
+            className="ios-btn ios-btn-secondary"
+            onClick={handleExportCsv}
+            style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
+          >
+            <Download size={16} /> Експорт CSV
+          </button>
+        </div>
+      </div>
+
+      {/* KPI Strip */}
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))',
+          gap: '12px',
+          marginBottom: '18px'
+        }}
+      >
+        <div className="ios-card" style={{ padding: '14px 16px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+            <span style={{ fontSize: '12px', color: 'var(--text-medium)', fontWeight: 600 }}>Вартість складу (Рах. 201)</span>
+            <Wallet size={16} color="var(--primary)" />
+          </div>
+          <div style={{ fontSize: '20px', fontWeight: 700, fontFamily: 'var(--font-mono)' }}>
+            {formatMoney(kpis.totalValuation)}
+          </div>
+          <div style={{ fontSize: '11px', color: 'var(--text-medium)', marginTop: '4px' }}>
+            {materials.length} позицій у номенклатурі
+          </div>
         </div>
 
-        <button 
-          type="button" 
-          onClick={() => setShowAddMaterialModal(true)}
-          className="ios-btn ios-btn-primary"
-          style={{ display: 'flex', alignItems: 'center', gap: '6px' }}
-        >
-          <Plus size={14} />
-          Додати товар на склад
-        </button>
-      </div>
+        <div className="ios-card" style={{ padding: '14px 16px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+            <span style={{ fontSize: '12px', color: 'var(--text-medium)', fontWeight: 600 }}>Вартість у резерві</span>
+            <Package size={16} color="#0284c7" />
+          </div>
+          <div style={{ fontSize: '20px', fontWeight: 700, fontFamily: 'var(--font-mono)', color: '#0284c7' }}>
+            {formatMoney(kpis.totalReservedValue)}
+          </div>
+          <div style={{ fontSize: '11px', color: 'var(--text-medium)', marginTop: '4px' }}>
+            Заблоковано під активні тиражі
+          </div>
+        </div>
 
-      {/* Sub-tabs inside Warehouse */}
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        backgroundColor: '#e5e5ea',
-        padding: '3px',
-        borderRadius: '10px',
-        marginBottom: '16px',
-        overflowX: 'auto',
-        position: 'relative',
-        zIndex: 1,
-        minHeight: '40px'
-      }}>
-        {(['zalyshki', 'vyroby', 'oprybutkuvannya', 'spysannya', 'peremishchennya', 'inventaryzatsii', 'povernennya', 'tovary'] as const).map(tab => (
-          <button 
-            key={tab}
-            type="button"
-            onClick={() => setActiveTab(tab)}
-            className="ios-btn"
+        <div
+          className="ios-card"
+          style={{ padding: '14px 16px', cursor: 'pointer' }}
+          onClick={() => setActiveTab('povernennya')}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+            <span style={{ fontSize: '12px', color: 'var(--text-medium)', fontWeight: 600 }}>Позицій у дефіциті</span>
+            <AlertTriangle size={16} color={kpis.lowStockCount > 0 ? '#dc2626' : '#059669'} />
+          </div>
+          <div
             style={{
-              flexGrow: 1,
-              padding: '7px 14px',
-              fontSize: '11px',
-              borderRadius: '7px',
-              backgroundColor: activeTab === tab ? '#ffffff' : 'transparent',
-              color: activeTab === tab ? 'var(--primary)' : '#1c1c1e',
-              boxShadow: activeTab === tab ? '0 1px 4px rgba(0,0,0,0.12)' : 'none',
-              fontWeight: activeTab === tab ? '800' : '600',
-              whiteSpace: 'nowrap',
-              transition: 'all 0.15s ease'
+              fontSize: '20px',
+              fontWeight: 700,
+              fontFamily: 'var(--font-mono)',
+              color: kpis.lowStockCount > 0 ? '#dc2626' : '#059669'
             }}
           >
-            {tab === 'zalyshki' ? `Залишки (${materials.length})` : 
-             tab === 'vyroby' ? 'Вироби / Прайс' : 
-             tab === 'oprybutkuvannya' ? 'Оприбуткування' : 
-             tab === 'spysannya' ? 'Списання' : 
-             tab === 'peremishchennya' ? 'Переміщення' : 
-             tab === 'inventaryzatsii' ? 'Інвентаризації' : 
-             tab === 'povernennya' ? 'Повернення' : 'Папки / Склади'}
-          </button>
-        ))}
+            {kpis.lowStockCount} поз.
+          </div>
+          <div style={{ fontSize: '11px', color: 'var(--text-medium)', marginTop: '4px' }}>
+            Натисніть для перегляду заявок постачальникам
+          </div>
+        </div>
+
+        <div className="ios-card" style={{ padding: '14px 16px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+            <span style={{ fontSize: '12px', color: 'var(--text-medium)', fontWeight: 600 }}>Журнал руху ТМЦ</span>
+            <ClipboardCheck size={16} color="#7c3aed" />
+          </div>
+          <div style={{ fontSize: '20px', fontWeight: 700, fontFamily: 'var(--font-mono)' }}>
+            {kpis.movementsCount} док.
+          </div>
+          <div style={{ fontSize: '11px', color: 'var(--text-medium)', marginTop: '4px' }}>
+            Повна історія приходу, витрат і звірок
+          </div>
+        </div>
       </div>
 
+      {/* Top Navigation Tabs */}
+      <div
+        className="ios-card"
+        style={{
+          padding: '6px',
+          marginBottom: '16px',
+          display: 'flex',
+          gap: '4px',
+          overflowX: 'auto',
+          flexWrap: 'wrap'
+        }}
+      >
+        {topTabs.map(tab => {
+          const active = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              style={{
+                border: 'none',
+                background: active ? 'var(--primary)' : 'transparent',
+                color: active ? '#fff' : 'var(--text-dark)',
+                padding: '8px 13px',
+                borderRadius: '8px',
+                fontSize: '13px',
+                fontWeight: active ? 600 : 500,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                whiteSpace: 'nowrap'
+              }}
+            >
+              <span>{tab.label}</span>
+              {typeof tab.count === 'number' && (
+                <span
+                  style={{
+                    fontSize: '11px',
+                    padding: '1px 6px',
+                    borderRadius: '10px',
+                    background: active ? 'rgba(255,255,255,0.22)' : 'var(--bg-card-subtle)',
+                    color: active ? '#fff' : 'var(--text-medium)'
+                  }}
+                >
+                  {tab.count}
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* TAB 1: ZALYSHKI */}
       {activeTab === 'zalyshki' && (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-          
-          {/* Quick Search & Filters Bar */}
-          <div className="ios-card bg-white" style={{ display: 'flex', gap: '12px', padding: '12px 16px', alignItems: 'center', flexWrap: 'wrap' }}>
-            <div style={{ position: 'relative', width: '220px' }}>
-              <Search style={{ position: 'absolute', left: '10px', top: '9px', color: '#94a3b8' }} size={14} />
-              <input 
-                placeholder="Швидкий пошук товару..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                style={{ paddingLeft: '32px', height: '32px', fontSize: '12px', width: '100%' }}
-              />
-            </div>
+        <div className="ios-card" style={{ padding: '16px' }}>
+          <div
+            style={{
+              display: 'flex',
+              flexWrap: 'wrap',
+              gap: '10px',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginBottom: '14px'
+            }}
+          >
+            <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', flex: 1, minWidth: '280px' }}>
+              <div style={{ position: 'relative', flex: '1 1 240px' }}>
+                <Search
+                  size={15}
+                  style={{ position: 'absolute', left: '10px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-medium)' }}
+                />
+                <input
+                  type="text"
+                  className="ios-input"
+                  placeholder="Пошук за назвою, групою або постачальником..."
+                  value={searchQuery}
+                  onChange={e => { setSearchQuery(e.target.value); setCurrentPage(1); }}
+                  style={{ paddingLeft: '32px', width: '100%' }}
+                />
+              </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', color: '#64748b' }}>
-              <span>Тип:</span>
-              <select 
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                style={{ height: '32px', fontSize: '12px', width: '140px' }}
+              <select
+                className="ios-input"
+                value={typeFilter}
+                onChange={e => { setTypeFilter(e.target.value as 'all' | Material['type']); setCurrentPage(1); }}
+                style={{ minWidth: '160px' }}
               >
-                <option value="all">Всі матеріали</option>
-                <option value="offset">Офсетний папір</option>
-                <option value="gazetka">Газетний папір</option>
-                <option value="coated">Крейдований папір</option>
+                <option value="all">Всі групи матеріалів</option>
+                <option value="coated">Крейдований</option>
+                <option value="offset">Офсетний / Картон</option>
+                <option value="gazetka">Газетний / Спец.</option>
+              </select>
+
+              <select
+                className="ios-input"
+                value={warehouseFilter}
+                onChange={e => { setWarehouseFilter(e.target.value); setCurrentPage(1); }}
+                style={{ minWidth: '170px' }}
+              >
+                <option value="all">Всі склади / зони</option>
+                {warehousesList.map(w => (
+                  <option key={w} value={w}>{w}</option>
+                ))}
               </select>
             </div>
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', fontWeight: '700', textTransform: 'uppercase', color: '#64748b' }}>
-              <span>Статус:</span>
-              <select 
-                value={selectedStockFilter}
-                onChange={(e) => setSelectedStockFilter(e.target.value as any)}
-                style={{ height: '32px', fontSize: '12px', width: '140px' }}
-              >
-                <option value="all">Всі записи</option>
-                <option value="instock">В достатку</option>
-                <option value="lowstock">Низький залишок</option>
-              </select>
-            </div>
-
-            <div style={{ display: 'flex', gap: '6px', marginLeft: 'auto' }}>
+            <div style={{ display: 'flex', gap: '6px', flexWrap: 'wrap' }}>
+              {[
+                { id: 'all', label: 'Усі' },
+                { id: 'in_stock', label: 'В наявності' },
+                { id: 'reserved', label: 'З резервом' },
+                { id: 'low_stock', label: 'Дефіцит' }
+              ].map(p => (
+                <button
+                  key={p.id}
+                  onClick={() => { setPresetFilter(p.id as typeof presetFilter); setCurrentPage(1); }}
+                  className={presetFilter === p.id ? 'ios-btn ios-btn-primary ios-btn-small' : 'ios-btn ios-btn-secondary ios-btn-small'}
+                >
+                  {p.label}
+                </button>
+              ))}
               <button
-                type="button"
-                onClick={() => setShowMultiReceiptModal(true)}
-                className="ios-btn ios-btn-primary ios-btn-small"
-                style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
-              >
-                <Plus size={13} />
-                Мультиприхід
-              </button>
-              <button
-                type="button"
-                onClick={() => setShowRelocateModal(true)}
                 className="ios-btn ios-btn-secondary ios-btn-small"
-                style={{ display: 'flex', alignItems: 'center', gap: '4px' }}
+                title="Скинути фільтри"
+                onClick={() => {
+                  setSearchQuery('');
+                  setTypeFilter('all');
+                  setWarehouseFilter('all');
+                  setPresetFilter('all');
+                }}
               >
-                <ArrowLeftRight size={13} />
-                Перемістити
+                <RefreshCw size={14} />
               </button>
             </div>
           </div>
 
-          {/* Mass Duplication panel */}
-          {selectedMaterials.length > 0 && (
-            <div className="ios-card bg-slate-50 flex items-center justify-between py-3 px-4 border border-blue-200">
-              <span className="text-xs font-bold text-slate-700">Осталось обрано: {selectedMaterials.length} товарів</span>
-              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                <select 
-                  value={bulkFolderTarget}
-                  onChange={(e) => setBulkFolderTarget(e.target.value)}
-                  style={{ height: '28px', fontSize: '11px', width: '130px' }}
+          <div className="ios-table-container">
+            <table className="ios-table">
+              <thead>
+                <tr>
+                  <th style={{ width: '36px' }}>
+                    <input
+                      type="checkbox"
+                      checked={paginatedMaterials.length > 0 && paginatedMaterials.every(m => selectedIds.includes(m.id))}
+                      onChange={toggleSelectAll}
+                    />
+                  </th>
+                  <th>Код / Матеріал</th>
+                  <th>Секція</th>
+                  <th style={{ textAlign: 'right' }}>Факт</th>
+                  <th style={{ textAlign: 'right' }}>Резерв</th>
+                  <th style={{ textAlign: 'right' }}>Доступно</th>
+                  <th style={{ textAlign: 'right' }}>Ціна за од.</th>
+                  <th style={{ textAlign: 'right' }}>Сума (₴)</th>
+                  <th style={{ textAlign: 'right' }}>Дії</th>
+                </tr>
+              </thead>
+              <tbody>
+                {paginatedMaterials.length === 0 ? (
+                  <tr>
+                    <td colSpan={9} style={{ textAlign: 'center', padding: '28px', color: 'var(--text-medium)' }}>
+                      Матеріалів за заданим фільтром не знайдено
+                    </td>
+                  </tr>
+                ) : (
+                  paginatedMaterials.map(m => {
+                    const free = m.quantity - m.reserved;
+                    const minStock = getMinStock(m);
+                    const isLow = free <= minStock;
+                    const price = getDefaultMaterialPrice(m);
+                    const totalVal = m.quantity * price;
+                    return (
+                      <tr key={m.id}>
+                        <td>
+                          <input
+                            type="checkbox"
+                            checked={selectedIds.includes(m.id)}
+                            onChange={() => toggleSelect(m.id)}
+                          />
+                        </td>
+                        <td>
+                          <div
+                            onClick={() => setDetailMaterial(m)}
+                            style={{ fontWeight: 600, cursor: 'pointer', color: 'var(--primary)' }}
+                          >
+                            {m.name}
+                          </div>
+                          <div style={{ fontSize: '11px', color: 'var(--text-medium)' }}>
+                            MAT-{m.id.padStart(3, '0')} · {MATERIAL_TYPE_LABEL[m.type]} · {getSupplier(m)}
+                          </div>
+                        </td>
+                        <td style={{ fontSize: '12px' }}>{getLocation(m)}</td>
+                        <td style={{ textAlign: 'right', fontFamily: 'var(--font-mono)', fontWeight: 600 }}>
+                          {m.quantity.toLocaleString('uk-UA')} {m.unit}
+                        </td>
+                        <td style={{ textAlign: 'right', fontFamily: 'var(--font-mono)', color: m.reserved > 0 ? '#0284c7' : 'var(--text-medium)' }}>
+                          {m.reserved.toLocaleString('uk-UA')}
+                        </td>
+                        <td style={{ textAlign: 'right', fontFamily: 'var(--font-mono)', fontWeight: 700, color: isLow ? '#dc2626' : '#059669' }}>
+                          {free.toLocaleString('uk-UA')}
+                          {isLow && (
+                            <div style={{ fontSize: '10px', fontWeight: 600, color: '#dc2626' }}>
+                              Мін: {minStock.toLocaleString('uk-UA')}
+                            </div>
+                          )}
+                        </td>
+                        <td style={{ textAlign: 'right', fontFamily: 'var(--font-mono)', fontSize: '12px' }}>
+                          {price.toFixed(2)} ₴
+                        </td>
+                        <td style={{ textAlign: 'right', fontFamily: 'var(--font-mono)', fontWeight: 600 }}>
+                          {formatMoney(totalVal)}
+                        </td>
+                        <td style={{ textAlign: 'right' }}>
+                          <div style={{ display: 'inline-flex', gap: '4px' }}>
+                            <button
+                              className="ios-btn ios-btn-secondary ios-btn-small"
+                              title="Картка та історія руху"
+                              onClick={() => setDetailMaterial(m)}
+                            >
+                              <Info size={14} />
+                            </button>
+                            <button
+                              className="ios-btn ios-btn-secondary ios-btn-small"
+                              title="Перемістити"
+                              onClick={() => {
+                                setRelocateTarget(m);
+                                setRelocateQty(Math.min(500, Math.max(1, m.quantity)));
+                                setRelocateTo(getLocation(m) === 'Основний склад' ? 'Цех друку (Оперативний)' : 'Основний склад');
+                              }}
+                            >
+                              <ArrowLeftRight size={14} />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px', flexWrap: 'wrap', gap: '10px' }}>
+            <div style={{ fontSize: '12px', color: 'var(--text-medium)' }}>
+              Показано {paginatedMaterials.length} з {filteredMaterials.length} позицій
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <select
+                className="ios-input"
+                value={pageSize}
+                onChange={e => { setPageSize(Number(e.target.value)); setCurrentPage(1); }}
+                style={{ padding: '4px 8px', fontSize: '12px' }}
+              >
+                <option value={10}>10 / стор.</option>
+                <option value={20}>20 / стор.</option>
+                <option value={50}>50 / стор.</option>
+              </select>
+              <button className="ios-btn ios-btn-secondary ios-btn-small" disabled={safePage <= 1} onClick={() => setCurrentPage(1)}>
+                <ChevronsLeft size={14} />
+              </button>
+              <button className="ios-btn ios-btn-secondary ios-btn-small" disabled={safePage <= 1} onClick={() => setCurrentPage(p => Math.max(1, p - 1))}>
+                <ChevronLeft size={14} />
+              </button>
+              <span style={{ fontSize: '12px', padding: '0 6px' }}>
+                {safePage} / {totalPages}
+              </span>
+              <button className="ios-btn ios-btn-secondary ios-btn-small" disabled={safePage >= totalPages} onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}>
+                <ChevronRight size={14} />
+              </button>
+              <button className="ios-btn ios-btn-secondary ios-btn-small" disabled={safePage >= totalPages} onClick={() => setCurrentPage(totalPages)}>
+                <ChevronsRight size={14} />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TAB 2: OPRYBUTKUVANNYA */}
+      {activeTab === 'oprybutkuvannya' && (
+        <div className="ios-card" style={{ padding: '16px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '10px' }}>
+            <div>
+              <h3 style={{ margin: 0, fontSize: '16px' }}>Журнал оприбуткувань від постачальників</h3>
+              <div style={{ fontSize: '12px', color: 'var(--text-medium)' }}>
+                Кожне надходження оновлює склад і за потреби формує проводку Дт 201 — Кт 631 у Бухгалтерії
+              </div>
+            </div>
+            <button className="ios-btn ios-btn-primary" onClick={() => setShowReceiptModal(true)} style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Plus size={16} /> Оприбуткувати прихід
+            </button>
+          </div>
+          {renderMovementTable('receipt')}
+        </div>
+      )}
+
+      {/* TAB 3: SPYSANNYA */}
+      {activeTab === 'spysannya' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div className="ios-card" style={{ padding: '16px' }}>
+            <h3 style={{ margin: '0 0 12px 0', fontSize: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <ArrowUpFromLine size={18} color="#dc2626" /> Оформити списання матеріалу (під замовлення або технологічний брак)
+            </h3>
+            <form onSubmit={handleInlineWriteoff} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px', alignItems: 'end' }}>
+              <div className="ios-input-group" style={{ marginBottom: 0 }}>
+                <label className="ios-label">Матеріал</label>
+                <select
+                  className="ios-input"
+                  value={writeoffForm.materialId}
+                  onChange={e => setWriteoffForm(prev => ({ ...prev, materialId: e.target.value }))}
                 >
-                  <option value="Папір">Папка: Папір</option>
-                  <option value="Фарби та Тонери">Папка: Фарби</option>
-                  <option value="Палітурні матеріали">Папка: Палітурка</option>
+                  {materials.map(m => (
+                    <option key={m.id} value={m.id}>
+                      {m.name} (Залишок: {m.quantity} {m.unit})
+                    </option>
+                  ))}
                 </select>
-                <button type="button" onClick={handleBulkDuplicate} className="ios-btn ios-btn-primary ios-btn-small flex items-center gap-1">
-                  <Copy size={11} />
-                  Копіювати в папку
+              </div>
+              <div className="ios-input-group" style={{ marginBottom: 0 }}>
+                <label className="ios-label">Кількість</label>
+                <input
+                  type="number"
+                  min={1}
+                  className="ios-input"
+                  value={writeoffForm.quantity}
+                  onChange={e => setWriteoffForm(prev => ({ ...prev, quantity: Math.max(1, Number(e.target.value)) }))}
+                />
+              </div>
+              <div className="ios-input-group" style={{ marginBottom: 0 }}>
+                <label className="ios-label">Прив’язка до угоди (необов’язково)</label>
+                <select
+                  className="ios-input"
+                  value={writeoffForm.dealId}
+                  onChange={e => setWriteoffForm(prev => ({ ...prev, dealId: e.target.value }))}
+                >
+                  <option value="">Загальновиробничі витрати / Приладка</option>
+                  {orders.map(o => {
+                    const cName = clients.find(c => c.id === o.clientId)?.name || 'Клієнт';
+                    return (
+                      <option key={o.id} value={o.id}>
+                        {o.id} — {o.name} ({cName})
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
+              <div className="ios-input-group" style={{ marginBottom: 0 }}>
+                <label className="ios-label">Причина списання</label>
+                <input
+                  type="text"
+                  className="ios-input"
+                  value={writeoffForm.reason}
+                  onChange={e => setWriteoffForm(prev => ({ ...prev, reason: e.target.value }))}
+                />
+              </div>
+              <button type="submit" className="ios-btn ios-btn-primary" style={{ backgroundColor: '#dc2626' }}>
+                Провести списання
+              </button>
+            </form>
+          </div>
+
+          <div className="ios-card" style={{ padding: '16px' }}>
+            <h3 style={{ margin: '0 0 12px 0', fontSize: '16px' }}>Журнал списань у виробництво</h3>
+            {renderMovementTable('writeoff')}
+          </div>
+        </div>
+      )}
+
+      {/* TAB 4: PEREMISHCHENNYA */}
+      {activeTab === 'peremishchennya' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div className="ios-card" style={{ padding: '16px' }}>
+            <h3 style={{ margin: '0 0 12px 0', fontSize: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <ArrowLeftRight size={18} color="#2563eb" /> Внутрішнє переміщення між зонами зберігання
+            </h3>
+            <form onSubmit={handleInlineRelocate} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '12px', alignItems: 'end' }}>
+              <div className="ios-input-group" style={{ marginBottom: 0 }}>
+                <label className="ios-label">Матеріал</label>
+                <select
+                  className="ios-input"
+                  value={inlineRelocateForm.materialId}
+                  onChange={e => setInlineRelocateForm(prev => ({ ...prev, materialId: e.target.value }))}
+                >
+                  {materials.map(m => (
+                    <option key={m.id} value={m.id}>
+                      {m.name} ({getLocation(m)})
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="ios-input-group" style={{ marginBottom: 0 }}>
+                <label className="ios-label">Кількість</label>
+                <input
+                  type="number"
+                  min={1}
+                  className="ios-input"
+                  value={inlineRelocateForm.quantity}
+                  onChange={e => setInlineRelocateForm(prev => ({ ...prev, quantity: Math.max(1, Number(e.target.value)) }))}
+                />
+              </div>
+              <div className="ios-input-group" style={{ marginBottom: 0 }}>
+                <label className="ios-label">Куди перемістити</label>
+                <select
+                  className="ios-input"
+                  value={inlineRelocateForm.warehouseTo}
+                  onChange={e => setInlineRelocateForm(prev => ({ ...prev, warehouseTo: e.target.value }))}
+                >
+                  {WAREHOUSE_ZONES.map(z => (
+                    <option key={z} value={z}>{z}</option>
+                  ))}
+                </select>
+              </div>
+              <div className="ios-input-group" style={{ marginBottom: 0 }}>
+                <label className="ios-label">Примітка</label>
+                <input
+                  type="text"
+                  className="ios-input"
+                  value={inlineRelocateForm.reason}
+                  onChange={e => setInlineRelocateForm(prev => ({ ...prev, reason: e.target.value }))}
+                />
+              </div>
+              <button type="submit" className="ios-btn ios-btn-primary">
+                Перемістити
+              </button>
+            </form>
+          </div>
+
+          <div className="ios-card" style={{ padding: '16px' }}>
+            <h3 style={{ margin: '0 0 12px 0', fontSize: '16px' }}>Журнал переміщень</h3>
+            {renderMovementTable('relocate')}
+          </div>
+        </div>
+      )}
+
+      {/* TAB 5: INVENTARYZATSII */}
+      {activeTab === 'inventaryzatsii' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div className="ios-card" style={{ padding: '16px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', flexWrap: 'wrap', gap: '10px' }}>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '16px' }}>Відомість інвентаризації (Звірка фактичних залишків)</h3>
+                <div style={{ fontSize: '12px', color: 'var(--text-medium)' }}>
+                  Вкажіть фактичний перерахований залишок — система автоматично розрахує надлишок або нестачу в штуках та гривнях і проведе коригування
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                <input
+                  type="text"
+                  className="ios-input"
+                  placeholder="Акт / Причина інвентаризації"
+                  value={reconcileReason}
+                  onChange={e => setReconcileReason(e.target.value)}
+                  style={{ minWidth: '240px' }}
+                />
+                <button
+                  className="ios-btn ios-btn-primary"
+                  disabled={Object.keys(countsMap).length === 0}
+                  onClick={handleSaveReconciliation}
+                >
+                  Провести інвентаризацію
                 </button>
               </div>
             </div>
-          )}
 
-          {/* Warehouse Table - Detailed Informative View */}
-          <div className="ios-card" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)', padding: 0, overflow: 'hidden' }}>
             <div className="ios-table-container">
               <table className="ios-table">
                 <thead>
                   <tr>
-                    <th style={{ width: '40px', color: 'var(--text-medium)' }}><CheckSquare size={13} /></th>
-                    <th style={{ width: '80px', color: 'var(--text-medium)' }}>Код</th>
-                    <th style={{ color: 'var(--text-medium)' }}>Найменування номенклатури</th>
-                    <th style={{ color: 'var(--text-medium)' }}>Складська локація</th>
-                    <th style={{ width: '110px', textAlign: 'right', color: 'var(--text-medium)' }}>Закупівельна ціна</th>
-                    <th style={{ width: '100px', textAlign: 'right', color: 'var(--text-medium)' }}>Залишок</th>
-                    <th style={{ width: '100px', textAlign: 'right', color: 'var(--text-medium)' }}>Резерв</th>
-                    <th style={{ width: '110px', textAlign: 'right', color: 'var(--text-medium)' }}>Доступно</th>
-                    <th style={{ width: '100px', textAlign: 'center', color: 'var(--text-medium)' }}>Статус</th>
-                    <th style={{ width: '150px', textAlign: 'center', color: 'var(--text-medium)' }}>Дії</th>
+                    <th>Матеріал</th>
+                    <th>Склад</th>
+                    <th style={{ textAlign: 'right' }}>Обліковий залишок</th>
+                    <th style={{ textAlign: 'right', width: '160px' }}>Факт (перерахунок)</th>
+                    <th style={{ textAlign: 'right' }}>Відхилення (к-ть)</th>
+                    <th style={{ textAlign: 'right' }}>Відхилення (₴)</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredMaterials.map((m) => {
-                    const minStock = m.minStock || 1000;
-                    const available = m.quantity - m.reserved;
-                    const isCritical = available <= 0;
-                    const isLow = available <= minStock;
-                    const folder = getFolderForMaterial(m.type);
-                    const unitPrice = m.price || 0.60;
-                    const loc = m.location || `Стелаж ${m.type === 'offset' ? 'А' : m.type === 'coated' ? 'Б' : 'В'}`;
-                    const typeLabel = m.type === 'offset' ? 'Офсетний' : m.type === 'coated' ? 'Крейдований' : 'Газетний';
-
+                  {materials.map(m => {
+                    const rawVal = countsMap[m.id];
+                    const hasVal = rawVal !== undefined && rawVal !== '';
+                    const parsedVal = hasVal ? Number(rawVal) : m.quantity;
+                    const diffQty = hasVal ? parsedVal - m.quantity : 0;
+                    const price = getDefaultMaterialPrice(m);
+                    const diffSum = diffQty * price;
                     return (
-                      <tr key={m.id} style={{ borderBottom: '1px solid var(--border-light)' }}>
+                      <tr key={m.id}>
                         <td>
-                          <input 
-                            type="checkbox"
-                            checked={selectedMaterials.includes(m.id)}
-                            onChange={() => handleSelectMaterial(m.id)}
+                          <div style={{ fontWeight: 600 }}>{m.name}</div>
+                          <div style={{ fontSize: '11px', color: 'var(--text-medium)' }}>{MATERIAL_TYPE_LABEL[m.type]} · {price.toFixed(2)} ₴/{m.unit}</div>
+                        </td>
+                        <td style={{ fontSize: '12px' }}>{getLocation(m)}</td>
+                        <td style={{ textAlign: 'right', fontFamily: 'var(--font-mono)' }}>
+                          {m.quantity.toLocaleString('uk-UA')} {m.unit}
+                        </td>
+                        <td style={{ textAlign: 'right' }}>
+                          <input
+                            type="number"
+                            min={0}
+                            className="ios-input"
+                            placeholder={String(m.quantity)}
+                            value={rawVal ?? ''}
+                            onChange={e => setCountsMap(prev => ({ ...prev, [m.id]: e.target.value }))}
+                            style={{ width: '125px', textAlign: 'right', fontFamily: 'var(--font-mono)' }}
                           />
                         </td>
-                        <td style={{ fontWeight: '600', color: 'var(--text-medium)', fontFamily: 'var(--font-mono)' }}>#{m.id}</td>
-                        <td>
-                          {/* Clickable material name: triggers journal/detail modal view */}
-                          <div 
-                            onClick={() => setSelectedMaterialForLog(m)} 
-                            style={{ fontWeight: '800', color: 'var(--primary)', cursor: 'pointer', textDecoration: 'underline' }}
-                            title="Клацніть для перегляду деталей та журналу руху товару"
-                          >
-                            {m.name}
-                          </div>
-                          <div style={{ display: 'flex', gap: '6px', alignItems: 'center', marginTop: '2px' }}>
-                            <span className="ios-badge ios-badge-blue">{typeLabel}</span>
-                            {m.supplier && <span style={{ fontSize: '10px', color: 'var(--text-medium)' }}>🏢 {m.supplier}</span>}
-                          </div>
+                        <td
+                          style={{
+                            textAlign: 'right',
+                            fontFamily: 'var(--font-mono)',
+                            fontWeight: 700,
+                            color: diffQty === 0 ? 'var(--text-medium)' : diffQty > 0 ? '#059669' : '#dc2626'
+                          }}
+                        >
+                          {diffQty === 0 ? '0' : diffQty > 0 ? `+${diffQty.toLocaleString('uk-UA')}` : diffQty.toLocaleString('uk-UA')} {m.unit}
                         </td>
-                        <td>
-                          <span style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '11px', fontWeight: '700', color: 'var(--text-dark)' }}>
-                            <FolderOpen size={12} style={{ color: 'var(--primary)' }} />
-                            {loc} ({folder})
-                          </span>
-                        </td>
-                        <td style={{ textAlign: 'right', fontWeight: '700', color: 'var(--text-dark)', fontFamily: 'var(--font-mono)' }}>
-                          {unitPrice.toFixed(2)} ₴/{m.unit}
-                        </td>
-                        <td style={{ textAlign: 'right', fontWeight: '700', color: 'var(--text-dark)', fontFamily: 'var(--font-mono)' }}>
-                          {m.quantity.toLocaleString()} {m.unit}
-                        </td>
-                        <td style={{ textAlign: 'right', color: 'var(--warning)', fontWeight: '700', fontFamily: 'var(--font-mono)' }}>
-                          {m.reserved.toLocaleString()} {m.unit}
-                        </td>
-                        <td style={{ textAlign: 'right', fontWeight: '800', color: isCritical ? 'var(--danger)' : isLow ? 'var(--warning)' : 'var(--success)', fontFamily: 'var(--font-mono)' }}>
-                          {available.toLocaleString()} {m.unit}
-                        </td>
-                        <td style={{ textAlign: 'center' }}>
-                          <span className={`ios-badge ${isCritical ? 'ios-badge-red' : isLow ? 'ios-badge-orange' : 'ios-badge-green'}`}>
-                            {isCritical ? 'Немає' : isLow ? 'Мало' : 'В нормі'}
-                          </span>
-                        </td>
-                        <td style={{ textAlign: 'center' }}>
-                          <div style={{ display: 'flex', gap: '4px', justifyContent: 'center' }}>
-                            <button
-                              type="button"
-                              onClick={() => setSelectedMaterialForLog(m)}
-                              className="ios-btn ios-btn-secondary ios-btn-small"
-                              style={{ padding: '4px 8px' }}
-                            >
-                              <History size={11} />
-                              <span>Деталі</span>
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => handleDuplicate(m.id, folder)}
-                              className="ios-btn ios-btn-secondary ios-btn-small"
-                              style={{ padding: '4px 8px' }}
-                            >
-                              <Copy size={11} />
-                            </button>
-                          </div>
+                        <td
+                          style={{
+                            textAlign: 'right',
+                            fontFamily: 'var(--font-mono)',
+                            fontWeight: 700,
+                            color: diffSum === 0 ? 'var(--text-medium)' : diffSum > 0 ? '#059669' : '#dc2626'
+                          }}
+                        >
+                          {diffSum === 0 ? '0.00 ₴' : `${diffSum > 0 ? '+' : ''}${formatMoney(diffSum)}`}
                         </td>
                       </tr>
                     );
@@ -531,427 +1177,635 @@ export const Warehouse: React.FC = () => {
               </table>
             </div>
           </div>
+
+          <div className="ios-card" style={{ padding: '16px' }}>
+            <h3 style={{ margin: '0 0 12px 0', fontSize: '16px' }}>Архів актів інвентаризації</h3>
+            {renderMovementTable('reconciliation')}
+          </div>
         </div>
       )}
 
-      {/* Add New Material Modal with Fast Preset Autofill */}
-      {showAddMaterialModal && (
-        <div className="ios-modal-overlay">
-          <form onSubmit={handleCreateMaterial} className="ios-modal" style={{ maxWidth: '600px', width: '95%' }}>
-            <div className="ios-modal-header">
-              <h3 className="ios-modal-title">✨ Додати новий товар на склад</h3>
-              <button type="button" onClick={() => setShowAddMaterialModal(false)} style={{ border: 'none', background: 'transparent', cursor: 'pointer' }}>✕</button>
-            </div>
-            
-            <div className="ios-modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              {/* Presets Bar for 1-Click Fast Creation */}
-              <div style={{ backgroundColor: '#f8fafc', padding: '10px 12px', borderRadius: '8px', border: '1px dashed #cbd5e1' }}>
-                <span style={{ fontSize: '11px', fontWeight: '850', color: 'var(--text-dark)', display: 'block', marginBottom: '6px' }}>
-                  ⚡ Швидке шаблонне заповнення в 1 клік:
-                </span>
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
-                  {presets.map((preset, idx) => (
-                    <button
-                      key={idx}
-                      type="button"
-                      onClick={() => applyPreset(preset)}
-                      className="ios-btn ios-btn-secondary"
-                      style={{ fontSize: '10px', padding: '3px 8px', borderRadius: '4px' }}
-                    >
-                      {preset.title}
-                    </button>
-                  ))}
+      {/* TAB 6: POVERNENNYA & MATERIAL REQUESTS */}
+      {activeTab === 'povernennya' && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          <div className="ios-card" style={{ padding: '16px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px', flexWrap: 'wrap', gap: '10px' }}>
+              <div>
+                <h3 style={{ margin: 0, fontSize: '16px' }}>Потреба в закупівлі (позиції нижче критичного мінімуму)</h3>
+                <div style={{ fontSize: '12px', color: 'var(--text-medium)' }}>
+                  Автоматичний список дозамовлення постачальникам на основі вільного залишку (Факт - Резерв)
                 </div>
               </div>
+            </div>
 
-              <div className="ios-input-group">
-                <label className="ios-label">Назва матеріалу / товару *</label>
-                <input 
-                  required 
-                  placeholder="напр. Крейдований папір 150г (A1)" 
-                  value={newMatName} 
-                  onChange={(e) => setNewMatName(e.target.value)} 
+            <div className="ios-table-container">
+              <table className="ios-table">
+                <thead>
+                  <tr>
+                    <th>Матеріал</th>
+                    <th>Постачальник</th>
+                    <th style={{ textAlign: 'right' }}>Доступно (Факт - Резерв)</th>
+                    <th style={{ textAlign: 'right' }}>Мін. поріг</th>
+                    <th style={{ textAlign: 'right' }}>Рекомендоване замовлення</th>
+                    <th style={{ textAlign: 'right' }}>Орієнтовний бюджет</th>
+                    <th style={{ textAlign: 'right' }}>Дія</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {materials.filter(m => m.quantity - m.reserved <= getMinStock(m)).length === 0 ? (
+                    <tr>
+                      <td colSpan={7} style={{ textAlign: 'center', padding: '24px', color: '#059669', fontWeight: 600 }}>
+                        Усі позиції складу забезпечені вище мінімального порогу.
+                      </td>
+                    </tr>
+                  ) : (
+                    materials
+                      .filter(m => m.quantity - m.reserved <= getMinStock(m))
+                      .map(m => {
+                        const free = m.quantity - m.reserved;
+                        const minStock = getMinStock(m);
+                        const recOrder = Math.max(minStock * 2 - free, minStock);
+                        const price = getDefaultMaterialPrice(m);
+                        return (
+                          <tr key={m.id}>
+                            <td>
+                              <div style={{ fontWeight: 600 }}>{m.name}</div>
+                              <div style={{ fontSize: '11px', color: 'var(--text-medium)' }}>{MATERIAL_TYPE_LABEL[m.type]}</div>
+                            </td>
+                            <td>{getSupplier(m)}</td>
+                            <td style={{ textAlign: 'right', fontFamily: 'var(--font-mono)', color: '#dc2626', fontWeight: 700 }}>
+                              {free.toLocaleString('uk-UA')} {m.unit}
+                            </td>
+                            <td style={{ textAlign: 'right', fontFamily: 'var(--font-mono)' }}>
+                              {minStock.toLocaleString('uk-UA')} {m.unit}
+                            </td>
+                            <td style={{ textAlign: 'right', fontFamily: 'var(--font-mono)', fontWeight: 700, color: 'var(--primary)' }}>
+                              +{recOrder.toLocaleString('uk-UA')} {m.unit}
+                            </td>
+                            <td style={{ textAlign: 'right', fontFamily: 'var(--font-mono)' }}>
+                              {formatMoney(recOrder * price)}
+                            </td>
+                            <td style={{ textAlign: 'right' }}>
+                              <button
+                                className="ios-btn ios-btn-primary ios-btn-small"
+                                onClick={() => {
+                                  setReceiptForm({
+                                    warehouse: getLocation(m),
+                                    supplier: getSupplier(m),
+                                    docNote: `Планове поповнення дефіциту (${m.name})`,
+                                    createFinanceRecord: true,
+                                    financePaidImmediately: false,
+                                    walletId: wallets[0]?.id || 'w-bank-1',
+                                    items: [{ materialId: m.id, quantity: recOrder, unitPrice: price }]
+                                  });
+                                  setShowReceiptModal(true);
+                                }}
+                              >
+                                Оформити прихід
+                              </button>
+                            </td>
+                          </tr>
+                        );
+                      })
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div className="ios-card" style={{ padding: '16px' }}>
+            <h3 style={{ margin: '0 0 12px 0', fontSize: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <RotateCcw size={18} color="#d97706" /> Оформити повернення матеріалів
+            </h3>
+            <form onSubmit={handleReturnSubmit} style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))', gap: '12px', alignItems: 'end' }}>
+              <div className="ios-input-group" style={{ marginBottom: 0 }}>
+                <label className="ios-label">Тип повернення</label>
+                <select
+                  className="ios-input"
+                  value={returnForm.mode}
+                  onChange={e => setReturnForm(prev => ({ ...prev, mode: e.target.value as 'from_production' | 'to_supplier' }))}
+                >
+                  <option value="from_production">Повернення з цеху на склад (+)</option>
+                  <option value="to_supplier">Повернення браку постачальнику (-)</option>
+                </select>
+              </div>
+              <div className="ios-input-group" style={{ marginBottom: 0 }}>
+                <label className="ios-label">Матеріал</label>
+                <select
+                  className="ios-input"
+                  value={returnForm.materialId}
+                  onChange={e => setReturnForm(prev => ({ ...prev, materialId: e.target.value }))}
+                >
+                  {materials.map(m => (
+                    <option key={m.id} value={m.id}>{m.name} ({m.quantity} {m.unit})</option>
+                  ))}
+                </select>
+              </div>
+              <div className="ios-input-group" style={{ marginBottom: 0 }}>
+                <label className="ios-label">Кількість</label>
+                <input
+                  type="number"
+                  min={1}
+                  className="ios-input"
+                  value={returnForm.quantity}
+                  onChange={e => setReturnForm(prev => ({ ...prev, quantity: Math.max(1, Number(e.target.value)) }))}
                 />
               </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px' }}>
-                <div className="ios-input-group">
-                  <label className="ios-label">Категорія матеріалу</label>
-                  <select value={newMatType} onChange={(e) => setNewMatType(e.target.value as any)}>
-                    <option value="coated">Крейдований папір</option>
-                    <option value="offset">Офсетний папір</option>
-                    <option value="gazetka">Газетний папір</option>
-                  </select>
-                </div>
-                <div className="ios-input-group">
-                  <label className="ios-label">Одиниця виміру</label>
-                  <select value={newMatUnit} onChange={(e) => setNewMatUnit(e.target.value)}>
-                    <option value="арк.">арк. (аркуші)</option>
-                    <option value="шт.">шт. (штуки)</option>
-                    <option value="кг">кг (кілограми)</option>
-                    <option value="рулон">рулон (рулони)</option>
-                  </select>
-                </div>
-                <div className="ios-input-group">
-                  <label className="ios-label">Початковий залишок</label>
-                  <input type="number" min="0" value={newMatQty} onChange={(e) => setNewMatQty(Number(e.target.value))} />
-                </div>
+              <div className="ios-input-group" style={{ marginBottom: 0 }}>
+                <label className="ios-label">Цех / Постачальник</label>
+                <input
+                  type="text"
+                  className="ios-input"
+                  value={returnForm.party}
+                  onChange={e => setReturnForm(prev => ({ ...prev, party: e.target.value }))}
+                />
               </div>
-
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                <div className="ios-input-group">
-                  <label className="ios-label">Закупівельна ціна (грн/{newMatUnit})</label>
-                  <input type="number" step="0.01" min="0" value={newMatPrice} onChange={(e) => setNewMatPrice(Number(e.target.value))} />
-                </div>
-                <div className="ios-input-group">
-                  <label className="ios-label">Мінімальний залишок (попередження)</label>
-                  <input type="number" min="0" value={newMatMinStock} onChange={(e) => setNewMatMinStock(Number(e.target.value))} />
-                </div>
+              <div className="ios-input-group" style={{ marginBottom: 0 }}>
+                <label className="ios-label">Причина</label>
+                <input
+                  type="text"
+                  className="ios-input"
+                  value={returnForm.reason}
+                  onChange={e => setReturnForm(prev => ({ ...prev, reason: e.target.value }))}
+                />
               </div>
+              <button type="submit" className="ios-btn ios-btn-primary">
+                Зафіксувати
+              </button>
+            </form>
+          </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-                <div className="ios-input-group">
-                  <label className="ios-label">Постачальник</label>
-                  <input placeholder="напр. ТОВ Папір-Світ" value={newMatSupplier} onChange={(e) => setNewMatSupplier(e.target.value)} />
-                </div>
-                <div className="ios-input-group">
-                  <label className="ios-label">Локація / Стелаж зберігання</label>
-                  <input placeholder="напр. Стелаж А-1" value={newMatLocation} onChange={(e) => setNewMatLocation(e.target.value)} />
-                </div>
-              </div>
-            </div>
-
-            <div className="ios-modal-footer">
-              <button type="button" onClick={() => setShowAddMaterialModal(false)} className="ios-btn ios-btn-secondary">Скасувати</button>
-              <button type="submit" className="ios-btn ios-btn-primary">Зберегти новий товар</button>
-            </div>
-          </form>
+          <div className="ios-card" style={{ padding: '16px' }}>
+            <h3 style={{ margin: '0 0 12px 0', fontSize: '16px' }}>Історія повернень</h3>
+            {renderMovementTable('return')}
+          </div>
         </div>
       )}
 
-      {/* Relocate Stock Modal */}
-      {showRelocateModal && (
-        <div className="ios-modal-overlay">
-          <form onSubmit={handleRelocateStock} className="ios-modal" style={{ maxWidth: '400px' }}>
-            <div className="ios-modal-header">
-              <h3 className="ios-modal-title">Переміщення між складами</h3>
-              <button type="button" onClick={() => setShowRelocateModal(false)} style={{ border: 'none', background: 'transparent', cursor: 'pointer' }}>✕</button>
-            </div>
-            <div className="ios-modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              <div className="ios-input-group">
-                <label className="ios-label">Матеріал для перенесення</label>
-                <select value={relocateMaterialId} onChange={(e) => setRelocateMaterialId(e.target.value)}>
-                  {materials.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
-                </select>
-              </div>
-
-              <div className="ios-input-group">
-                <label className="ios-label">Кількість переміщення</label>
-                <input type="number" min="1" value={relocateQty} onChange={(e) => setRelocateQty(Number(e.target.value))} />
-              </div>
-
-              <div className="ios-input-group">
-                <label className="ios-label">Склад-відправник</label>
-                <select value={relocateFrom} onChange={(e) => setRelocateFrom(e.target.value)}>
-                  <option>Головний склад Вінниця</option>
-                  <option>Друкарський цех</option>
-                  <option>Точка видачі (Соборна)</option>
-                </select>
-              </div>
-
-              <div className="ios-input-group">
-                <label className="ios-label">Склад-отримувач</label>
-                <select value={relocateTo} onChange={(e) => setRelocateTo(e.target.value)}>
-                  <option>Друкарський цех</option>
-                  <option>Головний склад Вінниця</option>
-                  <option>Точка видачі (Соборна)</option>
-                </select>
-              </div>
-            </div>
-            <div className="ios-modal-footer">
-              <button type="button" onClick={() => setShowRelocateModal(false)} className="ios-btn ios-btn-secondary">Скасувати</button>
-              <button type="submit" className="ios-btn ios-btn-primary">Підтвердити перенесення</button>
-            </div>
-          </form>
-        </div>
-      )}
-
-      {/* Multi-receipt Modal */}
-      {showMultiReceiptModal && (
-        <div className="ios-modal-overlay">
-          <form onSubmit={handleRegisterMultiReceipt} className="ios-modal" style={{ maxWidth: '650px', width: '90%' }}>
-            <div className="ios-modal-header">
-              <h3 className="ios-modal-title">📦 Мультиприхід товарів на склад</h3>
-              <button type="button" onClick={() => setShowMultiReceiptModal(false)} style={{ border: 'none', background: 'transparent', cursor: 'pointer' }}>✕</button>
-            </div>
-            
-            <div className="ios-modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
-              <div className="ios-input-group">
-                <label className="ios-label">Постачальник *</label>
-                <input required value={multiReceiptSupplier} onChange={(e) => setMultiReceiptSupplier(e.target.value)} />
-              </div>
-
-              <span className="ios-label">Список товарів для оприбуткування:</span>
-              
-              {/* Column Headers for Multi-receipt table */}
-              <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr auto', gap: '10px', paddingBottom: '6px', borderBottom: '1.5px solid #cbd5e1', fontSize: '11px', fontWeight: '850', color: 'var(--text-dark)', textTransform: 'uppercase' }}>
-                <span>Найменування товару</span>
-                <span>Кількість</span>
-                <span>Ціна закупівлі (грн)</span>
-                <span style={{ width: '16px' }}></span>
-              </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxHeight: '250px', overflowY: 'auto', paddingRight: '4px' }}>
-                {multiReceiptRows.map((row, idx) => (
-                  <div key={idx} style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr auto', gap: '10px', alignItems: 'center', borderBottom: '1px solid #f1f5f9', paddingBottom: '8px' }}>
-                    <div className="ios-input-group" style={{ marginBottom: 0 }}>
-                      <select 
-                        value={row.materialId} 
-                        onChange={(e) => {
-                          const newRows = [...multiReceiptRows];
-                          newRows[idx].materialId = e.target.value;
-                          setMultiReceiptRows(newRows);
-                        }}
-                        style={{ height: '32px', fontSize: '12px' }}
-                      >
-                        {materials.map(m => <option key={m.id} value={m.id}>{m.name} ({m.unit})</option>)}
-                      </select>
-                    </div>
-
-                    <div className="ios-input-group" style={{ marginBottom: 0 }}>
-                      <input 
-                        type="number" 
-                        min="1" 
-                        placeholder="Кількість" 
-                        value={row.quantity} 
-                        onChange={(e) => {
-                          const newRows = [...multiReceiptRows];
-                          newRows[idx].quantity = Number(e.target.value);
-                          setMultiReceiptRows(newRows);
-                        }} 
-                        style={{ height: '32px', fontSize: '12px' }}
-                      />
-                    </div>
-
-                    <div className="ios-input-group" style={{ marginBottom: 0 }}>
-                      <input 
-                        type="number" 
-                        min="0" 
-                        placeholder="Ціна закупівлі" 
-                        value={row.price} 
-                        onChange={(e) => {
-                          const newRows = [...multiReceiptRows];
-                          newRows[idx].price = Number(e.target.value);
-                          setMultiReceiptRows(newRows);
-                        }} 
-                        style={{ height: '32px', fontSize: '12px' }}
-                      />
-                    </div>
-
-                    <button 
-                      type="button" 
-                      onClick={() => removeMultiReceiptRow(idx)} 
-                      disabled={multiReceiptRows.length === 1}
-                      style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: 'var(--danger)', opacity: multiReceiptRows.length === 1 ? 0.3 : 1 }}
-                    >
-                      <Trash size={16} />
-                    </button>
-                  </div>
+      {/* TAB 7: VYROBY (BOM Specs) */}
+      {activeTab === 'vyroby' && (
+        <div className="ios-card" style={{ padding: '16px' }}>
+          <h3 style={{ margin: '0 0 12px 0', fontSize: '16px' }}>Виробничі специфікації (BOM) поліграфічних виробів</h3>
+          <div className="ios-table-container">
+            <table className="ios-table">
+              <thead>
+                <tr>
+                  <th>Артикул</th>
+                  <th>Назва виробу</th>
+                  <th>Формат</th>
+                  <th>Склад матеріалів і процесів</th>
+                  <th style={{ textAlign: 'right' }}>Нормативна собівартість</th>
+                </tr>
+              </thead>
+              <tbody>
+                {ASSEMBLY_SPECS.map(spec => (
+                  <tr key={spec.id}>
+                    <td style={{ fontFamily: 'var(--font-mono)', fontWeight: 600 }}>{spec.article}</td>
+                    <td style={{ fontWeight: 600 }}>{spec.name}</td>
+                    <td>{spec.format}</td>
+                    <td style={{ fontSize: '12px', color: 'var(--text-medium)' }}>{spec.componentsSummary}</td>
+                    <td style={{ textAlign: 'right', fontFamily: 'var(--font-mono)', fontWeight: 700 }}>
+                      {spec.baseCost.toFixed(2)} ₴ / {spec.unit}
+                    </td>
+                  </tr>
                 ))}
-              </div>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
 
-              <button 
-                type="button" 
-                onClick={addMultiReceiptRow}
-                style={{
-                  alignSelf: 'flex-start',
-                  border: 'none',
-                  background: 'transparent',
-                  color: 'var(--primary)',
-                  fontSize: '11px',
-                  fontWeight: '750',
-                  cursor: 'pointer',
-                  padding: 0
-                }}
-              >
-                + Додати ще одну позицію
+      {/* TAB 8: TOVARY (Zones Summary) */}
+      {activeTab === 'tovary' && (
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+            gap: '14px'
+          }}
+        >
+          {warehousesList.map(zone => {
+            const zoneMats = materials.filter(m => getLocation(m) === zone);
+            const zoneValue = zoneMats.reduce((s, m) => s + m.quantity * getDefaultMaterialPrice(m), 0);
+            const zoneUnits = zoneMats.reduce((s, m) => s + m.quantity, 0);
+            return (
+              <div key={zone} className="ios-card" style={{ padding: '16px' }}>
+                <div style={{ fontWeight: 700, fontSize: '15px', marginBottom: '6px' }}>{zone}</div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: 'var(--text-medium)', marginBottom: '4px' }}>
+                  <span>Позицій:</span>
+                  <strong style={{ color: 'var(--text-dark)' }}>{zoneMats.length}</strong>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: 'var(--text-medium)', marginBottom: '4px' }}>
+                  <span>Загальний обсяг:</span>
+                  <strong style={{ color: 'var(--text-dark)', fontFamily: 'var(--font-mono)' }}>{zoneUnits.toLocaleString('uk-UA')} од.</strong>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: 'var(--text-medium)', marginBottom: '12px' }}>
+                  <span>Вартість у зоні:</span>
+                  <strong style={{ color: 'var(--primary)', fontFamily: 'var(--font-mono)' }}>{formatMoney(zoneValue)}</strong>
+                </div>
+                <button
+                  className="ios-btn ios-btn-secondary ios-btn-small"
+                  style={{ width: '100%' }}
+                  onClick={() => {
+                    setWarehouseFilter(zone);
+                    setActiveTab('zalyshki');
+                  }}
+                >
+                  Показати залишки зони
+                </button>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* MATERIAL DETAIL MODAL */}
+      {detailMaterial && (
+        <div className="ios-modal-overlay" onClick={() => setDetailMaterial(null)}>
+          <div className="ios-modal" style={{ maxWidth: '720px', width: '95%' }} onClick={e => e.stopPropagation()}>
+            <div className="ios-modal-header">
+              <div>
+                <h3 style={{ margin: 0 }}>{detailMaterial.name}</h3>
+                <div style={{ fontSize: '12px', color: 'var(--text-medium)' }}>
+                  MAT-{detailMaterial.id.padStart(3, '0')} · {getLocation(detailMaterial)} · {getSupplier(detailMaterial)}
+                </div>
+              </div>
+              <button className="ios-btn ios-btn-secondary ios-btn-small" onClick={() => setDetailMaterial(null)}>
+                <X size={16} />
               </button>
             </div>
-
-            <div className="ios-modal-footer">
-              <button type="button" onClick={() => setShowMultiReceiptModal(false)} className="ios-btn ios-btn-secondary">Скасувати</button>
-              <button type="submit" className="ios-btn ios-btn-primary">Оформити мультиприхід</button>
-            </div>
-          </form>
-        </div>
-      )}
-
-      {/* Selected Material Detailed Information Modal */}
-      {selectedMaterialForLog && (
-        <div className="ios-modal-overlay">
-          <div className="ios-modal" style={{ maxWidth: '600px', backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)' }}>
-            <div className="ios-modal-header" style={{ borderBottom: '1px solid var(--border-light)' }}>
-              <h3 className="ios-modal-title" style={{ color: 'var(--text-dark)' }}>Деталі та історія товару: {selectedMaterialForLog.name}</h3>
-              <button type="button" onClick={() => setSelectedMaterialForLog(null)} style={{ border: 'none', background: 'transparent', color: 'var(--text-medium)', cursor: 'pointer' }}>✕</button>
-            </div>
-            <div className="ios-modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              
-              {/* Material specifications breakdown */}
-              <div style={{ backgroundColor: 'var(--bg-card-subtle)', padding: '14px', borderRadius: '8px', border: '1px solid var(--border-light)' }}>
-                <span style={{ fontSize: '11px', fontWeight: '800', color: 'var(--text-dark)', display: 'block', marginBottom: '8px' }}>
-                  Основні параметри номенклатури:
-                </span>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '10px', fontSize: '11px' }}>
-                  <div style={{ backgroundColor: 'var(--bg-card)', padding: '8px 10px', borderRadius: '6px', border: '1px solid var(--border-light)' }}>
-                    <span style={{ color: 'var(--text-medium)', fontSize: '10px', display: 'block' }}>Код / SKU:</span>
-                    <strong style={{ color: 'var(--text-dark)', fontSize: '12px', fontFamily: 'var(--font-mono)' }}>#{selectedMaterialForLog.id}</strong>
+            <div className="ios-modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px' }}>
+                <div style={{ padding: '10px', borderRadius: '10px', background: 'var(--bg-card-subtle)' }}>
+                  <div style={{ fontSize: '11px', color: 'var(--text-medium)' }}>На складі (Факт)</div>
+                  <div style={{ fontSize: '16px', fontWeight: 700, fontFamily: 'var(--font-mono)' }}>
+                    {detailMaterial.quantity.toLocaleString('uk-UA')} {detailMaterial.unit}
                   </div>
-                  <div style={{ backgroundColor: 'var(--bg-card)', padding: '8px 10px', borderRadius: '6px', border: '1px solid var(--border-light)' }}>
-                    <span style={{ color: 'var(--text-medium)', fontSize: '10px', display: 'block' }}>Категорія:</span>
-                    <strong style={{ color: 'var(--text-dark)', fontSize: '12px' }}>
-                      {selectedMaterialForLog.type === 'offset' ? 'Офсетний папір 70г' : selectedMaterialForLog.type === 'gazetka' ? 'Газетний папір' : 'Крейдований папір'}
-                    </strong>
+                </div>
+                <div style={{ padding: '10px', borderRadius: '10px', background: 'var(--bg-card-subtle)' }}>
+                  <div style={{ fontSize: '11px', color: 'var(--text-medium)' }}>Резерв</div>
+                  <div style={{ fontSize: '16px', fontWeight: 700, fontFamily: 'var(--font-mono)', color: '#0284c7' }}>
+                    {detailMaterial.reserved.toLocaleString('uk-UA')} {detailMaterial.unit}
                   </div>
-                  <div style={{ backgroundColor: 'var(--bg-card)', padding: '8px 10px', borderRadius: '6px', border: '1px solid var(--border-light)' }}>
-                    <span style={{ color: 'var(--text-medium)', fontSize: '10px', display: 'block' }}>Закупівельна ціна:</span>
-                    <strong style={{ color: 'var(--text-dark)', fontSize: '12px' }}>{(selectedMaterialForLog.price || 0.60).toFixed(2)} ₴/{selectedMaterialForLog.unit}</strong>
+                </div>
+                <div style={{ padding: '10px', borderRadius: '10px', background: 'var(--bg-card-subtle)' }}>
+                  <div style={{ fontSize: '11px', color: 'var(--text-medium)' }}>Вільно</div>
+                  <div style={{ fontSize: '16px', fontWeight: 700, fontFamily: 'var(--font-mono)', color: '#059669' }}>
+                    {(detailMaterial.quantity - detailMaterial.reserved).toLocaleString('uk-UA')} {detailMaterial.unit}
                   </div>
-                  <div style={{ backgroundColor: 'var(--bg-card)', padding: '8px 10px', borderRadius: '6px', border: '1px solid var(--border-light)' }}>
-                    <span style={{ color: 'var(--text-medium)', fontSize: '10px', display: 'block' }}>Постачальник:</span>
-                    <strong style={{ color: 'var(--text-dark)', fontSize: '12px' }}>{selectedMaterialForLog.supplier || 'ТОВ Папір-Світ'}</strong>
-                  </div>
-                  <div style={{ backgroundColor: 'var(--bg-card)', padding: '8px 10px', borderRadius: '6px', border: '1px solid var(--border-light)' }}>
-                    <span style={{ color: 'var(--text-medium)', fontSize: '10px', display: 'block' }}>Локація зберігання:</span>
-                    <strong style={{ color: 'var(--text-dark)', fontSize: '12px' }}>{selectedMaterialForLog.location || 'Стелаж А'}</strong>
-                  </div>
-                  <div style={{ backgroundColor: 'var(--bg-card)', padding: '8px 10px', borderRadius: '6px', border: '1px solid var(--border-light)' }}>
-                    <span style={{ color: 'var(--text-medium)', fontSize: '10px', display: 'block' }}>Мін. залишок:</span>
-                    <strong style={{ color: 'var(--text-dark)', fontSize: '12px' }}>{selectedMaterialForLog.minStock || 1000} {selectedMaterialForLog.unit}</strong>
+                </div>
+                <div style={{ padding: '10px', borderRadius: '10px', background: 'var(--bg-card-subtle)' }}>
+                  <div style={{ fontSize: '11px', color: 'var(--text-medium)' }}>Оцінка запасу</div>
+                  <div style={{ fontSize: '16px', fontWeight: 700, fontFamily: 'var(--font-mono)' }}>
+                    {formatMoney(detailMaterial.quantity * getDefaultMaterialPrice(detailMaterial))}
                   </div>
                 </div>
               </div>
 
-              {/* Sales log list */}
-              <div className="ios-table-container" style={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-light)' }}>
-                <table className="ios-table" style={{ fontSize: '11px' }}>
-                  <thead>
-                    <tr>
-                      <th style={{ color: 'var(--text-medium)' }}>Дата</th>
-                      <th style={{ color: 'var(--text-medium)' }}>Працівник</th>
-                      <th style={{ color: 'var(--text-medium)' }}>Кількість</th>
-                      <th style={{ color: 'var(--text-medium)' }}>Списано під угоду</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {(!selectedMaterialForLog.salesLog || selectedMaterialForLog.salesLog.length === 0) ? (
-                      <tr>
-                        <td colSpan={4} style={{ textAlign: 'center', padding: '16px', color: 'var(--text-medium)' }}>
-                          Ручні списання відсутні
-                        </td>
-                      </tr>
-                    ) : (
-                      selectedMaterialForLog.salesLog.map(entry => (
-                        <tr key={entry.id} style={{ borderBottom: '1px solid var(--border-light)' }}>
-                          <td style={{ color: 'var(--text-dark)', fontFamily: 'var(--font-mono)' }}>{entry.date}</td>
-                          <td style={{ color: 'var(--text-dark)' }}>{entry.employee}</td>
-                          <td style={{ fontWeight: '700', color: 'var(--danger)' }}>-{entry.quantity} {selectedMaterialForLog.unit}</td>
-                          <td style={{ color: 'var(--text-dark)' }}>{entry.dealName || entry.dealId || '—'}</td>
-                        </tr>
-                      ))
-                    )}
-                  </tbody>
-                </table>
+              <div>
+                <h4 style={{ margin: '0 0 8px 0', fontSize: '13px' }}>Історія руху за матеріалом</h4>
+                <div style={{ maxHeight: '260px', overflowY: 'auto', border: '1px solid var(--border-light)', borderRadius: '10px', padding: '8px' }}>
+                  {warehouseMovements.filter(mov => mov.materialId === detailMaterial.id).length === 0 ? (
+                    <div style={{ fontSize: '12px', color: 'var(--text-medium)', padding: '12px' }}>
+                      Ще немає зафіксованих документів руху по цій позиції.
+                    </div>
+                  ) : (
+                    warehouseMovements
+                      .filter(mov => mov.materialId === detailMaterial.id)
+                      .map(mov => {
+                        const delta = mov.quantityChange !== 0 ? mov.quantityChange : mov.quantity;
+                        return (
+                          <div
+                            key={mov.id}
+                            style={{
+                              display: 'flex',
+                              justifyContent: 'space-between',
+                              alignItems: 'center',
+                              padding: '8px',
+                              borderBottom: '1px solid var(--border-light)',
+                              fontSize: '12px'
+                            }}
+                          >
+                            <div>
+                              <div style={{ fontWeight: 600 }}>{(MOVEMENT_LABELS[mov.type] || MOVEMENT_LABELS.receipt).label} · {mov.date}</div>
+                              <div style={{ color: 'var(--text-medium)' }}>{mov.reason}</div>
+                            </div>
+                            <div style={{ textAlign: 'right', fontFamily: 'var(--font-mono)', fontWeight: 700 }}>
+                              {delta > 0 ? `+${delta}` : delta} {mov.unit}
+                            </div>
+                          </div>
+                        );
+                      })
+                  )}
+                </div>
               </div>
             </div>
             <div className="ios-modal-footer">
-              <button type="button" onClick={() => setSelectedMaterialForLog(null)} className="ios-btn ios-btn-secondary">Закрити</button>
+              <button
+                className="ios-btn ios-btn-secondary"
+                onClick={() => {
+                  const mat = detailMaterial;
+                  setDetailMaterial(null);
+                  setReceiptForm({
+                    warehouse: getLocation(mat),
+                    supplier: getSupplier(mat),
+                    docNote: `Поповнення ${mat.name}`,
+                    createFinanceRecord: true,
+                    financePaidImmediately: false,
+                    walletId: wallets[0]?.id || 'w-bank-1',
+                    items: [{ materialId: mat.id, quantity: 2000, unitPrice: getDefaultMaterialPrice(mat) }]
+                  });
+                  setShowReceiptModal(true);
+                }}
+              >
+                Оприбуткувати ще
+              </button>
+              <button className="ios-btn ios-btn-primary" onClick={() => setDetailMaterial(null)}>
+                Закрити
+              </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Render sub-tabs content */}
-      {activeTab === 'vyroby' && (
-        <div className="ios-table-container bg-white rounded-xl shadow-sm border border-slate-100">
-          <table className="ios-table">
-            <thead>
-              <tr>
-                <th style={{ width: '100px' }}>Артикул</th>
-                <th>Назва готового виробу</th>
-                <th>Складові матеріали</th>
-                <th style={{ width: '120px' }}>Собівартість</th>
-                <th style={{ width: '120px' }}>Час збірки</th>
-              </tr>
-            </thead>
-            <tbody>
-              {assemblies.map(item => (
-                <tr key={item.sku}>
-                  <td style={{ fontFamily: 'var(--font-mono)', fontWeight: '600' }}>{item.sku}</td>
-                  <td style={{ fontWeight: '700' }}>
-                    <div 
-                      onClick={() => alert(`Залишок та детальна інформація прайс-листа для: ${item.name}`)}
-                      style={{ color: 'var(--primary)', cursor: 'pointer', textDecoration: 'underline' }}
-                    >
-                      {item.name}
-                    </div>
-                  </td>
-                  <td style={{ color: '#475569' }}>{item.components}</td>
-                  <td style={{ fontWeight: '800', color: '#10b981' }}>{item.price}</td>
-                  <td style={{ fontWeight: '500' }}>{item.speed}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      {activeTab === 'oprybutkuvannya' && (
-        <div className="ios-table-container bg-white rounded-xl shadow-sm border border-slate-100">
-          <table className="ios-table">
-            <thead>
-              <tr>
-                <th style={{ width: '110px' }}>Дата ордера</th>
-                <th>Постачальник</th>
-                <th>Найменування матеріалу</th>
-                <th style={{ width: '120px', textAlign: 'right' }}>Кількість</th>
-                <th style={{ width: '120px', textAlign: 'right' }}>Сума закупки</th>
-                <th style={{ width: '120px' }}>Статус</th>
-              </tr>
-            </thead>
-            <tbody>
-              {receipts.map((item, idx) => (
-                <tr key={idx}>
-                  <td>{item.date}</td>
-                  <td style={{ fontWeight: '700' }}>{item.supplier}</td>
-                  <td>{item.item}</td>
-                  <td style={{ textAlign: 'right', fontWeight: '700', color: 'var(--success)' }}>{item.qty}</td>
-                  <td style={{ textAlign: 'right', fontWeight: '700' }}>{item.total}</td>
-                  <td><span className="ios-badge ios-badge-green">{item.status}</span></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
-
-      {/* Categories / Folders sub tab */}
-      {activeTab === 'tovary' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {categories.map((cat, idx) => (
-            <div key={idx} className="ios-card bg-white space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="flex items-center gap-1.5 font-bold text-slate-800 text-sm">
-                  <FolderOpen size={16} style={{ color: 'var(--primary)' }} />
-                  {cat.name}
-                </span>
-                <span className="ios-badge ios-badge-blue">{cat.itemsCount} найменувань</span>
-              </div>
-              <div style={{ fontSize: '12px', color: '#636366', display: 'flex', flexDirection: 'column', gap: '4px' }}>
-                <p>📍 Розташування складання: {cat.location}</p>
-                <p>👤 Відповідальний за зону: {cat.manager}</p>
-              </div>
+      {/* ADD NEW MATERIAL MODAL */}
+      {showAddModal && (
+        <div className="ios-modal-overlay" onClick={() => setShowAddModal(false)}>
+          <div className="ios-modal" style={{ maxWidth: '540px', width: '95%' }} onClick={e => e.stopPropagation()}>
+            <div className="ios-modal-header">
+              <h3 style={{ margin: 0 }}>Додати номенклатурну позицію</h3>
+              <button className="ios-btn ios-btn-secondary ios-btn-small" onClick={() => setShowAddModal(false)}>
+                <X size={16} />
+              </button>
             </div>
-          ))}
+            <form onSubmit={handleAddMaterialSubmit}>
+              <div className="ios-modal-body" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px' }}>
+                <div className="ios-input-group" style={{ gridColumn: '1 / -1' }}>
+                  <label className="ios-label">Назва матеріалу</label>
+                  <input
+                    required
+                    type="text"
+                    className="ios-input"
+                    placeholder="Наприклад: Крейда матова 150 г/м² SRA3"
+                    value={newMatForm.name}
+                    onChange={e => setNewMatForm(prev => ({ ...prev, name: e.target.value }))}
+                  />
+                </div>
+                <div className="ios-input-group">
+                  <label className="ios-label">Група</label>
+                  <select className="ios-input" value={newMatForm.type} onChange={e => setNewMatForm(prev => ({ ...prev, type: e.target.value as Material['type'] }))}>
+                    <option value="coated">Крейдований папір</option>
+                    <option value="offset">Офсетний / Картон / Фарба</option>
+                    <option value="gazetka">Газетний / Спец. носій</option>
+                  </select>
+                </div>
+                <div className="ios-input-group">
+                  <label className="ios-label">Одиниця виміру</label>
+                  <input type="text" className="ios-input" value={newMatForm.unit} onChange={e => setNewMatForm(prev => ({ ...prev, unit: e.target.value }))} />
+                </div>
+                <div className="ios-input-group">
+                  <label className="ios-label">Початковий залишок</label>
+                  <input type="number" min={0} className="ios-input" value={newMatForm.quantity} onChange={e => setNewMatForm(prev => ({ ...prev, quantity: Number(e.target.value) }))} />
+                </div>
+                <div className="ios-input-group">
+                  <label className="ios-label">Ціна за од. (₴)</label>
+                  <input type="number" min={0} step="0.01" className="ios-input" value={newMatForm.price} onChange={e => setNewMatForm(prev => ({ ...prev, price: Number(e.target.value) }))} />
+                </div>
+                <div className="ios-input-group">
+                  <label className="ios-label">Критичний мінімум</label>
+                  <input type="number" min={0} className="ios-input" value={newMatForm.minStock} onChange={e => setNewMatForm(prev => ({ ...prev, minStock: Number(e.target.value) }))} />
+                </div>
+                <div className="ios-input-group">
+                  <label className="ios-label">Склад / Секція</label>
+                  <select className="ios-input" value={newMatForm.location} onChange={e => setNewMatForm(prev => ({ ...prev, location: e.target.value }))}>
+                    {WAREHOUSE_ZONES.map(z => <option key={z} value={z}>{z}</option>)}
+                  </select>
+                </div>
+                <div className="ios-input-group" style={{ gridColumn: '1 / -1', marginBottom: 0 }}>
+                  <label className="ios-label">Основний постачальник</label>
+                  <input type="text" className="ios-input" value={newMatForm.supplier} onChange={e => setNewMatForm(prev => ({ ...prev, supplier: e.target.value }))} />
+                </div>
+              </div>
+              <div className="ios-modal-footer">
+                <button type="button" className="ios-btn ios-btn-secondary" onClick={() => setShowAddModal(false)}>Скасувати</button>
+                <button type="submit" className="ios-btn ios-btn-primary">Створити позицію</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* MULTI-RECEIPT MODAL */}
+      {showReceiptModal && (
+        <div className="ios-modal-overlay" onClick={() => setShowReceiptModal(false)}>
+          <div className="ios-modal" style={{ maxWidth: '680px', width: '95%' }} onClick={e => e.stopPropagation()}>
+            <div className="ios-modal-header">
+              <h3 style={{ margin: 0 }}>Прибуткова накладна (Оприбуткування на склад)</h3>
+              <button className="ios-btn ios-btn-secondary ios-btn-small" onClick={() => setShowReceiptModal(false)}>
+                <X size={16} />
+              </button>
+            </div>
+            <form onSubmit={handleMultiReceiptSubmit}>
+              <div className="ios-modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
+                  <div className="ios-input-group" style={{ marginBottom: 0 }}>
+                    <label className="ios-label">Постачальник</label>
+                    <input
+                      required
+                      type="text"
+                      className="ios-input"
+                      value={receiptForm.supplier}
+                      onChange={e => setReceiptForm(prev => ({ ...prev, supplier: e.target.value }))}
+                    />
+                  </div>
+                  <div className="ios-input-group" style={{ marginBottom: 0 }}>
+                    <label className="ios-label">Склад отримання</label>
+                    <select
+                      className="ios-input"
+                      value={receiptForm.warehouse}
+                      onChange={e => setReceiptForm(prev => ({ ...prev, warehouse: e.target.value }))}
+                    >
+                      {WAREHOUSE_ZONES.map(z => <option key={z} value={z}>{z}</option>)}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="ios-input-group" style={{ marginBottom: 0 }}>
+                  <label className="ios-label">Номер накладної / Коментар</label>
+                  <input
+                    type="text"
+                    className="ios-input"
+                    placeholder="Наприклад: Видаткова накладна №РН-0412"
+                    value={receiptForm.docNote}
+                    onChange={e => setReceiptForm(prev => ({ ...prev, docNote: e.target.value }))}
+                  />
+                </div>
+
+                <div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
+                    <label className="ios-label" style={{ margin: 0 }}>Позиції накладної</label>
+                    <button
+                      type="button"
+                      className="ios-btn ios-btn-secondary ios-btn-small"
+                      onClick={() => {
+                        const first = materials[0];
+                        setReceiptForm(prev => ({
+                          ...prev,
+                          items: [...prev.items, { materialId: first?.id || '1', quantity: 1000, unitPrice: getDefaultMaterialPrice(first) }]
+                        }));
+                      }}
+                    >
+                      + Додати рядок
+                    </button>
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {receiptForm.items.map((row, idx) => (
+                      <div key={idx} style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr auto', gap: '8px', alignItems: 'center' }}>
+                        <select
+                          className="ios-input"
+                          value={row.materialId}
+                          onChange={e => {
+                            const mat = materials.find(m => m.id === e.target.value);
+                            setReceiptForm(prev => ({
+                              ...prev,
+                              items: prev.items.map((it, i) =>
+                                i === idx ? { ...it, materialId: e.target.value, unitPrice: getDefaultMaterialPrice(mat) } : it
+                              )
+                            }));
+                          }}
+                        >
+                          {materials.map(m => <option key={m.id} value={m.id}>{m.name} ({m.unit})</option>)}
+                        </select>
+                        <input
+                          type="number"
+                          min={1}
+                          className="ios-input"
+                          placeholder="К-ть"
+                          value={row.quantity}
+                          onChange={e =>
+                            setReceiptForm(prev => ({
+                              ...prev,
+                              items: prev.items.map((it, i) => i === idx ? { ...it, quantity: Number(e.target.value) } : it)
+                            }))
+                          }
+                        />
+                        <input
+                          type="number"
+                          min={0}
+                          step="0.01"
+                          className="ios-input"
+                          placeholder="Ціна ₴"
+                          value={row.unitPrice}
+                          onChange={e =>
+                            setReceiptForm(prev => ({
+                              ...prev,
+                              items: prev.items.map((it, i) => i === idx ? { ...it, unitPrice: Number(e.target.value) } : it)
+                            }))
+                          }
+                        />
+                        <button
+                          type="button"
+                          className="ios-btn ios-btn-secondary ios-btn-small"
+                          disabled={receiptForm.items.length <= 1}
+                          onClick={() =>
+                            setReceiptForm(prev => ({
+                              ...prev,
+                              items: prev.items.filter((_, i) => i !== idx)
+                            }))
+                          }
+                        >
+                          <X size={14} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div style={{ padding: '10px 12px', borderRadius: '10px', background: 'var(--bg-card-subtle)', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                  <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', fontWeight: 600, cursor: 'pointer' }}>
+                    <input
+                      type="checkbox"
+                      checked={receiptForm.createFinanceRecord}
+                      onChange={e => setReceiptForm(prev => ({ ...prev, createFinanceRecord: e.target.checked }))}
+                    />
+                    Створити запис у Бухгалтерії (Рах. 631 — розрахунки з постачальником)
+                  </label>
+                  {receiptForm.createFinanceRecord && (
+                    <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', alignItems: 'center', paddingLeft: '22px' }}>
+                      <label style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', cursor: 'pointer' }}>
+                        <input
+                          type="checkbox"
+                          checked={receiptForm.financePaidImmediately}
+                          onChange={e => setReceiptForm(prev => ({ ...prev, financePaidImmediately: e.target.checked }))}
+                        />
+                        Оплатити одразу з рахунку (списати залишок)
+                      </label>
+                      {receiptForm.financePaidImmediately && (
+                        <select
+                          className="ios-input"
+                          value={receiptForm.walletId}
+                          onChange={e => setReceiptForm(prev => ({ ...prev, walletId: e.target.value }))}
+                          style={{ padding: '4px 8px', fontSize: '12px' }}
+                        >
+                          {wallets.map(w => (
+                            <option key={w.id} value={w.id}>{w.name} ({formatMoney(w.balance)})</option>
+                          ))}
+                        </select>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontWeight: 700, fontSize: '15px' }}>
+                  <span>Разом по накладній:</span>
+                  <span style={{ fontFamily: 'var(--font-mono)', color: 'var(--primary)' }}>{formatMoney(receiptTotalPreview)}</span>
+                </div>
+              </div>
+              <div className="ios-modal-footer">
+                <button type="button" className="ios-btn ios-btn-secondary" onClick={() => setShowReceiptModal(false)}>Скасувати</button>
+                <button type="submit" className="ios-btn ios-btn-primary">Оприбуткувати</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* RELOCATE MODAL */}
+      {relocateTarget && (
+        <div className="ios-modal-overlay" onClick={() => setRelocateTarget(null)}>
+          <div className="ios-modal" style={{ maxWidth: '460px', width: '95%' }} onClick={e => e.stopPropagation()}>
+            <div className="ios-modal-header">
+              <h3 style={{ margin: 0 }}>Перемістити матеріал</h3>
+              <button className="ios-btn ios-btn-secondary ios-btn-small" onClick={() => setRelocateTarget(null)}>
+                <X size={16} />
+              </button>
+            </div>
+            <form onSubmit={handleRelocateSubmit}>
+              <div className="ios-modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <div style={{ fontSize: '13px', fontWeight: 600 }}>{relocateTarget.name}</div>
+                <div style={{ fontSize: '12px', color: 'var(--text-medium)' }}>Поточна секція: {getLocation(relocateTarget)}</div>
+                <div className="ios-input-group" style={{ marginBottom: 0 }}>
+                  <label className="ios-label">Цільовий склад / цех</label>
+                  <select className="ios-input" value={relocateTo} onChange={e => setRelocateTo(e.target.value)}>
+                    {WAREHOUSE_ZONES.map(z => <option key={z} value={z}>{z}</option>)}
+                  </select>
+                </div>
+                <div className="ios-input-group" style={{ marginBottom: 0 }}>
+                  <label className="ios-label">Кількість ({relocateTarget.unit})</label>
+                  <input type="number" min={1} className="ios-input" value={relocateQty} onChange={e => setRelocateQty(Number(e.target.value))} />
+                </div>
+                <div className="ios-input-group" style={{ marginBottom: 0 }}>
+                  <label className="ios-label">Підстава / Коментар</label>
+                  <input type="text" className="ios-input" value={relocateReason} onChange={e => setRelocateReason(e.target.value)} />
+                </div>
+              </div>
+              <div className="ios-modal-footer">
+                <button type="button" className="ios-btn ios-btn-secondary" onClick={() => setRelocateTarget(null)}>Скасувати</button>
+                <button type="submit" className="ios-btn ios-btn-primary">Перемістити</button>
+              </div>
+            </form>
+          </div>
         </div>
       )}
     </div>

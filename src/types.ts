@@ -42,6 +42,8 @@ export interface Client {
   sectionStatus?: string; // Статус у цьому розділі
   sectionFieldValues?: Record<string, string | number>;
   additionalContacts?: AdditionalContact[]; // Додаткові контактні особи
+  creditLimit?: number; // Кредитний ліміт дебіторки (грн)
+  paymentTermsDays?: number; // Дозволена відстрочка оплати (днів)
 }
 
 export interface WarehouseLogEntry {
@@ -140,6 +142,7 @@ export interface Order {
   stageChangedAt?: Record<string, string>; // SLA - таймінг кожного етапу
   totalMarkupPercent?: number; // Націнка на загальну суму замовлення
   isImportant?: boolean; // Відмітка для важливих угод (VIP)
+  materialId?: string; // Прив'язка до конкретного матеріалу складу
 }
 
 export interface Norms {
@@ -243,4 +246,64 @@ export interface Lead {
     options?: string;
   };
 }
+
+export type WarehouseMovementType =
+  | 'receipt'
+  | 'writeoff'
+  | 'relocate'
+  | 'reconciliation'
+  | 'return'
+  | 'reserve'
+  | 'release';
+
+export interface WarehouseMovement {
+  id: string;
+  date: string;
+  type: WarehouseMovementType;
+  materialId: string;
+  materialName: string;
+  quantityChange: number; // Signed change in physical stock (+ or -, 0 for pure reserve/relocate)
+  quantity: number; // Absolute quantity involved in operation
+  quantityAfter: number;
+  unit: string;
+  unitPrice: number;
+  totalSum: number;
+  warehouseFrom?: string;
+  warehouseTo?: string;
+  party?: string; // Постачальник або клієнт
+  dealId?: string;
+  dealName?: string;
+  reason?: string;
+  employee: string;
+}
+
+export interface WalletAccount {
+  id: string;
+  code: string; // Бух. субрахунок (напр. 31101, 30101)
+  name: string;
+  balance: number;
+  currency: 'UAH';
+  accountType: 'bank' | 'cash' | 'pos';
+}
+
+export interface FinanceEntry {
+  id: string;
+  date: string;
+  dt: string; // Рахунок Дебет
+  kt: string; // Рахунок Кредит
+  sum: number;
+  type: 'income' | 'expense' | 'transfer';
+  status?: 'posted' | 'planned'; // Проведена або планова операція
+  description: string;
+  document: string;
+  party: string;
+  user: string;
+  category: string;
+  walletId: string;
+  wallet: string;
+  targetWalletId?: string; // Для переказів між рахунками
+  dealId?: string;
+  materialMovementId?: string;
+}
+
 
