@@ -3841,17 +3841,17 @@ export const Calculator: React.FC = () => {
 
     // 2. Paper Specs & Caliper
     const paperSpecs: Record<string, { name: string; density: number; caliper: number; priceKg: number }> = {
-      off_70: { name: 'Офсетний 70 г/м²', density: 70, caliper: 0.095, priceKg: 58 },
-      off_80: { name: 'Офсетний 80 г/м² (Стандарт)', density: 80, caliper: 0.110, priceKg: 56 },
-      off_100: { name: 'Офсетний 100 г/м²', density: 100, caliper: 0.130, priceKg: 60 }
+      off_70: { name: 'Офсетний 70 г/м²', density: 70, caliper: 0.095, priceKg: 61 },
+      off_80: { name: 'Офсетний 80 г/м² (Стандарт)', density: 80, caliper: 0.110, priceKg: 61 },
+      off_100: { name: 'Офсетний 100 г/м²', density: 100, caliper: 0.130, priceKg: 61 }
     };
 
     const coverSpecs: Record<string, { name: string; density: number; caliper: number; priceKg: number }> = {
-      self: { name: 'Своя обкладинка (папір блоку)', density: paperSpecs[magBlockPaper]?.density || 80, caliper: paperSpecs[magBlockPaper]?.caliper || 0.11, priceKg: paperSpecs[magBlockPaper]?.priceKg || 56 },
-      coat_170: { name: 'Крейда 170 г/м²', density: 170, caliper: 0.145, priceKg: 70 },
-      coat_200: { name: 'Крейда 200 г/м²', density: 200, caliper: 0.170, priceKg: 71 },
-      coat_250: { name: 'Крейда 250 г/м² (Стандарт)', density: 250, caliper: 0.220, priceKg: 72 },
-      coat_300: { name: 'Крейда 300 г/м² (Щільна)', density: 300, caliper: 0.270, priceKg: 74 },
+      self: { name: 'Своя обкладинка (папір блоку)', density: paperSpecs[magBlockPaper]?.density || 80, caliper: paperSpecs[magBlockPaper]?.caliper || 0.11, priceKg: paperSpecs[magBlockPaper]?.priceKg || 61 },
+      coat_170: { name: 'Крейда 170 г/м²', density: 170, caliper: 0.145, priceKg: 62 },
+      coat_200: { name: 'Крейда 200 г/м²', density: 200, caliper: 0.170, priceKg: 62 },
+      coat_250: { name: 'Крейда 250 г/м² (Стандарт)', density: 250, caliper: 0.220, priceKg: 62 },
+      coat_300: { name: 'Крейда 300 г/м² (Щільна)', density: 300, caliper: 0.270, priceKg: 62 },
       card_250: { name: 'Картон целюлозний 250 г/м²', density: 250, caliper: 0.330, priceKg: 85 }
     };
 
@@ -3921,7 +3921,7 @@ export const Calculator: React.FC = () => {
       const defBlockPaperTariff = curBlockPaper.priceKg;
       const defCoverPaperTariff = curCoverPaper.priceKg;
       const defBoardTariff = 85.0; // Палітурний картон для твердої обкладинки
-      const defCtpPlateTariff = 175.00; // Сама металева пластина CTP B2 (матеріал)
+      const defCtpPlateTariff = 170.00; // Сама металева пластина CTP B2 (матеріал)
       const defCtpCopyTariff = 4.0000;  // 1С #1: Копіювання форм (експонування пластин)
       const defCtpMountTariff = 3.1200; // 1С #2: Монтаж плівок (лавсанових)
       const defMakereadyTariff = magBlockColor === '1+1' ? 250.0 : 400.0;
