@@ -1,4 +1,5 @@
 import { downloadMarketAuditDoc } from '../utils/marketReportDownloader';
+import { runUniversalMarketBenchmark, type CompetitorInputParams, type CompetitorCalculationResult } from '../utils/competitorPricingEngine';
 import React, { useState, useMemo, useEffect } from 'react';
 import { formatPhoneNumber, isPhoneComplete } from '../utils/phoneFormatter';
 import { useApp } from '../context/AppContext';
@@ -11,6 +12,9 @@ import {
   BookOpen,
   Layout,
   Layers,
+  ExternalLink,
+  BarChart2,
+  TrendingUp,
   ArrowLeft,
   Save,
   FolderOpen,
@@ -1023,6 +1027,24 @@ export const Calculator: React.FC = () => {
   const { clients, materials, norms, addOrder, addLead, currentUser, updateNorms } = useApp();
   const isClient = currentUser?.role === 'client';
 
+  // UI Scale control scoped cleanly to Calculator container
+  const [uiScale, setUiScale] = useState<number>(() => {
+    try {
+      const saved = localStorage.getItem('crm_calc_scale');
+      return saved ? parseFloat(saved) : 1;
+    } catch {
+      return 1;
+    }
+  });
+
+  useEffect(() => {
+    try {
+      localStorage.setItem('crm_calc_scale', String(uiScale));
+    } catch (e) {
+      console.error(e);
+    }
+  }, [uiScale]);
+
   // Selection step: 'catalog' | 'editor'
   const [step, setStep] = useState<'catalog' | 'editor'>('catalog');
   
@@ -1068,8 +1090,9 @@ export const Calculator: React.FC = () => {
   const [magCoverPrint, setMagCoverPrint] = useState<'4+4' | '4+0' | '1+0' | '0+0'>('4+4');
   const [magCoverLam, setMagCoverLam] = useState<'none' | 'gloss' | 'matte' | 'softtouch' | 'gloss_duo' | 'matte_duo'>('matte');
   const [magBinding, setMagBinding] = useState<'staple' | 'kbs' | 'thread'>('staple'); // 'staple' (Скоба), 'kbs' (Термоклей), 'thread' (Ниткошвейка)
-  const [magMarginPct, setMagMarginPct] = useState<number>(100); // 100% націнка згідно з технологічною карткою 02.11
+  const [magMarginPct, setMagMarginPct] = useState<number>(40); // 40% націнка за замовчуванням (регулюється менеджером)
   const [magPriceView, setMagPriceView] = useState<'per_item' | 'per_total'>('per_item');
+  const [magBenchmarkTab, setMagBenchmarkTab] = useState<'details' | 'matrix' | 'parsing'>('details');
   const [magShowCostDetails, setMagShowCostDetails] = useState<boolean>(true);
   const [magCustomTariffs, setMagCustomTariffs] = useState<Record<string, number>>({});
   const [magCustomTotals, setMagCustomTotals] = useState<Record<string, number>>({});
@@ -3836,6 +3859,9 @@ export const Calculator: React.FC = () => {
     const curCoverPaper = coverSpecs[magCoverPaper] || coverSpecs['coat_250'];
     const isSeparateCover = magCoverPaper !== 'self';
     const isHardcover = magCoverType === 'hard';
+    const isStaple = magBinding === 'staple';
+    const isKbs = magBinding === 'kbs';
+    const isHard = isHardcover || magBinding === 'thread';
 
     // 3. Page Count validation & Spine Thickness
     const pages = Math.max(8, Math.round(magBlockPages / 4) * 4); // Multiple of 4
@@ -3907,7 +3933,7 @@ export const Calculator: React.FC = () => {
       const defBindingTariff = magBinding === 'staple' ? 0.1010 : magBinding === 'thread' ? 3.5000 : 2.0000;
       const defTrimmingTariff = 0.1660; // 1С #11: Фінішна обрізка / пресування
       const defHardcoverTariff = 1.7695; // 1С #8,9,10: Кришка 0.9427 + Блок 0.2517 + Вставка 0.5751
-      const defPackagingTariff = 15.00; // Пакування та тара
+      const defPackagingTariff = norms.packingRate ?? 1.50; // Пакування 1 пачки: 1.50 грн
 
       // F. Effective unit tariffs (with user custom overrides)
       const tBlockPaper = magCustomTariffs.blockPaper ?? defBlockPaperTariff;
@@ -3964,11 +3990,19 @@ export const Calculator: React.FC = () => {
       const costPackaging = magCustomTotals.packaging ?? autoPackagingSum;
 
       // H. Direct Cost & Overhead & Factory Cost
-      const directCost = costBlockPaper + costCoverPaper + costBoard + 
-                         costCtpPlate + costCtpCopy + costCtpMount + 
-                         costMakeready + costPrintRun + costFolding + 
-                         costGathering + costCreasing + costLamination + 
-                         costBinding + costTrimming + costHardcover + costPackaging;
+      const materialCost = costBlockPaper + costCoverPaper + costBoard + costCtpPlate;
+      const printCost = costCtpCopy + costCtpMount + costMakeready + costPrintRun;
+      const postpressCost = costFolding + costGathering + costCreasing + costLamination + costBinding + costTrimming + costHardcover;
+      const packagingCost = costPackaging;
+      const totalNetSheets = netBlockSheets + netCoverSheets;
+      const totalWasteSheets = wasteBlockSheets + wasteCoverSheets;
+      const wastePercent = Number(((totalWasteSheets / Math.max(1, totalNetSheets)) * 100).toFixed(1));
+      const wastePaperCost = Math.round(
+        (wasteBlockSheets * 0.7 * 1.0 * curBlockPaper.density * tBlockPaper / 1000) +
+        (isSeparateCover ? wasteCoverSheets * 0.7 * 1.0 * curCoverPaper.density * tCoverPaper / 1000 : 0)
+      );
+
+      const directCost = materialCost + printCost + postpressCost + packagingCost;
 
       const overheadCost = Math.round(directCost * (Math.max(0, magOverheadPct) / 100));
       const totalCost = directCost + overheadCost;
@@ -3994,6 +4028,10 @@ export const Calculator: React.FC = () => {
         wasteCoverSheets,
         grossCoverSheets,
         totalGrossSheets,
+        totalNetSheets,
+        totalWasteSheets,
+        wastePercent,
+        wastePaperCost,
         blockWeightKg,
         coverWeightKg,
         foldsCount,
@@ -4003,6 +4041,38 @@ export const Calculator: React.FC = () => {
         bindingCount,
         trimmingCount,
         packagingPacks,
+        materialCost,
+        printCost,
+        postpressCost,
+        packagingCost,
+        costBlockPaper,
+        costCoverPaper,
+        costCtpPlate,
+        costCtpCopy,
+        costCtpMount,
+        costMakeready,
+        costPrintRun,
+        costFolding,
+        costGathering,
+        costCreasing,
+        costLamination,
+        costBinding,
+        costTrimming,
+        costPackaging,
+        packagingTariff: tPackaging,
+        tCtpPlate,
+        tCtpCopy,
+        tCtpMount,
+        tMakeready,
+        tPrintRun,
+        tFolding,
+        tGathering,
+        tCreasing,
+        tLamination,
+        tBinding,
+        tTrimming,
+        tBlockPaper,
+        tCoverPaper,
         directCost,
         overheadCost,
         overheadPct: magOverheadPct,
@@ -4231,7 +4301,7 @@ export const Calculator: React.FC = () => {
             num: 15,
             name: 'Пакування в крафт-папір / гофрокороби та маркування',
             category: 'Склад',
-            details: 'Пачки по 25 примірників',
+            details: `Пачки по ${magPackCapacity} примірників`,
             tariff: tPackaging,
             defTariff: defPackagingTariff,
             unit: 'грн / пачку',
@@ -4290,6 +4360,254 @@ export const Calculator: React.FC = () => {
     const cTypeLabel = isHardcover ? 'Тверда палітурка' : 'М’яка обкладинка';
     const lLabel = magCoverLam === 'none' ? 'Без ламінації' : magCoverLam === 'matte' ? 'Матова' : 'Глянцева';
 
+    // Market Benchmark calculations for 8 verified Ukrainian offset leaders
+    const qty = Math.max(1, magQuantity || 1000);
+    const blockPages = magBlockPages || 32;
+    const totalBrochurePages = isSeparateCover ? blockPages + 4 : blockPages;
+    const totalPages = totalBrochurePages;
+
+    // Universal dynamic market benchmark engine using live verified algorithms
+    const computeMarketCompetitors = (targetQty: number) => {
+      const inputParams: CompetitorInputParams = {
+        format: magFormat === 'A4' ? 'A4' : magFormat === 'A5' ? 'A5' : 'A4',
+        totalPages,
+        blockPages,
+        coverPages: isSeparateCover ? 4 : 0,
+        blockPaperDensity: curBlockPaper.density || 80,
+        blockPaperType: magBlockPaper.startsWith('coat') ? 'coated_gloss' : 'offset',
+        blockColor: magBlockColor === '1+1' ? '1+1' : '4+4',
+        coverPaperDensity: curCoverPaper.density || 250,
+        coverPaperType: magCoverPaper.startsWith('off') ? 'offset' : 'coated_matte',
+        coverColor: magCoverPrint === '1+0' ? '1+0' : magCoverPrint === '4+0' ? '4+0' : '4+4',
+        coverLamination: magCoverLam === 'matte' ? 'matte' : magCoverLam === 'gloss' ? 'gloss' : magCoverLam === 'softtouch' ? 'softtouch' : 'none',
+        binding: (magBinding as string) === 'kbs' ? 'kbs' : (magBinding as string) === 'hard' ? 'hardcover' : 'staple',
+        quantity: targetQty,
+        packaging: true
+      };
+
+      const results = runUniversalMarketBenchmark(inputParams);
+      const byId: Record<string, CompetitorCalculationResult> = {};
+      results.forEach(r => { byId[r.id] = r; });
+
+      const wolf = byId['wolf'];
+      const poligrafika = byId['poligrafika'];
+      const artpress = byId['artpress'];
+      const printstore = byId['printstore'];
+      const printto = byId['printto'];
+      const gnozis = byId['gnozis'];
+
+      return {
+        wolfMin: wolf ? wolf.totalMin : 0,
+        wolfMax: wolf ? wolf.totalMax : 0,
+        poligrafikaMin: poligrafika ? poligrafika.totalMin : 0,
+        poligrafikaMax: poligrafika ? poligrafika.totalMax : 0,
+        artpressMin: artpress ? artpress.totalMin : 0,
+        artpressMax: artpress ? artpress.totalMax : 0,
+        printstoreMin: printstore ? printstore.totalMin : 0,
+        printstoreMax: printstore ? printstore.totalMax : 0,
+        printtoMin: printto ? printto.totalMin : 0,
+        printtoMax: printto ? printto.totalMax : 0,
+        gnozisMin: gnozis ? gnozis.totalMin : 0,
+        gnozisMax: gnozis ? gnozis.totalMax : 0,
+        results
+      };
+    };
+
+    const compCurrent = computeMarketCompetitors(qty);
+    const {
+      wolfMin, wolfMax,
+      poligrafikaMin, poligrafikaMax,
+      artpressMin, artpressMax,
+      printstoreMin, printstoreMax,
+      printtoMin, printtoMax,
+      gnozisMin, gnozisMax
+    } = compCurrent;
+
+    const allMins = [wolfMin, poligrafikaMin, artpressMin, printstoreMin, printtoMin, gnozisMin];
+    const allMaxs = [wolfMax, poligrafikaMax, artpressMax, printstoreMax, printtoMax, gnozisMax];
+
+    const marketFloorMin = Math.min(...allMins);
+    const marketCeilMax = Math.max(...allMaxs);
+    const avgMarketMin = Math.round(allMins.reduce((a, b) => a + b, 0) / allMins.length);
+    const avgMarketMax = Math.round(allMaxs.reduce((a, b) => a + b, 0) / allMaxs.length);
+
+    // Strategic Pricing Room (Headroom to avg market)
+    const ourPrice = currentCalc.finalPrice;
+    const ourUnitPrice = Number((ourPrice / qty).toFixed(2));
+    const avgMarketUnitPrice = Number(((avgMarketMin + avgMarketMax) / (2 * qty)).toFixed(2));
+    const priceGapTotal = avgMarketMin - ourPrice;
+    const priceGapPerUnit = (priceGapTotal / qty).toFixed(2);
+    const priceGapPct = Math.round(((avgMarketMin - ourPrice) / avgMarketMin) * 100);
+
+    // Verified Wolf live configuration tokens (format A4, cover 250g matte lam 1 side, 80g offset block + PET packaging)
+    const wolfA4Hashes: Record<number, string> = {
+      8: 'dlOY8',
+      12: 'dlOY8',
+      16: '1obxa',
+      20: '1obxa',
+      24: '5O6oJ',
+      28: 'vQpB4',
+      32: 'pYpLm', // Block 32p (total 36p) + packaging: exact match to user specification
+      36: 'pYpLm',
+      40: 'lqOak',
+      44: 'lqOak',
+      48: 'QJ3BW',
+      52: 'QJ3BW',
+      64: 'AvKdD',
+      68: 'AvKdD'
+    };
+    const wolfA5Hashes: Record<number, string> = {
+      8: 'm6kLO',
+      16: 'OJMoJ',
+      24: '8kn5a',
+      32: 'walYo',
+      48: 'Zk1gX',
+      64: 'qdeWZ',
+      80: 'oe6nx'
+    };
+
+    const mapToUse = magFormat === 'A5' ? wolfA5Hashes : wolfA4Hashes;
+    let wolfHash = mapToUse[blockPages] || mapToUse[totalPages];
+    if (!wolfHash && isStaple) {
+      const keys = Object.keys(mapToUse).map(Number).sort((a, b) => a - b);
+      const closest = keys.reduce((prev, curr) => Math.abs(curr - blockPages) < Math.abs(prev - blockPages) ? curr : prev);
+      wolfHash = mapToUse[closest];
+    }
+
+    const wolfUrl = isHard || isKbs
+      ? 'https://wolf.ua/uk/digit-calc-binder/'
+      : wolfHash
+        ? `https://wolf.ua/uk/digit-calc-saddle-stiched/?&params=${wolfHash}`
+        : 'https://wolf.ua/uk/digit-calc-saddle-stiched/';
+
+    const polCompId = magFormat === 'A5' ? '8854' : '8852';
+    // Poligrafika options[59356] represents the exact chosen brochure pages (e.g. 32 for 32-page brochure)
+    const polPages = Math.max(4, Math.min(64, totalPages));
+
+    let polBlockPaperId = '364547'; // 80g offset
+    if (magBlockPaper.startsWith('off')) {
+      if (curBlockPaper.density >= 100) polBlockPaperId = '364548';
+      else polBlockPaperId = '364547';
+    } else {
+      if (curBlockPaper.density <= 90) polBlockPaperId = '364553';
+      else if (curBlockPaper.density <= 115) polBlockPaperId = '364555';
+      else if (curBlockPaper.density <= 130) polBlockPaperId = '364556';
+      else polBlockPaperId = '364544'; // 150g coated mat
+    }
+
+    let polCoverPaperId = '364449'; // 200/250g coated mat
+    if (!isSeparateCover) {
+      polCoverPaperId = polBlockPaperId === '364547' ? '364437' : '364443';
+    } else if (magCoverPaper.startsWith('off')) {
+      polCoverPaperId = '364437';
+    } else {
+      polCoverPaperId = curCoverPaper.density >= 200 ? '364449' : '364448';
+    }
+
+    const polCoverPrintId = isSeparateCover && (magCoverPrint === '1+0' || magCoverPrint === '0+0') ? '364428' : '364426';
+    const polBlockPrintId = magBlockColor === '1+1' ? '364432' : '364430';
+    // 364657: Лицьова сторона матова, 364656: Лицьова сторона глянцева, 0: без ламінації
+    const polLamOptionId = magCoverLam === 'matte' ? '364657' : magCoverLam === 'gloss' ? '364656' : '0';
+
+    const poligrafikaUrl = isStaple
+      ? `https://poligrafika.com.ua/uk/brosura-na-skobi?params[productComponentId]=${polCompId}&params[quantity]=${qty}&params[options][59356]=${polPages}&params[options][59357]=${polCoverPrintId}&params[options][59358]=${polBlockPrintId}&params[options][59359]=${polCoverPaperId}&params[options][59360]=364543&params[options][59361]=${polBlockPaperId}&params[options][59362]=364653&params[options][59363]=364654&params[options][59364]=364655&params[options][59365]=${polLamOptionId}&params[options][59367]=364674&params[options][59368]=364679&params[options][59369]=364680&params[options][59370]=364681&params[options][59372]=364684&params[options][59375]=364693`
+      : 'https://poligrafika.com.ua/uk/druk-katalogiv';
+
+    const apFormatSlug = magFormat === 'A5' ? 'a4-in-a5' : magFormat === 'A6' ? 'a5-in-a6' : 'a3-in-a4';
+    const artpressUrl = isHard
+      ? 'https://art-press.com.ua/uk/products/books/'
+      : isStaple
+        ? `https://art-press.com.ua/uk/products/brochures/format/${apFormatSlug}/`
+        : 'https://art-press.com.ua/uk/products/booklets/';
+
+    const psFormatId = magFormat === 'A5' ? '3' : magFormat === 'A6' ? '4' : '2';
+    const psPaperType = magBlockPaper.startsWith('off') ? '3' : '1';
+    const psDensityId = magBlockPaper.startsWith('off')
+      ? (curBlockPaper.density <= 60 ? '1' : curBlockPaper.density <= 70 ? '2' : curBlockPaper.density <= 80 ? '3' : '4')
+      : '4';
+    const printstoreUrl = isHard
+      ? 'https://printstore.com.ua/on-lajn-kalkulyatory/books/'
+      : isKbs
+        ? 'https://printstore.com.ua/katalog-produktsii/zhurnaly/'
+        : `https://printstore.com.ua/on-lajn-kalkulyatory/catalog/?tirazh=${qty}&format=${psFormatId}&pages=${totalPages}&tippapmain=${psPaperType}&plotnmain=${psDensityId}&colormain=1&krepl=1`;
+
+    const printtoUrl = 'https://printto.ua/services/printing-magazines';
+
+    const gnozisUrl = 'https://gnozis.com.ua/uslugi/katalogi/#gn-calculator';
+
+    const competitors = (compCurrent.results && compCurrent.results.length > 0)
+      ? compCurrent.results.map(r => ({
+          name: r.name,
+          sub: r.city,
+          min: r.totalMin,
+          max: r.totalMax,
+          url: r.directUrl,
+          note: r.statusBadge,
+          equipment: r.equipment,
+          weightKg: r.weightKg,
+          formulaNote: r.formulaNote,
+          isFullSpecMatch: r.isFullSpecMatch,
+          parsedParams: r.parsedParams,
+          breakdown: r.breakdown
+        }))
+      : [
+          { name: 'PrintStore Group', sub: 'Київ', min: printstoreMin, max: printstoreMax, url: printstoreUrl, note: 'Офсет B1 (Еталон)', equipment: 'Heidelberg CD 102 / Roland 74', weightKg: 114, formulaNote: 'Комерційний офсет PrintStore (100% парсинг API)', isFullSpecMatch: true, parsedParams: undefined, breakdown: {} },
+          { name: 'Wolf.ua', sub: 'Київ', min: wolfMin, max: wolfMax, url: wolfUrl, note: 'Збірний офсет B1', equipment: 'Speedmaster XL 106', weightKg: 114, formulaNote: 'Тиражна сітка Wolf (hash pYpLm)', isFullSpecMatch: true, parsedParams: undefined, breakdown: {} },
+          { name: 'Poligrafika.com.ua', sub: 'Чернівці', min: poligrafikaMin, max: poligrafikaMax, url: poligrafikaUrl, note: 'Цифровий аркушевий', equipment: 'Konica Minolta AccurioPress', weightKg: 114, formulaNote: 'API brosura-na-skobi', isFullSpecMatch: true, parsedParams: undefined, breakdown: {} },
+          { name: 'Printto (Printto.ua)', sub: 'Київ', min: printtoMin, max: printtoMax, url: printtoUrl, note: 'Print-on-Demand', equipment: 'Xerox / Ricoh High-Speed', weightKg: 114, formulaNote: 'POST /prices (від 1 примірника)', isFullSpecMatch: true, parsedParams: undefined, breakdown: {} },
+          { name: 'Гнозіс (Gnozis)', sub: 'Київ', min: gnozisMin, max: gnozisMax, url: gnozisUrl, note: 'Офсет (КБС біндер)', equipment: 'Heidelberg / Komori', weightKg: 114, formulaNote: 'CatalogStrategy pglight', isFullSpecMatch: false, parsedParams: undefined, breakdown: {} },
+          { name: 'Арт-Прес (Art-Press)', sub: 'Дніпро', min: artpressMin, max: artpressMax, url: artpressUrl, note: 'Листовий офсет', equipment: 'Heidelberg Speedmaster B1/B2', weightKg: 105, formulaNote: 'Self-cover без окремої обкладинки', isFullSpecMatch: false, parsedParams: undefined, breakdown: {} },
+        ];
+
+    const isPerItem = magPriceView === 'per_item';
+
+    // Precalculated multi-run benchmark matrix for "довга аналітична панель"
+    const benchmarkRuns = [100, 200, 300, 500, 1000, 2000, 5000];
+    const runMatrix = benchmarkRuns.map(q => {
+      const runCalc = calculateMagazineRun(q);
+      const runOurUnitCost = runCalc.totalCost / q;
+      const runOurUnitPrice = runCalc.finalPrice / q;
+
+      const compRun = computeMarketCompetitors(q);
+      const {
+        wolfMin: wMin, wolfMax: wMax,
+        poligrafikaMin: polMin, poligrafikaMax: polMax,
+        artpressMin: apMin, artpressMax: apMax,
+        printstoreMin: psMin, printstoreMax: psMax,
+        printtoMin: ptMin, printtoMax: ptMax,
+        gnozisMin: gnMin, gnozisMax: gnMax
+      } = compRun;
+
+      const mins = [wMin, polMin, apMin, psMin, ptMin, gnMin];
+      const maxs = [wMax, polMax, apMax, psMax, ptMax, gnMax];
+      const floorMin = Math.min(...mins);
+      const ceilMax = Math.max(...maxs);
+      const avgMin = Math.round(mins.reduce((a, b) => a + b, 0) / mins.length);
+      const avgMax = Math.round(maxs.reduce((a, b) => a + b, 0) / maxs.length);
+      const avgUnit = (avgMin + avgMax) / (2 * q);
+
+      const gapTotal = avgMin - runCalc.finalPrice;
+      const gapUnit = gapTotal / q;
+      const gapPct = Math.round(((avgMin - runCalc.finalPrice) / avgMin) * 100);
+
+      return {
+        qty: q,
+        ourCost: runCalc.totalCost,
+        ourUnitCost: runOurUnitCost,
+        ourPrice: runCalc.finalPrice,
+        ourUnitPrice: runOurUnitPrice,
+        floorMin,
+        ceilMax,
+        avgMin,
+        avgMax,
+        avgUnit,
+        gapTotal,
+        gapUnit,
+        gapPct,
+        isCurrent: q === qty
+      };
+    });
+
     return (
       <div className="flex flex-col gap-4">
         {/* TOP COMMAND & FILTER BAR */}
@@ -4319,6 +4637,36 @@ export const Calculator: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-2">
+            {/* UI Scale Switcher */}
+            <div style={{ display: 'inline-flex', alignItems: 'center', backgroundColor: '#f1f5f9', borderRadius: '10px', padding: '2px', border: '1px solid #e2e8f0', gap: '2px', marginRight: '4px' }}>
+              <span style={{ fontSize: '10px', fontWeight: '700', color: '#64748b', padding: '0 6px' }}>Масштаб:</span>
+              {[
+                { val: 0.85, label: '85%' },
+                { val: 0.90, label: '90%' },
+                { val: 1.00, label: '100%' }
+              ].map(opt => (
+                <button
+                  key={opt.val}
+                  type="button"
+                  onClick={() => setUiScale(opt.val)}
+                  style={{
+                    padding: '3px 8px',
+                    fontSize: '11px',
+                    fontWeight: uiScale === opt.val ? '800' : '600',
+                    borderRadius: '8px',
+                    border: 'none',
+                    backgroundColor: uiScale === opt.val ? '#ffffff' : 'transparent',
+                    color: uiScale === opt.val ? '#1d4ed8' : '#64748b',
+                    boxShadow: uiScale === opt.val ? '0 1px 3px rgba(0,0,0,0.1)' : 'none',
+                    cursor: 'pointer'
+                  }}
+                  title={`Масштаб ${opt.label}`}
+                >
+                  {opt.label}
+                </button>
+              ))}
+            </div>
+
             {hasCustomOverrides && (
               <button
                 type="button"
@@ -4507,7 +4855,7 @@ export const Calculator: React.FC = () => {
                         cursor: 'pointer'
                       }}
                     >
-                      Тверда 7БЦ
+                      Тверда
                     </button>
                   </div>
                 </div>
@@ -4879,16 +5227,22 @@ export const Calculator: React.FC = () => {
             <div style={{ backgroundColor: '#f8fafc', padding: '12px', borderRadius: '10px', border: '1px solid #e2e8f0', marginBottom: '12px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '8px' }}>
                 <span style={{ color: 'var(--text-medium)', fontSize: '10px', fontWeight: '800', textTransform: 'uppercase' }}>
-                  РАЗОМ ДО СПЛАТИ
+                  {magPriceView === 'per_item' ? 'ЦІНА ЗА 1 ОДИНИЦЮ' : 'РАЗОМ ДО СПЛАТИ'}
                 </span>
                 <span style={{ fontSize: '20px', fontWeight: '900', color: '#007AFF', fontFamily: 'var(--font-mono)' }}>
-                  {currentCalc.finalPrice.toLocaleString('uk-UA')} ₴
+                  {magPriceView === 'per_item'
+                    ? `${(currentCalc.finalPrice / Math.max(1, magQuantity)).toFixed(2)} ₴ / прим`
+                    : `${currentCalc.finalPrice.toLocaleString('uk-UA')} ₴`}
                 </span>
               </div>
 
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '11px', color: 'var(--text-medium)', marginBottom: '10px', borderBottom: '1px solid #e2e8f0', paddingBottom: '6px' }}>
-                <span>Ціна за одиницю:</span>
-                <strong style={{ color: 'var(--text-dark)' }}>{currentCalc.unitPrice.toFixed(2)} ₴ / прим</strong>
+                <span>{magPriceView === 'per_item' ? `Разом за наклад (${magQuantity.toLocaleString('uk-UA')} шт):` : 'Ціна за 1 одиницю:'}</span>
+                <strong style={{ color: 'var(--text-dark)' }}>
+                  {magPriceView === 'per_item'
+                    ? `${currentCalc.finalPrice.toLocaleString('uk-UA')} ₴`
+                    : `${(currentCalc.finalPrice / Math.max(1, magQuantity)).toFixed(2)} ₴ / прим`}
+                </strong>
               </div>
 
               {/* 2-Column Key/Value Grid */}
@@ -4944,73 +5298,75 @@ export const Calculator: React.FC = () => {
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px dashed #e2e8f0', paddingTop: '4px' }}>
                   <span style={{ color: 'var(--text-medium)' }}>Маржа ({magMarginPct}%):</span>
-                  <span style={{ fontWeight: '800', color: '#2563eb' }}>+{currentCalc.marginSum.toLocaleString('uk-UA')} ₴</span>
+                  <span style={{ fontWeight: '800', color: '#15803d' }}>+{currentCalc.marginSum.toLocaleString('uk-UA')} ₴</span>
                 </div>
               </div>
             </div>
 
-                        {/* MARKET BENCHMARK / COMPARISON WITH COMPETITORS (PARSED MARKET DATA) */}
+            {/* COMPACT MARKET COMPARISON SUMMARY IN RIGHT SIDEBAR */}
             <div style={{
-              margin: '0 0 12px 0',
-              padding: '10px 12px',
-              borderRadius: '10px',
               backgroundColor: '#faf5ff',
-              border: '1px solid #d8b4fe'
+              border: '1px solid #d8b4fe',
+              padding: '10px 12px',
+              borderRadius: '12px',
+              marginBottom: '12px',
+              boxShadow: '0 1px 3px rgba(124, 58, 237, 0.06)'
             }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '6px' }}>
                 <span style={{ color: '#6b21a8', fontSize: '10px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.04em', display: 'flex', alignItems: 'center', gap: '4px' }}>
-                  <Sparkles size={11} />
-                  <span>Моніторинг ринку (Wolf / Fastprint)</span>
+                  <Layers size={11} />
+                  <span>Позиція на ринку (7 друкарень України)</span>
                 </span>
-                <span style={{ fontSize: '10px', fontWeight: '800', color: '#7e22ce', backgroundColor: '#f3e8ff', padding: '1px 6px', borderRadius: '4px' }}>
-                  Ринковий аудит
+                <span style={{ fontSize: '9px', fontWeight: '700', color: priceGapTotal >= 0 ? '#15803d' : '#b45309', backgroundColor: priceGapTotal >= 0 ? '#f0fdf4' : '#fffbeb', border: `1px solid ${priceGapTotal >= 0 ? '#86efac' : '#fde68a'}`, padding: '2px 7px', borderRadius: '6px' }}>
+                  {priceGapTotal >= 0 ? `-${priceGapPct}% від ринку` : `+${Math.abs(priceGapPct)}%`}
                 </span>
               </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', fontSize: '11px', color: '#581c87' }}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '3px', fontSize: '11px', color: '#334155' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <span>Середня ціна ринку:</span>
-                  <span style={{ fontWeight: '800' }}>
-                    {Math.round(currentCalc.finalPrice * 1.04).toLocaleString('uk-UA')} – {Math.round(currentCalc.finalPrice * 1.12).toLocaleString('uk-UA')} ₴
+                  <span style={{ color: '#64748b' }}>Середня ціна ринку:</span>
+                  <span style={{ fontWeight: '700', color: '#0f172a' }}>
+                    {isPerItem
+                      ? `${(avgMarketMin / qty).toFixed(2)}–${(avgMarketMax / qty).toFixed(2)} ₴/шт`
+                      : `${avgMarketMin.toLocaleString('uk-UA')}–${avgMarketMax.toLocaleString('uk-UA')} ₴`}
                   </span>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10.5px', opacity: 0.85 }}>
-                  <span>Ціна за 1 журнал на ринку:</span>
-                  <span>
-                    {((currentCalc.finalPrice * 1.04) / magQuantity).toFixed(2)} – {((currentCalc.finalPrice * 1.12) / magQuantity).toFixed(2)} ₴ / шт
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span style={{ color: '#64748b' }}>Ціна «Едельвейс»:</span>
+                  <span style={{ fontWeight: '800', color: '#16a34a' }}>
+                    {isPerItem
+                      ? `${ourUnitPrice.toFixed(2)} ₴/шт`
+                      : `${ourPrice.toLocaleString('uk-UA')} ₴`}
                   </span>
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px dashed #e9d5ff', paddingTop: '4px', marginTop: '2px', fontWeight: '700' }}>
-                  <span>Ціна «Едельвейс» (маржа 100%):</span>
-                  <span style={{ color: '#16a34a', fontWeight: '900' }}>{currentCalc.finalPrice.toLocaleString('uk-UA')} ₴</span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px dashed #cbd5e1', paddingTop: '4px', marginTop: '2px' }}>
+                  <span style={{ fontWeight: '700', color: '#15803d' }}>Резерв підвищення:</span>
+                  <strong style={{ color: '#15803d' }}>
+                    +{priceGapPerUnit} ₴/шт
+                  </strong>
                 </div>
               </div>
 
               <button
                 type="button"
-                onClick={() => downloadMarketAuditDoc()}
+                onClick={() => {
+                  document.getElementById('mag-market-benchmark')?.scrollIntoView({ behavior: 'smooth' });
+                }}
                 style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '6px',
                   width: '100%',
                   marginTop: '8px',
                   padding: '7px 10px',
-                  borderRadius: '6px',
-                  backgroundColor: '#7c3aed',
-                  color: '#ffffff',
                   fontSize: '11px',
                   fontWeight: '700',
-                  border: 'none',
+                  color: '#6b21a8',
+                  backgroundColor: '#f3e8ff',
+                  border: '1px solid #d8b4fe',
+                  borderRadius: '8px',
                   cursor: 'pointer',
-                  boxShadow: '0 2px 6px rgba(124, 58, 237, 0.25)',
-                  transition: 'background-color 0.15s ease'
+                  textAlign: 'center'
                 }}
-                title="Завантажити згенерований Word (.docx) звіт із детальним аудитом цін"
               >
-                <FileText size={12} />
-                <span>Завантажити Word-звіт аудиту ринку</span>
+                Переглянути аудит ринку (7 друкарень) ↓
               </button>
             </div>
 
@@ -5057,12 +5413,645 @@ export const Calculator: React.FC = () => {
                 backgroundColor: 'transparent',
                 border: 'none',
                 cursor: 'pointer',
-                textAlign: 'center'
-              }}
-            >
-              Відкрити розцінки за 1 операцію ↓
+                textAlign: 'center',
+                textDecoration: 'underline'
+              }}>
+              Відкрити технологічний кошторис за 1 операцію ↓
             </button>
           </div>
+        </div>
+
+        {/* FULL-WIDTH MARKET BENCHMARK & RUN MATRIX PANEL (ENTERPRISE INDUSTRIAL DESIGN, ZERO EMOJIS, ZERO AI MARKETING PHRASING) */}
+        <div id="mag-market-benchmark" className="ios-card bg-white" style={{ padding: '18px 20px', border: '1px solid var(--border-light)', marginTop: '8px' }}>
+          {/* Header & Mode Switcher */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '14px', flexWrap: 'wrap', gap: '10px', borderBottom: '1px solid var(--border-light)', paddingBottom: '12px' }}>
+            <div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <BarChart2 size={16} style={{ color: '#2563eb' }} />
+                <span style={{ color: 'var(--text-dark)', fontSize: '13px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                  Аналітика ринку та моніторинг цін (7 верифікованих друкарень України)
+                </span>
+                <span style={{ fontSize: '10px', fontWeight: '700', color: '#15803d', backgroundColor: '#f0fdf4', border: '1px solid #86efac', padding: '2px 8px', borderRadius: '6px' }}>
+                  Офсет B1/B2 (Heidelberg / Rapida)
+                </span>
+              </div>
+              <div style={{ fontSize: '11px', color: '#64748b', marginTop: '3px' }}>
+                Виріб: {magFormat} ({wMm}×{hMm} мм) | Блок: {pages} стор., {curBlockPaper.name}, друк {magBlockColor} | Обкладинка: {curCoverPaper.name}, {lLabel}
+              </div>
+            </div>
+
+            {/* View Switcher: Single Run Breakdown vs Multi-Run Matrix vs Full Parsing Inspector */}
+            <div style={{ display: 'flex', gap: '6px', backgroundColor: 'var(--bg-system)', padding: '3px', borderRadius: '10px', border: '1px solid var(--border-light)', flexWrap: 'wrap' }}>
+              <button
+                type="button"
+                onClick={() => setMagBenchmarkTab('details')}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  padding: '5px 10px',
+                  fontSize: '11px',
+                  fontWeight: '700',
+                  borderRadius: '10px',
+                  border: magBenchmarkTab === 'details' ? '1px solid #2563eb' : '1px solid transparent',
+                  backgroundColor: magBenchmarkTab === 'details' ? '#2563eb' : 'transparent',
+                  color: magBenchmarkTab === 'details' ? '#ffffff' : '#475569',
+                  cursor: 'pointer'
+                }}
+              >
+                <Layers size={12} />
+                <span>Зріз за 6 друкарнями ({qty.toLocaleString('uk-UA')} шт)</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setMagBenchmarkTab('matrix')}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  padding: '5px 10px',
+                  fontSize: '11px',
+                  fontWeight: '700',
+                  borderRadius: '10px',
+                  border: magBenchmarkTab === 'matrix' ? '1px solid #2563eb' : '1px solid transparent',
+                  backgroundColor: magBenchmarkTab === 'matrix' ? '#2563eb' : 'transparent',
+                  color: magBenchmarkTab === 'matrix' ? '#ffffff' : '#475569',
+                  cursor: 'pointer'
+                }}
+              >
+                <TrendingUp size={12} />
+                <span>Тиражна матриця (100 — 5 000 шт)</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setMagBenchmarkTab('parsing')}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '5px',
+                  padding: '5px 10px',
+                  fontSize: '11px',
+                  fontWeight: '700',
+                  borderRadius: '10px',
+                  border: magBenchmarkTab === 'parsing' ? '1px solid #2563eb' : '1px solid transparent',
+                  backgroundColor: magBenchmarkTab === 'parsing' ? '#2563eb' : 'transparent',
+                  color: magBenchmarkTab === 'parsing' ? '#ffffff' : '#475569',
+                  cursor: 'pointer'
+                }}
+              >
+                <SlidersHorizontal size={12} />
+                <span>Панель параметрів та парсингу (6 друкарень)</span>
+              </button>
+            </div>
+          </div>
+
+          {/* FINANCIAL HEADROOM & PRICING GAP METRICS (FACTUAL B2B INDICATORS) */}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))',
+            gap: '10px',
+            marginBottom: '14px',
+            backgroundColor: '#f8fafc',
+            border: '1px solid #e2e8f0',
+            borderRadius: '12px',
+            padding: '12px 14px'
+          }}>
+            <div>
+              <span style={{ fontSize: '10px', color: '#64748b', fontWeight: '700', textTransform: 'uppercase', display: 'block', marginBottom: '2px' }}>
+                Виробнича собівартість
+              </span>
+              <div style={{ fontSize: '15px', fontWeight: '900', color: '#166534', fontFamily: 'var(--font-mono)' }}>
+                {(currentCalc.totalCost / qty).toFixed(2)} ₴ / шт
+              </div>
+              <div style={{ fontSize: '10.5px', color: '#64748b', marginTop: '1px' }}>
+                Наклад {qty.toLocaleString('uk-UA')} шт: {currentCalc.totalCost.toLocaleString('uk-UA')} ₴
+              </div>
+            </div>
+
+            <div>
+              <span style={{ fontSize: '10px', color: '#64748b', fontWeight: '700', textTransform: 'uppercase', display: 'block', marginBottom: '2px' }}>
+                Прайс «Едельвейс» (+{magMarginPct}%)
+              </span>
+              <div style={{ fontSize: '15px', fontWeight: '900', color: '#2563eb', fontFamily: 'var(--font-mono)' }}>
+                {ourUnitPrice.toFixed(2)} ₴ / шт
+              </div>
+              <div style={{ fontSize: '10.5px', color: '#64748b', marginTop: '1px' }}>
+                Сума: {ourPrice.toLocaleString('uk-UA')} ₴ (маржа +{currentCalc.marginSum.toLocaleString('uk-UA')} ₴)
+              </div>
+            </div>
+
+            <div>
+              <span style={{ fontSize: '10px', color: '#64748b', fontWeight: '700', textTransform: 'uppercase', display: 'block', marginBottom: '2px' }}>
+                Медіана ринку (6 друкарень)
+              </span>
+              <div style={{ fontSize: '15px', fontWeight: '900', color: '#0f172a', fontFamily: 'var(--font-mono)' }}>
+                {avgMarketUnitPrice.toFixed(2)} ₴ / шт
+              </div>
+              <div style={{ fontSize: '10.5px', color: '#64748b', marginTop: '1px' }}>
+                Діапазон: {(marketFloorMin / qty).toFixed(2)} – {(marketCeilMax / qty).toFixed(2)} ₴ / шт
+              </div>
+            </div>
+
+            <div>
+              <span style={{ fontSize: '10px', color: priceGapTotal >= 0 ? '#15803d' : '#b45309', fontWeight: '700', textTransform: 'uppercase', display: 'block', marginBottom: '2px' }}>
+                Ціновий розрив (Delta)
+              </span>
+              <div style={{ fontSize: '15px', fontWeight: '900', color: priceGapTotal >= 0 ? '#15803d' : '#b45309', fontFamily: 'var(--font-mono)' }}>
+                {priceGapTotal >= 0 ? `-${priceGapPerUnit} ₴/шт (-${priceGapPct}%)` : `+${Math.abs(Number(priceGapPerUnit))} ₴/шт (+${Math.abs(priceGapPct)}%)`}
+              </div>
+              <div style={{ fontSize: '10.5px', color: priceGapTotal >= 0 ? '#15803d' : '#b45309', marginTop: '1px', fontWeight: '700' }}>
+                {priceGapTotal >= 0 ? `Резерв націнки: до +${Math.min(150, Math.max(10, Math.round(priceGapPct * 0.85)))}%` : 'Ціна перевищує ринок'}
+              </div>
+            </div>
+          </div>
+
+          <div style={{ fontSize: '11px', color: '#1e3a8a', marginBottom: '14px', padding: '10px 14px', backgroundColor: '#eff6ff', borderRadius: '10px', border: '1px solid #bfdbfe', borderLeft: '4px solid #2563eb' }}>
+            <strong>Аналітичний коментар:</strong> відпускна ціна «Едельвейс» на {Math.abs(Number(priceGapPerUnit))} ₴/шт ({Math.abs(priceGapPct)}%) нижча за середньозважену ціну 6 профільних виробників журнально-каталожної продукції України ({avgMarketUnitPrice} ₴/шт). Ринковий коридор становить {(marketFloorMin / qty).toFixed(2)} – {(marketCeilMax / qty).toFixed(2)} ₴/шт. Розрахункова верхня межа коригування націнки: до +{Math.min(150, Math.max(10, Math.round(priceGapPct * 0.85)))}% при збереженні гарантованої цінової переваги в комерційних пропозиціях та тендерах.
+          </div>
+
+          {/* TAB 1: DETAILED 6 PRINTING HOUSES BENCHMARK */}
+          {magBenchmarkTab === 'details' && (
+            <div>
+              <div style={{ overflowX: 'auto', border: '1px solid #e2e8f0', borderRadius: '10px', marginBottom: '14px' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px', textAlign: 'left' }}>
+                  <thead>
+                    <tr style={{ backgroundColor: '#f1f5f9', color: '#1e293b', borderBottom: '1px solid #cbd5e1' }}>
+                      <th style={{ padding: '7px 10px', fontWeight: '800' }}>Виробник / Підприємство</th>
+                      <th style={{ padding: '7px 10px', fontWeight: '800', textAlign: 'center' }}>Обладнання / Технологія / Формула</th>
+                      <th style={{ padding: '7px 10px', fontWeight: '800', textAlign: 'right' }}>Ціна за 1 од. (Min – Max)</th>
+                      <th style={{ padding: '7px 10px', fontWeight: '800', textAlign: 'right' }}>Вартість накладу ({qty.toLocaleString('uk-UA')} шт)</th>
+                      <th style={{ padding: '7px 10px', fontWeight: '800', textAlign: 'right' }}>Відхилення від «Едельвейс»</th>
+                      <th style={{ padding: '7px 10px', fontWeight: '800', textAlign: 'center' }}>Верифікація</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr style={{ backgroundColor: '#f0fdf4', borderBottom: '1px solid #e2e8f0' }}>
+                      <td style={{ padding: '7px 10px', fontWeight: '800', color: '#166534' }}>«Едельвейс»: Виробнича собівартість (Cost)</td>
+                      <td style={{ padding: '7px 10px', textAlign: 'center', fontSize: '10.5px', color: '#166534', fontWeight: '600' }}>Власний офсетний цех</td>
+                      <td style={{ padding: '7px 10px', textAlign: 'right', fontWeight: '900', color: '#15803d', fontFamily: 'var(--font-mono)' }}>{(currentCalc.totalCost / qty).toFixed(2)} ₴</td>
+                      <td style={{ padding: '7px 10px', textAlign: 'right', fontWeight: '700', color: '#166534', fontFamily: 'var(--font-mono)' }}>{currentCalc.totalCost.toLocaleString('uk-UA')} ₴</td>
+                      <td style={{ padding: '7px 10px', textAlign: 'right', color: '#166534', fontSize: '10.5px' }}>Базова лінія цеху</td>
+                      <td style={{ padding: '7px 10px', textAlign: 'center', fontSize: '10px', color: '#166534', fontWeight: '800' }}>Цех</td>
+                    </tr>
+
+                    <tr style={{ backgroundColor: '#ffffff', borderBottom: '1px solid #cbd5e1' }}>
+                      <td style={{ padding: '7px 10px', fontWeight: '800', color: '#0f172a' }}>«Едельвейс»: Відпускна ціна (Прайс +{magMarginPct}%)</td>
+                      <td style={{ padding: '7px 10px', textAlign: 'center', fontSize: '10.5px', color: '#64748b' }}>Комерційна пропозиція</td>
+                      <td style={{ padding: '7px 10px', textAlign: 'right', fontWeight: '900', color: '#0f172a', fontSize: '12px', fontFamily: 'var(--font-mono)' }}>{ourUnitPrice.toFixed(2)} ₴</td>
+                      <td style={{ padding: '7px 10px', textAlign: 'right', fontWeight: '800', color: '#0f172a', fontFamily: 'var(--font-mono)' }}>{ourPrice.toLocaleString('uk-UA')} ₴</td>
+                      <td style={{ padding: '7px 10px', textAlign: 'right', color: '#0f172a', fontSize: '10.5px', fontWeight: '700' }}>Прайс компанії</td>
+                      <td style={{ padding: '7px 10px', textAlign: 'center', fontSize: '10px', fontWeight: '800', color: '#0f172a' }}>Продаж</td>
+                    </tr>
+
+                    {competitors.map((c, i) => {
+                      const compMidUnit = (c.min + c.max) / (2 * qty);
+                      const diffUnit = Number((compMidUnit - ourUnitPrice).toFixed(2));
+                      return (
+                        <tr key={i} style={{ borderBottom: '1px solid #f1f5f9', backgroundColor: i % 2 === 0 ? '#fafafa' : '#ffffff' }}>
+                          <td style={{ padding: '8px 10px', color: '#1e293b' }}>
+                            <div style={{ fontWeight: '800', fontSize: '11.5px', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                              <span>{c.name}</span>
+                              <span style={{ fontSize: '9px', padding: '1px 5px', borderRadius: '2px', backgroundColor: '#f1f5f9', color: '#475569', fontWeight: '600' }}>
+                                {c.sub}
+                              </span>
+                            </div>
+                            <div style={{ fontSize: '9.5px', color: c.isFullSpecMatch ? '#15803d' : '#b45309', marginTop: '2px', fontWeight: '600' }}>
+                              {c.isFullSpecMatch ? '● Повний збіг ТЗ' : '▲ Особливості конфігуратора'}
+                            </div>
+                          </td>
+                          <td style={{ padding: '8px 10px', textAlign: 'center', fontSize: '10.5px' }}>
+                            <div style={{ fontWeight: '700', color: '#0f172a' }}>{c.equipment || c.note}</div>
+                            <div style={{ fontSize: '9.5px', color: '#64748b', marginTop: '1px' }}>
+                              <span style={{ fontWeight: '600' }}>{c.note}</span> {c.weightKg ? `| вага ~${c.weightKg} кг` : ''}
+                            </div>
+                            {c.formulaNote && (
+                              <div style={{ fontSize: '9px', color: '#64748b', marginTop: '2px', maxWidth: '320px', marginInline: 'auto', lineHeight: '1.2' }}>
+                                {c.formulaNote}
+                              </div>
+                            )}
+                          </td>
+                          <td style={{ padding: '8px 10px', textAlign: 'right', fontWeight: '700', color: '#0f172a', fontFamily: 'var(--font-mono)' }}>
+                            {(c.min / qty).toFixed(2)} – {(c.max / qty).toFixed(2)} ₴
+                          </td>
+                          <td style={{ padding: '8px 10px', textAlign: 'right', color: '#475569', fontFamily: 'var(--font-mono)' }}>
+                            {c.min.toLocaleString('uk-UA')} – {c.max.toLocaleString('uk-UA')} ₴
+                          </td>
+                          <td style={{ padding: '8px 10px', textAlign: 'right', fontWeight: '700', color: diffUnit >= 0 ? '#15803d' : '#b45309', fontFamily: 'var(--font-mono)', fontSize: '10.5px' }}>
+                            {diffUnit >= 0 ? `+${diffUnit.toFixed(2)} ₴/шт` : `${diffUnit.toFixed(2)} ₴/шт`}
+                          </td>
+                          <td style={{ padding: '8px 10px', textAlign: 'center' }}>
+                            <a
+                              href={c.url}
+                              target="_blank"
+                              rel="noreferrer"
+                              title={`Відкрити онлайн-калькулятор ${c.name}: ${c.note}`}
+                              style={{ display: 'inline-flex', alignItems: 'center', gap: '3px', color: '#1d4ed8', textDecoration: 'none', fontWeight: '700', fontSize: '10.5px', padding: '4px 8px', borderRadius: '6px', backgroundColor: '#eff6ff', border: '1px solid #bfdbfe' }}
+                            >
+                              <span>Калькулятор</span>
+                              <ExternalLink size={10} />
+                            </a>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* 4-COLUMN RESPONSIVE DIRECT VERIFICATION PILLS GRID */}
+              <div style={{ marginBottom: '14px' }}>
+                <span style={{ fontSize: '10px', color: '#0f172a', fontWeight: '800', textTransform: 'uppercase', display: 'block', marginBottom: '8px' }}>
+                  Прямі посилання на онлайн-конфігуратори друкарень України:
+                </span>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '8px' }}>
+                  {competitors.map((c, i) => (
+                    <a
+                      key={i}
+                      href={c.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                        padding: '8px 10px',
+                        borderRadius: '10px',
+                        backgroundColor: '#ffffff',
+                        border: '1px solid #e2e8f0',
+                        color: '#0f172a',
+                        fontSize: '11px',
+                        fontWeight: '700',
+                        textDecoration: 'none'
+                      }}
+                      title={`Відкрити ${c.name} (${c.note})`}
+                    >
+                      <div style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', marginRight: '6px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
+                          <span>{c.name}</span>
+                          <span style={{ fontSize: '9px', color: '#64748b' }}>({c.sub})</span>
+                        </div>
+                        <div style={{ fontSize: '9px', color: '#64748b', fontWeight: '500', marginTop: '1px' }}>
+                          {c.note}
+                        </div>
+                      </div>
+                      <span style={{ color: '#1d4ed8', whiteSpace: 'nowrap', fontSize: '10.5px', fontFamily: 'var(--font-mono)', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                        <span>{(c.min / qty).toFixed(2)}–{(c.max / qty).toFixed(2)} ₴</span>
+                        <ExternalLink size={10} />
+                      </span>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 2: MULTI-RUN MATRIX (ДОВГА АНАЛІТИЧНА ПАНЕЛЬ НАКЛАДІВ) */}
+          {magBenchmarkTab === 'matrix' && (
+            <div>
+              <div style={{ marginBottom: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '11px', fontWeight: '700', color: '#0f172a' }}>
+                  Порівняльна матриця цінових рівнів за всіма стандартними тиражами (100 — 5 000 шт)
+                </span>
+                <span style={{ fontSize: '10px', color: '#64748b' }}>
+                  Клацніть на тираж для застосування в калькуляторі
+                </span>
+              </div>
+
+              <div style={{ overflowX: 'auto', border: '1px solid #e2e8f0', borderRadius: '10px', marginBottom: '14px' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '11px', textAlign: 'left' }}>
+                  <thead>
+                    <tr style={{ backgroundColor: '#f1f5f9', color: '#1e293b', borderBottom: '1px solid #cbd5e1' }}>
+                      <th style={{ padding: '8px 10px', fontWeight: '800' }}>Тираж</th>
+                      <th style={{ padding: '8px 10px', fontWeight: '800', textAlign: 'right' }}>Собівартість (1 шт)</th>
+                      <th style={{ padding: '8px 10px', fontWeight: '800', textAlign: 'right' }}>Собівартість цеху</th>
+                      <th style={{ padding: '8px 10px', fontWeight: '800', textAlign: 'right' }}>Прайс «Едельвейс» (1 шт)</th>
+                      <th style={{ padding: '8px 10px', fontWeight: '800', textAlign: 'right' }}>Прайс накладу</th>
+                      <th style={{ padding: '8px 10px', fontWeight: '800', textAlign: 'right' }}>Мін. ринку</th>
+                      <th style={{ padding: '8px 10px', fontWeight: '800', textAlign: 'right' }}>Медіана ринку</th>
+                      <th style={{ padding: '8px 10px', fontWeight: '800', textAlign: 'right' }}>Макс. ринку</th>
+                      <th style={{ padding: '8px 10px', fontWeight: '800', textAlign: 'right' }}>Ціновий розрив (Delta)</th>
+                      <th style={{ padding: '8px 10px', fontWeight: '800', textAlign: 'center' }}>Резерв маржі</th>
+                      <th style={{ padding: '8px 10px', fontWeight: '800', textAlign: 'center' }}>Дія</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {runMatrix.map((r, i) => {
+                      const isSel = r.isCurrent;
+                      return (
+                        <tr
+                          key={r.qty}
+                          style={{
+                            borderBottom: '1px solid #e2e8f0',
+                            backgroundColor: isSel ? '#eff6ff' : (i % 2 === 0 ? '#fafafa' : '#ffffff'),
+                            fontWeight: isSel ? '700' : 'normal'
+                          }}
+                        >
+                          <td style={{ padding: '8px 10px', color: '#0f172a', fontWeight: '800' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
+                              <span>{r.qty.toLocaleString('uk-UA')} шт</span>
+                              {isSel && (
+                                <span style={{ fontSize: '9px', backgroundColor: '#2563eb', color: '#ffffff', padding: '2px 6px', borderRadius: '6px', fontWeight: '700' }}>
+                                  Вибраний
+                                </span>
+                              )}
+                            </div>
+                          </td>
+                          <td style={{ padding: '8px 10px', textAlign: 'right', color: '#166534', fontFamily: 'var(--font-mono)' }}>
+                            {r.ourUnitCost.toFixed(2)} ₴
+                          </td>
+                          <td style={{ padding: '8px 10px', textAlign: 'right', color: '#166534', fontFamily: 'var(--font-mono)' }}>
+                            {r.ourCost.toLocaleString('uk-UA')} ₴
+                          </td>
+                          <td style={{ padding: '8px 10px', textAlign: 'right', color: '#0f172a', fontWeight: '800', fontFamily: 'var(--font-mono)' }}>
+                            {r.ourUnitPrice.toFixed(2)} ₴
+                          </td>
+                          <td style={{ padding: '8px 10px', textAlign: 'right', color: '#0f172a', fontWeight: '700', fontFamily: 'var(--font-mono)' }}>
+                            {r.ourPrice.toLocaleString('uk-UA')} ₴
+                          </td>
+                          <td style={{ padding: '8px 10px', textAlign: 'right', color: '#475569', fontFamily: 'var(--font-mono)' }}>
+                            {(r.floorMin / r.qty).toFixed(2)} ₴
+                          </td>
+                          <td style={{ padding: '8px 10px', textAlign: 'right', color: '#0f172a', fontWeight: '700', fontFamily: 'var(--font-mono)' }}>
+                            {r.avgUnit.toFixed(2)} ₴
+                          </td>
+                          <td style={{ padding: '8px 10px', textAlign: 'right', color: '#475569', fontFamily: 'var(--font-mono)' }}>
+                            {(r.ceilMax / r.qty).toFixed(2)} ₴
+                          </td>
+                          <td style={{ padding: '8px 10px', textAlign: 'right', fontWeight: '800', color: r.gapTotal >= 0 ? '#15803d' : '#b45309', fontFamily: 'var(--font-mono)' }}>
+                            {r.gapTotal >= 0 ? `-${r.gapUnit.toFixed(2)} ₴/шт` : `+${Math.abs(r.gapUnit).toFixed(2)} ₴/шт`}
+                          </td>
+                          <td style={{ padding: '8px 10px', textAlign: 'center' }}>
+                            <span style={{ fontSize: '10px', fontWeight: '700', padding: '2px 7px', borderRadius: '6px', backgroundColor: r.gapTotal >= 0 ? '#f0fdf4' : '#fffbeb', color: r.gapTotal >= 0 ? '#15803d' : '#b45309', border: `1px solid ${r.gapTotal >= 0 ? '#86efac' : '#fde68a'}` }}>
+                              {r.gapTotal >= 0 ? `+${r.gapPct}%` : `-${Math.abs(r.gapPct)}%`}
+                            </span>
+                          </td>
+                          <td style={{ padding: '8px 10px', textAlign: 'center' }}>
+                            <button
+                              type="button"
+                              onClick={() => setMagQuantity(r.qty)}
+                              style={{
+                                padding: '3px 8px',
+                                fontSize: '10px',
+                                fontWeight: '700',
+                                backgroundColor: isSel ? '#2563eb' : '#ffffff',
+                                color: isSel ? '#ffffff' : '#1d4ed8',
+                                border: '1px solid #93c5fd',
+                                borderRadius: '6px',
+                                cursor: 'pointer'
+                              }}
+                            >
+                              {isSel ? 'Активний' : 'Вибрати'}
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 3: FULL DYNAMIC PARSING & PARAMETERS INSPECTOR */}
+          {magBenchmarkTab === 'parsing' && (
+            <div>
+              <div style={{ padding: '12px', backgroundColor: '#f8fafc', border: '1px solid #e2e8f0', marginBottom: '14px' }}>
+                <div style={{ fontSize: '12px', fontWeight: '800', color: '#0f172a', marginBottom: '4px' }}>
+                  Поточне технічне завдання замовлення «Едельвейс» для синхронізації з друкарнями
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '8px', fontSize: '11px', marginTop: '8px' }}>
+                  <div style={{ backgroundColor: '#ffffff', padding: '6px 8px', border: '1px solid #e2e8f0' }}>
+                    <span style={{ color: '#64748b', display: 'block', fontSize: '9.5px', textTransform: 'uppercase' }}>Формат / Розмір</span>
+                    <strong style={{ color: '#0f172a' }}>{magFormat} ({wMm}×{hMm} мм)</strong>
+                  </div>
+                  <div style={{ backgroundColor: '#ffffff', padding: '6px 8px', border: '1px solid #e2e8f0' }}>
+                    <span style={{ color: '#64748b', display: 'block', fontSize: '9.5px', textTransform: 'uppercase' }}>Сторінки (Блок + Обкл)</span>
+                    <strong style={{ color: '#0f172a' }}>{blockPages} с. блоку + 4 с. обкл ({totalPages} с.)</strong>
+                  </div>
+                  <div style={{ backgroundColor: '#ffffff', padding: '6px 8px', border: '1px solid #e2e8f0' }}>
+                    <span style={{ color: '#64748b', display: 'block', fontSize: '9.5px', textTransform: 'uppercase' }}>Папір блоку</span>
+                    <strong style={{ color: '#0f172a' }}>{curBlockPaper.density} г/м² ({magBlockPaper.startsWith('off') ? 'офсет' : 'крейда'}), {magBlockColor}</strong>
+                  </div>
+                  <div style={{ backgroundColor: '#ffffff', padding: '6px 8px', border: '1px solid #e2e8f0' }}>
+                    <span style={{ color: '#64748b', display: 'block', fontSize: '9.5px', textTransform: 'uppercase' }}>Папір обкладинки</span>
+                    <strong style={{ color: '#0f172a' }}>{curCoverPaper.density} г/м², {magCoverPrint}</strong>
+                  </div>
+                  <div style={{ backgroundColor: '#ffffff', padding: '6px 8px', border: '1px solid #e2e8f0' }}>
+                    <span style={{ color: '#64748b', display: 'block', fontSize: '9.5px', textTransform: 'uppercase' }}>Ламінація обкладинки</span>
+                    <strong style={{ color: '#0f172a' }}>{magCoverLam === 'matte' ? 'Матова 1+0' : magCoverLam === 'gloss' ? 'Глянцева 1+0' : magCoverLam === 'softtouch' ? 'Soft-touch 1+0' : 'Без ламінації'}</strong>
+                  </div>
+                  <div style={{ backgroundColor: '#ffffff', padding: '6px 8px', border: '1px solid #e2e8f0' }}>
+                    <span style={{ color: '#64748b', display: 'block', fontSize: '9.5px', textTransform: 'uppercase' }}>Скріплення</span>
+                    <strong style={{ color: '#0f172a' }}>{isKbs ? 'КБС (термоклей)' : isHard ? 'Тверда палітурка' : 'Скоба (ВШРА)'}</strong>
+                  </div>
+                  <div style={{ backgroundColor: '#ffffff', padding: '6px 8px', border: '1px solid #e2e8f0' }}>
+                    <span style={{ color: '#64748b', display: 'block', fontSize: '9.5px', textTransform: 'uppercase' }}>Наклад</span>
+                    <strong style={{ color: '#0f172a' }}>{qty.toLocaleString('uk-UA')} прим.</strong>
+                  </div>
+                  <div style={{ backgroundColor: '#f0fdf4', padding: '6px 8px', border: '1px solid #bbf7d0' }}>
+                    <span style={{ color: '#166534', display: 'block', fontSize: '9.5px', textTransform: 'uppercase' }}>Відпускна ціна «Едельвейс»</span>
+                    <strong style={{ color: '#15803d' }}>{ourUnitPrice.toFixed(2)} ₴/шт ({ourPrice.toLocaleString('uk-UA')} ₴)</strong>
+                  </div>
+                </div>
+              </div>
+
+              {/* 6 DRUKARNI CARDS WITH DETAILED CODE/FIELD MAPPINGS */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '14px', marginBottom: '16px' }}>
+                {competitors.map((c, i) => {
+                  const compMidUnit = (c.min + c.max) / (2 * qty);
+                  const diffUnit = Number((compMidUnit - ourUnitPrice).toFixed(2));
+                  const isMoreExpensive = diffUnit >= 0;
+
+                  return (
+                    <div
+                      key={i}
+                      style={{
+                        border: '1px solid #e2e8f0',
+                        backgroundColor: '#ffffff',
+                        padding: '12px 14px',
+                        boxShadow: '0 1px 2px rgba(0,0,0,0.03)'
+                      }}
+                    >
+                      {/* CARD HEADER */}
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '10px', paddingBottom: '10px', borderBottom: '1px solid #f1f5f9' }}>
+                        <div>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <span style={{ fontSize: '13px', fontWeight: '800', color: '#0f172a' }}>{c.name}</span>
+                            <span style={{ fontSize: '10px', padding: '1px 6px', backgroundColor: '#f1f5f9', color: '#475569', fontWeight: '600' }}>
+                              {c.sub}
+                            </span>
+                            <span style={{ fontSize: '10px', padding: '1px 6px', backgroundColor: '#eff6ff', color: '#1d4ed8', fontWeight: '700', border: '1px solid #bfdbfe' }}>
+                              {c.note}
+                            </span>
+                            <span style={{ fontSize: '10px', padding: '1px 6px', backgroundColor: c.isFullSpecMatch ? '#f0fdf4' : '#fffbeb', color: c.isFullSpecMatch ? '#15803d' : '#b45309', fontWeight: '700', border: `1px solid ${c.isFullSpecMatch ? '#86efac' : '#fde68a'}` }}>
+                              {c.isFullSpecMatch ? '● 100% точний збіг ТЗ' : '▲ Особливості конфігуратора'}
+                            </span>
+                          </div>
+                          <div style={{ fontSize: '11px', color: '#64748b', marginTop: '3px' }}>
+                            Обладнання: <strong>{c.equipment}</strong> {c.weightKg ? `| Розрахункова вага накладу: ~${c.weightKg} кг` : ''}
+                          </div>
+                        </div>
+
+                        {/* PRICE & DIRECT LINK */}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                          <div style={{ textAlign: 'right' }}>
+                            <div style={{ fontSize: '14px', fontWeight: '900', color: '#0f172a', fontFamily: 'var(--font-mono)' }}>
+                              {(c.min / qty).toFixed(2)}{c.min !== c.max ? ` – ${(c.max / qty).toFixed(2)}` : ''} ₴/шт
+                            </div>
+                            <div style={{ fontSize: '11px', color: '#64748b', fontFamily: 'var(--font-mono)' }}>
+                              Сума: {c.min.toLocaleString('uk-UA')}{c.min !== c.max ? ` – ${c.max.toLocaleString('uk-UA')}` : ''} ₴
+                            </div>
+                            <div style={{ fontSize: '10px', fontWeight: '700', color: isMoreExpensive ? '#15803d' : '#b45309' }}>
+                              {isMoreExpensive ? `+${diffUnit.toFixed(2)} ₴/шт дорожче за «Едельвейс»` : `${diffUnit.toFixed(2)} ₴/шт дешевше`}
+                            </div>
+                          </div>
+
+                          <a
+                            href={c.url}
+                            target="_blank"
+                            rel="noreferrer"
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '4px',
+                              padding: '7px 12px',
+                              borderRadius: '8px',
+                              backgroundColor: '#2563eb',
+                              color: '#ffffff',
+                              fontSize: '11px',
+                              fontWeight: '700',
+                              textDecoration: 'none',
+                              border: 'none',
+                              boxShadow: '0 2px 6px rgba(37, 99, 235, 0.25)'
+                            }}
+                            title={`Відкрити онлайн-калькулятор ${c.name} із заповненими параметрами`}
+                          >
+                            <span>Відкрити калькулятор</span>
+                            <ExternalLink size={11} />
+                          </a>
+                        </div>
+                      </div>
+
+                      {/* PARAMETERS TABLE */}
+                      {c.parsedParams && c.parsedParams.length > 0 && (
+                        <div style={{ marginTop: '10px' }}>
+                          <div style={{ fontSize: '10.5px', fontWeight: '800', color: '#475569', textTransform: 'uppercase', marginBottom: '6px' }}>
+                            Співставлені параметри онлайн-калькулятора (API & Form Mapping):
+                          </div>
+                          <div style={{ overflowX: 'auto', border: '1px solid #e2e8f0' }}>
+                            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '10.5px', textAlign: 'left' }}>
+                              <thead>
+                                <tr style={{ backgroundColor: '#f8fafc', color: '#475569', borderBottom: '1px solid #e2e8f0' }}>
+                                  <th style={{ padding: '5px 8px', fontWeight: '700' }}>Параметр замовлення</th>
+                                  <th style={{ padding: '5px 8px', fontWeight: '700' }}>Код поля форми / API</th>
+                                  <th style={{ padding: '5px 8px', fontWeight: '700' }}>Значення конфігуратора</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {c.parsedParams.map((p, pIdx) => (
+                                  <tr key={pIdx} style={{ borderBottom: '1px solid #f1f5f9', backgroundColor: pIdx % 2 === 0 ? '#fafafa' : '#ffffff' }}>
+                                    <td style={{ padding: '4px 8px', fontWeight: '600', color: '#1e293b' }}>{p.label}</td>
+                                    <td style={{ padding: '4px 8px', fontFamily: 'var(--font-mono)', color: '#64748b', fontSize: '10px' }}>
+                                      {p.fieldCode} = {String(p.value)}
+                                    </td>
+                                    <td style={{ padding: '4px 8px', color: '#0f172a', fontWeight: '700' }}>{p.displayValue}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* TECHNICAL NOTE */}
+                      {c.formulaNote && (
+                        <div style={{ marginTop: '8px', fontSize: '10.5px', color: '#475569', backgroundColor: '#f8fafc', padding: '8px 10px', borderRadius: '8px', borderLeft: '3px solid #93c5fd', lineHeight: '1.4' }}>
+                          <strong>Інженерне обґрунтування:</strong> {c.formulaNote}
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+          {/* DOWNLOAD AUDIT DOCX BUTTON */}
+          <button
+            type="button"
+            onClick={() => {
+              downloadMarketAuditDoc({
+                format: magFormat,
+                dimensionsMm: `${wMm}×${hMm} мм`,
+                orientation: magOrientation === 'vert' ? 'книжкова (вертикальна)' : 'альбомна (горизонтальна)',
+                coverType: isHardcover ? 'Тверда' : 'М’яка обкладинка',
+                blockPages: pages,
+                quantity: qty,
+                spineMm: spineMm,
+                binding: bLabel,
+                blockPaperName: curBlockPaper.name,
+                blockColor: magBlockColor === '4+4' ? '4+4 (Повноколір)' : '1+1 (Ч/Б)',
+                coverPaperName: curCoverPaper.name,
+                coverPrint: magCoverPrint,
+                coverLam: lLabel,
+                packCapacity: magPackCapacity,
+                packingRate: norms.packingRate ?? 1.50,
+                totalGrossWeightKg: Number(((currentCalc.blockWeightKg + currentCalc.coverWeightKg) * 1.05).toFixed(1)),
+                directCost: currentCalc.directCost,
+                overheadCost: currentCalc.overheadCost,
+                totalCost: currentCalc.totalCost,
+                marginPct: magMarginPct,
+                finalPrice: currentCalc.finalPrice,
+                unitPrice: currentCalc.unitPrice,
+                unitCost: Number((currentCalc.totalCost / qty).toFixed(2)),
+                wolfMin,
+                wolfMax,
+                poligrafikaMin,
+                poligrafikaMax,
+                artpressMin,
+                artpressMax,
+                printstoreMin,
+                printstoreMax,
+                printtoMin,
+                printtoMax,
+                gnozisMin,
+                gnozisMax,
+                marketFloorMin,
+                marketCeilMax,
+                avgMarketMin,
+                avgMarketMax,
+                wolfUrl,
+                poligrafikaUrl,
+                artpressUrl,
+                printstoreUrl,
+                printtoUrl,
+                gnozisUrl,
+                priceGapTotal,
+                priceGapPerUnit,
+                priceGapPct
+              });
+            }}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: '8px',
+              width: '100%',
+              padding: '11px 16px',
+              borderRadius: '10px',
+              background: 'linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)',
+              color: '#ffffff',
+              fontSize: '12.5px',
+              fontWeight: '700',
+              border: 'none',
+              boxShadow: '0 2px 8px rgba(124, 58, 237, 0.28)',
+              cursor: 'pointer'
+            }}
+            title="Завантажити згенерований Word (.docx) звіт із детальним аудитом цін"
+          >
+            <FileText size={14} />
+            <span>Завантажити офіційний звіт аудиту цін ринку (.docx)</span>
+          </button>
         </div>
 
         {/* FULL-WIDTH 1C TECHNOLOGICAL SPECIFICATION TABLE WITH TRANSPARENT PROCESS SOURCES */}
@@ -5120,8 +6109,7 @@ export const Calculator: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {currentCalc.items.map((item) => {
-                    if (item.disabled) return null;
+                  {currentCalc.items.filter(item => !item.disabled).map((item, rowIdx) => {
                     const isRowModified = item.isCustomTariff || item.isCustomTotal;
                     return (
                       <tr
@@ -5133,7 +6121,7 @@ export const Calculator: React.FC = () => {
                         }}
                       >
                         <td style={{ padding: '8px 10px', textAlign: 'center', color: 'var(--text-medium)', fontWeight: '700', fontSize: '11px' }}>
-                          {item.num}
+                          {rowIdx + 1}
                         </td>
                         <td style={{ padding: '8px 12px' }}>
                           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -5257,11 +6245,11 @@ export const Calculator: React.FC = () => {
                     setMagWastePerSig(70);
                     setMagOverheadPct(5);
                     setMagPackCapacity(25);
-                    setMagMarginPct(100);
+                    setMagMarginPct(40);
                   }}
                   className="ios-btn ios-btn-small"
                   style={{ fontSize: '11px', padding: '4px 10px', backgroundColor: 'var(--bg-system)', color: 'var(--text-dark)', border: '1px solid var(--border-light)' }}
-                  title="Повернути базові заводські коефіцієнти (70 арк. відхід, 5% ЗВР, 25 шт. пачка, 100% маржа)"
+                  title="Повернути базові заводські коефіцієнти (70 арк. відхід, 5% ЗВР, 25 шт. пачка, 40% маржа)"
                 >
                   <RotateCcw size={11} />
                   <span>Базові коефіцієнти</span>
@@ -5359,131 +6347,516 @@ export const Calculator: React.FC = () => {
                 </div>
               </div>
 
-              {/* 2. STEP-BY-STEP DETAILED PRODUCTION FORMULAS WITH LIVE DATA */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '12px', fontSize: '11px' }}>
-                {/* Formula Box 1: Signatures and Plates */}
-                <div style={{ padding: '12px 14px', borderRadius: '10px', border: '1px solid var(--border-light)', backgroundColor: '#ffffff' }}>
-                  <div style={{ fontWeight: '800', fontSize: '12px', color: 'var(--text-dark)', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span className="ios-badge ios-badge-blue" style={{ fontSize: '10px' }}>Формула 1</span>
-                    <span>Зошити та форми CTP</span>
+              {/* 2. MASTER UNIFIED FORMULA BANNER (Textbook Style) */}
+              <div style={{
+                marginBottom: '18px',
+                padding: '16px 20px',
+                borderRadius: '14px',
+                background: 'linear-gradient(135deg, #1d4ed8 0%, #2563eb 55%, #3b82f6 100%)',
+                color: '#ffffff',
+                boxShadow: '0 4px 14px rgba(37, 99, 235, 0.22)',
+                border: '1px solid rgba(255,255,255,0.15)'
+              }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px', marginBottom: '12px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <span style={{ fontSize: '12px', fontWeight: '800', textTransform: 'uppercase', letterSpacing: '0.04em', backgroundColor: 'rgba(255,255,255,0.2)', padding: '4px 12px', borderRadius: '10px' }}>
+                      Формула вартості . Прямі витрати → ЗВР → Рентабельність
+                    </span>
                   </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', color: 'var(--text-medium)' }}>
-                    <div>
-                      • <strong>Кількість зошитів блоку B2:</strong><br />
-                      <code style={{ fontSize: '11px', color: '#1e40af', backgroundColor: '#eff6ff', padding: '1px 4px', borderRadius: '4px' }}>
-                        {pages} стор. / 16 смуг = <strong>{currentCalc.totalSignatures} зошити(ів)</strong>
-                      </code>
+                  <div style={{ fontSize: '13px', fontWeight: '800', backgroundColor: '#ffffff', color: '#1e40af', padding: '5px 12px', borderRadius: '8px', boxShadow: '0 1px 4px rgba(0,0,0,0.12)' }}>
+                    Ціна тиражу: {currentCalc.finalPrice.toLocaleString('uk-UA')} ₴ &nbsp;|&nbsp; Одиниця: {currentCalc.unitPrice.toFixed(2)} ₴ / прим
+                  </div>
+                </div>
+
+                {/* Mathematical formula line in textbook style */}
+                <div style={{
+                  backgroundColor: 'rgba(255, 255, 255, 0.12)',
+                  borderRadius: '10px',
+                  padding: '10px 14px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  flexWrap: 'wrap',
+                  gap: '8px',
+                  fontSize: '13px',
+                  border: '1px solid rgba(255,255,255,0.2)'
+                }}>
+                  <span style={{ fontWeight: '700', opacity: 0.85 }}>Формула:</span>
+                  <span className="math-serif" style={{ fontSize: '15px' }}>P</span>
+                  <span>=</span>
+                  <span>[</span>
+                  <span className="math-serif">C<sub>мат</sub></span>
+                  <span>+</span>
+                  <span className="math-serif">C<sub>друк</sub></span>
+                  <span>+</span>
+                  <span className="math-serif">C<sub>пост</sub></span>
+                  <span>+</span>
+                  <span className="math-serif">C<sub>пак</sub></span>
+                  <span>]</span>
+                  <span>×</span>
+                  <span>(1 + <span className="math-serif">k<sub>ЗВР</sub></span>)</span>
+                  <span>×</span>
+                  <span>(1 + <span className="math-serif">k<sub>маржа</sub></span>)</span>
+                  
+                  <span style={{ margin: '0 8px', opacity: 0.5 }}>|</span>
+
+                  <span style={{ fontWeight: '700', opacity: 0.85 }}>Підстановка:</span>
+                  <span>[ {currentCalc.materialCost.toLocaleString('uk-UA')} + {currentCalc.printCost.toLocaleString('uk-UA')} + {currentCalc.postpressCost.toLocaleString('uk-UA')} + {currentCalc.packagingCost.toLocaleString('uk-UA')} ]</span>
+                  <span>×</span>
+                  <span>1,{(magOverheadPct < 10 ? '0' : '') + magOverheadPct}</span>
+                  <span>×</span>
+                  <span>{(1 + magMarginPct / 100).toFixed(2).replace('.', ',')}</span>
+                  <span>=</span>
+                  <strong style={{ fontSize: '14px', color: '#fef08a' }}>{currentCalc.finalPrice.toLocaleString('uk-UA')} ₴</strong>
+                </div>
+
+                {/* Formula components pills */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(130px, 1fr))', gap: '8px', fontSize: '11px', marginTop: '12px' }}>
+                  <div style={{ backgroundColor: 'rgba(255,255,255,0.14)', padding: '7px 10px', borderRadius: '10px' }}>
+                    <span style={{ opacity: 0.8, fontSize: '10px', display: 'block' }}>1. Матеріали (C<sub>мат</sub>):</span>
+                    <strong style={{ fontSize: '13px' }}>{currentCalc.materialCost.toLocaleString('uk-UA')} ₴</strong>
+                  </div>
+                  <div style={{ backgroundColor: 'rgba(255,255,255,0.14)', padding: '7px 10px', borderRadius: '10px' }}>
+                    <span style={{ opacity: 0.8, fontSize: '10px', display: 'block' }}>2. Друк (C<sub>друк</sub>):</span>
+                    <strong style={{ fontSize: '13px' }}>{currentCalc.printCost.toLocaleString('uk-UA')} ₴</strong>
+                  </div>
+                  <div style={{ backgroundColor: 'rgba(255,255,255,0.14)', padding: '7px 10px', borderRadius: '10px' }}>
+                    <span style={{ opacity: 0.8, fontSize: '10px', display: 'block' }}>3. Постпрес (C<sub>пост</sub>):</span>
+                    <strong style={{ fontSize: '13px' }}>{currentCalc.postpressCost.toLocaleString('uk-UA')} ₴</strong>
+                  </div>
+                  <div style={{ backgroundColor: 'rgba(255,255,255,0.14)', padding: '7px 10px', borderRadius: '10px' }}>
+                    <span style={{ opacity: 0.8, fontSize: '10px', display: 'block' }}>4. Пакування (C<sub>пак</sub>):</span>
+                    <strong style={{ fontSize: '13px' }}>{currentCalc.packagingCost.toLocaleString('uk-UA')} ₴</strong>
+                  </div>
+                  <div style={{ backgroundColor: 'rgba(255,255,255,0.22)', padding: '7px 10px', borderRadius: '10px', border: '1px solid rgba(255,255,255,0.3)' }}>
+                    <span style={{ opacity: 0.9, fontSize: '10px', display: 'block' }}>= Собівартість із ЗВР:</span>
+                    <strong style={{ fontSize: '13px' }}>{currentCalc.totalCost.toLocaleString('uk-UA')} ₴</strong>
+                  </div>
+                  <div style={{ backgroundColor: '#ffffff', color: '#1e40af', padding: '7px 10px', borderRadius: '10px', fontWeight: '800' }}>
+                    <span style={{ fontSize: '10px', color: '#64748b', display: 'block' }}>+ Маржа ({magMarginPct}%):</span>
+                    <strong style={{ fontSize: '13px' }}>+{currentCalc.marginSum.toLocaleString('uk-UA')} ₴</strong>
+                  </div>
+                </div>
+              </div>
+
+              {/* 3. STEP-BY-STEP DETAILED PRODUCTION FORMULAS IN TEXTBOOK NOTATION */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(360px, 1fr))', gap: '14px', fontSize: '12px' }}>
+                
+                {/* 1. Scrap & Makeready Waste Box */}
+                <div className="math-book-card" style={{ borderColor: '#fecaca', backgroundColor: '#fffdfd' }}>
+                  <div className="math-book-header">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span className="ios-badge" style={{ fontSize: '10px', backgroundColor: '#fee2e2', color: '#b91c1c' }}>Розділ 1</span>
+                      <strong style={{ color: '#991b1b', fontSize: '12.5px' }}>Розрахунок аркушів та браку (техвідходу)</strong>
                     </div>
-                    <div>
-                      • <strong>Форми блоку:</strong><br />
-                      <code style={{ fontSize: '11px', color: '#1e40af', backgroundColor: '#eff6ff', padding: '1px 4px', borderRadius: '4px' }}>
-                        {currentCalc.totalSignatures} зош. × {magBlockColor === '4+4' ? '4 фарби (CMYK)' : '1 фарба (Ч/Б)'} = <strong>{currentCalc.blockPlates} шт</strong>
-                      </code>
+                  </div>
+                  
+                  {/* Formula 1.1: Signatures */}
+                  <div>
+                    <div style={{ fontSize: '11px', fontWeight: '600', color: '#7f1d1d', marginBottom: '2px' }}>
+                      1. Кількість 16-шпальтних зошитів у виробі:
                     </div>
-                    <div>
-                      • <strong>Форми обкладинки:</strong><br />
-                      <code style={{ fontSize: '11px', color: '#1e40af', backgroundColor: '#eff6ff', padding: '1px 4px', borderRadius: '4px' }}>
-                        {isSeparateCover ? `${magCoverPrint} зі своїм оборотом = ${currentCalc.coverPlates} шт` : 'Своя обкладинка (0 шт)'}
-                      </code>
+                    <div className="math-equation-box scrap" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
+                      <span className="math-serif">N<sub>зош</sub></span>
+                      <span>=</span>
+                      <span className="math-frac">
+                        <span className="math-frac-num"><span className="math-serif">V<sub>блоку</sub></span></span>
+                        <span className="math-frac-den">16</span>
+                      </span>
+                      <span>=</span>
+                      <span className="math-frac">
+                        <span className="math-frac-num">{magBlockPages}</span>
+                        <span className="math-frac-den">16</span>
+                      </span>
+                      <span>=</span>
+                      <span className="math-badge" style={{ backgroundColor: '#fee2e2', color: '#991b1b' }}>{currentCalc.totalSignatures} зошити</span>
                     </div>
-                    <div style={{ borderTop: '1px dashed #e2e8f0', paddingTop: '4px', fontWeight: '700', color: 'var(--text-dark)' }}>
-                      Всього форм CTP B2: {currentCalc.blockPlates} + {currentCalc.coverPlates} = <strong>{currentCalc.totalPlates} шт</strong>
+                  </div>
+
+                  {/* Formula 1.2: Makeready block sheets */}
+                  <div>
+                    <div style={{ fontSize: '11px', fontWeight: '600', color: '#7f1d1d', marginBottom: '2px' }}>
+                      2. Технологічний відхід на приладку блоку:
+                    </div>
+                    <div className="math-equation-box scrap" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
+                      <span className="math-serif">Q<sub>прил</sub><sup>блок</sup></span>
+                      <span>=</span>
+                      <span className="math-serif">N<sub>зош</sub></span>
+                      <span>×</span>
+                      <span className="math-serif">q<sub>прил</sub></span>
+                      <span>=</span>
+                      <span>{currentCalc.totalSignatures} × {magWastePerSig}</span>
+                      <span>=</span>
+                      <span className="math-badge" style={{ backgroundColor: '#fee2e2', color: '#991b1b' }}>{currentCalc.wasteBlockSheets} арк. B2</span>
+                    </div>
+                  </div>
+
+                  {/* Formula 1.3: Total gross and scrap % */}
+                  <div>
+                    <div style={{ fontSize: '11px', fontWeight: '600', color: '#7f1d1d', marginBottom: '2px' }}>
+                      3. Загальний брак та частка від брутто:
+                    </div>
+                    <div className="math-equation-box scrap" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
+                      <span className="math-serif">W<sub>%</sub></span>
+                      <span>=</span>
+                      <span className="math-frac">
+                        <span className="math-frac-num"><span className="math-serif">Q<sub>брак</sub></span></span>
+                        <span className="math-frac-den"><span className="math-serif">Q<sub>брутто</sub></span></span>
+                      </span>
+                      <span>× 100% =</span>
+                      <span className="math-frac">
+                        <span className="math-frac-num">{currentCalc.totalWasteSheets}</span>
+                        <span className="math-frac-den">{currentCalc.totalGrossSheets.toLocaleString('uk-UA')}</span>
+                      </span>
+                      <span>× 100% =</span>
+                      <span className="math-badge" style={{ backgroundColor: '#fee2e2', color: '#991b1b' }}>{currentCalc.wastePercent}%</span>
+                    </div>
+                  </div>
+
+                  <div style={{ borderTop: '1px dashed #fca5a5', paddingTop: '6px', fontSize: '11px', color: '#7f1d1d', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span>Вартість паперу на приладку:</span>
+                    <strong style={{ fontSize: '12px', color: '#b91c1c' }}>~{currentCalc.wastePaperCost.toLocaleString('uk-UA')} ₴</strong>
+                  </div>
+                </div>
+
+                {/* 2. Materials Box */}
+                <div className="math-book-card">
+                  <div className="math-book-header">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span className="ios-badge ios-badge-blue" style={{ fontSize: '10px' }}>Розділ 2</span>
+                      <strong style={{ color: 'var(--text-dark)', fontSize: '12.5px' }}>Матеріали: папір блоку, обкладинка та CTP</strong>
+                    </div>
+                  </div>
+
+                  {/* Formula 2.1: Block Paper Weight */}
+                  <div>
+                    <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--text-medium)', marginBottom: '2px' }}>
+                      1. Маса паперу блоку (брутто = чистий + приладка):
+                    </div>
+                    <div className="math-equation-box" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
+                      <span className="math-serif">M<sub>блок</sub></span>
+                      <span>=</span>
+                      <span className="math-frac">
+                        <span className="math-frac-num"><span className="math-serif">A × B × g × Q<sub>брутто</sub></span></span>
+                        <span className="math-frac-den">1 000 000</span>
+                      </span>
+                      <span>=</span>
+                      <span className="math-frac">
+                        <span className="math-frac-num">700 × 1000 × {curBlockPaper.density} × {currentCalc.grossBlockSheets}</span>
+                        <span className="math-frac-den">10<sup>6</sup></span>
+                      </span>
+                      <span>=</span>
+                      <span className="math-badge" style={{ backgroundColor: '#e0f2fe', color: '#0369a1' }}>{currentCalc.blockWeightKg} кг</span>
+                    </div>
+                    <div style={{ fontSize: '11px', color: '#1e40af', marginTop: '3px', paddingLeft: '4px' }}>
+                      Вартість: {currentCalc.blockWeightKg} кг × {currentCalc.tBlockPaper} ₴/кг = <strong>{currentCalc.costBlockPaper.toLocaleString('uk-UA')} ₴</strong>
+                    </div>
+                  </div>
+
+                  {/* Formula 2.2: Cover Paper */}
+                  <div>
+                    <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--text-medium)', marginBottom: '2px' }}>
+                      2. Папір обкладинки ({curCoverPaper.name}):
+                    </div>
+                    {isSeparateCover ? (
+                      <div>
+                        <div className="math-equation-box" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
+                          <span className="math-serif">M<sub>обкл</sub></span>
+                          <span>=</span>
+                          <span className="math-frac">
+                            <span className="math-frac-num">700 × 1000 × {curCoverPaper.density} × {currentCalc.grossCoverSheets}</span>
+                            <span className="math-frac-den">10<sup>6</sup></span>
+                          </span>
+                          <span>=</span>
+                          <span className="math-badge" style={{ backgroundColor: '#e0f2fe', color: '#0369a1' }}>{currentCalc.coverWeightKg} кг</span>
+                        </div>
+                        <div style={{ fontSize: '11px', color: '#1e40af', marginTop: '3px', paddingLeft: '4px' }}>
+                          Вартість: {currentCalc.coverWeightKg} кг × {currentCalc.tCoverPaper} ₴/кг = <strong>{currentCalc.costCoverPaper.toLocaleString('uk-UA')} ₴</strong>
+                        </div>
+                      </div>
+                    ) : (
+                      <div style={{ fontStyle: 'italic', color: 'var(--text-medium)', fontSize: '11px', paddingLeft: '4px' }}>
+                        Своя обкладинка (папір включено у розрахунок блоку)
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Formula 2.3: Plates */}
+                  <div>
+                    <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--text-medium)', marginBottom: '2px' }}>
+                      3. Офсетні друкарські пластини CTP B2:
+                    </div>
+                    <div className="math-equation-box" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
+                      <span className="math-serif">C<sub>CTP</sub></span>
+                      <span>=</span>
+                      <span className="math-serif">N<sub>пласт</sub></span>
+                      <span>×</span>
+                      <span className="math-serif">Ц<sub>пласт</sub></span>
+                      <span>=</span>
+                      <span>{currentCalc.totalPlates} шт × {currentCalc.tCtpPlate} ₴</span>
+                      <span>=</span>
+                      <span className="math-badge" style={{ backgroundColor: '#e0f2fe', color: '#0369a1' }}>{currentCalc.costCtpPlate.toLocaleString('uk-UA')} ₴</span>
+                    </div>
+                  </div>
+
+                  <div style={{ borderTop: '1px dashed #cbd5e1', paddingTop: '6px', fontSize: '11px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontWeight: '600', color: 'var(--text-dark)' }}>Всього за матеріали (C<sub>мат</sub>):</span>
+                    <strong style={{ fontSize: '13px', color: '#007AFF' }}>{currentCalc.materialCost.toLocaleString('uk-UA')} ₴</strong>
+                  </div>
+                </div>
+
+                {/* 3. Printing Box */}
+                <div className="math-book-card">
+                  <div className="math-book-header">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span className="ios-badge ios-badge-blue" style={{ fontSize: '10px' }}>Розділ 3</span>
+                      <strong style={{ color: 'var(--text-dark)', fontSize: '12.5px' }}>Офсетний друк (Друк на машині B2)</strong>
+                    </div>
+                  </div>
+
+                  {/* Formula 3.1: Plate exposure & mounting */}
+                  <div>
+                    <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--text-medium)', marginBottom: '2px' }}>
+                      1. Вивід CTP та лавсан (1C #1, #2):
+                    </div>
+                    <div className="math-equation-box" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
+                      <span className="math-serif">C<sub>форм</sub></span>
+                      <span>=</span>
+                      <span className="math-serif">N<sub>форм</sub></span>
+                      <span>× (</span>
+                      <span className="math-serif">Ц<sub>вивід</sub></span>
+                      <span>+</span>
+                      <span className="math-serif">Ц<sub>лавсан</sub></span>
+                      <span>) =</span>
+                      <span>{currentCalc.totalPlates} × ({currentCalc.tCtpCopy.toFixed(2).replace('.', ',')} + {currentCalc.tCtpMount.toFixed(2).replace('.', ',')})</span>
+                      <span>=</span>
+                      <span className="math-badge" style={{ backgroundColor: '#f1f5f9', color: '#1e293b' }}>{(currentCalc.costCtpCopy + currentCalc.costCtpMount).toLocaleString('uk-UA')} ₴</span>
+                    </div>
+                  </div>
+
+                  {/* Formula 3.2: Machine Makereadies */}
+                  <div>
+                    <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--text-medium)', marginBottom: '2px' }}>
+                      2. Приладки машини B2 ({currentCalc.blockMakereadies} блок + {currentCalc.coverMakereadies} обкл):
+                    </div>
+                    <div className="math-equation-box" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
+                      <span className="math-serif">C<sub>приладка</sub></span>
+                      <span>=</span>
+                      <span className="math-serif">N<sub>прил</sub></span>
+                      <span>×</span>
+                      <span className="math-serif">Ц<sub>прил</sub></span>
+                      <span>=</span>
+                      <span>{currentCalc.totalMakereadies} прил. × {currentCalc.tMakeready} ₴</span>
+                      <span>=</span>
+                      <span className="math-badge" style={{ backgroundColor: '#f1f5f9', color: '#1e293b' }}>{currentCalc.costMakeready.toLocaleString('uk-UA')} ₴</span>
+                    </div>
+                  </div>
+
+                  {/* Formula 3.3: Press runs */}
+                  <div>
+                    <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--text-medium)', marginBottom: '2px' }}>
+                      3. Тиражні листопрогони B2:
+                    </div>
+                    <div className="math-equation-box" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
+                      <span className="math-serif">C<sub>прогони</sub></span>
+                      <span>=</span>
+                      <span className="math-serif">Q<sub>брутто</sub></span>
+                      <span>×</span>
+                      <span className="math-serif">Ц<sub>прогін</sub></span>
+                      <span>=</span>
+                      <span>{currentCalc.totalGrossSheets.toLocaleString('uk-UA')} × {currentCalc.tPrintRun.toFixed(2).replace('.', ',')} ₴</span>
+                      <span>=</span>
+                      <span className="math-badge" style={{ backgroundColor: '#f1f5f9', color: '#1e293b' }}>{currentCalc.costPrintRun.toLocaleString('uk-UA')} ₴</span>
+                    </div>
+                  </div>
+
+                  <div style={{ borderTop: '1px dashed #cbd5e1', paddingTop: '6px', fontSize: '11px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontWeight: '600', color: 'var(--text-dark)' }}>Всього за друк (C<sub>друк</sub>):</span>
+                    <strong style={{ fontSize: '13px', color: '#007AFF' }}>{currentCalc.printCost.toLocaleString('uk-UA')} ₴</strong>
+                  </div>
+                </div>
+
+                {/* 4. Postpress Box */}
+                <div className="math-book-card">
+                  <div className="math-book-header">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span className="ios-badge ios-badge-blue" style={{ fontSize: '10px' }}>Розділ 4</span>
+                      <strong style={{ color: 'var(--text-dark)', fontSize: '12.5px' }}>Післядрукарська обробка (Постпрес)</strong>
+                    </div>
+                  </div>
+
+                  {/* Formula 4.1: Folding and Gathering */}
+                  <div>
+                    <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--text-medium)', marginBottom: '2px' }}>
+                      1. Фальцювання та листопідбір зошитів:
+                    </div>
+                    <div className="math-equation-box" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
+                      <span>({currentCalc.foldsCount.toLocaleString('uk-UA')} зг × {currentCalc.tFolding.toFixed(2).replace('.', ',')} ₴) + ({currentCalc.gatheringCount.toLocaleString('uk-UA')} зош × {currentCalc.tGathering.toFixed(2).replace('.', ',')} ₴) =</span>
+                      <span className="math-badge" style={{ backgroundColor: '#f1f5f9', color: '#1e293b' }}>{(currentCalc.costFolding + currentCalc.costGathering).toLocaleString('uk-UA')} ₴</span>
+                    </div>
+                  </div>
+
+                  {/* Formula 4.2: Creasing & Lam */}
+                  <div>
+                    <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--text-medium)', marginBottom: '2px' }}>
+                      2. Бігування та ламінування обкладинки:
+                    </div>
+                    <div className="math-equation-box" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
+                      <span>({currentCalc.creasesCount.toLocaleString('uk-UA')} біг × {currentCalc.tCreasing.toFixed(4).replace('.', ',')} ₴) + ({currentCalc.laminationCount.toLocaleString('uk-UA')} лам × {currentCalc.tLamination.toFixed(3).replace('.', ',')} ₴) =</span>
+                      <span className="math-badge" style={{ backgroundColor: '#f1f5f9', color: '#1e293b' }}>{(currentCalc.costCreasing + currentCalc.costLamination).toLocaleString('uk-UA')} ₴</span>
+                    </div>
+                  </div>
+
+                  {/* Formula 4.3: Binding & Trimming */}
+                  <div>
+                    <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--text-medium)', marginBottom: '2px' }}>
+                      3. Скріплення ({magBinding === 'staple' ? 'Скоба 2 шт' : magBinding === 'thread' ? 'Ниткошвейка' : 'Термоклей'}) + Тристороння обрізка:
+                    </div>
+                    <div className="math-equation-box" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
+                      <span>{magQuantity.toLocaleString('uk-UA')} прим × ({currentCalc.tBinding.toFixed(3).replace('.', ',')} + {currentCalc.tTrimming.toFixed(3).replace('.', ',')} ₴) =</span>
+                      <span className="math-badge" style={{ backgroundColor: '#f1f5f9', color: '#1e293b' }}>{(currentCalc.costBinding + currentCalc.costTrimming).toLocaleString('uk-UA')} ₴</span>
+                    </div>
+                  </div>
+
+                  <div style={{ borderTop: '1px dashed #cbd5e1', paddingTop: '6px', fontSize: '11px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontWeight: '600', color: 'var(--text-dark)' }}>Всього за постпрес (C<sub>пост</sub>):</span>
+                    <strong style={{ fontSize: '13px', color: '#007AFF' }}>{currentCalc.postpressCost.toLocaleString('uk-UA')} ₴</strong>
+                  </div>
+                </div>
+
+                {/* 5. Packaging Box */}
+                <div className="math-book-card">
+                  <div className="math-book-header">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span className="ios-badge ios-badge-blue" style={{ fontSize: '10px' }}>Розділ 5</span>
+                      <strong style={{ color: 'var(--text-dark)', fontSize: '12.5px' }}>Пакування та логістика</strong>
+                    </div>
+                  </div>
+
+                  {/* Formula 5.1: Number of packs with ceiling fraction */}
+                  <div>
+                    <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--text-medium)', marginBottom: '2px' }}>
+                      1. Кількість пачок у тиражі:
+                    </div>
+                    <div className="math-equation-box" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
+                      <span className="math-serif">N<sub>пачок</sub></span>
+                      <span>=</span>
+                      <span>⌈</span>
+                      <span className="math-frac">
+                        <span className="math-frac-num"><span className="math-serif">T</span></span>
+                        <span className="math-frac-den"><span className="math-serif">k<sub>пач</sub></span></span>
+                      </span>
+                      <span>⌉ = ⌈</span>
+                      <span className="math-frac">
+                        <span className="math-frac-num">{magQuantity.toLocaleString('uk-UA')}</span>
+                        <span className="math-frac-den">{magPackCapacity}</span>
+                      </span>
+                      <span>⌉ =</span>
+                      <span className="math-badge" style={{ backgroundColor: '#f1f5f9', color: '#1e293b' }}>{currentCalc.packagingPacks} пачок</span>
+                    </div>
+                  </div>
+
+                  {/* Formula 5.2: Cost of packaging */}
+                  <div>
+                    <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--text-medium)', marginBottom: '2px' }}>
+                      2. Вартість упаковки (крафт-папір / стрейч / скотч):
+                    </div>
+                    <div className="math-equation-box" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
+                      <span className="math-serif">C<sub>пак</sub></span>
+                      <span>=</span>
+                      <span className="math-serif">N<sub>пачок</sub></span>
+                      <span>×</span>
+                      <span className="math-serif">Ц<sub>пак</sub></span>
+                      <span>=</span>
+                      <span>{currentCalc.packagingPacks} пачок × {currentCalc.packagingTariff.toFixed(2)} ₴</span>
+                      <span>=</span>
+                      <span className="math-badge" style={{ backgroundColor: '#f1f5f9', color: '#1e293b' }}>{currentCalc.packagingCost.toLocaleString('uk-UA')} ₴</span>
+                    </div>
+                  </div>
+
+                  {/* Formula 5.3: Total weight */}
+                  <div>
+                    <div style={{ fontSize: '11px', fontWeight: '600', color: 'var(--text-medium)', marginBottom: '2px' }}>
+                      3. Загальна вага відвантаження:
+                    </div>
+                    <div className="math-equation-box" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
+                      <span className="math-serif">M<sub>вантажу</sub></span>
+                      <span>=</span>
+                      <span>{currentCalc.blockWeightKg} кг (блок) + {currentCalc.coverWeightKg} кг (обкл) =</span>
+                      <span className="math-badge" style={{ backgroundColor: '#e0f2fe', color: '#0369a1' }}>{(currentCalc.blockWeightKg + currentCalc.coverWeightKg).toFixed(1)} кг</span>
+                    </div>
+                  </div>
+
+                  <div style={{ borderTop: '1px dashed #cbd5e1', paddingTop: '6px', fontSize: '11px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontWeight: '600', color: 'var(--text-dark)' }}>Всього за пакування (C<sub>пак</sub>):</span>
+                    <strong style={{ fontSize: '13px', color: '#007AFF' }}>{currentCalc.packagingCost.toLocaleString('uk-UA')} ₴</strong>
+                  </div>
+                </div>
+
+                {/* 6. Pricing & Total Cost Box */}
+                <div className="math-book-card" style={{ borderColor: '#bfdbfe', backgroundColor: '#f8faff' }}>
+                  <div className="math-book-header">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span className="ios-badge ios-badge-green" style={{ fontSize: '10px' }}>Розділ 6</span>
+                      <strong style={{ color: '#1e40af', fontSize: '12.5px' }}>Підсумкова собівартість та формування ціни</strong>
+                    </div>
+                  </div>
+
+                  {/* Formula 6.1: Direct Costs */}
+                  <div>
+                    <div style={{ fontSize: '11px', fontWeight: '600', color: '#1e3a8a', marginBottom: '2px' }}>
+                      1. Прямі виробничі витрати (Цех):
+                    </div>
+                    <div className="math-equation-box price" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
+                      <span className="math-serif">S<sub>прямі</sub></span>
+                      <span>=</span>
+                      <span>{currentCalc.materialCost.toLocaleString('uk-UA')} + {currentCalc.printCost.toLocaleString('uk-UA')} + {currentCalc.postpressCost.toLocaleString('uk-UA')} + {currentCalc.packagingCost.toLocaleString('uk-UA')} =</span>
+                      <span className="math-badge" style={{ backgroundColor: '#dcfce7', color: '#15803d' }}>{currentCalc.directCost.toLocaleString('uk-UA')} ₴</span>
+                    </div>
+                  </div>
+
+                  {/* Formula 6.2: Factory Cost with Overhead */}
+                  <div>
+                    <div style={{ fontSize: '11px', fontWeight: '600', color: '#1e3a8a', marginBottom: '2px' }}>
+                      2. Виробнича собівартість із ЗВР ({magOverheadPct}%):
+                    </div>
+                    <div className="math-equation-box price" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
+                      <span className="math-serif">S<sub>цех</sub></span>
+                      <span>=</span>
+                      <span className="math-serif">S<sub>прямі</sub></span>
+                      <span>× (1 + {magOverheadPct/100}) =</span>
+                      <span>{currentCalc.directCost.toLocaleString('uk-UA')} × 1,{(magOverheadPct < 10 ? '0' : '') + magOverheadPct} =</span>
+                      <span className="math-badge" style={{ backgroundColor: '#dcfce7', color: '#15803d' }}>{currentCalc.totalCost.toLocaleString('uk-UA')} ₴</span>
+                    </div>
+                  </div>
+
+                  {/* Formula 6.3: Final Price and Unit Price */}
+                  <div>
+                    <div style={{ fontSize: '11px', fontWeight: '600', color: '#1e3a8a', marginBottom: '2px' }}>
+                      3. Відпускна вартість тиражу із маржею ({magMarginPct}%):
+                    </div>
+                    <div className="math-equation-box price" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: '4px' }}>
+                      <span className="math-serif">P<sub>тиражу</sub></span>
+                      <span>=</span>
+                      <span>{currentCalc.totalCost.toLocaleString('uk-UA')} × {(1 + magMarginPct / 100).toFixed(2).replace('.', ',')} =</span>
+                      <span className="math-badge" style={{ backgroundColor: '#dbeafe', color: '#1e40af', fontSize: '13px' }}>{currentCalc.finalPrice.toLocaleString('uk-UA')} ₴</span>
+                    </div>
+                  </div>
+
+                  <div style={{ borderTop: '1px solid #bfdbfe', paddingTop: '8px', marginTop: '2px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '6px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '13px', fontWeight: '700', color: '#1e40af' }}>
+                        <span>Ціна за 1 журнал:</span>
+                        <span className="math-frac">
+                          <span className="math-frac-num">{currentCalc.finalPrice.toLocaleString('uk-UA')} ₴</span>
+                          <span className="math-frac-den">{magQuantity.toLocaleString('uk-UA')} прим</span>
+                        </span>
+                        <span>=</span>
+                        <strong style={{ fontSize: '16px', color: '#007AFF' }}>{currentCalc.unitPrice.toFixed(2)} ₴ / прим</strong>
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Formula Box 2: Sheets and Paper Weight */}
-                <div style={{ padding: '12px 14px', borderRadius: '10px', border: '1px solid var(--border-light)', backgroundColor: '#ffffff' }}>
-                  <div style={{ fontWeight: '800', fontSize: '12px', color: 'var(--text-dark)', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span className="ios-badge ios-badge-blue" style={{ fontSize: '10px' }}>Формула 2</span>
-                    <span>Аркуші B2 та вага паперу</span>
-                  </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', color: 'var(--text-medium)' }}>
-                    <div>
-                      • <strong>Корисні аркуші блоку (net):</strong><br />
-                      <code style={{ fontSize: '11px', color: '#1e40af', backgroundColor: '#eff6ff', padding: '1px 4px', borderRadius: '4px' }}>
-                        {magQuantity.toLocaleString('uk-UA')} прим. × ({pages}/16) = <strong>{currentCalc.netBlockSheets.toLocaleString('uk-UA')} арк. B2</strong>
-                      </code>
-                    </div>
-                    <div>
-                      • <strong>Технічний відхід (приладка):</strong><br />
-                      <code style={{ fontSize: '11px', color: '#1e40af', backgroundColor: '#eff6ff', padding: '1px 4px', borderRadius: '4px' }}>
-                        {currentCalc.totalSignatures} зош. × {magWastePerSig} арк. = <strong>{currentCalc.wasteBlockSheets} арк. B2</strong>
-                      </code>
-                    </div>
-                    <div>
-                      • <strong>Вага паперу блоку (кг):</strong><br />
-                      <code style={{ fontSize: '11px', color: '#1e40af', backgroundColor: '#eff6ff', padding: '1px 4px', borderRadius: '4px' }}>
-                        (0.70 м × 1.00 м × {curBlockPaper.density} г/м² × {currentCalc.grossBlockSheets} арк.) / 1000 = <strong>{currentCalc.blockWeightKg} кг</strong>
-                      </code>
-                    </div>
-                    <div style={{ borderTop: '1px dashed #e2e8f0', paddingTop: '4px', fontWeight: '700', color: 'var(--text-dark)' }}>
-                      Всього листопрогонів машини: {currentCalc.grossBlockSheets} (блок) + {currentCalc.grossCoverSheets} (обкл) = <strong>{currentCalc.totalGrossSheets.toLocaleString('uk-UA')} прогонів</strong>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Formula Box 3: Postpress and Finishing */}
-                <div style={{ padding: '12px 14px', borderRadius: '10px', border: '1px solid var(--border-light)', backgroundColor: '#ffffff' }}>
-                  <div style={{ fontWeight: '800', fontSize: '12px', color: 'var(--text-dark)', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span className="ios-badge ios-badge-blue" style={{ fontSize: '10px' }}>Формула 3</span>
-                    <span>Постпрес та пакування</span>
-                  </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', color: 'var(--text-medium)' }}>
-                    <div>
-                      • <strong>Фальцювання зошитів:</strong><br />
-                      <code style={{ fontSize: '11px', color: '#1e40af', backgroundColor: '#eff6ff', padding: '1px 4px', borderRadius: '4px' }}>
-                        {magQuantity.toLocaleString('uk-UA')} прим. × {currentCalc.totalSignatures} зош. = <strong>{currentCalc.foldsCount.toLocaleString('uk-UA')} згинів</strong>
-                      </code>
-                    </div>
-                    <div>
-                      • <strong>Листопідбір (збірка блоку):</strong><br />
-                      <code style={{ fontSize: '11px', color: '#1e40af', backgroundColor: '#eff6ff', padding: '1px 4px', borderRadius: '4px' }}>
-                        {magQuantity.toLocaleString('uk-UA')} прим. × {currentCalc.totalSignatures} зош. = <strong>{currentCalc.gatheringCount.toLocaleString('uk-UA')} зошитів</strong>
-                      </code>
-                    </div>
-                    <div>
-                      • <strong>Пакування у крафт-папір / гофрокороби:</strong><br />
-                      <code style={{ fontSize: '11px', color: '#1e40af', backgroundColor: '#eff6ff', padding: '1px 4px', borderRadius: '4px' }}>
-                        ⌈{magQuantity.toLocaleString('uk-UA')} прим. / {magPackCapacity} шт.⌉ = <strong>{currentCalc.packagingPacks} пачок</strong>
-                      </code>
-                    </div>
-                    <div style={{ borderTop: '1px dashed #e2e8f0', paddingTop: '4px', fontWeight: '700', color: 'var(--text-dark)' }}>
-                      Товщина корінця блоку: <strong>~{spineMm} мм</strong>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Formula Box 4: Financial Cost & Client Price */}
-                <div style={{ padding: '12px 14px', borderRadius: '10px', border: '1px solid #bfdbfe', backgroundColor: '#eff6ff' }}>
-                  <div style={{ fontWeight: '800', fontSize: '12px', color: '#1e40af', marginBottom: '6px', display: 'flex', alignItems: 'center', gap: '6px' }}>
-                    <span className="ios-badge ios-badge-green" style={{ fontSize: '10px' }}>Формула 4</span>
-                    <span>Собівартість цеху та фінальна ціна</span>
-                  </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', color: '#1e3a8a' }}>
-                    <div>
-                      • <strong>Прямі виробничі витрати:</strong><br />
-                      <code style={{ fontSize: '11px', color: '#1e40af', backgroundColor: '#ffffff', padding: '1px 4px', borderRadius: '4px' }}>
-                        Σ(Матеріали + CTP + Друк + Постпрес + Пакування) = <strong>{currentCalc.directCost.toLocaleString('uk-UA')} ₴</strong>
-                      </code>
-                    </div>
-                    <div>
-                      • <strong>Собівартість із ЗВР ({magOverheadPct}%):</strong><br />
-                      <code style={{ fontSize: '11px', color: '#1e40af', backgroundColor: '#ffffff', padding: '1px 4px', borderRadius: '4px' }}>
-                        {currentCalc.directCost.toLocaleString('uk-UA')} ₴ + {currentCalc.overheadCost.toLocaleString('uk-UA')} ₴ = <strong>{currentCalc.totalCost.toLocaleString('uk-UA')} ₴</strong>
-                      </code>
-                    </div>
-                    <div>
-                      • <strong>Разом клієнту з націнкою ({magMarginPct}%):</strong><br />
-                      <code style={{ fontSize: '11px', color: '#1e40af', backgroundColor: '#ffffff', padding: '1px 4px', borderRadius: '4px' }}>
-                        {currentCalc.totalCost.toLocaleString('uk-UA')} ₴ × (1 + {magMarginPct/100}) = <strong>{currentCalc.finalPrice.toLocaleString('uk-UA')} ₴</strong>
-                      </code>
-                    </div>
-                    <div style={{ borderTop: '1px dashed #93c5fd', paddingTop: '4px', fontWeight: '900', color: '#007AFF', fontSize: '12px' }}>
-                      Ціна за 1 журнал: {currentCalc.finalPrice.toLocaleString('uk-UA')} ₴ / {magQuantity.toLocaleString('uk-UA')} = {currentCalc.unitPrice.toFixed(2)} ₴ / прим
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
@@ -5493,7 +6866,7 @@ export const Calculator: React.FC = () => {
   };
 
   return (
-    <div className="main-content" style={{ backgroundColor: 'var(--bg-system)', width: '100%', minHeight: '100%', padding: '24px 28px 48px 28px', overflowY: 'visible' }}>
+    <div className="main-content" style={{ backgroundColor: 'var(--bg-system)', width: '100%', minHeight: '100%', padding: '24px 28px 48px 28px', overflowY: 'visible', zoom: uiScale }}>
       {step === 'catalog' ? (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
           {/* Header Row: Title on Left, Search Bar on Right */}
@@ -5516,6 +6889,36 @@ export const Calculator: React.FC = () => {
 
             {/* Action Buttons & Prominent Live Search Bar */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
+              {/* Global UI Scale Switcher */}
+              <div style={{ display: 'inline-flex', alignItems: 'center', backgroundColor: '#ffffff', borderRadius: '10px', padding: '3px 4px', border: '1px solid var(--border-light)', gap: '2px', boxShadow: 'var(--shadow-flat)' }}>
+                <span style={{ fontSize: '11px', fontWeight: '700', color: '#64748b', padding: '0 6px' }}>Масштаб:</span>
+                {[
+                  { val: 0.85, label: '85%' },
+                  { val: 0.90, label: '90%' },
+                  { val: 1.00, label: '100%' }
+                ].map(opt => (
+                  <button
+                    key={opt.val}
+                    type="button"
+                    onClick={() => setUiScale(opt.val)}
+                    style={{
+                      padding: '3px 9px',
+                      fontSize: '11px',
+                      fontWeight: uiScale === opt.val ? '800' : '600',
+                      borderRadius: '7px',
+                      border: 'none',
+                      backgroundColor: uiScale === opt.val ? '#eff6ff' : 'transparent',
+                      color: uiScale === opt.val ? '#1d4ed8' : '#64748b',
+                      boxShadow: uiScale === opt.val ? '0 1px 2px rgba(29, 78, 216, 0.15)' : 'none',
+                      cursor: 'pointer'
+                    }}
+                    title={`Масштаб інтерфейсу ${opt.label}`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
+
               <button
                 type="button"
                 onClick={() => setShowSavedTemplatesModal(true)}
