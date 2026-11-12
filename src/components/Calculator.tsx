@@ -4362,7 +4362,7 @@ export const Calculator: React.FC = () => {
 
     // Market Benchmark calculations for 8 verified Ukrainian offset leaders
     const qty = Math.max(1, magQuantity || 1000);
-    const blockPages = magBlockPages || 32;
+    const blockPages = pages;
     const totalBrochurePages = isSeparateCover ? blockPages + 4 : blockPages;
     const totalPages = totalBrochurePages;
 
@@ -4380,7 +4380,7 @@ export const Calculator: React.FC = () => {
         coverPaperType: magCoverPaper.startsWith('off') ? 'offset' : 'coated_matte',
         coverColor: magCoverPrint === '1+0' ? '1+0' : magCoverPrint === '4+0' ? '4+0' : '4+4',
         coverLamination: magCoverLam === 'matte' ? 'matte' : magCoverLam === 'gloss' ? 'gloss' : magCoverLam === 'softtouch' ? 'softtouch' : 'none',
-        binding: (magBinding as string) === 'kbs' ? 'kbs' : (magBinding as string) === 'hard' ? 'hardcover' : 'staple',
+        binding: isHardcover ? 'hardcover' : magBinding === 'kbs' ? 'kbs' : 'staple',
         quantity: targetQty,
         packaging: true
       };
@@ -4523,13 +4523,13 @@ export const Calculator: React.FC = () => {
     const psFormatId = magFormat === 'A5' ? '3' : magFormat === 'A6' ? '4' : '2';
     const psPaperType = magBlockPaper.startsWith('off') ? '3' : '1';
     const psDensityId = magBlockPaper.startsWith('off')
-      ? (curBlockPaper.density <= 60 ? '1' : curBlockPaper.density <= 70 ? '2' : curBlockPaper.density <= 80 ? '3' : '4')
+      ? (curBlockPaper.density <= 60 ? '1' : curBlockPaper.density <= 70 ? '2' : curBlockPaper.density <= 80 ? '3' : curBlockPaper.density <= 90 ? '4' : '5')
       : '4';
     const printstoreUrl = isHard
       ? 'https://printstore.com.ua/on-lajn-kalkulyatory/books/'
       : isKbs
         ? 'https://printstore.com.ua/katalog-produktsii/zhurnaly/'
-        : `https://printstore.com.ua/on-lajn-kalkulyatory/catalog/?tirazh=${qty}&format=${psFormatId}&pages=${totalPages}&tippapmain=${psPaperType}&plotnmain=${psDensityId}&colormain=1&krepl=1`;
+        : `https://printstore.com.ua/on-lajn-kalkulyatory/catalog/?tirazh=${qty}&format=${psFormatId}&pages=${blockPages}&tippapmain=${psPaperType}&plotnmain=${psDensityId}&colormain=1&krepl=1`;
 
     const printtoUrl = 'https://printto.ua/services/printing-magazines';
 
