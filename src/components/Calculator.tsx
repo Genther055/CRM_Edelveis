@@ -4627,12 +4627,12 @@ export const Calculator: React.FC = () => {
           <div className="flex items-center gap-3">
             <button
               type="button"
-              onClick={() => { setMainCategoryTab('products'); setOffsetSubTab('overview'); }}
+              onClick={() => { setMainCategoryTab('offset'); setOffsetSubTab('overview'); }}
               className="ios-btn ios-btn-secondary ios-btn-small"
               style={{ padding: '4px 10px', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '5px' }}
             >
               <ArrowLeft size={13} />
-              <span>Усі продукти</span>
+              <span>Офсетний друк</span>
             </button>
 
             <div style={{ width: '1px', height: '18px', backgroundColor: 'var(--border-light)' }} />
@@ -8529,7 +8529,7 @@ export const Calculator: React.FC = () => {
                       </h4>
                     </div>
                     <span className="ios-badge ios-badge-blue" style={{ fontSize: '11px', padding: '3px 9px' }}>
-                      4 основні напрямки
+                      5 основних напрямків
                     </span>
                   </div>
 
@@ -8663,13 +8663,13 @@ export const Calculator: React.FC = () => {
                       </h4>
                     </div>
                     <span style={{ fontSize: '11px', color: 'var(--text-medium)', fontWeight: '600' }}>
-                      17 окремих виробів
+                      18 окремих виробів
                     </span>
                   </div>
                 </div>
               )}
 
-              {/* OVERVIEW SUBTAB: 17 Offset Products in Exact Dashboard iOS Card Style */}
+              {/* OVERVIEW SUBTAB: 18 Offset Products in Exact Dashboard iOS Card Style */}
               {offsetSubTab === 'overview' && (
                 <div style={{
                   display: 'grid',
@@ -8795,6 +8795,23 @@ export const Calculator: React.FC = () => {
                         { name: 'А6', onClick: () => openOffsetProduct({ category: 'Буклети', subCategory: 'Буклет', subTab: 'sheets', preset: '312', w: '105', h: '148', kind: '6' }) },
                         { name: 'А5', onClick: () => openOffsetProduct({ category: 'Буклети', subCategory: 'Буклет', subTab: 'sheets', preset: '32', w: '148', h: '210', kind: '6' }) },
                         { name: 'А4', onClick: () => openOffsetProduct({ category: 'Буклети', subCategory: 'Буклет', subTab: 'sheets', preset: '34', w: '210', h: '297', kind: '6' }) }
+                      ]
+                    },
+                    {
+                      id: 'magazines',
+                      title: 'Журнали (Офсет)',
+                      desc: 'Глянцеві, наукові та періодичні журнали на скобу або термоклей (КБС/PUR). Розрахунок по зошитах і 1С.',
+                      icon: <BookOpen size={30} style={{ color: 'var(--primary)' }} />,
+                      color: 'rgba(0, 122, 255, 0.1)',
+                      badgeClass: 'ios-badge-blue',
+                      badge: 'Журнали',
+                      metric: 'Офсетні зошити / CTP',
+                      onClick: () => setOffsetSubTab('magazines'),
+                      formats: [
+                        { name: 'А4', onClick: () => { setMagFormat('A4'); setOffsetSubTab('magazines'); } },
+                        { name: 'А5', onClick: () => { setMagFormat('A5'); setOffsetSubTab('magazines'); } },
+                        { name: 'Скоба', onClick: () => { setMagBinding('staple'); setOffsetSubTab('magazines'); } },
+                        { name: 'КБС', onClick: () => { setMagBinding('kbs'); setOffsetSubTab('magazines'); } }
                       ]
                     },
                     {
