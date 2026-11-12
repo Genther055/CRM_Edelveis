@@ -4533,16 +4533,15 @@ export const Calculator: React.FC = () => {
         ? `https://art-press.com.ua/uk/products/brochures/format/${apFormatSlug}/`
         : 'https://art-press.com.ua/uk/products/booklets/';
 
+    const printstoreEntry = compCurrent.results?.find(r => r.id === 'printstore');
     const psFormatId = magFormat === 'A5' ? '3' : magFormat === 'A6' ? '4' : '2';
-    const psPaperType = magBlockPaper.startsWith('off') ? '3' : '1';
+    const psPaperType = magBlockPaper.startsWith('off') ? '3' : magBlockPaper.includes('mat') ? '2' : '1';
     const psDensityId = magBlockPaper.startsWith('off')
-      ? (curBlockPaper.density <= 60 ? '1' : curBlockPaper.density <= 70 ? '2' : curBlockPaper.density <= 80 ? '3' : curBlockPaper.density <= 90 ? '4' : '5')
-      : '4';
-    const printstoreUrl = isHard
-      ? 'https://printstore.com.ua/on-lajn-kalkulyatory/books/'
-      : isKbs
-        ? 'https://printstore.com.ua/katalog-produktsii/zhurnaly/'
-        : `https://printstore.com.ua/on-lajn-kalkulyatory/catalog/?tirazh=${qty}&format=${psFormatId}&pages=${blockPages}&tippapmain=${psPaperType}&plotnmain=${psDensityId}&colormain=1&krepl=1`;
+      ? (curBlockPaper.density <= 60 ? '1' : curBlockPaper.density <= 70 ? '2' : curBlockPaper.density <= 80 ? '3' : curBlockPaper.density <= 90 ? '4' : curBlockPaper.density <= 100 ? '5' : curBlockPaper.density <= 120 ? '6' : '7')
+      : (curBlockPaper.density <= 60 ? '1' : curBlockPaper.density <= 70 ? '3' : curBlockPaper.density <= 80 ? '4' : curBlockPaper.density <= 90 ? '5' : curBlockPaper.density <= 115 ? '6' : curBlockPaper.density <= 130 ? '7' : curBlockPaper.density <= 150 ? '8' : '9');
+    const psKreplId = isHard ? '5' : isKbs ? '2' : '1';
+    const psBlockColorId = magBlockColor === '1+1' ? '2' : '1';
+    const printstoreUrl = printstoreEntry?.directUrl || `https://printstore.com.ua/on-lajn-kalkulyatory/jornal/?tirazh=${qty}&format=${psFormatId}&orient=1&krepl=${psKreplId}&pages=${blockPages}&tippapmain=${psPaperType}&plotnmain=${psDensityId}&colormain=${psBlockColorId}&is_oblozh=1&curr=1&speed=3`;
 
     const printtoUrl = 'https://printto.ua/services/printing-magazines';
 

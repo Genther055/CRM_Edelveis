@@ -107,9 +107,9 @@ export const COMPETITOR_KNOWLEDGE_BASE: Record<string, CompetitorRecord> = {
     shortName: 'PrintStore Group',
     city: 'Київ',
     productionType: 'Комерційний офсет (Man Roland 74 / Heidelberg CD 102)',
-    equipmentNote: 'Повноформатний офсетний друк журналів та каталогів. Розрахунок виконується клієнтським AJAX-скриптом catalog.js без збереження параметрів у URL GET.',
-    verifiedSource: 'Офіційний Рахунок № 29336 (Info_order_29336.pdf) + повний HTML-код форми калькулятора catalog/',
-    verifiedDate: '2026-11-11',
+    equipmentNote: 'Повноформатний офсетний друк журналів та каталогів. Розрахунок виконується клієнтським AJAX-скриптом jornal.js (/on-lajn-kalkulyatory/jornal/) без збереження параметрів у URL GET.',
+    verifiedSource: 'Офіційний Рахунок № 29336 (Info_order_29336.pdf) + живий AJAX API калькулятора on-lajn-kalkulyatory/jornal/',
+    verifiedDate: '2026-11-12',
     configurations: [
       {
         configId: 'printstore-a4-32p-offset80-cover250',
@@ -118,11 +118,11 @@ export const COMPETITOR_KNOWLEDGE_BASE: Record<string, CompetitorRecord> = {
         totalBrochurePages: 36,
         blockPages: 32,
         coverPages: 4,
-        blockPaper: 'Офсетний 80 г/м² (tippapmain=3, plotnmain=4), 4+4',
+        blockPaper: 'Офсетний 80 г/м² (tippapmain=3, plotnmain=3), 4+4',
         coverPaper: 'Крейдований глянець 250 г/м² (tippapoblozh=1, plotnoblozh=11), 4+4',
         coverFinish: 'Матова ламінація 1+0 (otdelkaf=6, otdelkab=1)',
         packaging: true,
-        directUrl: 'https://printstore.com.ua/on-lajn-kalkulyatory/catalog/',
+        directUrl: 'https://printstore.com.ua/on-lajn-kalkulyatory/jornal/',
         tiers: [
           { quantity: 100, totalMinUah: 22750, totalMaxUah: 23100, unitMinUah: 227.50, unitMaxUah: 231.00 },
           { quantity: 200, totalMinUah: 38670, totalMaxUah: 39150, unitMinUah: 193.35, unitMaxUah: 195.75 },
@@ -132,7 +132,7 @@ export const COMPETITOR_KNOWLEDGE_BASE: Record<string, CompetitorRecord> = {
           { quantity: 3000, totalMinUah: 92080, totalMaxUah: 93200, unitMinUah: 30.69, unitMaxUah: 31.07 },
           { quantity: 5000, totalMinUah: 131300, totalMaxUah: 132800, unitMinUah: 26.26, unitMaxUah: 26.56 },
         ],
-        technicalNotes: 'Верифіковано за офіційним файлом D:\\Info_order_29336.pdf (Замовлення № 29336 від PrintStore Group): наклад 1000 прим, 32 стор. блок 80г офсет 4+4, обкладинка 4 стор. глянець 250г 4+4, ламінація мат 1+0, скоба. Вага тиражу: 114 кг. Підсумкова вартість: рівно 53 570 грн (53.57 ₴/шт). Калькулятор PrintStore працює через WordPress/AJAX (catalog.js) і НЕ підставляє параметри з GET URL при відкритті сторінки — форму потрібно заповнювати вручну або передавати через POST.'
+        technicalNotes: 'Верифіковано за офіційним файлом D:\\Info_order_29336.pdf (Замовлення № 29336 від PrintStore Group) та живим API on-lajn-kalkulyatory/jornal/: наклад 1000 прим, 32 стор. блок 80г офсет 4+4, обкладинка 4 стор. глянець 250г 4+4, ламінація мат 1+0, скоба. Вага тиражу: 114 кг. Підсумкова вартість: 53 130 ₴ на сайті / 53 570 ₴ у рахунку. Калькулятор PrintStore працює через WordPress/AJAX (jornal.js) і НЕ підставляє параметри з GET URL при відкритті сторінки (відкриває за замовчуванням 16 с., глянець 80г, обкладинка 200г) — форму потрібно заповнювати вручну або передавати через POST.'
       }
     ]
   },

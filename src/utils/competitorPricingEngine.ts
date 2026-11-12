@@ -2,7 +2,7 @@
  * Універсальний аналітичний двигун розрахунку вартості друкарень-конкурентів України
  * 
  * Включає повністю реверс-інжинірингові алгоритми та формули калькуляторів:
- * 1. PrintStore Group (Київ) — комерційний офсет B1 (Heidelberg / Roland 74, Рахунок № 29336, catalog.js)
+ * 1. PrintStore Group (Київ) — комерційний офсет B1 (Heidelberg / Roland 74, Рахунок № 29336, jornal.js /on-lajn-kalkulyatory/jornal/)
  * 2. Друкарня Вольф / Wolf.ua (Київ) — збірний офсет B1 (Speedmaster XL 106, priceLoadDigital, pYpLm)
  * 3. Poligrafika.com.ua (Чернівці/Київ) — поаркушний цифровий друк (Konica Minolta AccurioPress, Nuxt 3)
  * 4. Printto.ua (Київ) — оперативний цифровий On-Demand (POST /prices, тонер/струмінь)
@@ -109,44 +109,53 @@ export function calculatePrintStore(p: CompetitorInputParams): CompetitorCalcula
   const baseAtQty = getBaseRunCost(q);
   const runRatio = q / 1000;
 
-  // Форматний коефіцієнт (A5 за парсингом API = 31 950 ₴ на 1000 шт)
-  const formatFactor = isA4 ? 1.0 : 0.601355;
+  // Форматний коефіцієнт (A5 за живим парсингом API jornal/ = 31 950 ₴ на 1000 шт)
+  const formatFactor = isA4 ? 1.0 : p.format === 'A5' ? (31950 / 53130) : 0.82;
 
-  // Поправка на кількість сторінок (8 сторінок = 8 850 ₴ на 1000 шт = 1 106.25 ₴/стор)
+  // Поправка на кількість сторінок (8 сторінок = ~8 850–9 080 ₴ на 1000 шт ≈ 1 106.25 ₴/стор)
   const pageDeltaAt1000 = (blockP - 32) * 1106.25;
   const pageDelta = pageDeltaAt1000 * Math.max(0.4, Math.min(4.0, 0.45 + 0.55 * runRatio));
 
-  // Поправка на тип і щільність паперу блоку
-  // За фактом живого парсингу PrintStore (A4, 32 с., обкл. 250г, ламінація матова, скоба, 1000 шт):
-  // і глянець 80г, і офсет 80г дають рівно 53 130 ₴ (53.13 ₴/шт, 114 кг)
+  // Поправка на тип і щільність паперу блоку (живі дельти /on-lajn-kalkulyatory/jornal/ при 1000 шт)
+  // Глянець 80г, мат 80г та офсет 80г (tippapmain=3, plotnmain=3) дають рівно 53 130 ₴ (114 кг)
   let paperDeltaAt1000 = 0;
-  if (p.blockPaperDensity >= 150) paperDeltaAt1000 += 7100;
-  else if (p.blockPaperDensity >= 130) paperDeltaAt1000 += 5200;
-  else if (p.blockPaperDensity >= 115) paperDeltaAt1000 += 3400;
-  else if (p.blockPaperDensity >= 90) paperDeltaAt1000 += 1200;
+  if (p.blockPaperDensity >= 150) paperDeltaAt1000 += 8490; // 61 620 ₴
+  else if (p.blockPaperDensity >= 130) paperDeltaAt1000 += 5520; // 58 650 ₴
+  else if (p.blockPaperDensity >= 115) paperDeltaAt1000 += 3870; // 57 000 ₴
+  else if (p.blockPaperDensity >= 90) paperDeltaAt1000 += 1110; // 54 240 ₴
   const paperDelta = paperDeltaAt1000 * runRatio;
 
-  // Поправка на щільність паперу обкладинки (база еталона = 250 г/м²)
-  const coverDensityDelta = ((p.coverPaperDensity - 250) / 50) * 480 * runRatio;
+  // Поправка на кольоровість блоку (ч/б 1+1 = colormain=2 -> 39 730 ₴ проти 53 130 ₴ = -13 400 ₴ на 32с/1000 шт)
+  const blockColorDelta = p.blockColor === '1+1'
+    ? -13400 * (blockP / 32) * Math.max(0.4, Math.min(4.0, 0.45 + 0.55 * runRatio))
+    : 0;
 
-  // Поправка на оздоблення (ламінацію) обкладинки
-  // База: матова = 0 (включена у 53 130 ₴); глянець = -510 ₴; softtouch = +2 740 ₴; без ламінації = -4 060 ₴
+  // Поправка на щільність паперу обкладинки (база = 250 г/м²; 200г=-740₴, 300г=+740₴, 350г=+1480₴)
+  const coverDensityDelta = ((p.coverPaperDensity - 250) / 50) * 740 * runRatio;
+
+  // Поправка на оздоблення (ламінацію) обкладинки (/on-lajn-kalkulyatory/jornal/ при 1000 шт):
+  // База: матова = 0 (53 130 ₴); без ламінації = -4 060 ₴ (49 070); глянець = -510 ₴ (52 620); softtouch = +4 380 ₴ (57 510)
   let lamDeltaAt1000 = 0;
   if (p.coverLamination === 'none') lamDeltaAt1000 = -4060;
   else if (p.coverLamination === 'gloss') lamDeltaAt1000 = -510;
-  else if (p.coverLamination === 'softtouch') lamDeltaAt1000 = 2740;
+  else if (p.coverLamination === 'softtouch') lamDeltaAt1000 = 4380;
   const lamDelta = lamDeltaAt1000 * runRatio;
 
-  // Поправка на барвистість обкладинки (4+0 замість 4+4 дає -260 ₴ на 1000 шт)
+  // Поправка на барвистість обкладинки (4+0 замість 4+4 = -260 ₴; 1+0 замість 4+4 = -3 030 ₴ на 1000 шт)
   const is40 = p.coverColor === '4+0' || p.coverColor === '1+0';
-  const coverColorDelta = is40 ? -260 * Math.max(0.5, runRatio) : 0;
+  const coverColorDelta = p.coverColor === '1+0'
+    ? -3030 * Math.max(0.5, runRatio)
+    : p.coverColor === '4+0'
+      ? -260 * Math.max(0.5, runRatio)
+      : 0;
 
-  // Поправка на скріплення (КБС біндер дорожчий на ~2 800 ₴ на 1000 шт)
+  // Поправка на скріплення (живий API jornal/: КБС термоклей krepl=2 -> 56 780 ₴ (+3 650 ₴); тверда krepl=5 -> 119 350 ₴ (+66 220 ₴))
   const isKbs = p.binding === 'kbs';
-  const bindingDelta = isKbs ? (1200 + q * 1.60) : 0;
+  const isHard = p.binding === 'hardcover';
+  const bindingDelta = isHard ? (16220 + q * 50) : isKbs ? (1450 + q * 2.2) : 0;
 
   const totalCalculated = Math.round(
-    (baseAtQty * formatFactor) + pageDelta + paperDelta + coverDensityDelta + lamDelta + coverColorDelta + bindingDelta
+    (baseAtQty * formatFactor) + pageDelta + paperDelta + blockColorDelta + coverDensityDelta + lamDelta + coverColorDelta + bindingDelta
   );
 
   const totalMin = Math.round(totalCalculated);
@@ -154,8 +163,8 @@ export function calculatePrintStore(p: CompetitorInputParams): CompetitorCalcula
   const unitMin = +(totalMin / q).toFixed(2);
   const unitMax = +(totalMax / q).toFixed(2);
 
-  // Коди полів для форми PrintStore (з живого DOM / catalog.js)
-  const psFormatId = isA4 ? '2' : p.format === 'A5' ? '3' : '4';
+  // Коди полів для форми PrintStore (з живого DOM /on-lajn-kalkulyatory/jornal/ та jornal.js)
+  const psFormatId = isA4 ? '2' : p.format === 'A5' ? '3' : '6'; // 2=A4, 3=A5, 6=B5
   const psPaperType = p.blockPaperType === 'offset' ? '3' : p.blockPaperType === 'coated_matte' ? '2' : '1';
   let psDensityId = '3'; // 80г для офсетного, '4' для крейдованого
   if (p.blockPaperType === 'offset') {
@@ -179,6 +188,8 @@ export function calculatePrintStore(p: CompetitorInputParams): CompetitorCalcula
     else psDensityId = '9';
   }
 
+  const psBlockColorId = p.blockColor === '1+1' ? '2' : '1';
+
   const psCoverPaperType = p.coverPaperType === 'offset' ? '3' : p.coverPaperType === 'coated_matte' ? '2' : '1';
   let psCoverDensityId = '11'; // 250г під '1'/'2' (крейда)
   if (p.coverPaperType === 'offset') {
@@ -201,30 +212,31 @@ export function calculatePrintStore(p: CompetitorInputParams): CompetitorCalcula
     else psCoverDensityId = '13';
   }
 
+  const psCoverColorFront = p.coverColor === '1+0' ? '2' : '1';
   const psCoverColorBack = is40 ? '3' : '1';
   let psCoverLamId = '1';
   if (p.coverLamination === 'matte') psCoverLamId = '6';
   else if (p.coverLamination === 'gloss') psCoverLamId = '5';
   else if (p.coverLamination === 'softtouch') psCoverLamId = '7';
 
-  const psKreplId = isKbs ? '2' : '1';
+  const psKreplId = isHard ? '5' : isKbs ? '2' : '1';
 
-  // Повне пряме посилання з усіма параметрами, що заповнюють форму калькулятора PrintStore
-  const directUrl = `https://printstore.com.ua/on-lajn-kalkulyatory/catalog/?tirazh=${q}&format=${psFormatId}&orient=1&krepl=${psKreplId}&pages=${blockP}&tippapmain=${psPaperType}&plotnmain=${psDensityId}&colormain=1&otdelkamain=1&rubriks=0&techn_main=1&is_dopblock=0&pages_dopblock=0&is_oblozh=1&tippapoblozh=${psCoverPaperType}&plotnoblozh=${psCoverDensityId}&colorsf=1&colorsb=${psCoverColorBack}&otdelkaf=${psCoverLamId}&otdelkab=1&techn_oblozh=1&curr=1&speed=3`;
+  // Повне пряме посилання на калькулятор журналів PrintStore (/on-lajn-kalkulyatory/jornal/)
+  const directUrl = `https://printstore.com.ua/on-lajn-kalkulyatory/jornal/?tirazh=${q}&format=${psFormatId}&orient=1&krepl=${psKreplId}&pages=${blockP}&tippapmain=${psPaperType}&plotnmain=${psDensityId}&colormain=${psBlockColorId}&otdelkamain=1&rubriks=0&techn_main=1&is_dopblock=0&pages_dopblock=0&is_oblozh=1&tippapoblozh=${psCoverPaperType}&plotnoblozh=${psCoverDensityId}&colorsf=${psCoverColorFront}&colorsb=${psCoverColorBack}&otdelkaf=${psCoverLamId}&otdelkab=1&techn_oblozh=1&curr=1&speed=3`;
 
   const parsedParams: CompetitorParsedParam[] = [
     { label: 'Наклад', fieldCode: 'tirazh', value: q, displayValue: `${q.toLocaleString('uk-UA')} прим.` },
     { label: 'Формат', fieldCode: 'format', value: psFormatId, displayValue: p.format },
     { label: 'Орієнтація', fieldCode: 'orient', value: '1', displayValue: 'Книжна' },
-    { label: 'Кріплення', fieldCode: 'krepl', value: psKreplId, displayValue: isKbs ? 'Термоклей (КБС)' : 'Скоба' },
+    { label: 'Кріплення', fieldCode: 'krepl', value: psKreplId, displayValue: isHard ? 'Тверда обкладинка' : isKbs ? 'Термоклей (КБС)' : 'Скоба' },
     { label: 'Сторінок блоку', fieldCode: 'pages', value: blockP, displayValue: `${blockP} с.` },
     { label: 'Папір блоку', fieldCode: 'tippapmain', value: psPaperType, displayValue: p.blockPaperType === 'offset' ? 'Офсетний' : p.blockPaperType === 'coated_matte' ? 'Крейдований мат' : 'Крейдований глянець' },
     { label: 'Щільність блоку', fieldCode: 'plotnmain', value: psDensityId, displayValue: `${p.blockPaperDensity} г/м²` },
-    { label: 'Кольоровість блоку', fieldCode: 'colormain', value: '1', displayValue: p.blockColor },
+    { label: 'Кольоровість блоку', fieldCode: 'colormain', value: psBlockColorId, displayValue: p.blockColor },
     { label: 'Окрема обкладинка', fieldCode: 'is_oblozh', value: '1', displayValue: 'Так (4 сторінки)' },
     { label: 'Папір обкладинки', fieldCode: 'tippapoblozh', value: psCoverPaperType, displayValue: p.coverPaperType === 'offset' ? 'Офсетний' : p.coverPaperType === 'coated_matte' ? 'Крейдований мат' : 'Крейдований глянець' },
     { label: 'Щільність обкладинки', fieldCode: 'plotnoblozh', value: psCoverDensityId, displayValue: `${p.coverPaperDensity} г/м²` },
-    { label: 'Барвистість обкладинки', fieldCode: 'colorsb', value: psCoverColorBack, displayValue: p.coverColor === '4+4' ? '4+4 (колір зворот)' : '4+0 (без друку)' },
+    { label: 'Барвистість обкладинки', fieldCode: 'colorsb', value: psCoverColorBack, displayValue: p.coverColor === '4+4' ? '4+4 (колір зворот)' : p.coverColor === '1+0' ? '1+0 (ч/б лице, без звороту)' : '4+0 (без друку)' },
     { label: 'Ламінація обкладинки', fieldCode: 'otdelkaf', value: psCoverLamId, displayValue: p.coverLamination === 'matte' ? 'Матова лицьова' : p.coverLamination === 'gloss' ? 'Глянцева лицьова' : p.coverLamination === 'softtouch' ? 'Soft-touch лицьова' : 'Без ламінації' },
     { label: 'Валюта розрахунку', fieldCode: 'curr', value: '1', displayValue: 'Гривня (₴)' },
     { label: 'Терміновість', fieldCode: 'speed', value: '3', displayValue: 'Планово' }
@@ -246,7 +258,7 @@ export function calculatePrintStore(p: CompetitorInputParams): CompetitorCalcula
     statusBadge: 'Офсет B1 (Еталон)',
     isFullSpecMatch: true,
     parsedParams,
-    formulaNote: `Увага: сайт PrintStore не підставляє GET-параметри з URL (завжди відкриває форму за замовчуванням: 16 стор., глянець 115г) — на сайті виставте ${blockP} стор., ${p.blockPaperType === 'offset' ? 'офсет' : 'крейду'} ${p.blockPaperDensity}г та обкладинку ${p.coverPaperDensity}г вручну. Розрахунок у таблиці (${totalMin.toLocaleString('uk-UA')} ₴) верифіковано безпосередньо через AJAX калькулятора PrintStore (114 кг на 32с/250г).`,
+    formulaNote: `Увага: сторінка PrintStore /jornal/ не зчитує GET-параметри з URL (завжди відкриває форму за замовчуванням: 16 стор., глянець 80г, обкладинка 200г) — на сайті виставте ${blockP} стор., ${p.blockPaperType === 'offset' ? 'офсет' : 'крейду'} ${p.blockPaperDensity}г та обкладинку ${p.coverPaperDensity}г вручну. Розрахунок (${totalMin.toLocaleString('uk-UA')} ₴) верифіковано через AJAX jornal.js.`,
     breakdown: {
       platesCost: Math.round(signatures * 1900 + 1250),
       makereadyCost: Math.round((q / 1000) * signatures * 420),
