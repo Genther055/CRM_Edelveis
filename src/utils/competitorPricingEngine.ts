@@ -511,45 +511,53 @@ export function calculateGnozis(p: CompetitorInputParams): CompetitorCalculation
   // Формули прямо зі скрипта jquery.pglight.js (CatalogStrategy)
   // Частки аркуша: A4 = 4, A5 = 8
   const parts = isA4 ? 4 : 8;
-  const printSheets = Math.ceil(blockP / parts) / 2; // оборотні аркуші
+  const printSheets = Math.ceil(blockP / parts) / 2; // оборотні аркуші (4 для 32 с. А4)
 
   // Тарифні константи Gnozis:
-  const nextPrepare = 200;
   const f1000 = p.blockColor === '4+4' ? 2300 : 1150;
-  const n1000 = 400; // 2 обороти
+  const fixedSetup = Math.round((printSheets * f1000) + (f1000 * 0.5) + (printSheets * 312.5)); // 11 600 ₴ для 32 с. А4 4+4
+  const runWorkCost = Math.round(q * printSheets * 0.025); // 100 ₴ на 1000 шт для 32 с.
 
-  // Площа друк. аркуша та папір (у реальній сітці 45 грн/кг)
+  // Площа друк. аркуша та папір (у реальній сітці ~45 грн/кг)
   const formatArea = isA4 ? 0.288 : 0.144;
   const techNeeds = q <= 5000 ? 250 : 500;
   const paperPricePerKg = p.blockPaperType === 'offset' ? 44.5 : 48.0;
   const onePrSheetCost = (formatArea * p.blockPaperDensity * (paperPricePerKg * 1000)) / 1000000;
   const paperCost = (q + techNeeds) * onePrSheetCost;
 
-  const foreignCost = printSheets * (paperCost + f1000 + (q / 1000) * n1000);
-
-  // Кріплення: біндер = 2 грн/шт (зафіксовано у формі каталогів)
-  const bindingCost = p.binding === 'kbs' ? q * 2 : (450 + q * 0.10);
+  // На формі /uslugi/katalogi/ кріплення за замовчуванням — Биндер (2 грн/шт)
+  const bindingCost = Math.round(q * 2);
 
   // Обкладинка: 4 сторінки
   const coverSheets = (printSheets * 4) / blockP;
   const coverPaperPricePerKg = 52.0;
   const coverPrSheetCost = (formatArea * p.coverPaperDensity * (coverPaperPricePerKg * 1000)) / 1000000;
   const coverPaperCost = ((coverSheets * q) + techNeeds) * coverPrSheetCost;
-  const coverCost = coverPaperCost + (f1000 * 0.5) + (((coverSheets * q) / 1000) * nextPrepare);
+  const totalPaperRealCost = Math.round((paperCost * printSheets) + coverPaperCost);
 
-  // Ламінація: матова 2.40 ₴/аркуш, глянцева 2.20 ₴/аркуш
+  // Ламінація: матова 2.40 ₴/аркуш (1 200 ₴ на 1000 шт), глянцева 2.20 ₴/аркуш (1 100 ₴ на 1000 шт)
   let decorRate = 0;
   if (p.coverLamination === 'matte') decorRate = 2.40;
   else if (p.coverLamination === 'gloss') decorRate = 2.20;
+  else if (p.coverLamination === 'softtouch') decorRate = 2.80;
   const decorCost = Math.round(coverSheets * q * decorRate);
 
-  // totalMin — це ціна роботи калькулятора на сайті (де uaPerTone=0)
-  // totalMax — це реальна комерційна вартість із включеним папером
-  const workOnlyCost = Math.round((printSheets * (f1000 + (q / 1000) * n1000)) + bindingCost + (f1000 * 0.5) + decorCost);
-  const fullCostWithPaper = Math.round(foreignCost + bindingCost + coverCost + decorCost);
+  // Вага за формулою Gnozis (калібровано до 112 кг на 1000 шт А4 32с 80г + обкл 250г)
+  const a4Area = 0.21 * 0.297;
+  const sheetArea = isA4 ? a4Area : a4Area * 0.5;
+  const weightKg = Math.max(
+    1,
+    Math.round((((blockP / 2) * sheetArea * (p.blockPaperDensity / 1000) + 2 * sheetArea * (p.coverPaperDensity / 1000)) * q) + (q * 0.001))
+  );
 
-  const totalMin = Math.round(workOnlyCost);
-  const totalMax = Math.round(fullCostWithPaper);
+  // totalMin — точна ціна роботи онлайн-калькулятора на сайті (де uaPerTone=0):
+  // 14 900 ₴ (матова лам.) або 14 800 ₴ (глянцева лам.) для А4 32с 80г + обкл 250г 4+4 Біндер 1000 шт
+  // totalMax — повна комерційна вартість із доданим папером
+  const workOnlyCost = Math.round(fixedSetup + runWorkCost + bindingCost + decorCost);
+  const fullCostWithPaper = Math.round(workOnlyCost + totalPaperRealCost);
+
+  const totalMin = workOnlyCost;
+  const totalMax = fullCostWithPaper;
   const unitMin = +(totalMin / q).toFixed(2);
   const unitMax = +(totalMax / q).toFixed(2);
 
@@ -560,9 +568,10 @@ export function calculateGnozis(p: CompetitorInputParams): CompetitorCalculation
     { label: 'Формат видання', fieldCode: 'format', value: p.format, displayValue: `${p.format} (частка ${parts})` },
     { label: 'Сторінок блоку', fieldCode: 'pages', value: blockP, displayValue: `${blockP} с.` },
     { label: 'Оборотні аркуші', fieldCode: 'printSheets', value: printSheets, displayValue: `${printSheets} аркушів` },
-    { label: 'Папір блоку', fieldCode: 'density', value: p.blockPaperDensity, displayValue: `${p.blockPaperDensity} г/м²` },
-    { label: 'Скріплення', fieldCode: 'binding', value: p.binding === 'kbs' ? 'kbs' : 'staple', displayValue: p.binding === 'kbs' ? 'КБС біндер (2 ₴/шт)' : 'Скоба' },
-    { label: 'Ламінація обкладинки', fieldCode: 'decorRate', value: `${decorRate} грн`, displayValue: p.coverLamination === 'matte' ? 'Матова (2.40 ₴/арк)' : p.coverLamination === 'gloss' ? 'Глянцева (2.20 ₴/арк)' : 'Без ламінації' },
+    { label: 'Папір блоку', fieldCode: 'density', value: p.blockPaperDensity, displayValue: `${p.blockPaperType === 'offset' ? 'Офсетна' : 'Крейдована'} ${p.blockPaperDensity} г/м², ${p.blockColor}` },
+    { label: 'Обкладинка', fieldCode: 'cover', value: p.coverPaperDensity, displayValue: `Крейдована ${p.coverPaperDensity} г/м², ${p.coverColor}` },
+    { label: 'Скріплення (на сайті)', fieldCode: 'binding', value: 'binder', displayValue: 'Біндер (2 ₴/шт, базовий режим форми)' },
+    { label: 'Оформлення (ламінація)', fieldCode: 'decorRate', value: `${decorRate} грн/арк`, displayValue: p.coverLamination === 'matte' ? 'Матова (2.40 ₴/арк)' : p.coverLamination === 'gloss' ? 'Глянцева (2.20 ₴/арк)' : 'Без ламінації' },
     { label: 'Наклад', fieldCode: 'quantity', value: q, displayValue: `${q.toLocaleString('uk-UA')} шт` }
   ];
 
@@ -571,20 +580,20 @@ export function calculateGnozis(p: CompetitorInputParams): CompetitorCalculation
     name: 'Гнозіс (Gnozis)',
     shortName: 'Гнозіс',
     city: 'Київ',
-    techType: 'Офсетний друк (КБС біндер)',
+    techType: 'Офсетний друк (Біндер)',
     equipment: 'Офсетні машини Heidelberg/Komori (B1/B2)',
     unitMin,
     unitMax,
     totalMin,
     totalMax,
-    weightKg: Math.ceil(q * (blockP * 0.0025 + 0.031)),
+    weightKg,
     directUrl,
-    statusBadge: 'Офсет (КБС біндер)',
+    statusBadge: 'Офсет (Біндер, без паперу в URL)',
     isFullSpecMatch: p.binding === 'kbs',
     parsedParams,
-    formulaNote: `Скрипт CatalogStrategy: форми + приладка ${foreignCost.toFixed(0)} ₴, біндер ${bindingCost} ₴, ламінація ${decorCost} ₴. Онлайн-база не рахує папір (totalMin); повна ціна з папером — totalMax.`,
+    formulaNote: `Увага: форма gnozis.com.ua не підставляє параметри з URL (відкривається порожньою на A3/70г/1+0) — параметри A4, ${blockP} с., ${p.blockPaperDensity}г, обкл. ${p.coverPaperDensity}г, ${q} шт потрібно ввести на сайті вручну. Онлайн-калькулятор сайту не додає вартість паперу і видає ${workOnlyCost.toLocaleString('uk-UA')} ₴ (totalMin); реальна ціна з папером (~${totalPaperRealCost.toLocaleString('uk-UA')} ₴) — ${fullCostWithPaper.toLocaleString('uk-UA')} ₴ (totalMax).`,
     breakdown: {
-      paperCost: Math.round(paperCost * printSheets + coverPaperCost),
+      paperCost: totalPaperRealCost,
       bindingCost,
       laminationCost: decorCost
     }
