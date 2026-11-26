@@ -1,7 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { Menu, Printer, MapPin, Phone, Send, Lock, Clock } from 'lucide-react';
 import { AppProvider, useApp } from './context/AppContext';
-import { parseCurrentRoute, syncRouteUrl, updateDocumentMeta } from './utils/seoRouting';
 import { Login } from './components/Login';
 import { Sidebar } from './components/Sidebar';
 import { Dashboard } from './components/Dashboard';
@@ -27,37 +26,8 @@ import './mobile.css';
 
 function AppContent() {
   const { currentUser } = useApp();
-  const [activeTab, setActiveTab] = useState(() => {
-    const route = parseCurrentRoute();
-    return route.tab || 'dashboard';
-  });
+  const [activeTab, setActiveTab] = useState('dashboard');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
-  // Sync route and listen for browser popstate
-  useEffect(() => {
-    const route = parseCurrentRoute();
-    updateDocumentMeta(route);
-  }, []);
-
-  useEffect(() => {
-    const handlePopState = () => {
-      const route = parseCurrentRoute();
-      if (route.tab && route.tab !== activeTab) {
-        setActiveTab(route.tab);
-      }
-      updateDocumentMeta(route);
-    };
-
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, [activeTab]);
-
-  const handleSelectTab = (tab: string) => {
-    setActiveTab(tab);
-    if (tab !== 'calculator') {
-      syncRouteUrl({ tab });
-    }
-  };
 
   if (!currentUser) {
     return <Login />;
@@ -285,7 +255,7 @@ function AppContent() {
 
         <button
           type="button"
-          onClick={() => handleSelectTab('profile')}
+          onClick={() => setActiveTab('profile')}
           className="w-8 h-8 rounded-full bg-blue-50 dark:bg-slate-800 text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-slate-700 flex items-center justify-center text-xs font-bold cursor-pointer"
           title="Профіль"
         >
@@ -295,13 +265,13 @@ function AppContent() {
 
       <Sidebar 
         activeTab={activeTab} 
-        setActiveTab={handleSelectTab}
+        setActiveTab={setActiveTab}
         isOpenOnMobile={isMobileMenuOpen}
         onCloseMobile={() => setIsMobileMenuOpen(false)}
       />
       
       {activeTab === 'dashboard' && (
-        <Dashboard setActiveTab={handleSelectTab} />
+        <Dashboard setActiveTab={setActiveTab} />
       )}
       
       {activeTab === 'leads' && ['admin', 'manager'].includes(role) && (
