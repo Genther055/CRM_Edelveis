@@ -48,9 +48,11 @@ import {
   ArrowLeftRight,
   Upload,
   Trash2,
-  Eye
+  Eye,
+  Link2
 } from 'lucide-react';
 import html2pdf from 'html2pdf.js';
+import { parseCurrentRoute, syncRouteUrl, copyDirectLink } from '../utils/seoRouting';
 
 export interface CalcTemplate {
   id?: string;
@@ -1046,13 +1048,28 @@ export const Calculator: React.FC = () => {
   }, [uiScale]);
 
   // Selection step: 'catalog' | 'editor'
-  const [step, setStep] = useState<'catalog' | 'editor'>('catalog');
+  const initialRoute = useMemo(() => parseCurrentRoute(), []);
+  const [step, setStep] = useState<'catalog' | 'editor'>(() => {
+    if (initialRoute.subTab === 'magazines') return 'editor';
+    return 'catalog';
+  });
   
   // Main Category Tab: 'products' | 'offset' | 'digital' | 'wide' | 'roll' | 'films' | 'notebooks'
-  const [mainCategoryTab, setMainCategoryTab] = useState<'products' | 'offset' | 'digital' | 'wide' | 'roll' | 'films'>('products');
+  const [mainCategoryTab, setMainCategoryTab] = useState<'products' | 'offset' | 'digital' | 'wide' | 'roll' | 'films'>(() => {
+    if (initialRoute.category && ['products', 'offset', 'digital', 'wide', 'roll', 'films'].includes(initialRoute.category)) {
+      return initialRoute.category as any;
+    }
+    if (initialRoute.subTab === 'magazines') return 'offset';
+    return 'products';
+  });
 
   // Sub-tabs in Offset printing: 'overview' | 'sheets' | 'felling' | 'multipage' | 'custom'
-  const [offsetSubTab, setOffsetSubTab] = useState<'overview' | 'sheets' | 'felling' | 'magazines' | 'multipage' | 'notebooks' | 'custom'>('overview');
+  const [offsetSubTab, setOffsetSubTab] = useState<'overview' | 'sheets' | 'felling' | 'magazines' | 'multipage' | 'notebooks' | 'custom'>(() => {
+    if (initialRoute.subTab && ['overview', 'sheets', 'felling', 'magazines', 'multipage', 'notebooks', 'custom'].includes(initialRoute.subTab)) {
+      return initialRoute.subTab as any;
+    }
+    return 'overview';
+  });
 
   // Sheet Offset Calculator specific states
   const [sheetSizePreset, setSheetSizePreset] = useState<string>('1'); // Default Business Card 90x50
@@ -1077,11 +1094,21 @@ export const Calculator: React.FC = () => {
   const [multiBlockColor, setMultiBlockColor] = useState<string>('2'); // 4+4
   const [multiInsertPages, setMultiInsertPages] = useState<string>('0'); // Без вставки
   // Dedicated Offset Magazines Calculator states
-  const [magFormat, setMagFormat] = useState<'A4' | 'A5' | 'A6' | 'custom'>('A4');
+  const [magFormat, setMagFormat] = useState<'A4' | 'A5' | 'A6' | 'custom'>(() => {
+    const f = initialRoute.params?.format?.toUpperCase();
+    if (f === 'A4' || f === 'A5' || f === 'A6') return f as any;
+    return 'A4';
+  });
   const [magCustomWidth, setMagCustomWidth] = useState<number>(210);
   const [magCustomHeight, setMagCustomHeight] = useState<number>(297);
-  const [magBlockPages, setMagBlockPages] = useState<number>(32);
-  const [magQuantity, setMagQuantity] = useState<number>(1000);
+  const [magBlockPages, setMagBlockPages] = useState<number>(() => {
+    const p = initialRoute.params?.pages ? parseInt(initialRoute.params.pages, 10) : NaN;
+    return (!isNaN(p) && p >= 8) ? p : 32;
+  });
+  const [magQuantity, setMagQuantity] = useState<number>(() => {
+    const q = initialRoute.params?.qty ? parseInt(initialRoute.params.qty, 10) : NaN;
+    return (!isNaN(q) && q > 0) ? q : 1000;
+  });
   const [magBlockPaper, setMagBlockPaper] = useState<string>('off_80');
   const [magBlockColor, setMagBlockColor] = useState<'4+4' | '1+1'>('4+4');
   const [magOrientation, setMagOrientation] = useState<'vert' | 'horiz'>('vert');
@@ -1165,7 +1192,12 @@ export const Calculator: React.FC = () => {
   const [hoveredMegaProduct, setHoveredMegaProduct] = useState<string>('cards');
 
   // Sub-tabs in Digital printing: 'overview' | 'sheets' | 'felling' | 'multipage' | 'custom' | 'mounted' | 'in_sheets' | 'pouch_lam' | 'plotter_cut' | 'die_cut_custom' | 'folders'
-  const [digitalSubTab, setDigitalSubTab] = useState<'overview' | 'sheets' | 'felling' | 'multipage' | 'notebooks' | 'custom' | 'mounted' | 'in_sheets' | 'pouch_lam' | 'plotter_cut' | 'die_cut_custom' | 'folders'>('overview');
+  const [digitalSubTab, setDigitalSubTab] = useState<'overview' | 'sheets' | 'felling' | 'multipage' | 'notebooks' | 'custom' | 'mounted' | 'in_sheets' | 'pouch_lam' | 'plotter_cut' | 'die_cut_custom' | 'folders'>(() => {
+    if (initialRoute.category === 'digital' && initialRoute.subTab) {
+      return initialRoute.subTab as any;
+    }
+    return 'overview';
+  });
 
   // Digital Specific States
   const [digitalMountedLayers, setDigitalMountedLayers] = useState<'2' | '3' | '4'>('2');
@@ -1198,7 +1230,87 @@ export const Calculator: React.FC = () => {
   const [fellingSelectedPrints, setFellingSelectedPrints] = useState<string[]>(['4+4']);
 
   // Wide Format Specific States
-  const [wideSubTab, setWideSubTab] = useState<'overview' | 'banner' | 'film' | 'paper' | 'custom' | 'pvc' | 'foam_board' | 'composite' | 'acrylic' | 'canvas' | 'stands'>('overview');
+  const [wideSubTab, setWideSubTab] = useState<'overview' | 'banner' | 'film' | 'paper' | 'custom' | 'pvc' | 'foam_board' | 'composite' | 'acrylic' | 'canvas' | 'stands'>(() => {
+    if (initialRoute.category === 'wide' && initialRoute.subTab) {
+      return initialRoute.subTab as any;
+    }
+    return 'overview';
+  });
+
+  // URL Deep-Linking & Manager Share Integration
+  const [copyToast, setCopyToast] = useState<string | null>(null);
+
+  const handleCopyShareLink = async () => {
+    let activeSub = 'overview';
+    if (mainCategoryTab === 'offset') activeSub = offsetSubTab;
+    else if (mainCategoryTab === 'digital') activeSub = digitalSubTab;
+    else if (mainCategoryTab === 'wide') activeSub = wideSubTab;
+
+    const params: Record<string, string> = {};
+    if (mainCategoryTab === 'offset' && offsetSubTab === 'magazines') {
+      params.format = magFormat;
+      params.pages = String(magBlockPages);
+      params.qty = String(magQuantity);
+    }
+
+    syncRouteUrl({
+      tab: 'calculator',
+      category: mainCategoryTab,
+      subTab: activeSub !== 'overview' ? activeSub : undefined,
+      params: Object.keys(params).length > 0 ? params : undefined
+    });
+
+    const res = await copyDirectLink();
+    if (res.success) {
+      setCopyToast('Пряме посилання скопійовано! Надішліть його менеджеру для відкриття саме цієї вкладки.');
+      setTimeout(() => setCopyToast(null), 3500);
+    }
+  };
+
+  // Sync route URL whenever subtabs change
+  useEffect(() => {
+    let activeSub = 'overview';
+    if (mainCategoryTab === 'offset') activeSub = offsetSubTab;
+    else if (mainCategoryTab === 'digital') activeSub = digitalSubTab;
+    else if (mainCategoryTab === 'wide') activeSub = wideSubTab;
+
+    const params: Record<string, string> = {};
+    if (mainCategoryTab === 'offset' && offsetSubTab === 'magazines') {
+      params.format = magFormat;
+      params.pages = String(magBlockPages);
+      params.qty = String(magQuantity);
+    }
+
+    syncRouteUrl({
+      tab: 'calculator',
+      category: mainCategoryTab,
+      subTab: activeSub !== 'overview' ? activeSub : undefined,
+      params: Object.keys(params).length > 0 ? params : undefined
+    }, true);
+  }, [mainCategoryTab, offsetSubTab, digitalSubTab, wideSubTab, magFormat, magBlockPages, magQuantity]);
+
+  // Listen for browser popstate
+  useEffect(() => {
+    const handlePopState = () => {
+      const route = parseCurrentRoute();
+      if (route.tab === 'calculator') {
+        if (route.category && route.category !== mainCategoryTab) {
+          setMainCategoryTab(route.category as any);
+        }
+        if (route.category === 'offset' && route.subTab) {
+          setOffsetSubTab(route.subTab as any);
+          if (route.subTab === 'magazines') setStep('editor');
+        } else if (route.category === 'digital' && route.subTab) {
+          setDigitalSubTab(route.subTab as any);
+        } else if (route.category === 'wide' && route.subTab) {
+          setWideSubTab(route.subTab as any);
+        }
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [mainCategoryTab, offsetSubTab, digitalSubTab, wideSubTab]);
   const [wideWidth, setWideWidth] = useState<string>('2000');
   const [wideHeight, setWideHeight] = useState<string>('1000');
   const [wideUnit, setWideUnit] = useState<'mm' | 'cm' | 'm'>('mm');
@@ -4679,6 +4791,30 @@ export const Calculator: React.FC = () => {
               ))}
             </div>
 
+            {/* Direct Link Share Button for Manager */}
+            <button
+              type="button"
+              onClick={handleCopyShareLink}
+              className="ios-btn ios-btn-small"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '5px',
+                padding: '4px 10px',
+                fontSize: '11px',
+                fontWeight: '700',
+                borderRadius: '8px',
+                backgroundColor: 'rgba(2, 132, 199, 0.08)',
+                color: '#0284c7',
+                border: '1px solid rgba(2, 132, 199, 0.3)',
+                cursor: 'pointer'
+              }}
+              title="Скопіювати пряме посилання на цей розрахунок журналів для передачі менеджеру"
+            >
+              <Link2 size={12} style={{ color: '#0284c7' }} />
+              <span>Посилання для менеджера</span>
+            </button>
+
             {hasCustomOverrides && (
               <button
                 type="button"
@@ -6979,6 +7115,32 @@ export const Calculator: React.FC = () => {
                 <span>Ціни на матеріали</span>
               </button>
               )}
+
+              {/* Share Direct Link Button */}
+              <button
+                type="button"
+                onClick={handleCopyShareLink}
+                className="ios-btn ios-btn-secondary"
+                style={{
+                  height: '36px',
+                  padding: '0 12px',
+                  borderRadius: '10px',
+                  fontWeight: 700,
+                  fontSize: '12px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  cursor: 'pointer',
+                  whiteSpace: 'nowrap',
+                  border: '1px solid rgba(2, 132, 199, 0.4)',
+                  backgroundColor: 'rgba(2, 132, 199, 0.06)',
+                  color: '#0284c7'
+                }}
+                title="Скопіювати пряме посилання на поточну вкладку калькулятора для менеджера"
+              >
+                <Link2 size={15} style={{ color: '#0284c7' }} />
+                <span>Посилання на вкладку</span>
+              </button>
 
               <div style={{ position: 'relative', width: '320px', maxWidth: '100%' }}>
                 <Search size={15} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--primary)', pointerEvents: 'none' }} />
@@ -21784,6 +21946,49 @@ export const Calculator: React.FC = () => {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {/* Floating Toast Notification when direct link is copied */}
+      {copyToast && (
+        <div style={{
+          position: 'fixed',
+          bottom: '24px',
+          right: '24px',
+          zIndex: 99999,
+          backgroundColor: '#0f172a',
+          color: '#ffffff',
+          padding: '14px 20px',
+          borderRadius: '16px',
+          boxShadow: '0 12px 30px -4px rgba(0, 0, 0, 0.45)',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px',
+          fontSize: '13px',
+          fontWeight: '700',
+          border: '1px solid #334155',
+          animation: 'fadeIn 0.2s ease-out'
+        }}>
+          <div style={{
+            width: '28px',
+            height: '28px',
+            borderRadius: '50%',
+            backgroundColor: 'rgba(34, 197, 94, 0.2)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0
+          }}>
+            <Check size={18} style={{ color: '#22c55e' }} />
+          </div>
+          <div>
+            <div style={{ fontSize: '13.5px', fontWeight: '800', color: '#f8fafc' }}>
+              Пряме посилання скопійовано!
+            </div>
+            <div style={{ fontSize: '11.5px', color: '#94a3b8', fontWeight: '500', marginTop: '2px' }}>
+              {copyToast}
+            </div>
           </div>
         </div>
       )}
