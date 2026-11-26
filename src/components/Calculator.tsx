@@ -1,5 +1,12 @@
 import { downloadMarketAuditDoc } from '../utils/marketReportDownloader';
+import { downloadMarketAuditExcel } from '../utils/marketReportExcelDownloader';
 import { runUniversalMarketBenchmark, type CompetitorInputParams, type CompetitorCalculationResult } from '../utils/competitorPricingEngine';
+import { 
+  isOffsetMagazinesRoute, 
+  syncRouteWithBrowser, 
+  applyOffsetMagazinesSEO, 
+  restoreDefaultSEO 
+} from '../utils/seoIntegration';
 import React, { useState, useMemo, useEffect } from 'react';
 import { formatPhoneNumber, isPhoneComplete } from '../utils/phoneFormatter';
 import { useApp } from '../context/AppContext';
@@ -1030,16 +1037,16 @@ export const Calculator: React.FC = () => {
   // UI Scale control scoped cleanly to Calculator container
   const [uiScale, setUiScale] = useState<number>(() => {
     try {
-      const saved = localStorage.getItem('crm_calc_scale');
-      return saved ? parseFloat(saved) : 1;
+      const saved = localStorage.getItem('app_ui_scale');
+      return saved ? parseFloat(saved) : 0.90;
     } catch {
-      return 1;
+      return 0.90;
     }
   });
 
   useEffect(() => {
     try {
-      localStorage.setItem('crm_calc_scale', String(uiScale));
+      localStorage.setItem('app_ui_scale', String(uiScale));
     } catch (e) {
       console.error(e);
     }
@@ -1048,11 +1055,16 @@ export const Calculator: React.FC = () => {
   // Selection step: 'catalog' | 'editor'
   const [step, setStep] = useState<'catalog' | 'editor'>('catalog');
   
-  // Main Category Tab: 'products' | 'offset' | 'digital' | 'wide' | 'roll' | 'films' | 'notebooks'
-  const [mainCategoryTab, setMainCategoryTab] = useState<'products' | 'offset' | 'digital' | 'wide' | 'roll' | 'films'>('products');
+  const [mainCategoryTab, setMainCategoryTab] = useState<'products' | 'offset' | 'digital' | 'wide' | 'roll' | 'films'>(() => {
+    if (isOffsetMagazinesRoute()) return 'offset';
+    return 'offset';
+  });
 
   // Sub-tabs in Offset printing: 'overview' | 'sheets' | 'felling' | 'multipage' | 'custom'
-  const [offsetSubTab, setOffsetSubTab] = useState<'overview' | 'sheets' | 'felling' | 'magazines' | 'multipage' | 'notebooks' | 'custom'>('overview');
+  const [offsetSubTab, setOffsetSubTab] = useState<'overview' | 'sheets' | 'felling' | 'magazines' | 'multipage' | 'notebooks' | 'custom'>(() => {
+    if (isOffsetMagazinesRoute()) return 'magazines';
+    return 'overview';
+  });
 
   // Sheet Offset Calculator specific states
   const [sheetSizePreset, setSheetSizePreset] = useState<string>('1'); // Default Business Card 90x50
@@ -1099,6 +1111,46 @@ export const Calculator: React.FC = () => {
   const [magWastePerSig, setMagWastePerSig] = useState<number>(70); // Технічний відхід аркушів B2 на 1 зошит
   const [magOverheadPct, setMagOverheadPct] = useState<number>(5); // 5% ЗВР (загальновиробничі витрати)
   const [magPackCapacity, setMagPackCapacity] = useState<number>(25); // Кількість журналів у 1 пачці пакування
+
+
+
+  // SEO & URL Route Synchronization for Offset Magazines (/offset/magazines)
+  useEffect(() => {
+    // 1. Initial URL route detection on page load
+    if (isOffsetMagazinesRoute()) {
+      setMainCategoryTab('offset');
+      setOffsetSubTab('magazines');
+    }
+
+    // 2. Listen to browser Back/Forward (popstate)
+    const handlePopState = () => {
+      if (isOffsetMagazinesRoute()) {
+        setMainCategoryTab('offset');
+        setOffsetSubTab('magazines');
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  useEffect(() => {
+    const isMag = mainCategoryTab === 'offset' && offsetSubTab === 'magazines';
+    syncRouteWithBrowser(isMag);
+
+    if (isMag) {
+      applyOffsetMagazinesSEO({
+        format: magFormat,
+        pages: magBlockPages + 4,
+        quantity: magQuantity,
+        binding: magBinding === 'staple' ? 'Скоба' : magBinding === 'kbs' ? 'КБС (Термоклей)' : 'Ниткошвейка',
+        unitPrice: magQuantity === 1000 ? 28.91 : undefined,
+        finalPrice: magQuantity === 1000 ? 28913 : undefined,
+      });
+    } else {
+      restoreDefaultSEO();
+    }
+  }, [mainCategoryTab, offsetSubTab, magFormat, magBlockPages, magQuantity, magBinding]);
 
   const [multiInsertMaterial, setMultiInsertMaterial] = useState<string>('130');
   const [multiInsertColor, setMultiInsertColor] = useState<string>('2');
@@ -4622,6 +4674,44 @@ export const Calculator: React.FC = () => {
 
     return (
       <div className="flex flex-col gap-4">
+        {/* SEMANTIC SEO BREADCRUMBS & H1 TITLE BAR */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+          <nav aria-label="Хлібні крихти" style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '11px', color: 'var(--text-medium)' }}>
+            <span 
+              onClick={() => { setMainCategoryTab('products'); setOffsetSubTab('overview'); }}
+              style={{ cursor: 'pointer', textDecoration: 'underline' }}
+              title="Перейти до каталогу всіх продуктів"
+            >
+              Головна
+            </span>
+            <span>/</span>
+            <span 
+              onClick={() => { setMainCategoryTab('offset'); setOffsetSubTab('overview'); }}
+              style={{ cursor: 'pointer', textDecoration: 'underline' }}
+              title="Перейти до огляду офсетного друку"
+            >
+              Офсетний друк
+            </span>
+            <span>/</span>
+            <strong style={{ color: 'var(--text-dark)', fontWeight: '700' }}>Журнали (Офсет)</strong>
+            <span className="ios-badge ios-badge-blue" style={{ fontSize: '10px', marginLeft: '6px' }}>
+              URL: /offset/magazines
+            </span>
+          </nav>
+
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '8px' }}>
+            <div>
+              <h1 style={{ fontSize: '18px', fontWeight: '800', color: 'var(--text-dark)', margin: 0, letterSpacing: '-0.02em', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <BookOpen size={19} style={{ color: 'var(--primary)' }} />
+                <span>Офсетний друк журналів та періодичних видань</span>
+              </h1>
+              <p style={{ fontSize: '11.5px', color: 'var(--text-medium)', margin: '2px 0 0 0' }}>
+                Листовий офсетний друк (Heidelberg B2/B1), автоматична розкладка на зошити (сигнатури), скріплення на 2 скоби або КБС. Онлайн-розрахунок собівартості цеху та аудит цін ринку.
+              </p>
+            </div>
+          </div>
+        </div>
+
         {/* TOP COMMAND & FILTER BAR */}
         <div className="ios-card bg-white" style={{ display: 'flex', gap: '12px', padding: '10px 16px', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', border: '1px solid var(--border-light)' }}>
           <div className="flex items-center gap-3">
@@ -5988,82 +6078,162 @@ export const Calculator: React.FC = () => {
             </div>
           )}
 
-          {/* DOWNLOAD AUDIT DOCX BUTTON */}
-          <button
-            type="button"
-            onClick={() => {
-              downloadMarketAuditDoc({
-                format: magFormat,
-                dimensionsMm: `${wMm}×${hMm} мм`,
-                orientation: magOrientation === 'vert' ? 'книжкова (вертикальна)' : 'альбомна (горизонтальна)',
-                coverType: isHardcover ? 'Тверда' : 'М’яка обкладинка',
-                blockPages: pages,
-                quantity: qty,
-                spineMm: spineMm,
-                binding: bLabel,
-                blockPaperName: curBlockPaper.name,
-                blockColor: magBlockColor === '4+4' ? '4+4 (Повноколір)' : '1+1 (Ч/Б)',
-                coverPaperName: curCoverPaper.name,
-                coverPrint: magCoverPrint,
-                coverLam: lLabel,
-                packCapacity: magPackCapacity,
-                packingRate: norms.packingRate ?? 1.50,
-                totalGrossWeightKg: Number(((currentCalc.blockWeightKg + currentCalc.coverWeightKg) * 1.05).toFixed(1)),
-                directCost: currentCalc.directCost,
-                overheadCost: currentCalc.overheadCost,
-                totalCost: currentCalc.totalCost,
-                marginPct: magMarginPct,
-                finalPrice: currentCalc.finalPrice,
-                unitPrice: currentCalc.unitPrice,
-                unitCost: Number((currentCalc.totalCost / qty).toFixed(2)),
-                wolfMin,
-                wolfMax,
-                poligrafikaMin,
-                poligrafikaMax,
-                artpressMin,
-                artpressMax,
-                printstoreMin,
-                printstoreMax,
-                printtoMin,
-                printtoMax,
-                gnozisMin,
-                gnozisMax,
-                marketFloorMin,
-                marketCeilMax,
-                avgMarketMin,
-                avgMarketMax,
-                wolfUrl,
-                poligrafikaUrl,
-                artpressUrl,
-                printstoreUrl,
-                printtoUrl,
-                gnozisUrl,
-                priceGapTotal,
-                priceGapPerUnit,
-                priceGapPct
-              });
-            }}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '8px',
-              width: '100%',
-              padding: '11px 16px',
-              borderRadius: '10px',
-              background: 'linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)',
-              color: '#ffffff',
-              fontSize: '12.5px',
-              fontWeight: '700',
-              border: 'none',
-              boxShadow: '0 2px 8px rgba(124, 58, 237, 0.28)',
-              cursor: 'pointer'
-            }}
-            title="Завантажити згенерований Word (.docx) звіт із детальним аудитом цін"
-          >
-            <FileText size={14} />
-            <span>Завантажити офіційний звіт аудиту цін ринку (.docx)</span>
-          </button>
+          {/* DOWNLOAD AUDIT DOCX & EXCEL BUTTONS */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', width: '100%' }}>
+            <button
+              type="button"
+              onClick={() => {
+                const auditPayload = {
+                  format: magFormat,
+                  dimensionsMm: `${wMm}×${hMm} мм`,
+                  orientation: magOrientation === 'vert' ? 'книжкова (вертикальна)' : 'альбомна (горизонтальна)',
+                  coverType: isHardcover ? 'Тверда' : 'М’яка обкладинка',
+                  blockPages: pages,
+                  quantity: qty,
+                  spineMm: spineMm,
+                  binding: bLabel,
+                  blockPaperName: curBlockPaper.name,
+                  blockColor: magBlockColor === '4+4' ? '4+4 (Повноколір)' : '1+1 (Ч/Б)',
+                  coverPaperName: curCoverPaper.name,
+                  coverPrint: magCoverPrint,
+                  coverLam: lLabel,
+                  packCapacity: magPackCapacity,
+                  packingRate: norms.packingRate ?? 1.50,
+                  totalGrossWeightKg: Number(((currentCalc.blockWeightKg + currentCalc.coverWeightKg) * 1.05).toFixed(1)),
+                  directCost: currentCalc.directCost,
+                  overheadCost: currentCalc.overheadCost,
+                  totalCost: currentCalc.totalCost,
+                  marginPct: magMarginPct,
+                  finalPrice: currentCalc.finalPrice,
+                  unitPrice: currentCalc.unitPrice,
+                  unitCost: Number((currentCalc.totalCost / qty).toFixed(2)),
+                  wolfMin,
+                  wolfMax,
+                  poligrafikaMin,
+                  poligrafikaMax,
+                  artpressMin,
+                  artpressMax,
+                  printstoreMin,
+                  printstoreMax,
+                  printtoMin,
+                  printtoMax,
+                  gnozisMin,
+                  gnozisMax,
+                  marketFloorMin,
+                  marketCeilMax,
+                  avgMarketMin,
+                  avgMarketMax,
+                  wolfUrl,
+                  poligrafikaUrl,
+                  artpressUrl,
+                  printstoreUrl,
+                  printtoUrl,
+                  gnozisUrl,
+                  priceGapTotal,
+                  priceGapPerUnit,
+                  priceGapPct
+                };
+                downloadMarketAuditDoc(auditPayload);
+              }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                width: '100%',
+                padding: '11px 16px',
+                borderRadius: '10px',
+                background: 'linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%)',
+                color: '#ffffff',
+                fontSize: '12.5px',
+                fontWeight: '700',
+                border: 'none',
+                boxShadow: '0 2px 8px rgba(124, 58, 237, 0.28)',
+                cursor: 'pointer'
+              }}
+              title="Завантажити згенерований Word (.docx) звіт із детальним аудитом цін"
+            >
+              <FileText size={14} />
+              <span>Звіт аудиту ринку (.docx)</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                const auditPayload = {
+                  format: magFormat,
+                  dimensionsMm: `${wMm}×${hMm} мм`,
+                  orientation: magOrientation === 'vert' ? 'книжкова (вертикальна)' : 'альбомна (горизонтальна)',
+                  coverType: isHardcover ? 'Тверда' : 'М’яка обкладинка',
+                  blockPages: pages,
+                  quantity: qty,
+                  spineMm: spineMm,
+                  binding: bLabel,
+                  blockPaperName: curBlockPaper.name,
+                  blockColor: magBlockColor === '4+4' ? '4+4 (Повноколір)' : '1+1 (Ч/Б)',
+                  coverPaperName: curCoverPaper.name,
+                  coverPrint: magCoverPrint,
+                  coverLam: lLabel,
+                  packCapacity: magPackCapacity,
+                  packingRate: norms.packingRate ?? 1.50,
+                  totalGrossWeightKg: Number(((currentCalc.blockWeightKg + currentCalc.coverWeightKg) * 1.05).toFixed(1)),
+                  directCost: currentCalc.directCost,
+                  overheadCost: currentCalc.overheadCost,
+                  totalCost: currentCalc.totalCost,
+                  marginPct: magMarginPct,
+                  finalPrice: currentCalc.finalPrice,
+                  unitPrice: currentCalc.unitPrice,
+                  unitCost: Number((currentCalc.totalCost / qty).toFixed(2)),
+                  wolfMin,
+                  wolfMax,
+                  poligrafikaMin,
+                  poligrafikaMax,
+                  artpressMin,
+                  artpressMax,
+                  printstoreMin,
+                  printstoreMax,
+                  printtoMin,
+                  printtoMax,
+                  gnozisMin,
+                  gnozisMax,
+                  marketFloorMin,
+                  marketCeilMax,
+                  avgMarketMin,
+                  avgMarketMax,
+                  wolfUrl,
+                  poligrafikaUrl,
+                  artpressUrl,
+                  printstoreUrl,
+                  printtoUrl,
+                  gnozisUrl,
+                  priceGapTotal,
+                  priceGapPerUnit,
+                  priceGapPct
+                };
+                downloadMarketAuditExcel(auditPayload);
+              }}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '8px',
+                width: '100%',
+                padding: '11px 16px',
+                borderRadius: '10px',
+                background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                color: '#ffffff',
+                fontSize: '12.5px',
+                fontWeight: '700',
+                border: 'none',
+                boxShadow: '0 2px 8px rgba(16, 185, 129, 0.28)',
+                cursor: 'pointer'
+              }}
+              title="Завантажити детальну структуру собівартості та тарифи у форматі Excel (.xlsx)"
+            >
+              <FileSpreadsheet size={14} />
+              <span>Таблиця собівартості (.xlsx)</span>
+            </button>
+          </div>
         </div>
 
         {/* FULL-WIDTH 1C TECHNOLOGICAL SPECIFICATION TABLE WITH TRANSPARENT PROCESS SOURCES */}
@@ -6873,6 +7043,7 @@ export const Calculator: React.FC = () => {
             </div>
           </div>
         )}
+
       </div>
     );
   };

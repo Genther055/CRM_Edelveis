@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Menu, Printer, MapPin, Phone, Send, Lock, Clock } from 'lucide-react';
+import { isOffsetMagazinesRoute } from './utils/seoIntegration';
 import { AppProvider, useApp } from './context/AppContext';
 import { Login } from './components/Login';
 import { Sidebar } from './components/Sidebar';
@@ -26,8 +27,21 @@ import './mobile.css';
 
 function AppContent() {
   const { currentUser } = useApp();
-  const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeTab, setActiveTab] = useState(() => {
+    if (isOffsetMagazinesRoute()) return 'calculator';
+    return 'dashboard';
+  });
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const handlePopState = () => {
+      if (isOffsetMagazinesRoute()) {
+        setActiveTab('calculator');
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   if (!currentUser) {
     return <Login />;

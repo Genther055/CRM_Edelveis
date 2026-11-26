@@ -288,6 +288,33 @@ function buildDocxRow(
     `</w:tr>`;
 }
 
+function buildMaterialsRow(cols: string[], isHeader = false, isEdelweiss = false): string {
+  const widths = [1800, 1250, 1150, 1100, 1250, 1150, 1150, 800];
+  const bg = isHeader ? '1E3A8A' : isEdelweiss ? 'F0FDF4' : 'FFFFFF';
+  const textColor = isHeader ? 'FFFFFF' : isEdelweiss ? '166534' : '0F172A';
+  const bold = (isHeader || isEdelweiss) ? '<w:b/>' : '';
+  const fontSize = isHeader ? '15' : '14';
+
+  let rowXml = '<w:tr>';
+  for (let i = 0; i < cols.length; i++) {
+    const w = widths[i] || 1100;
+    const text = cols[i] || '—';
+    const align = (i === 0) ? 'left' : (text === '—' ? 'center' : 'left');
+    const cellBold = (i === 0 && !isHeader) ? '<w:b/>' : bold;
+    const cellColor = (text === '—') ? '94A3B8' : textColor;
+
+    rowXml += `<w:tc>` +
+      `<w:tcPr><w:tcW w:type="dxa" w:w="${w}"/>` +
+      `${bg !== 'FFFFFF' ? `<w:shd w:fill="${bg}"/>` : ''}` +
+      `<w:tcMar><w:top w:w="50" w:type="dxa"/><w:bottom w:w="50" w:type="dxa"/><w:left w:w="45" w:type="dxa"/><w:right w:w="45" w:type="dxa"/></w:tcMar></w:tcPr>` +
+      `<w:p><w:pPr><w:jc w:val="${align}"/></w:pPr>` +
+      `<w:r><w:rPr><w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI"/>${cellBold}<w:color w:val="${cellColor}"/><w:sz w:val="${fontSize}"/></w:rPr>` +
+      `<w:t>${escapeXml(text)}</w:t></w:r></w:p></w:tc>`;
+  }
+  rowXml += '</w:tr>';
+  return rowXml;
+}
+
 function updateDocumentXml(xml: string, d: MarketAuditData): string {
   let res = xml;
   const qStr = d.quantity.toLocaleString('uk-UA');
@@ -438,6 +465,58 @@ function updateDocumentXml(xml: string, d: MarketAuditData): string {
 
   if (sec3Regex.test(res)) {
     res = res.replace(sec3Regex, newSection3Content);
+  }
+
+  // 5. Section 4 materials & operations breakdown table (by parsed site data)
+  const headerCols = [
+    'Виробник / Платформа',
+    'Папір блоку',
+    'Папір обкладинки',
+    'Ламінація',
+    'CTP / Форми',
+    'Друк / Прогін',
+    'Брошурування',
+    'Пакування'
+  ];
+
+  const edelweissBlockPaper = `56,00 ₴/кг (${d.blockPaperName || 'офсет 80г'})`;
+  const edelweissCoverPaper = `72,00 ₴/кг (${d.coverPaperName || 'крейда 250г'})`;
+  const edelweissLam = d.coverLam && d.coverLam !== 'Без ламінації' ? `0,58 ₴/арк. (${d.coverLam})` : '—';
+  const edelweissCtp = `175 ₴/шт (CTP B2, 4 форми на зошит)`;
+  const edelweissPack = `${d.packingRate ? d.packingRate.toFixed(2) : '1,50'} ₴/пачку (${d.packCapacity || 25} шт)`;
+
+  const matRows = [
+    { cols: ['«Едельвейс і К» (Власний цех)', edelweissBlockPaper, edelweissCoverPaper, edelweissLam, edelweissCtp, 'За тарифом цеху (Heidelberg GTO)', 'Horizon (2 скоби)', edelweissPack], isEdelweiss: true },
+    { cols: ['PrintStore Group (Київ)', '70,22 ₴/кг (119,8 кг)', '70,22 ₴/кг (50,2 кг)', '2,30 ₴/арк. (5,32 ₴ цикл)', '150 ₴/пластину B2 (36 шт)', '665 ₴/1000 прогонів (2941 ₴ приладка)', '4,33 ₴/шт (ВШРА)', '15 623 ₴ (ЗП+енергія)'] },
+    { cols: ['Гнозіс (Gnozis, Київ)', '42,75–44,82 ₴/кг (1030$)', '52,29 ₴/кг (картон 1260$)', '2,20–2,40 ₴/арк. B2', '450 ₴/форму B2', '200 ₴/1000 прогонів (700 ₴ приладка)', '0,10 ₴/шт + 450 ₴ ВШРА', '200 ₴ лак / 800 ₴ СУФ'] },
+    { cols: ['Прінтто (Printto.ua, Київ)', '4,50 ₴/арк (колір) / 1,125 ₴ (ч/б)', '18,50 ₴/обкл. (250г+лам)', 'Включено в обкладинку', '— (цифровий друк)', 'Поаркушний клік цифри', 'Включено у брошурування', '—'] },
+    { cols: ['Друкарня «Вольф» (Wolf.ua)', '— (збірний офсетний тираж B1)', '— (входить у спуск)', '— (входить у спуск)', '— (діляться на аркуші B1)', '— (збірний прогін XL 106)', '— (автоматичне ВШРА)', '—'] },
+    { cols: ['Арт-Прес (Art-Press, Дніпро)', '— (входить у self-cover)', '— (лише self-cover)', '— (онлайн без ламінації)', '— (закладено в калькулятор)', '— (листопрогін Heidelberg)', '— (входить у вартість)', '—'] },
+    { cols: ['Poligrafika.com.ua', '— (сумарний клік з папером)', '— (входить в опцію обкл.)', '— (враховано в опції)', '— (цифрова технологія)', '— (клік Konica Minolta)', '— (входить у вартість)', '—'] }
+  ];
+
+  let matTableXml = '<w:tbl><w:tblPr><w:tblW w:type="auto" w:w="0"/><w:jc w:val="center"/><w:tblLook w:firstColumn="1" w:firstRow="1" w:lastColumn="0" w:lastRow="0" w:noHBand="0" w:noVBand="1" w:val="04A0"/></w:tblPr>';
+  matTableXml += '<w:tblGrid><w:gridCol w:w="1800"/><w:gridCol w:w="1250"/><w:gridCol w:w="1150"/><w:gridCol w:w="1100"/><w:gridCol w:w="1250"/><w:gridCol w:w="1150"/><w:gridCol w:w="1150"/><w:gridCol w:w="800"/></w:tblGrid>';
+  matTableXml += buildMaterialsRow(headerCols, true);
+  for (const r of matRows) {
+    matTableXml += buildMaterialsRow(r.cols, false, r.isEdelweiss);
+  }
+  matTableXml += '</w:tbl>';
+
+  const newSection4Content = 
+    `<w:p><w:pPr><w:pStyle w:val="Heading1"/><w:keepNext/><w:spacing w:before="240" w:after="80"/></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI"/><w:b/><w:color w:val="1E3A8A"/><w:sz w:val="25"/></w:rPr><w:t>4. Вартість матеріалів та виробничих операцій за результатами парсингу</w:t></w:r></w:p>` +
+    `<w:p><w:pPr><w:spacing w:after="60" w:before="0" w:line="276" w:lineRule="auto"/></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI"/><w:color w:val="0F172A"/><w:sz w:val="19"/></w:rPr><w:t>Порівняльний аналіз структури собівартості сировини (папір блоку, папір обкладинки, CTP-форми, плівка для ламінації) та технологічних операцій (приладка, друкарський прогін, брошурування, пакування) між виробничим цехом «Едельвейс і К» та 6 акредитованими друкарнями України. Для платформ, які використовують збірні тиражі (Gang-run) або не публікують поаркушний розклад окремих операцій у відкритому доступі, проставлено символ «—»:</w:t></w:r></w:p>` +
+    matTableXml +
+    `<w:p><w:pPr><w:spacing w:before="120" w:after="40" w:line="276" w:lineRule="auto"/></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI"/><w:b/><w:color w:val="1E3A8A"/><w:sz w:val="19"/></w:rPr><w:t>Технологічні висновки щодо розкриття вартості матеріалів:</w:t></w:r></w:p>` +
+    `<w:p><w:pPr><w:ind w:left="360"/><w:spacing w:after="60" w:line="240" w:lineRule="auto"/></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI"/><w:color w:val="334155"/><w:sz w:val="16"/></w:rPr><w:t>• Повна виробнича розкладка PrintStore Group: Завдяки прямому парсингу ERP-енджину (calc_data_new) дешифровано пряму виробничу собівартість (36 446 ₴ на 1 000 шт), де папір коштує 70,22 ₴/кг (170 кг брутто = 11 939 ₴), CTP B2 — 150 ₴/форму (36 шт = 5 400 ₴), офсетна фарба — 530,40 ₴/кг, плівка ламінації — 2,30 ₴/арк. B2, зшивка ВШРА — 4,33 ₴/прим., ЗП та енергія цеху — 15 623 ₴, маржа цеху — 17 691 ₴, агентські — 2 313 ₴ (вихідна ціна 53 130 ₴ планово).</w:t></w:r></w:p>` +
+    `<w:p><w:pPr><w:ind w:left="360"/><w:spacing w:after="60" w:line="240" w:lineRule="auto"/></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI"/><w:color w:val="334155"/><w:sz w:val="16"/></w:rPr><w:t>• Відкрита тарифна сітка «Гнозіс»: База даних конфігуратора (get-config-data) оперує чистими тарифами: офсетний папір 1 080 $/т (44,82 ₴/кг), крейдований 1 030 $/т (42,75 ₴/кг), картон 1 260 $/т (52,29 ₴/кг), пластина CTP B2 — 450 ₴, приладка — 700 ₴, листопрогін — 200 ₴/1000, матова ламінація — 2,40 ₴/арк. B2, скріплення — 450 ₴ приладка + 0,10 ₴/скобу, термоклей — 2,00 ₴/прим.</w:t></w:r></w:p>` +
+    `<w:p><w:pPr><w:ind w:left="360"/><w:spacing w:after="60" w:line="240" w:lineRule="auto"/></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI"/><w:color w:val="334155"/><w:sz w:val="16"/></w:rPr><w:t>• Специфіка збірних тиражів: У друкарні «Вольф» (Wolf.ua) вартість паперу та CTP-форм не розділяється, оскільки десятки замовлень друкуються одночасно на спільному аркуші B1 (Heidelberg Speedmaster XL 106), а собівартість сировини інтегрована у фіксовану матрицю ціни.</w:t></w:r></w:p>` +
+    `<w:p><w:pPr><w:ind w:left="360"/><w:spacing w:after="80" w:line="240" w:lineRule="auto"/></w:pPr><w:r><w:rPr><w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI"/><w:color w:val="334155"/><w:sz w:val="16"/></w:rPr><w:t>• Повна прозорість «Едельвейс і К»: Власна калькуляція цеху базується на прямому виробничому обліку (папір блоку та обкладинки, форми CTP B2, плівка для ламінації, пакувальні матеріали та нормовані витрати праці).</w:t></w:r></w:p>`;
+
+  const sec4Regex = /<w:p[^>]*><w:pPr><w:pStyle w:val="Heading1"\/><w:keepNext\/><w:spacing w:before="240" w:after="80"\/><\/w:pPr><w:r><w:rPr><w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI"\/><w:b\/><w:color w:val="1E3A8A"\/><w:sz w:val="25"\/><\/w:rPr><w:t>4\. Ціни на сировину[\s\S]*?(?=<w:p[^>]*><w:pPr><w:pStyle w:val="Heading1"\/><w:keepNext\/><w:spacing w:before="240" w:after="80"\/><\/w:pPr><w:r><w:rPr><w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI"\/><w:b\/><w:color w:val="1E3A8A"\/><w:sz w:val="25"\/><\/w:rPr><w:t>5\. Висновки)/;
+
+  if (sec4Regex.test(res)) {
+    res = res.replace(sec4Regex, newSection4Content);
   }
 
   // 6. Section 5 recommendations
