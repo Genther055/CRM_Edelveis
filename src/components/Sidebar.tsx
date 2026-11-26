@@ -1,5 +1,6 @@
 import React from 'react';
 import { useApp } from '../context/AppContext';
+import { buildRouteUrl } from '../utils/seoRouting';
 import { 
   LayoutGrid, 
   Users, 
@@ -188,10 +189,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     const Icon = item.icon;
                     const isActive = activeTab === item.id;
                     return (
-                      <button
+                      <a
                         key={item.id}
-                        type="button"
-                        onClick={() => handleSelectTab(item.id)}
+                        href={buildRouteUrl({ tab: item.id })}
+                        onClick={(e) => {
+                          if (!e.ctrlKey && !e.metaKey && e.button === 0) {
+                            e.preventDefault();
+                            handleSelectTab(item.id);
+                          }
+                        }}
                         style={{
                           display: 'flex',
                           alignItems: 'center',
@@ -200,6 +206,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                           padding: '9px 12px',
                           borderRadius: '6px',
                           border: 'none',
+                          textDecoration: 'none',
                           backgroundColor: isActive 
                             ? (isDark ? 'rgba(59, 130, 246, 0.16)' : 'var(--primary)') 
                             : 'transparent',
@@ -254,7 +261,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                             )}
                           </div>
                         )}
-                      </button>
+                      </a>
                     );
                   })}
                 </nav>
@@ -429,10 +436,15 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 const Icon = item.icon;
                 const isActive = activeTab === item.id;
                 return (
-                  <button
+                  <a
                     key={item.id}
-                    type="button"
-                    onClick={() => setActiveTab(item.id)}
+                    href={buildRouteUrl({ tab: item.id })}
+                    onClick={(e) => {
+                      if (!e.ctrlKey && !e.metaKey && e.button === 0) {
+                        e.preventDefault();
+                        setActiveTab(item.id);
+                      }
+                    }}
                     style={{
                       display: 'flex',
                       alignItems: 'center',
@@ -441,6 +453,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                       padding: '8px 12px',
                       borderRadius: '6px',
                       border: 'none',
+                      textDecoration: 'none',
                       backgroundColor: isActive 
                         ? (isDark ? 'rgba(59, 130, 246, 0.16)' : 'var(--primary)') 
                         : 'transparent',
@@ -508,7 +521,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
                         )}
                       </div>
                     )}
-                  </button>
+                  </a>
                 );
               })}
             </nav>

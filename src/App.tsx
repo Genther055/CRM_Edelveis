@@ -37,6 +37,7 @@ function AppContent() {
   useEffect(() => {
     const route = parseCurrentRoute();
     updateDocumentMeta(route);
+    syncRouteUrl(route, true);
   }, []);
 
   useEffect(() => {
@@ -54,9 +55,7 @@ function AppContent() {
 
   const handleSelectTab = (tab: string) => {
     setActiveTab(tab);
-    if (tab !== 'calculator') {
-      syncRouteUrl({ tab });
-    }
+    syncRouteUrl({ tab });
   };
 
   if (!currentUser) {
