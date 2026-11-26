@@ -52,7 +52,7 @@ import {
   Link2
 } from 'lucide-react';
 import html2pdf from 'html2pdf.js';
-import { parseCurrentRoute, syncRouteUrl, copyDirectLink, getAllSystemLinks } from '../utils/seoRouting';
+import { parseCurrentRoute, syncRouteUrl, copyDirectLink } from '../utils/seoRouting';
 
 export interface CalcTemplate {
   id?: string;
@@ -1239,9 +1239,6 @@ export const Calculator: React.FC = () => {
 
   // URL Deep-Linking & Manager Share Integration
   const [copyToast, setCopyToast] = useState<string | null>(null);
-  const [showLinksModal, setShowLinksModal] = useState<boolean>(false);
-  const [linksSearch, setLinksSearch] = useState<string>('');
-  const allSystemLinks = useMemo(() => getAllSystemLinks(), []);
 
   const handleCopyShareLink = async () => {
     let activeSub = 'overview';
@@ -7143,30 +7140,6 @@ export const Calculator: React.FC = () => {
               >
                 <Link2 size={15} style={{ color: '#0284c7' }} />
                 <span>Посилання на вкладку</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setShowLinksModal(true)}
-                className="ios-btn ios-btn-secondary"
-                style={{
-                  height: '36px',
-                  padding: '0 12px',
-                  borderRadius: '10px',
-                  fontWeight: 700,
-                  fontSize: '12px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  cursor: 'pointer',
-                  whiteSpace: 'nowrap',
-                  border: '1px solid var(--border-light)',
-                  backgroundColor: '#ffffff'
-                }}
-                title="Повний реєстр прямих посилань на всі вкладки системи"
-              >
-                <BookOpen size={15} style={{ color: 'var(--primary)' }} />
-                <span>Всі лінки системи</span>
               </button>
 
               <div style={{ position: 'relative', width: '320px', maxWidth: '100%' }}>
@@ -21973,88 +21946,6 @@ export const Calculator: React.FC = () => {
                 </button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
-
-      {/* System Direct Links Directory Modal */}
-      {showLinksModal && (
-        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl border border-slate-200 relative animate-in fade-in zoom-in duration-150 flex flex-col gap-4 max-h-[85vh]">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <div>
-                <h3 className="text-base font-extrabold text-slate-900 m-0 flex items-center gap-2">
-                  <span>🔗</span> Каталог прямих посилань системи
-                </h3>
-                <p className="text-xs text-slate-500 mt-1 m-0">
-                  Будь-яке з цих посилань можна надіслати менеджеру або замовнику для миттєвого переходу на потрібну вкладку
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setShowLinksModal(false)}
-                className="text-slate-400 hover:text-slate-700 w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center transition-colors cursor-pointer"
-              >
-                ✕
-              </button>
-            </div>
-
-            {/* Search Input */}
-            <div className="relative">
-              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-              <input
-                type="text"
-                placeholder="Пошук вкладки (журнали, склад, замовники...)"
-                value={linksSearch}
-                onChange={(e) => setLinksSearch(e.target.value)}
-                className="w-full pl-9 pr-3 py-2 rounded-xl border border-slate-200 text-xs font-semibold focus:outline-none focus:border-blue-500"
-              />
-            </div>
-
-            {/* Links List */}
-            <div className="overflow-y-auto flex flex-col gap-2.5 pr-1" style={{ maxHeight: '55vh' }}>
-              {allSystemLinks
-                .filter(l => !linksSearch.trim() || l.title.toLowerCase().includes(linksSearch.toLowerCase()) || l.desc.toLowerCase().includes(linksSearch.toLowerCase()) || l.category.toLowerCase().includes(linksSearch.toLowerCase()))
-                .map(item => (
-                  <div key={item.id} className="p-3 rounded-xl border border-slate-100 hover:border-blue-200 bg-slate-50/50 hover:bg-blue-50/30 transition-all flex items-center justify-between gap-3">
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2 flex-wrap">
-                        <span className="text-xs font-bold text-slate-900">{item.title}</span>
-                        <span className="text-[10px] font-extrabold px-1.5 py-0.5 rounded-md bg-blue-100 text-blue-700">{item.category}</span>
-                      </div>
-                      <div className="text-[11px] text-slate-500 mt-0.5 truncate">{item.desc}</div>
-                      <div className="text-[11px] font-mono text-blue-600 font-semibold mt-1 truncate">{item.fullUrl}</div>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={async () => {
-                        try {
-                          await navigator.clipboard.writeText(item.fullUrl);
-                          setCopyToast(`Посилання на «${item.title}» скопійовано!`);
-                          setTimeout(() => setCopyToast(null), 3000);
-                        } catch {
-                          alert(`Скопіюйте посилання: ${item.fullUrl}`);
-                        }
-                      }}
-                      className="px-3 py-1.5 rounded-lg bg-white border border-slate-200 hover:border-blue-400 text-blue-600 hover:text-blue-700 text-xs font-bold flex items-center gap-1.5 shrink-0 shadow-2xs cursor-pointer"
-                      title="Скопіювати це посилання"
-                    >
-                      <Link2 size={13} />
-                      <span>Скопіювати</span>
-                    </button>
-                  </div>
-                ))}
-            </div>
-
-            <div className="pt-2 border-t border-slate-100 flex justify-end">
-              <button
-                type="button"
-                onClick={() => setShowLinksModal(false)}
-                className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold cursor-pointer"
-              >
-                Закрити
-              </button>
-            </div>
           </div>
         </div>
       )}
