@@ -34,7 +34,6 @@ import {
   SlidersHorizontal,
   CreditCard,
   Sparkles,
-  Palette,
   Image,
   Utensils,
   Mail,
@@ -1055,13 +1054,13 @@ export const Calculator: React.FC = () => {
   // Selection step: 'catalog' | 'editor'
   const [step, setStep] = useState<'catalog' | 'editor'>('catalog');
   
-  const [mainCategoryTab, setMainCategoryTab] = useState<'products' | 'offset' | 'digital' | 'wide' | 'roll' | 'films' | 'other'>(() => {
+  const [mainCategoryTab, setMainCategoryTab] = useState<'products' | 'offset' | 'digital' | 'wide' | 'roll' | 'films'>(() => {
     if (isOffsetMagazinesRoute()) return 'offset';
     return 'products';
   });
 
-  // Filter in Products catalog: 'all' | 'approved' | 'other'
-  const [catalogFilter, setCatalogFilter] = useState<'all' | 'approved' | 'other'>('all');
+  // Category Filter in Products catalog
+  const [catalogFilter, setCatalogFilter] = useState<'all' | 'print' | 'multi' | 'office' | 'calendars' | 'labels' | 'wide' | 'psy'>('all');
 
   // Sub-tabs in Offset printing: 'overview' | 'sheets' | 'felling' | 'multipage' | 'custom'
   const [offsetSubTab, setOffsetSubTab] = useState<'overview' | 'sheets' | 'felling' | 'magazines' | 'multipage' | 'notebooks' | 'custom'>(() => {
@@ -7247,12 +7246,11 @@ export const Calculator: React.FC = () => {
                 </button>
 
                 {[
-                  { key: 'products', label: 'Усі Продукти', count: 44 },
+                  { key: 'products', label: 'Усі Продукти', count: 35 },
                   { key: 'offset', label: 'Офсетний друк', count: 19 },
                   { key: 'digital', label: 'Цифровий друк', count: 11 },
                   { key: 'wide', label: 'Широкоформатний', count: 10 },
-                  { key: 'roll', label: 'Рулонний друк', count: 4 },
-                  { key: 'other', label: 'Інше (На погодженні)', count: 9, isAmber: true }
+                  { key: 'roll', label: 'Рулонний друк', count: 4 }
                 ].map(tab => {
                   const isActive = mainCategoryTab === tab.key;
                   return (
@@ -7275,12 +7273,8 @@ export const Calculator: React.FC = () => {
                         display: 'flex',
                         alignItems: 'center',
                         gap: '8px',
-                        backgroundColor: isActive 
-                          ? (tab.isAmber ? '#d97706' : 'var(--primary)') 
-                          : (tab.isAmber ? 'rgba(217, 119, 6, 0.08)' : 'transparent'),
-                        color: isActive 
-                          ? '#ffffff' 
-                          : (tab.isAmber ? '#b45309' : 'var(--text-dark)'),
+                        backgroundColor: isActive ? 'var(--primary)' : 'transparent',
+                        color: isActive ? '#ffffff' : 'var(--text-dark)',
                         boxShadow: isActive ? '0 2px 8px rgba(0, 122, 255, 0.25)' : 'none',
                         transition: 'all 0.15s ease',
                         whiteSpace: 'nowrap'
@@ -7292,12 +7286,8 @@ export const Calculator: React.FC = () => {
                         padding: '2px 6px',
                         borderRadius: '10px',
                         fontWeight: '600',
-                        backgroundColor: isActive 
-                          ? 'rgba(255, 255, 255, 0.25)' 
-                          : (tab.isAmber ? 'rgba(217, 119, 6, 0.2)' : 'rgba(120, 120, 128, 0.1)'),
-                        color: isActive 
-                          ? '#ffffff' 
-                          : (tab.isAmber ? '#b45309' : 'var(--text-medium)')
+                        backgroundColor: isActive ? 'rgba(255, 255, 255, 0.2)' : 'rgba(120, 120, 128, 0.1)',
+                        color: isActive ? '#ffffff' : 'var(--text-medium)'
                       }}>
                         {tab.count}
                       </span>
@@ -8225,21 +8215,17 @@ export const Calculator: React.FC = () => {
             )}
           </div>
 
-                    {/* TAB 1: PRODUCTS (All Categories - Curated from "Продукція Альфа та Омега.docx") */}
+                              {/* TAB 1: PRODUCTS (All 35 Approved Categories - Exact "Продукція Альфа та Омега.docx") */}
           {mainCategoryTab === 'products' && (() => {
             const allProducts = [
-                // -------------------------------------------------------------
-                // ПОГОДЖЕНА ПРОДУКЦІЯ (Власне виробництво «Едельвейс і К»)
-                // -------------------------------------------------------------
                 {
                   title: 'Журнали (Офсетні та Глянцеві)',
                   desc: 'Глянцеві, періодичні, корпоративні та наукові журнали на скобу чи КБС. Повний прорахунок по зошитах Heidelberg B2/B1 та 1С.',
                   icon: <BookOpen size={30} style={{ color: '#007AFF' }} />,
                   color: 'rgba(0, 122, 255, 0.1)',
                   badgeClass: 'ios-badge-blue',
-                  badge: '✓ Погоджено',
+                  badge: 'Журнали',
                   metric: 'Heidelberg B2/B1 / 1С',
-                  isApproved: true,
                   group: 'multi',
                   keywords: ['журнал', 'журнали', 'глянець', 'періодика', 'офсет', 'heidelberg', 'зошити', 'сигнатури', 'кбс'],
                   onClick: () => { setMainCategoryTab('offset'); setOffsetSubTab('magazines'); }
@@ -8250,9 +8236,8 @@ export const Calculator: React.FC = () => {
                   icon: <BookOpen size={30} style={{ color: '#34c759' }} />,
                   color: 'rgba(52, 199, 89, 0.1)',
                   badgeClass: 'ios-badge-green',
-                  badge: '✓ Погоджено',
+                  badge: 'Каталоги',
                   metric: 'Скоба / Пружина / КБС',
-                  isApproved: true,
                   group: 'multi',
                   keywords: ['каталог', 'каталоги', 'брошура', 'брошури', 'презентація', 'звіт'],
                   onClick: () => handleSelectCategory('Книги')
@@ -8263,9 +8248,8 @@ export const Calculator: React.FC = () => {
                   icon: <BookOpen size={30} style={{ color: '#6366f1' }} />,
                   color: 'rgba(99, 102, 241, 0.1)',
                   badgeClass: 'ios-badge-blue',
-                  badge: '✓ Погоджено',
+                  badge: 'Книги 7БЦ',
                   metric: '7БЦ / Тверда палітурка',
-                  isApproved: true,
                   group: 'multi',
                   keywords: ['книга', 'книги', 'палітурка', '7бц', 'бумвініл', 'балакрон', 'ниткошвейка'],
                   onClick: () => handleSelectCategory('Книги')
@@ -8276,9 +8260,8 @@ export const Calculator: React.FC = () => {
                   icon: <FileSpreadsheet size={30} style={{ color: '#0ea5e9' }} />,
                   color: 'rgba(14, 165, 233, 0.1)',
                   badgeClass: 'ios-badge-blue',
-                  badge: '✓ Погоджено',
+                  badge: 'Журнали обліку',
                   metric: '«ТО» / «МО» / Прошнурування',
-                  isApproved: true,
                   group: 'office',
                   keywords: ['журнал обліку', 'книга обліку', 'реєстр', 'бухгалтерія', 'склад', 'прошнурування'],
                   onClick: () => handleSelectCategory('Нотаріальні книги')
@@ -8289,9 +8272,8 @@ export const Calculator: React.FC = () => {
                   icon: <BookOpen size={30} style={{ color: '#ff3b30' }} />,
                   color: 'rgba(255, 59, 48, 0.1)',
                   badgeClass: 'ios-badge-red',
-                  badge: '✓ Погоджено',
+                  badge: 'Шкільні реєстри',
                   metric: 'Шкільні реєстри',
-                  isApproved: true,
                   group: 'office',
                   keywords: ['класний журнал', 'школа', 'освіта', 'реєстр', 'успішність'],
                   onClick: () => handleSelectCategory('Шкільні журнали')
@@ -8302,9 +8284,8 @@ export const Calculator: React.FC = () => {
                   icon: <Sparkles size={30} style={{ color: '#af52de' }} />,
                   color: 'rgba(175, 82, 222, 0.1)',
                   badgeClass: 'ios-badge-purple',
-                  badge: '✓ Погоджено',
-                  metric: 'Mental Health поліграфія',
-                  isApproved: true,
+                  badge: 'Mental Health',
+                  metric: 'Психологічна поліграфія',
                   group: 'psy',
                   keywords: ['воркбук', 'щоденник', 'трекер', 'мак', 'афірмації', 'психологія', 'саморефлексія'],
                   onClick: () => { setMainCategoryTab('offset'); setOffsetSubTab('notebooks'); }
@@ -8315,9 +8296,8 @@ export const Calculator: React.FC = () => {
                   icon: <Zap size={30} style={{ color: '#ff9500' }} />,
                   color: 'rgba(255, 149, 0, 0.1)',
                   badgeClass: 'ios-badge-orange',
-                  badge: '✓ Погоджено',
+                  badge: 'Флаєри',
                   metric: '4+0 / 4+4 / Єврофлаєр',
-                  isApproved: true,
                   group: 'print',
                   keywords: ['флаєр', 'флаєри', 'листівка', 'єврофлаєр', 'а5', 'а6'],
                   onClick: () => handleSelectCategory('Флаєри')
@@ -8328,9 +8308,8 @@ export const Calculator: React.FC = () => {
                   icon: <CreditCard size={30} style={{ color: '#5856d6' }} />,
                   color: 'rgba(88, 86, 214, 0.1)',
                   badgeClass: 'ios-badge-purple',
-                  badge: '✓ Погоджено',
+                  badge: 'Візитки',
                   metric: 'SoftTouch / Золото',
-                  isApproved: true,
                   group: 'print',
                   keywords: ['візитка', 'візитки', 'візитівки', 'softtouch', 'шовкотрафарет'],
                   onClick: () => handleSelectCategory('Візитки')
@@ -8341,9 +8320,8 @@ export const Calculator: React.FC = () => {
                   icon: <BookOpen size={30} style={{ color: '#ff9500' }} />,
                   color: 'rgba(255, 149, 0, 0.1)',
                   badgeClass: 'ios-badge-orange',
-                  badge: '✓ Погоджено',
+                  badge: 'Буклети',
                   metric: '1–3 Фальці',
-                  isApproved: true,
                   group: 'print',
                   keywords: ['буклет', 'буклети', 'ліфлет', 'ліфлети', 'фальцювання', 'євробуклет'],
                   onClick: () => handleSelectCategory('Буклети')
@@ -8354,9 +8332,8 @@ export const Calculator: React.FC = () => {
                   icon: <Tag size={30} style={{ color: '#0ea5e9' }} />,
                   color: 'rgba(14, 165, 233, 0.1)',
                   badgeClass: 'ios-badge-blue',
-                  badge: '✓ Погоджено',
+                  badge: 'Хенгери',
                   metric: 'Висічний гачок / QR',
-                  isApproved: true,
                   group: 'print',
                   keywords: ['хенгер', 'хенгери', 'двері', 'ручка дверей', 'qr'],
                   onClick: () => { setMainCategoryTab('digital'); setDigitalSubTab('felling'); }
@@ -8367,9 +8344,8 @@ export const Calculator: React.FC = () => {
                   icon: <Sparkles size={30} style={{ color: '#ec4899' }} />,
                   color: 'rgba(236, 72, 153, 0.1)',
                   badgeClass: 'ios-badge-purple',
-                  badge: '✓ Погоджено',
+                  badge: 'POS-матеріали',
                   metric: 'Фігурна висічка / POS',
-                  isApproved: true,
                   group: 'print',
                   keywords: ['воблер', 'воблери', 'шельфтокер', 'pos', 'ніжка'],
                   onClick: () => { setMainCategoryTab('digital'); setDigitalSubTab('felling'); }
@@ -8380,9 +8356,8 @@ export const Calculator: React.FC = () => {
                   icon: <Image size={30} style={{ color: '#0ea5e9' }} />,
                   color: 'rgba(14, 165, 233, 0.1)',
                   badgeClass: 'ios-badge-blue',
-                  badge: '✓ Погоджено',
+                  badge: 'Листівки',
                   metric: 'Дизайнерський картон',
-                  isApproved: true,
                   group: 'print',
                   keywords: ['запрошення', 'вітальна', 'листівка', 'калька', 'фольга'],
                   onClick: () => handleSelectCategory('Листівки')
@@ -8393,9 +8368,8 @@ export const Calculator: React.FC = () => {
                   icon: <ShieldCheck size={30} style={{ color: '#10b981' }} />,
                   color: 'rgba(16, 185, 129, 0.1)',
                   badgeClass: 'ios-badge-green',
-                  badge: '✓ Погоджено',
+                  badge: 'Дипломи',
                   metric: 'Персоналізація / Тиснення',
-                  isApproved: true,
                   group: 'office',
                   keywords: ['диплом', 'сертифікат', 'грамота', 'нумерація', 'qr'],
                   onClick: () => handleSelectCategory('Дипломи і палітурка')
@@ -8406,9 +8380,8 @@ export const Calculator: React.FC = () => {
                   icon: <Bookmark size={30} style={{ color: '#10b981' }} />,
                   color: 'rgba(16, 185, 129, 0.1)',
                   badgeClass: 'ios-badge-green',
-                  badge: '✓ Погоджено',
+                  badge: 'Палітурка',
                   metric: 'Тиснення золотом',
-                  isApproved: true,
                   group: 'office',
                   keywords: ['дипломна', 'палітурка', 'прошиття', 'тверда', 'тиснення'],
                   onClick: () => handleSelectCategory('Дипломи і палітурка')
@@ -8419,9 +8392,8 @@ export const Calculator: React.FC = () => {
                   icon: <FileText size={30} style={{ color: 'var(--primary)' }} />,
                   color: 'rgba(0, 122, 255, 0.1)',
                   badgeClass: 'ios-badge-blue',
-                  badge: '✓ Погоджено',
+                  badge: 'Бланки',
                   metric: 'Офсет 80–120г',
-                  isApproved: true,
                   group: 'office',
                   keywords: ['бланк', 'бланки', 'фірмовий', 'офсет', 'лист'],
                   onClick: () => handleSelectCategory('Бланки')
@@ -8432,9 +8404,8 @@ export const Calculator: React.FC = () => {
                   icon: <Layers size={30} style={{ color: '#0ea5e9' }} />,
                   color: 'rgba(14, 165, 233, 0.1)',
                   badgeClass: 'ios-badge-blue',
-                  badge: '✓ Погоджено',
+                  badge: 'Самокопірка',
                   metric: '2–4 шари / Нумерація',
-                  isApproved: true,
                   group: 'office',
                   keywords: ['самокопірка', 'самокопіювальний', 'накладна', 'квитанція', 'нумерація'],
                   onClick: () => handleSelectCategory('Бланки')
@@ -8445,9 +8416,8 @@ export const Calculator: React.FC = () => {
                   icon: <Bookmark size={30} style={{ color: '#0ea5e9' }} />,
                   color: 'rgba(14, 165, 233, 0.1)',
                   badgeClass: 'ios-badge-blue',
-                  badge: '✓ Погоджено',
+                  badge: 'Блокноти',
                   metric: 'Пружина / Склейка',
-                  isApproved: true,
                   group: 'office',
                   keywords: ['блокнот', 'блокноти', 'пружина', 'склейка'],
                   onClick: () => handleSelectCategory('Блокноти')
@@ -8458,9 +8428,8 @@ export const Calculator: React.FC = () => {
                   icon: <Bookmark size={30} style={{ color: '#0ea5e9' }} />,
                   color: 'rgba(14, 165, 233, 0.1)',
                   badgeClass: 'ios-badge-blue',
-                  badge: '✓ Погоджено',
+                  badge: 'Кубарики',
                   metric: 'Кубарики 90×90',
-                  isApproved: true,
                   group: 'office',
                   keywords: ['кубарик', 'кубарики', 'листи для запису', 'нотатки'],
                   onClick: () => openOffsetProduct({ category: 'Листівки', subCategory: 'Кубарики', subTab: 'sheets', preset: '38', w: '90', h: '90', kind: '1' })
@@ -8471,9 +8440,8 @@ export const Calculator: React.FC = () => {
                   icon: <FolderOpen size={30} style={{ color: 'var(--primary)' }} />,
                   color: 'rgba(0, 122, 255, 0.1)',
                   badgeClass: 'ios-badge-blue',
-                  badge: '✓ Погоджено',
+                  badge: 'Папки',
                   metric: 'Висічний клапан',
-                  isApproved: true,
                   group: 'office',
                   keywords: ['папка', 'папки', 'кишеня', 'клапан', 'картон'],
                   onClick: () => handleSelectCategory('Папки')
@@ -8484,9 +8452,8 @@ export const Calculator: React.FC = () => {
                   icon: <Mail size={30} style={{ color: '#6366f1' }} />,
                   color: 'rgba(99, 102, 241, 0.1)',
                   badgeClass: 'ios-badge-blue',
-                  badge: '✓ Погоджено',
+                  badge: 'Конверти',
                   metric: 'DL / C5 / C4',
-                  isApproved: true,
                   group: 'office',
                   keywords: ['конверт', 'конверти', 'пошта', 'dl', 'c5', 'c4'],
                   onClick: () => openOffsetProduct({ category: 'Листівки', subCategory: 'Конверти', subTab: 'sheets', preset: '25', w: '220', h: '110', kind: '1' })
@@ -8497,9 +8464,8 @@ export const Calculator: React.FC = () => {
                   icon: <ShieldCheck size={30} style={{ color: '#64748b' }} />,
                   color: 'rgba(100, 116, 139, 0.1)',
                   badgeClass: 'ios-badge-blue',
-                  badge: '✓ Погоджено',
+                  badge: 'Посвідчення',
                   metric: 'Тверда обкладинка / Тиснення',
-                  isApproved: true,
                   group: 'office',
                   keywords: ['посвідчення', 'перепустка', 'пропуск', 'трудова книжка', 'залікова'],
                   onClick: () => { setMainCategoryTab('digital'); setDigitalSubTab('sheets'); }
@@ -8510,9 +8476,8 @@ export const Calculator: React.FC = () => {
                   icon: <Calendar size={30} style={{ color: '#ff3b30' }} />,
                   color: 'rgba(255, 59, 48, 0.1)',
                   badgeClass: 'ios-badge-red',
-                  badge: '✓ Погоджено',
+                  badge: 'Квартальні',
                   metric: '1 або 3 пружини',
-                  isApproved: true,
                   group: 'calendars',
                   keywords: ['календар', 'календарі', 'квартальний', 'курсор', 'пружина'],
                   onClick: () => handleSelectCategory('Календарі')
@@ -8523,9 +8488,8 @@ export const Calculator: React.FC = () => {
                   icon: <Calendar size={30} style={{ color: '#ff9500' }} />,
                   color: 'rgba(255, 149, 0, 0.1)',
                   badgeClass: 'ios-badge-orange',
-                  badge: '✓ Погоджено',
+                  badge: 'Будиночки',
                   metric: 'Перекидні / Самозбірні',
-                  isApproved: true,
                   group: 'calendars',
                   keywords: ['календар-будиночок', 'будиночок', 'настільний', 'перекидний'],
                   onClick: () => handleSelectCategory('Календарі')
@@ -8536,9 +8500,8 @@ export const Calculator: React.FC = () => {
                   icon: <Calendar size={30} style={{ color: '#34c759' }} />,
                   color: 'rgba(52, 199, 89, 0.1)',
                   badgeClass: 'ios-badge-green',
-                  badge: '✓ Погоджено',
+                  badge: 'Перекидні',
                   metric: 'А3 / А2 з ригелем',
-                  isApproved: true,
                   group: 'calendars',
                   keywords: ['настінний', 'перекидний', 'ригель', 'а3', 'а2'],
                   onClick: () => handleSelectCategory('Календарі')
@@ -8549,9 +8512,8 @@ export const Calculator: React.FC = () => {
                   icon: <Calendar size={30} style={{ color: '#34c759' }} />,
                   color: 'rgba(52, 199, 89, 0.1)',
                   badgeClass: 'ios-badge-green',
-                  badge: '✓ Погоджено',
+                  badge: 'Кишенькові',
                   metric: 'Ламінація 2+2',
-                  isApproved: true,
                   group: 'calendars',
                   keywords: ['кишеньковий', 'календарик', 'ламінація', 'скруглення'],
                   onClick: () => handleSelectCategory('Календарики кишенькові')
@@ -8562,9 +8524,8 @@ export const Calculator: React.FC = () => {
                   icon: <Calendar size={30} style={{ color: '#34c759' }} />,
                   color: 'rgba(52, 199, 89, 0.1)',
                   badgeClass: 'ios-badge-green',
-                  badge: '✓ Погоджено',
+                  badge: 'Сітки',
                   metric: 'Квартальні блоки',
-                  isApproved: true,
                   group: 'calendars',
                   keywords: ['сітка', 'сітки', 'календарні блоки'],
                   onClick: () => openOffsetProduct({ category: 'Календарі', subCategory: 'Календарні сітки', subTab: 'sheets', preset: '34', w: '297', h: '140', kind: '1' })
@@ -8575,9 +8536,8 @@ export const Calculator: React.FC = () => {
                   icon: <Tag size={30} style={{ color: '#f59e0b' }} />,
                   color: 'rgba(245, 158, 11, 0.1)',
                   badgeClass: 'ios-badge-orange',
-                  badge: '✓ Погоджено',
+                  badge: 'Рулонна',
                   metric: 'Рулонний друк / Аплікатор',
-                  isApproved: true,
                   group: 'labels',
                   keywords: ['рулонна', 'етикетка', 'аплікатор', 'бобіна', 'втулка', 'термотоп'],
                   onClick: () => setMainCategoryTab('roll')
@@ -8588,9 +8548,8 @@ export const Calculator: React.FC = () => {
                   icon: <Tag size={30} style={{ color: '#ff9500' }} />,
                   color: 'rgba(255, 149, 0, 0.1)',
                   badgeClass: 'ios-badge-orange',
-                  badge: '✓ Погоджено',
+                  badge: 'Аркушева',
                   metric: 'Raflatac / SRA3',
-                  isApproved: true,
                   group: 'labels',
                   keywords: ['аркушева', 'самоклейка', 'рафлатак', 'ritrama', 'наліпка'],
                   onClick: () => handleSelectCategory('Наклейки')
@@ -8601,9 +8560,8 @@ export const Calculator: React.FC = () => {
                   icon: <Scissors size={30} style={{ color: '#ff9500' }} />,
                   color: 'rgba(255, 149, 0, 0.1)',
                   badgeClass: 'ios-badge-orange',
-                  badge: '✓ Погоджено',
+                  badge: 'Стікери',
                   metric: 'Контурна порізка',
-                  isApproved: true,
                   group: 'labels',
                   keywords: ['стікер', 'стікери', 'стікерпак', 'плотер', 'контурна порізка'],
                   onClick: () => handleSelectCategory('Наклейки')
@@ -8614,9 +8572,8 @@ export const Calculator: React.FC = () => {
                   icon: <Tag size={30} style={{ color: '#0ea5e9' }} />,
                   color: 'rgba(14, 165, 233, 0.1)',
                   badgeClass: 'ios-badge-blue',
-                  badge: '✓ Погоджено',
+                  badge: 'Бирки',
                   metric: 'Отвори / Люверси',
-                  isApproved: true,
                   group: 'labels',
                   keywords: ['бирка', 'бирки', 'ярлик', 'ярлики', 'люверс'],
                   onClick: () => { setMainCategoryTab('digital'); setDigitalSubTab('felling'); }
@@ -8627,9 +8584,8 @@ export const Calculator: React.FC = () => {
                   icon: <Package size={30} style={{ color: '#f59e0b' }} />,
                   color: 'rgba(245, 158, 11, 0.1)',
                   badgeClass: 'ios-badge-orange',
-                  badge: '✓ Погоджено',
+                  badge: 'Упаковка',
                   metric: 'Каширування / Шубери',
-                  isApproved: true,
                   group: 'labels',
                   keywords: ['коробка', 'коробки', 'упаковка', 'пакування', 'шубер', 'каширування'],
                   onClick: () => { setMainCategoryTab('digital'); setDigitalSubTab('mounted'); }
@@ -8640,22 +8596,20 @@ export const Calculator: React.FC = () => {
                   icon: <Package size={30} style={{ color: '#10b981' }} />,
                   color: 'rgba(16, 185, 129, 0.1)',
                   badgeClass: 'ios-badge-green',
-                  badge: '✓ Погоджено',
+                  badge: 'Пакети',
                   metric: 'Крафт / Крейда з ручками',
-                  isApproved: true,
                   group: 'labels',
                   keywords: ['пакет', 'пакети', 'паперовий пакет', 'ручки', 'крафт'],
                   onClick: () => { setMainCategoryTab('digital'); setDigitalSubTab('felling'); }
                 },
                 {
                   title: 'Меню для ресторанів (HoReCa)',
-                  desc: 'Меню-папки на металевих болтах або пружині, плейсмати та меню з міцною вологостійкою пакетною ламінацією 125–250 мкм.',
+                  desc: 'Довговічні меню-листи та буклети з герметичною пакетною ламінацією 125–250 мкм, папки на болтах чи пружині, плейсмати.',
                   icon: <Utensils size={30} style={{ color: '#af52de' }} />,
                   color: 'rgba(175, 82, 222, 0.1)',
                   badgeClass: 'ios-badge-purple',
-                  badge: '✓ Погоджено',
+                  badge: 'Меню HoReCa',
                   metric: 'Пакетна ламінація / Болти',
-                  isApproved: true,
                   group: 'print',
                   keywords: ['меню', 'ресторан', 'кафе', 'horeca', 'плейсмат', 'пакетна ламінація'],
                   onClick: () => handleSelectCategory('Меню')
@@ -8666,9 +8620,8 @@ export const Calculator: React.FC = () => {
                   icon: <Layout size={30} style={{ color: 'var(--primary)' }} />,
                   color: 'rgba(0, 122, 255, 0.1)',
                   badgeClass: 'ios-badge-blue',
-                  badge: '✓ Погоджено',
+                  badge: 'Плакати',
                   metric: 'А3–А0 / Citylight',
-                  isApproved: true,
                   group: 'wide',
                   keywords: ['плакат', 'плакати', 'постер', 'постери', 'афіша', 'citylight'],
                   onClick: () => handleSelectCategory('Плакати')
@@ -8679,140 +8632,17 @@ export const Calculator: React.FC = () => {
                   icon: <Layout size={30} style={{ color: 'var(--primary)' }} />,
                   color: 'rgba(0, 122, 255, 0.1)',
                   badgeClass: 'ios-badge-blue',
-                  badge: '✓ Погоджено',
+                  badge: 'Банери',
                   metric: 'Frontlit / Mesh / Люверси',
-                  isApproved: true,
                   group: 'wide',
                   keywords: ['банер', 'банери', 'сітка mesh', 'люверси', 'frontlit', 'сітілайт'],
                   onClick: () => { setMainCategoryTab('wide'); setWideSubTab('banner'); }
-                },
-
-                // -------------------------------------------------------------
-                // КАТЕГОРІЯ «ІНШЕ» (Позиції на окремому узгодженні виробництва)
-                // -------------------------------------------------------------
-                {
-                  title: 'Пластикові карти (ПВХ)',
-                  desc: 'Пластикові картки товщиною 0.76 мм, магнітна смуга HiCo, ембосування, штрих-код (потребує узгодження щодо виготовлення).',
-                  icon: <CreditCard size={30} style={{ color: '#d97706' }} />,
-                  color: 'rgba(217, 119, 6, 0.1)',
-                  badgeClass: 'ios-badge-orange',
-                  badge: '⚠️ На погодженні',
-                  metric: 'Пластик 0.76 мм / Інше',
-                  isApproved: false,
-                  group: 'other',
-                  keywords: ['пластикова карта', 'пвх', 'дисконт', 'магнітна смуга'],
-                  onClick: () => { setMainCategoryTab('digital'); setDigitalSubTab('felling'); }
-                },
-                {
-                  title: 'Скретч-карти та Лотереї',
-                  desc: 'Промо-картки та купони із захисним шаром срібної скретч-фарби, що стирається монеткою (потребує узгодження щодо виготовлення).',
-                  icon: <Sparkles size={30} style={{ color: '#d97706' }} />,
-                  color: 'rgba(217, 119, 6, 0.1)',
-                  badgeClass: 'ios-badge-orange',
-                  badge: '⚠️ На погодженні',
-                  metric: 'Скретч-шар / Інше',
-                  isApproved: false,
-                  group: 'other',
-                  keywords: ['скретч', 'лотерея', 'купон', 'стерти монеткою'],
-                  onClick: () => { setMainCategoryTab('digital'); setDigitalSubTab('felling'); }
-                },
-                {
-                  title: 'Таблички та Фасадні вивіски',
-                  desc: 'Інформаційні та навігаційні таблички з ПВХ-пластику 3–5 мм, композиту, оргскла (потребує узгодження щодо виготовлення).',
-                  icon: <Layout size={30} style={{ color: '#d97706' }} />,
-                  color: 'rgba(217, 119, 6, 0.1)',
-                  badgeClass: 'ios-badge-orange',
-                  badge: '⚠️ На погодженні',
-                  metric: 'ПВХ / Композит / Інше',
-                  isApproved: false,
-                  group: 'other',
-                  keywords: ['табличка', 'вивіска', 'пвх', 'композит', 'акрил'],
-                  onClick: () => { setMainCategoryTab('wide'); setWideSubTab('pvc'); }
-                },
-                {
-                  title: 'Полотна та Картини на підрамнику',
-                  desc: 'Інтер’єрний друк на бавовняному полотні з подальшою галерейною натяжкою на підрамник (потребує узгодження щодо виготовлення).',
-                  icon: <Image size={30} style={{ color: '#d97706' }} />,
-                  color: 'rgba(217, 119, 6, 0.1)',
-                  badgeClass: 'ios-badge-orange',
-                  badge: '⚠️ На погодженні',
-                  metric: 'Полотно / Інше',
-                  isApproved: false,
-                  group: 'other',
-                  keywords: ['полотно', 'картина', 'підрамник', 'галерейна натяжка'],
-                  onClick: () => { setMainCategoryTab('wide'); setWideSubTab('canvas'); }
-                },
-                {
-                  title: 'Мобільні стенди (Roll-Up / Павук)',
-                  desc: 'Алюмінієві виставкові касети Roll-Up (80×200, 100×200 см) та X-Banner у чохлах (потребує узгодження щодо виготовлення).',
-                  icon: <Layout size={30} style={{ color: '#d97706' }} />,
-                  color: 'rgba(217, 119, 6, 0.1)',
-                  badgeClass: 'ios-badge-orange',
-                  badge: '⚠️ На погодженні',
-                  metric: 'Roll-Up / Інше',
-                  isApproved: false,
-                  group: 'other',
-                  keywords: ['roll-up', 'павук', 'ролап', 'мобільний стенд'],
-                  onClick: () => { setMainCategoryTab('wide'); setWideSubTab('stands'); }
-                },
-                {
-                  title: 'Магніти сувенірні',
-                  desc: 'Сувенірні магніти на магнітному вінілі 0.4–0.7 мм з ламінацією та фігурною висічкою (потребує узгодження щодо виготовлення).',
-                  icon: <Sparkles size={30} style={{ color: '#d97706' }} />,
-                  color: 'rgba(217, 119, 6, 0.1)',
-                  badgeClass: 'ios-badge-orange',
-                  badge: '⚠️ На погодженні',
-                  metric: 'Магнітний вініл / Інше',
-                  isApproved: false,
-                  group: 'other',
-                  keywords: ['магніт', 'магніти', 'сувенірний'],
-                  onClick: () => { setMainCategoryTab('digital'); setDigitalSubTab('felling'); }
-                },
-                {
-                  title: 'Кольорові плівки ORACAL 641',
-                  desc: 'Аплікаційна плотерна порізка кольорових самоклейних вінілових плівок для вітрин (потребує узгодження щодо виготовлення).',
-                  icon: <Scissors size={30} style={{ color: '#d97706' }} />,
-                  color: 'rgba(217, 119, 6, 0.1)',
-                  badgeClass: 'ios-badge-orange',
-                  badge: '⚠️ На погодженні',
-                  metric: 'ORACAL 641 / Інше',
-                  isApproved: false,
-                  group: 'other',
-                  keywords: ['oracal', 'оракал', 'плівка', 'монтажка'],
-                  onClick: () => setMainCategoryTab('films')
-                },
-                {
-                  title: 'Сувенірна продукція (Ручки, Брелоки)',
-                  desc: 'Брендовані кулькові ручки та металеві брелоки з нанесенням логотипу або написів (потребує узгодження щодо виготовлення).',
-                  icon: <Tag size={30} style={{ color: '#d97706' }} />,
-                  color: 'rgba(217, 119, 6, 0.1)',
-                  badgeClass: 'ios-badge-orange',
-                  badge: '⚠️ На погодженні',
-                  metric: 'Ручки / Брелоки / Інше',
-                  isApproved: false,
-                  group: 'other',
-                  keywords: ['ручка', 'ручки', 'брелок', 'брелоки', 'сувенірка'],
-                  onClick: () => alert('Сувенірна продукція (ручки, брелоки) знаходиться на стадії погодження постачальників та технології брендування.')
-                },
-                {
-                  title: 'Зразки матеріалів',
-                  desc: 'Віяла зразків паперів, дизайнерських картонів, плівок та видів оздоблення (довідковий каталог зразків).',
-                  icon: <Palette size={30} style={{ color: '#8b5cf6' }} />,
-                  color: 'rgba(139, 92, 246, 0.1)',
-                  badgeClass: 'ios-badge-purple',
-                  badge: 'Зразки',
-                  metric: 'Віяла зразків / Інше',
-                  isApproved: false,
-                  group: 'other',
-                  keywords: ['зразки', 'віяло', 'дизайнерський картон', 'матеріали'],
-                  onClick: () => setActiveInfoModal('samples')
                 }
               ];
 
               const q = productSearchQuery.trim().toLowerCase();
               const filteredProducts = allProducts.filter(item => {
-                if (catalogFilter === 'approved' && !item.isApproved) return false;
-                if (catalogFilter === 'other' && item.isApproved) return false;
+                if (catalogFilter !== 'all' && item.group !== catalogFilter) return false;
                 if (q) {
                   return (
                     item.title.toLowerCase().includes(q) ||
@@ -8825,79 +8655,47 @@ export const Calculator: React.FC = () => {
                 return true;
               });
 
-              const approvedCount = allProducts.filter(p => p.isApproved).length;
-              const otherCount = allProducts.filter(p => !p.isApproved).length;
-
               return (
                 <div className="flex flex-col gap-4">
-                  {/* Filter Pills Bar */}
+                  {/* Category Filter Chips Bar */}
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                      <button
-                        type="button"
-                        onClick={() => setCatalogFilter('all')}
-                        style={{
-                          padding: '6px 14px',
-                          borderRadius: '20px',
-                          fontSize: '12px',
-                          fontWeight: '700',
-                          border: catalogFilter === 'all' ? '1px solid var(--primary)' : '1px solid var(--border-light)',
-                          backgroundColor: catalogFilter === 'all' ? 'var(--primary)' : '#ffffff',
-                          color: catalogFilter === 'all' ? '#ffffff' : 'var(--text-dark)',
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '6px',
-                          transition: 'all 0.15s ease'
-                        }}
-                      >
-                        <span>Всі вироби</span>
-                        <span style={{ fontSize: '10px', opacity: 0.85 }}>({allProducts.length})</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => setCatalogFilter('approved')}
-                        style={{
-                          padding: '6px 14px',
-                          borderRadius: '20px',
-                          fontSize: '12px',
-                          fontWeight: '700',
-                          border: catalogFilter === 'approved' ? '1px solid #16a34a' : '1px solid #bbf7d0',
-                          backgroundColor: catalogFilter === 'approved' ? '#16a34a' : '#f0fdf4',
-                          color: catalogFilter === 'approved' ? '#ffffff' : '#15803d',
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '6px',
-                          transition: 'all 0.15s ease'
-                        }}
-                      >
-                        <span>✓ Погоджене виробництво</span>
-                        <span style={{ fontSize: '10px', opacity: 0.85 }}>({approvedCount})</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => setCatalogFilter('other')}
-                        style={{
-                          padding: '6px 14px',
-                          borderRadius: '20px',
-                          fontSize: '12px',
-                          fontWeight: '700',
-                          border: catalogFilter === 'other' ? '1px solid #d97706' : '1px solid #fde68a',
-                          backgroundColor: catalogFilter === 'other' ? '#d97706' : '#fffbeb',
-                          color: catalogFilter === 'other' ? '#ffffff' : '#b45309',
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '6px',
-                          transition: 'all 0.15s ease'
-                        }}
-                      >
-                        <span>⚠️ Категорія «Інше» (На погодженні)</span>
-                        <span style={{ fontSize: '10px', opacity: 0.85 }}>({otherCount})</span>
-                      </button>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexWrap: 'wrap' }}>
+                      {[
+                        { key: 'all', label: 'Всі вироби', count: allProducts.length },
+                        { key: 'print', label: 'Листовий та рекламний друк', count: allProducts.filter(p => p.group === 'print').length },
+                        { key: 'multi', label: 'Журнали, каталоги, книги', count: allProducts.filter(p => p.group === 'multi').length },
+                        { key: 'office', label: 'Ділова поліграфія', count: allProducts.filter(p => p.group === 'office').length },
+                        { key: 'calendars', label: 'Календарі', count: allProducts.filter(p => p.group === 'calendars').length },
+                        { key: 'labels', label: 'Етикетка та упаковка', count: allProducts.filter(p => p.group === 'labels').length },
+                        { key: 'wide', label: 'Широкоформат', count: allProducts.filter(p => p.group === 'wide').length },
+                        { key: 'psy', label: 'Mental Health', count: allProducts.filter(p => p.group === 'psy').length }
+                      ].map(filter => {
+                        const isSel = catalogFilter === filter.key;
+                        return (
+                          <button
+                            key={filter.key}
+                            type="button"
+                            onClick={() => setCatalogFilter(filter.key as any)}
+                            style={{
+                              padding: '5px 12px',
+                              borderRadius: '20px',
+                              fontSize: '11.5px',
+                              fontWeight: '700',
+                              border: isSel ? '1px solid var(--primary)' : '1px solid var(--border-light)',
+                              backgroundColor: isSel ? 'var(--primary)' : '#ffffff',
+                              color: isSel ? '#ffffff' : 'var(--text-dark)',
+                              cursor: 'pointer',
+                              display: 'flex',
+                              alignItems: 'center',
+                              gap: '6px',
+                              transition: 'all 0.15s ease'
+                            }}
+                          >
+                            <span>{filter.label}</span>
+                            <span style={{ fontSize: '10px', opacity: isSel ? 0.9 : 0.6 }}>({filter.count})</span>
+                          </button>
+                        );
+                      })}
                     </div>
 
                     <span style={{ fontSize: '11.5px', color: 'var(--text-medium)' }}>
@@ -8952,7 +8750,7 @@ export const Calculator: React.FC = () => {
                             transition: 'all 0.2s ease',
                             minHeight: '200px',
                             position: 'relative',
-                            border: !item.isApproved ? '1px dashed #fcd34d' : '1px solid var(--border-light)'
+                            border: '1px solid var(--border-light)'
                           }}
                           onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
                           onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; }}
@@ -8994,7 +8792,7 @@ export const Calculator: React.FC = () => {
                             <span style={{ fontSize: '11px', fontWeight: '600', color: 'var(--text-medium)' }}>
                               {item.metric}
                             </span>
-                            <span style={{ color: !item.isApproved ? '#d97706' : 'var(--primary)', display: 'flex', alignItems: 'center', fontSize: '12px', fontWeight: '700' }}>
+                            <span style={{ color: 'var(--primary)', display: 'flex', alignItems: 'center', fontSize: '12px', fontWeight: '700' }}>
                               Відкрити <ChevronRight size={14} />
                             </span>
                           </div>
@@ -18982,197 +18780,7 @@ export const Calculator: React.FC = () => {
             </div>
           )}
 
-          {/* TAB 7: OTHER (КА ТЕГОРІЯ «ІНШЕ» — ПРОДУКЦІЯ НА ПОГОДЖЕННІ) */}
-          {mainCategoryTab === 'other' && (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-              <div 
-                className="ios-card bg-white" 
-                style={{ 
-                  padding: '20px 24px', 
-                  border: '1px solid #fcd34d', 
-                  backgroundColor: '#fffbeb', 
-                  borderRadius: '16px',
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  gap: '14px'
-                }}
-              >
-                <div style={{ width: '40px', height: '40px', borderRadius: '10px', backgroundColor: '#fef3c7', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                  <AlertTriangle size={22} style={{ color: '#d97706' }} />
-                </div>
-                <div>
-                  <h3 style={{ fontSize: '16px', fontWeight: '800', color: '#92400e', margin: '0 0 6px 0' }}>
-                    Категорія «Інше» (Продукція на стадії узгодження виробництва)
-                  </h3>
-                  <p style={{ fontSize: '12.5px', color: '#78350f', margin: 0, lineHeight: '1.5' }}>
-                    Відповідно до погодженого переліку (документ <em>«Продукція Альфа та Омега.docx»</em>), наведені нижче 9 позицій тимчасово винесено в категорію «Інше». Вони очікують окремого підтвердження щодо можливості власного виготовлення на устаткуванні «Едельвейс і К» або передачі на партнерський підряд (аутсорс).
-                  </p>
-                </div>
-              </div>
-
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-                gap: '20px'
-              }}>
-                {[
-                  {
-                    title: 'Пластикові карти (ПВХ)',
-                    desc: 'Пластикові дисконтні, клубні та VIP картки 0.76 мм, магнітна смуга HiCo, ембосування, штрих-код.',
-                    icon: <CreditCard size={30} style={{ color: '#d97706' }} />,
-                    color: 'rgba(217, 119, 6, 0.1)',
-                    badgeClass: 'ios-badge-orange',
-                    badge: '⚠️ На погодженні',
-                    metric: 'Пластик 0.76 мм',
-                    onClick: () => { setMainCategoryTab('digital'); setDigitalSubTab('felling'); }
-                  },
-                  {
-                    title: 'Скретч-карти та Лотереї',
-                    desc: 'Промо-картки та лотерейні квитки з нанесенням захисного шару срібної скретч-фарби, що стирається монеткою.',
-                    icon: <Sparkles size={30} style={{ color: '#d97706' }} />,
-                    color: 'rgba(217, 119, 6, 0.1)',
-                    badgeClass: 'ios-badge-orange',
-                    badge: '⚠️ На погодженні',
-                    metric: 'Скретч-шар',
-                    onClick: () => { setMainCategoryTab('digital'); setDigitalSubTab('felling'); }
-                  },
-                  {
-                    title: 'Таблички та Фасадні вивіски',
-                    desc: 'Інформаційні та навігаційні таблички з ПВХ пластику 3–5 мм, композиту, оргскла з дистанційними тримачами.',
-                    icon: <Layout size={30} style={{ color: '#d97706' }} />,
-                    color: 'rgba(217, 119, 6, 0.1)',
-                    badgeClass: 'ios-badge-orange',
-                    badge: '⚠️ На погодженні',
-                    metric: 'ПВХ / Композит',
-                    onClick: () => { setMainCategoryTab('wide'); setWideSubTab('pvc'); }
-                  },
-                  {
-                    title: 'Полотна та Картини на підрамнику',
-                    desc: 'Інтер’єрний друк на бавовняному художньому полотні з подальшою галерейною натяжкою на підрамник.',
-                    icon: <Image size={30} style={{ color: '#d97706' }} />,
-                    color: 'rgba(217, 119, 6, 0.1)',
-                    badgeClass: 'ios-badge-orange',
-                    badge: '⚠️ На погодженні',
-                    metric: 'Художнє полотно',
-                    onClick: () => { setMainCategoryTab('wide'); setWideSubTab('canvas'); }
-                  },
-                  {
-                    title: 'Мобільні стенди (Roll-Up / Павук)',
-                    desc: 'Алюмінієві виставкові касети Roll-Up (80×200, 100×200 см) та X-Banner у транспортувальних чохлах.',
-                    icon: <Layout size={30} style={{ color: '#d97706' }} />,
-                    color: 'rgba(217, 119, 6, 0.1)',
-                    badgeClass: 'ios-badge-orange',
-                    badge: '⚠️ На погодженні',
-                    metric: 'Roll-Up / Павук',
-                    onClick: () => { setMainCategoryTab('wide'); setWideSubTab('stands'); }
-                  },
-                  {
-                    title: 'Магніти сувенірні',
-                    desc: 'Плоскі сувенірні магніти на магнітному вінілі 0.4–0.7 мм з глянцевою ламінацією та фігурною висічкою.',
-                    icon: <Sparkles size={30} style={{ color: '#d97706' }} />,
-                    color: 'rgba(217, 119, 6, 0.1)',
-                    badgeClass: 'ios-badge-orange',
-                    badge: '⚠️ На погодженні',
-                    metric: 'Магнітний вініл',
-                    onClick: () => { setMainCategoryTab('digital'); setDigitalSubTab('felling'); }
-                  },
-                  {
-                    title: 'Кольорові плівки ORACAL 641',
-                    desc: 'Аплікаційна плотерна порізка кольорових самоклейних вінілових плівок для вітрин та автотранспорту.',
-                    icon: <Scissors size={30} style={{ color: '#d97706' }} />,
-                    color: 'rgba(217, 119, 6, 0.1)',
-                    badgeClass: 'ios-badge-orange',
-                    badge: '⚠️ На погодженні',
-                    metric: 'ORACAL 641',
-                    onClick: () => setMainCategoryTab('films')
-                  },
-                  {
-                    title: 'Сувенірна продукція (Ручки, Брелоки)',
-                    desc: 'Брендовані кулькові ручки та металеві брелоки з нанесенням логотипу або написів замовника.',
-                    icon: <Tag size={30} style={{ color: '#d97706' }} />,
-                    color: 'rgba(217, 119, 6, 0.1)',
-                    badgeClass: 'ios-badge-orange',
-                    badge: '⚠️ На погодженні',
-                    metric: 'Ручки / Брелоки',
-                    onClick: () => alert('Сувенірна продукція (ручки, брелоки) знаходиться на стадії погодження постачальників та технології брендування.')
-                  },
-                  {
-                    title: 'Зразки матеріалів',
-                    desc: 'Віяла зразків паперів, дизайнерських картонів, плівок та прикладів післядрукарського оздоблення.',
-                    icon: <Palette size={30} style={{ color: '#8b5cf6' }} />,
-                    color: 'rgba(139, 92, 246, 0.1)',
-                    badgeClass: 'ios-badge-purple',
-                    badge: 'Зразки',
-                    metric: 'Віяла матеріалів',
-                    onClick: () => setActiveInfoModal('samples')
-                  }
-                ].map(item => (
-                  <div
-                    key={item.title}
-                    onClick={item.onClick}
-                    className="ios-card bg-white"
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      justifyContent: 'space-between',
-                      padding: '24px',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s ease',
-                      minHeight: '200px',
-                      position: 'relative',
-                      border: '1px dashed #fcd34d'
-                    }}
-                    onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
-                    onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; }}
-                  >
-                    <div>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-                        <div style={{
-                          width: '56px',
-                          height: '56px',
-                          borderRadius: '16px',
-                          backgroundColor: item.color,
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center'
-                        }}>
-                          {item.icon}
-                        </div>
-                        <span className={`ios-badge ${item.badgeClass}`} style={{ fontSize: '11px', padding: '3px 8px' }}>
-                          {item.badge}
-                        </span>
-                      </div>
-
-                      <h4 style={{ fontSize: '15px', fontWeight: '800', marginBottom: '6px', color: 'var(--text-dark)' }}>
-                        {item.title}
-                      </h4>
-                      <p style={{ fontSize: '12px', color: 'var(--text-medium)', lineHeight: '1.4' }}>
-                        {item.desc}
-                      </p>
-                    </div>
-
-                    <div style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      alignItems: 'center',
-                      borderTop: '0.5px solid var(--border-light)',
-                      paddingTop: '12px',
-                      marginTop: '16px'
-                    }}>
-                      <span style={{ fontSize: '11px', fontWeight: '600', color: 'var(--text-medium)' }}>
-                        {item.metric}
-                      </span>
-                      <span style={{ color: '#d97706', display: 'flex', alignItems: 'center', fontSize: '12px', fontWeight: '700' }}>
-                        Відкрити <ChevronRight size={14} />
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          
+                    
         </div>
       ) : (
         <div className="flex flex-col gap-6 md:gap-7">
