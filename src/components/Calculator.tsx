@@ -1055,10 +1055,13 @@ export const Calculator: React.FC = () => {
   // Selection step: 'catalog' | 'editor'
   const [step, setStep] = useState<'catalog' | 'editor'>('catalog');
   
-  const [mainCategoryTab, setMainCategoryTab] = useState<'products' | 'offset' | 'digital' | 'wide' | 'roll' | 'films'>(() => {
+  const [mainCategoryTab, setMainCategoryTab] = useState<'products' | 'offset' | 'digital' | 'wide' | 'roll' | 'films' | 'other'>(() => {
     if (isOffsetMagazinesRoute()) return 'offset';
-    return 'offset';
+    return 'products';
   });
+
+  // Filter in Products catalog: 'all' | 'approved' | 'other'
+  const [catalogFilter, setCatalogFilter] = useState<'all' | 'approved' | 'other'>('all');
 
   // Sub-tabs in Offset printing: 'overview' | 'sheets' | 'felling' | 'multipage' | 'custom'
   const [offsetSubTab, setOffsetSubTab] = useState<'overview' | 'sheets' | 'felling' | 'magazines' | 'multipage' | 'notebooks' | 'custom'>(() => {
@@ -7244,12 +7247,12 @@ export const Calculator: React.FC = () => {
                 </button>
 
                 {[
-                  { key: 'products', label: 'Усі Продукти', count: 35 },
+                  { key: 'products', label: 'Усі Продукти', count: 44 },
                   { key: 'offset', label: 'Офсетний друк', count: 19 },
                   { key: 'digital', label: 'Цифровий друк', count: 11 },
                   { key: 'wide', label: 'Широкоформатний', count: 10 },
                   { key: 'roll', label: 'Рулонний друк', count: 4 },
-                  { key: 'films', label: 'Кольорові плівки', count: 5 }
+                  { key: 'other', label: 'Інше (На погодженні)', count: 9, isAmber: true }
                 ].map(tab => {
                   const isActive = mainCategoryTab === tab.key;
                   return (
@@ -7272,8 +7275,12 @@ export const Calculator: React.FC = () => {
                         display: 'flex',
                         alignItems: 'center',
                         gap: '8px',
-                        backgroundColor: isActive ? 'var(--primary)' : 'transparent',
-                        color: isActive ? '#ffffff' : 'var(--text-dark)',
+                        backgroundColor: isActive 
+                          ? (tab.isAmber ? '#d97706' : 'var(--primary)') 
+                          : (tab.isAmber ? 'rgba(217, 119, 6, 0.08)' : 'transparent'),
+                        color: isActive 
+                          ? '#ffffff' 
+                          : (tab.isAmber ? '#b45309' : 'var(--text-dark)'),
                         boxShadow: isActive ? '0 2px 8px rgba(0, 122, 255, 0.25)' : 'none',
                         transition: 'all 0.15s ease',
                         whiteSpace: 'nowrap'
@@ -7285,8 +7292,12 @@ export const Calculator: React.FC = () => {
                         padding: '2px 6px',
                         borderRadius: '10px',
                         fontWeight: '600',
-                        backgroundColor: isActive ? 'rgba(255, 255, 255, 0.2)' : 'rgba(120, 120, 128, 0.1)',
-                        color: isActive ? '#ffffff' : 'var(--text-medium)'
+                        backgroundColor: isActive 
+                          ? 'rgba(255, 255, 255, 0.25)' 
+                          : (tab.isAmber ? 'rgba(217, 119, 6, 0.2)' : 'rgba(120, 120, 128, 0.1)'),
+                        color: isActive 
+                          ? '#ffffff' 
+                          : (tab.isAmber ? '#b45309' : 'var(--text-medium)')
                       }}>
                         {tab.count}
                       </span>
@@ -8064,7 +8075,7 @@ export const Calculator: React.FC = () => {
                           Плакати та Афіші (А3–А0)
                         </h4>
                         <p style={{ fontSize: '11px', color: '#64748b', margin: '4px 0 0 0', maxWidth: '220px' }}>
-                          Інтер'єрний та широкоформатний фотодрук на папері Citylight 150г або фотопапері 200г.
+                          Інтер’єрний та широкоформатний фотодрук на папері Citylight 150г або фотопапері 200г.
                         </p>
                       </div>
                     )}
@@ -8214,378 +8225,686 @@ export const Calculator: React.FC = () => {
             )}
           </div>
 
-          {/* TAB 1: PRODUCTS (All Categories - Exact Dashboard iOS Card Grid) */}
+                    {/* TAB 1: PRODUCTS (All Categories - Curated from "Продукція Альфа та Омега.docx") */}
           {mainCategoryTab === 'products' && (() => {
             const allProducts = [
+                // -------------------------------------------------------------
+                // ПОГОДЖЕНА ПРОДУКЦІЯ (Власне виробництво «Едельвейс і К»)
+                // -------------------------------------------------------------
                 {
-                  title: 'Банери',
-                  desc: 'Банерні вивіски, розтяжки, тенти, брандмауери, вітростійка сітка Mesh.',
-                  icon: <Layout size={30} style={{ color: 'var(--primary)' }} />,
-                  color: 'rgba(0, 122, 255, 0.1)',
-                  badgeClass: 'ios-badge-blue',
-                  badge: 'Широкоформат',
-                  metric: 'Frontlit / Mesh',
-                  onClick: () => { setMainCategoryTab('wide'); setWideSubTab('banner'); }
-                },
-                {
-                  title: 'Бланки та Листи',
-                  desc: 'Друк бланкової продукції на офсетному та самокопіювальному папері.',
-                  icon: <FileText size={30} style={{ color: 'var(--primary)' }} />,
-                  color: 'rgba(0, 122, 255, 0.1)',
-                  badgeClass: 'ios-badge-blue',
-                  badge: 'Бланки',
-                  metric: 'Офсет / самоклейка',
-                  keywords: ['бланк', 'бланки', 'газетка', 'газетний', 'офсет', 'офсетний', 'самокопірка', 'самокопіювальний', 'лист', 'листи'],
-                  onClick: () => handleSelectCategory('Бланки')
-                },
-                {
-                  title: 'Блокноти',
-                  desc: 'Фірмові блокноти А5, А4 з пружиною та персоналізованою обкладинкою.',
-                  icon: <Bookmark size={30} style={{ color: '#0ea5e9' }} />,
-                  color: 'rgba(14, 165, 233, 0.1)',
-                  badgeClass: 'ios-badge-blue',
-                  badge: 'Блокноти',
-                  metric: 'Пружина',
-                  onClick: () => handleSelectCategory('Блокноти')
-                },
-                {
-                  title: 'Журнали',
-                  desc: 'Глянцеві, періодичні, корпоративні та наукові журнали на скобу, термоклей або нитку. Повний прорахунок по зошитах і 1С.',
+                  title: 'Журнали (Офсетні та Глянцеві)',
+                  desc: 'Глянцеві, періодичні, корпоративні та наукові журнали на скобу чи КБС. Повний прорахунок по зошитах Heidelberg B2/B1 та 1С.',
                   icon: <BookOpen size={30} style={{ color: '#007AFF' }} />,
                   color: 'rgba(0, 122, 255, 0.1)',
                   badgeClass: 'ios-badge-blue',
-                  badge: 'Журнали',
-                  metric: 'Офсетні зошити / 1С',
-                  keywords: ['журнал', 'журнали', 'періодика', 'глянець', 'видання', 'глянцевий', 'науковий', 'збірник', 'offset'],
+                  badge: '✓ Погоджено',
+                  metric: 'Heidelberg B2/B1 / 1С',
+                  isApproved: true,
+                  group: 'multi',
+                  keywords: ['журнал', 'журнали', 'глянець', 'періодика', 'офсет', 'heidelberg', 'зошити', 'сигнатури', 'кбс'],
                   onClick: () => { setMainCategoryTab('offset'); setOffsetSubTab('magazines'); }
                 },
                 {
                   title: 'Брошури та Каталоги',
-                  desc: 'Багатосторінкові брошури, фірмові каталоги продукції, річні звіти на скобу, пружину або PUR-клей.',
+                  desc: 'Багатосторінкові каталоги продукції, брошури та презентації на скобу, пластикову/металеву пружину або термоклей (КБС).',
                   icon: <BookOpen size={30} style={{ color: '#34c759' }} />,
                   color: 'rgba(52, 199, 89, 0.1)',
                   badgeClass: 'ios-badge-green',
-                  badge: 'Каталоги',
-                  metric: 'Скоба / PUR клей',
-                  keywords: ['каталог', 'каталоги', 'брошура', 'брошури', 'книга', 'книги', 'звіт', 'звіти'],
+                  badge: '✓ Погоджено',
+                  metric: 'Скоба / Пружина / КБС',
+                  isApproved: true,
+                  group: 'multi',
+                  keywords: ['каталог', 'каталоги', 'брошура', 'брошури', 'презентація', 'звіт'],
                   onClick: () => handleSelectCategory('Книги')
                 },
                 {
-                  title: 'Буклети, Карти',
-                  desc: 'Рекламні буклети та карти з 1, 2 або 3 згинами (фальцами).',
-                  icon: <BookOpen size={30} style={{ color: '#ff9500' }} />,
-                  color: 'rgba(255, 149, 0, 0.1)',
-                  badgeClass: 'ios-badge-orange',
-                  badge: 'Буклети',
-                  metric: '1-3 Фальці',
-                  onClick: () => handleSelectCategory('Буклети')
+                  title: 'Книжкова продукція',
+                  desc: 'Художня та навчальна література у твердій (7БЦ, бумвініл, балакрон) або м’якій обкладинці з ниткошвейним скріпленням блоку.',
+                  icon: <BookOpen size={30} style={{ color: '#6366f1' }} />,
+                  color: 'rgba(99, 102, 241, 0.1)',
+                  badgeClass: 'ios-badge-blue',
+                  badge: '✓ Погоджено',
+                  metric: '7БЦ / Тверда палітурка',
+                  isApproved: true,
+                  group: 'multi',
+                  keywords: ['книга', 'книги', 'палітурка', '7бц', 'бумвініл', 'балакрон', 'ниткошвейка'],
+                  onClick: () => handleSelectCategory('Книги')
                 },
                 {
-                  title: 'Бірки, Цінники',
-                  desc: 'Висічні товарні бірки, маркувальні цінники з отвором для шнурка або люверсом.',
-                  icon: <Tag size={30} style={{ color: '#0ea5e9' }} />,
+                  title: 'Книги та Журнали обліку',
+                  desc: 'Бухгалтерські, кадрові, медичні, складські книги у твердій («то») та м’якій («мо») обкладинці, з нумерацією та прошнуруванням.',
+                  icon: <FileSpreadsheet size={30} style={{ color: '#0ea5e9' }} />,
                   color: 'rgba(14, 165, 233, 0.1)',
                   badgeClass: 'ios-badge-blue',
-                  badge: 'Висічка',
-                  metric: 'Отвори / Люверси',
-                  onClick: () => { setMainCategoryTab('digital'); setDigitalSubTab('felling'); }
+                  badge: '✓ Погоджено',
+                  metric: '«ТО» / «МО» / Прошнурування',
+                  isApproved: true,
+                  group: 'office',
+                  keywords: ['журнал обліку', 'книга обліку', 'реєстр', 'бухгалтерія', 'склад', 'прошнурування'],
+                  onClick: () => handleSelectCategory('Нотаріальні книги')
+                },
+                {
+                  title: 'Шкільні журнали та Реєстри',
+                  desc: 'Класні журнали обліку успішності та шкільні облікові відомості у цупкій зносостійкій палітурці за стандартами МОН.',
+                  icon: <BookOpen size={30} style={{ color: '#ff3b30' }} />,
+                  color: 'rgba(255, 59, 48, 0.1)',
+                  badgeClass: 'ios-badge-red',
+                  badge: '✓ Погоджено',
+                  metric: 'Шкільні реєстри',
+                  isApproved: true,
+                  group: 'office',
+                  keywords: ['класний журнал', 'школа', 'освіта', 'реєстр', 'успішність'],
+                  onClick: () => handleSelectCategory('Шкільні журнали')
+                },
+                {
+                  title: 'Воркбуки, Щоденники та Трекери (Mental Health)',
+                  desc: 'Робочі зошити для саморефлексії й арттерапії, трекери звичок та настрою, щоденники вдячності, колоди МАК-карт та афірмацій.',
+                  icon: <Sparkles size={30} style={{ color: '#af52de' }} />,
+                  color: 'rgba(175, 82, 222, 0.1)',
+                  badgeClass: 'ios-badge-purple',
+                  badge: '✓ Погоджено',
+                  metric: 'Mental Health поліграфія',
+                  isApproved: true,
+                  group: 'psy',
+                  keywords: ['воркбук', 'щоденник', 'трекер', 'мак', 'афірмації', 'психологія', 'саморефлексія'],
+                  onClick: () => { setMainCategoryTab('offset'); setOffsetSubTab('notebooks'); }
+                },
+                {
+                  title: 'Листівки та Флаєри',
+                  desc: 'Рекламні флаєри 4+0 та 4+4, єврофлаєри (99×210 мм), А6, А5, А4 на глянцевому або матовому крейдованому папері 130–350 г/м².',
+                  icon: <Zap size={30} style={{ color: '#ff9500' }} />,
+                  color: 'rgba(255, 149, 0, 0.1)',
+                  badgeClass: 'ios-badge-orange',
+                  badge: '✓ Погоджено',
+                  metric: '4+0 / 4+4 / Єврофлаєр',
+                  isApproved: true,
+                  group: 'print',
+                  keywords: ['флаєр', 'флаєри', 'листівка', 'єврофлаєр', 'а5', 'а6'],
+                  onClick: () => handleSelectCategory('Флаєри')
                 },
                 {
                   title: 'Візитівки',
-                  desc: '90х50 мм або євро-формат, ламінація SoftTouch, вибірковий УФ-лак та скруглення кутів.',
+                  desc: 'Стандартні 90×50 мм та євро 85×55 мм, одно- та двосторонні, з матовою або SoftTouch ламінацією, вибірковим лаком та фольгою.',
                   icon: <CreditCard size={30} style={{ color: '#5856d6' }} />,
                   color: 'rgba(88, 86, 214, 0.1)',
                   badgeClass: 'ios-badge-purple',
-                  badge: 'Візитки',
+                  badge: '✓ Погоджено',
                   metric: 'SoftTouch / Золото',
+                  isApproved: true,
+                  group: 'print',
+                  keywords: ['візитка', 'візитки', 'візитівки', 'softtouch', 'шовкотрафарет'],
                   onClick: () => handleSelectCategory('Візитки')
                 },
                 {
-                  title: 'Зразки матеріалів',
-                  desc: 'Віяла зразків паперів, дизайнерських картонів, плівок та видів оздоблення.',
-                  icon: <Palette size={30} style={{ color: '#af52de' }} />,
-                  color: 'rgba(175, 82, 222, 0.1)',
+                  title: 'Буклети та Ліфлети',
+                  desc: 'Рекламні буклети та карти з 1, 2 або 3 згинами (фальцюванням або біговкою): євробуклет, гармошка, віконце на папері 130–250г.',
+                  icon: <BookOpen size={30} style={{ color: '#ff9500' }} />,
+                  color: 'rgba(255, 149, 0, 0.1)',
+                  badgeClass: 'ios-badge-orange',
+                  badge: '✓ Погоджено',
+                  metric: '1–3 Фальці',
+                  isApproved: true,
+                  group: 'print',
+                  keywords: ['буклет', 'буклети', 'ліфлет', 'ліфлети', 'фальцювання', 'євробуклет'],
+                  onClick: () => handleSelectCategory('Буклети')
+                },
+                {
+                  title: 'Хенгери для дверей',
+                  desc: 'Хенгери на дверні ручки офісів, готелів, переговорних кімнат, з висічним отвором/гачком, рекламні хенгери з QR-кодом.',
+                  icon: <Tag size={30} style={{ color: '#0ea5e9' }} />,
+                  color: 'rgba(14, 165, 233, 0.1)',
+                  badgeClass: 'ios-badge-blue',
+                  badge: '✓ Погоджено',
+                  metric: 'Висічний гачок / QR',
+                  isApproved: true,
+                  group: 'print',
+                  keywords: ['хенгер', 'хенгери', 'двері', 'ручка дверей', 'qr'],
+                  onClick: () => { setMainCategoryTab('digital'); setDigitalSubTab('felling'); }
+                },
+                {
+                  title: 'Воблери та Шельфтокери',
+                  desc: 'Рекламні POS-матеріали з фігурною висічкою та прозорою гнучкою пластиковою ніжкою з двостороннім скотчем під полиці магазинів.',
+                  icon: <Sparkles size={30} style={{ color: '#ec4899' }} />,
+                  color: 'rgba(236, 72, 153, 0.1)',
                   badgeClass: 'ios-badge-purple',
-                  badge: 'Матеріали',
-                  metric: 'Віяла зразків',
-                  onClick: () => setActiveInfoModal('samples')
+                  badge: '✓ Погоджено',
+                  metric: 'Фігурна висічка / POS',
+                  isApproved: true,
+                  group: 'print',
+                  keywords: ['воблер', 'воблери', 'шельфтокер', 'pos', 'ніжка'],
+                  onClick: () => { setMainCategoryTab('digital'); setDigitalSubTab('felling'); }
                 },
                 {
-                  title: 'Календарні сітки',
-                  desc: 'Стандартні квартальні календарні блоки 297х140 мм на крейдованому або офсетному папері.',
-                  icon: <Calendar size={30} style={{ color: '#34c759' }} />,
-                  color: 'rgba(52, 199, 89, 0.1)',
+                  title: 'Листівки вітальні та Запрошення',
+                  desc: 'Весільні, святкові та корпоративні запрошення з калькою, тисненням фольгою або вибірковим лаком на дизайнерському картоні.',
+                  icon: <Image size={30} style={{ color: '#0ea5e9' }} />,
+                  color: 'rgba(14, 165, 233, 0.1)',
+                  badgeClass: 'ios-badge-blue',
+                  badge: '✓ Погоджено',
+                  metric: 'Дизайнерський картон',
+                  isApproved: true,
+                  group: 'print',
+                  keywords: ['запрошення', 'вітальна', 'листівка', 'калька', 'фольга'],
+                  onClick: () => handleSelectCategory('Листівки')
+                },
+                {
+                  title: 'Сертифікати та Дипломи',
+                  desc: 'Почесні грамоти, нагородні дипломи та сертифікати якості з персоналізацією, змінними QR-кодами, нумерацією та тисненням.',
+                  icon: <ShieldCheck size={30} style={{ color: '#10b981' }} />,
+                  color: 'rgba(16, 185, 129, 0.1)',
                   badgeClass: 'ios-badge-green',
-                  badge: 'Сітки',
-                  metric: 'Квартальні блоки',
-                  onClick: () => openOffsetProduct({ category: 'Календарі', subCategory: 'Календарні сітки', subTab: 'sheets', preset: '34', w: '297', h: '140', kind: '1' })
+                  badge: '✓ Погоджено',
+                  metric: 'Персоналізація / Тиснення',
+                  isApproved: true,
+                  group: 'office',
+                  keywords: ['диплом', 'сертифікат', 'грамота', 'нумерація', 'qr'],
+                  onClick: () => handleSelectCategory('Дипломи і палітурка')
                 },
                 {
-                  title: 'Календарі',
-                  desc: 'Квартальні триблочні, настінні перекидні або будиночки на пружині.',
+                  title: 'Тверда палітурка дипломних робіт',
+                  desc: 'Архівне та книжкове прошиття дипломних, магістерських і кандидатських робіт у твердій обкладинці із золотим або срібним тисненням.',
+                  icon: <Bookmark size={30} style={{ color: '#10b981' }} />,
+                  color: 'rgba(16, 185, 129, 0.1)',
+                  badgeClass: 'ios-badge-green',
+                  badge: '✓ Погоджено',
+                  metric: 'Тиснення золотом',
+                  isApproved: true,
+                  group: 'office',
+                  keywords: ['дипломна', 'палітурка', 'прошиття', 'тверда', 'тиснення'],
+                  onClick: () => handleSelectCategory('Дипломи і палітурка')
+                },
+                {
+                  title: 'Фірмові бланки та Листи',
+                  desc: 'Офіційні корпоративні бланки на білосніжному офсетному папері 80–120 г/м² для офісних принтерів та щоденного документообігу.',
+                  icon: <FileText size={30} style={{ color: 'var(--primary)' }} />,
+                  color: 'rgba(0, 122, 255, 0.1)',
+                  badgeClass: 'ios-badge-blue',
+                  badge: '✓ Погоджено',
+                  metric: 'Офсет 80–120г',
+                  isApproved: true,
+                  group: 'office',
+                  keywords: ['бланк', 'бланки', 'фірмовий', 'офсет', 'лист'],
+                  onClick: () => handleSelectCategory('Бланки')
+                },
+                {
+                  title: 'Самокопіювальні бланки',
+                  desc: 'Багатошарові бланки (2, 3 або 4 шари: білий, рожевий, блакитний, жовтий) для накладних, товарних чеків, договорів із нумерацією.',
+                  icon: <Layers size={30} style={{ color: '#0ea5e9' }} />,
+                  color: 'rgba(14, 165, 233, 0.1)',
+                  badgeClass: 'ios-badge-blue',
+                  badge: '✓ Погоджено',
+                  metric: '2–4 шари / Нумерація',
+                  isApproved: true,
+                  group: 'office',
+                  keywords: ['самокопірка', 'самокопіювальний', 'накладна', 'квитанція', 'нумерація'],
+                  onClick: () => handleSelectCategory('Бланки')
+                },
+                {
+                  title: 'Блокноти фірмові',
+                  desc: 'Корпоративні блокноти А6, А5, А4 на металевій пружині (зверху або збоку) чи склейці, з повноколірною брендованою обкладинкою.',
+                  icon: <Bookmark size={30} style={{ color: '#0ea5e9' }} />,
+                  color: 'rgba(14, 165, 233, 0.1)',
+                  badgeClass: 'ios-badge-blue',
+                  badge: '✓ Погоджено',
+                  metric: 'Пружина / Склейка',
+                  isApproved: true,
+                  group: 'office',
+                  keywords: ['блокнот', 'блокноти', 'пружина', 'склейка'],
+                  onClick: () => handleSelectCategory('Блокноти')
+                },
+                {
+                  title: 'Листи для запису (Кубарики)',
+                  desc: 'Фірмові кубарики 90×90 мм (проклеєні по торцю або розсипом у пластикових боксах) із нанесенням логотипу на кожному аркуші.',
+                  icon: <Bookmark size={30} style={{ color: '#0ea5e9' }} />,
+                  color: 'rgba(14, 165, 233, 0.1)',
+                  badgeClass: 'ios-badge-blue',
+                  badge: '✓ Погоджено',
+                  metric: 'Кубарики 90×90',
+                  isApproved: true,
+                  group: 'office',
+                  keywords: ['кубарик', 'кубарики', 'листи для запису', 'нотатки'],
+                  onClick: () => openOffsetProduct({ category: 'Листівки', subCategory: 'Кубарики', subTab: 'sheets', preset: '38', w: '90', h: '90', kind: '1' })
+                },
+                {
+                  title: 'Папки для документів',
+                  desc: 'Корпоративні висічні картонні папки формату А4 з замком-клапаном або вклеєною кишенею та прорізами під візитку.',
+                  icon: <FolderOpen size={30} style={{ color: 'var(--primary)' }} />,
+                  color: 'rgba(0, 122, 255, 0.1)',
+                  badgeClass: 'ios-badge-blue',
+                  badge: '✓ Погоджено',
+                  metric: 'Висічний клапан',
+                  isApproved: true,
+                  group: 'office',
+                  keywords: ['папка', 'папки', 'кишеня', 'клапан', 'картон'],
+                  onClick: () => handleSelectCategory('Папки')
+                },
+                {
+                  title: 'Фірмові конверти',
+                  desc: 'Брендовані поштові конверти форматів DL (євро), С6, С5, С4 з повноколірним друком та клейовою смужкою («ку-стріп»).',
+                  icon: <Mail size={30} style={{ color: '#6366f1' }} />,
+                  color: 'rgba(99, 102, 241, 0.1)',
+                  badgeClass: 'ios-badge-blue',
+                  badge: '✓ Погоджено',
+                  metric: 'DL / C5 / C4',
+                  isApproved: true,
+                  group: 'office',
+                  keywords: ['конверт', 'конверти', 'пошта', 'dl', 'c5', 'c4'],
+                  onClick: () => openOffsetProduct({ category: 'Листівки', subCategory: 'Конверти', subTab: 'sheets', preset: '25', w: '220', h: '110', kind: '1' })
+                },
+                {
+                  title: 'Посвідчення та Перепустки',
+                  desc: 'Виготовлення службових посвідчень у твердій обкладинці (бумвініл) із золотим тисненням герба/лого, пластикових перепусток та книжок.',
+                  icon: <ShieldCheck size={30} style={{ color: '#64748b' }} />,
+                  color: 'rgba(100, 116, 139, 0.1)',
+                  badgeClass: 'ios-badge-blue',
+                  badge: '✓ Погоджено',
+                  metric: 'Тверда обкладинка / Тиснення',
+                  isApproved: true,
+                  group: 'office',
+                  keywords: ['посвідчення', 'перепустка', 'пропуск', 'трудова книжка', 'залікова'],
+                  onClick: () => { setMainCategoryTab('digital'); setDigitalSubTab('sheets'); }
+                },
+                {
+                  title: 'Квартальні календарі',
+                  desc: 'Настінні квартальні календарі на 1 або 3 пружини з індивідуальним рекламним постером (шапкою), люверсом і курсором із віконцем.',
                   icon: <Calendar size={30} style={{ color: '#ff3b30' }} />,
                   color: 'rgba(255, 59, 48, 0.1)',
                   badgeClass: 'ios-badge-red',
-                  badge: 'Календарі',
-                  metric: 'Квартальні / Настінні',
+                  badge: '✓ Погоджено',
+                  metric: '1 або 3 пружини',
+                  isApproved: true,
+                  group: 'calendars',
+                  keywords: ['календар', 'календарі', 'квартальний', 'курсор', 'пружина'],
+                  onClick: () => handleSelectCategory('Календарі')
+                },
+                {
+                  title: 'Настільні календарі-«Будиночки»',
+                  desc: 'Календарі для робочого столу: перекидні на металевій пружині (6 або 12 аркушів) або економічні безперекидні самозбірні.',
+                  icon: <Calendar size={30} style={{ color: '#ff9500' }} />,
+                  color: 'rgba(255, 149, 0, 0.1)',
+                  badgeClass: 'ios-badge-orange',
+                  badge: '✓ Погоджено',
+                  metric: 'Перекидні / Самозбірні',
+                  isApproved: true,
+                  group: 'calendars',
+                  keywords: ['календар-будиночок', 'будиночок', 'настільний', 'перекидний'],
+                  onClick: () => handleSelectCategory('Календарі')
+                },
+                {
+                  title: 'Настінні перекидні календарі',
+                  desc: 'Преміальні іміджеві календарі формату А4, А3 або А2 на 13 повноколірних аркушів із пружиною та ригелем під цвяшок.',
+                  icon: <Calendar size={30} style={{ color: '#34c759' }} />,
+                  color: 'rgba(52, 199, 89, 0.1)',
+                  badgeClass: 'ios-badge-green',
+                  badge: '✓ Погоджено',
+                  metric: 'А3 / А2 з ригелем',
+                  isApproved: true,
+                  group: 'calendars',
+                  keywords: ['настінний', 'перекидний', 'ригель', 'а3', 'а2'],
                   onClick: () => handleSelectCategory('Календарі')
                 },
                 {
                   title: 'Календарики кишенькові',
-                  desc: 'Кишенькові календарики 70х100мм або 50х70мм з двосторонньою ламінацією та скругленням.',
+                  desc: 'Кишенькові календарики 70×100 або 85×55 мм із двосторонньою глянцевою/матовою ламінацією та безпечним скругленням кутів.',
                   icon: <Calendar size={30} style={{ color: '#34c759' }} />,
                   color: 'rgba(52, 199, 89, 0.1)',
                   badgeClass: 'ios-badge-green',
-                  badge: 'Кишенькові',
+                  badge: '✓ Погоджено',
                   metric: 'Ламінація 2+2',
+                  isApproved: true,
+                  group: 'calendars',
+                  keywords: ['кишеньковий', 'календарик', 'ламінація', 'скруглення'],
                   onClick: () => handleSelectCategory('Календарики кишенькові')
                 },
                 {
-                  title: 'Каширована продукція',
-                  desc: 'Каширування друкованих лайнерів на твердий палітурний картон від 1.5 до 3 мм.',
-                  icon: <Layers size={30} style={{ color: '#f59e0b' }} />,
-                  color: 'rgba(245, 158, 11, 0.1)',
-                  badgeClass: 'ios-badge-orange',
-                  badge: 'Каширування',
-                  metric: 'Палітурний картон',
-                  onClick: () => { setMainCategoryTab('digital'); setDigitalSubTab('mounted'); }
-                },
-                {
-                  title: 'Квитки, Купони',
-                  desc: 'Вхідні квитки, флаєри-купони, подарункові сертифікати з перфорацією та нумерацією.',
-                  icon: <Sparkles size={30} style={{ color: '#0ea5e9' }} />,
-                  color: 'rgba(14, 165, 233, 0.1)',
-                  badgeClass: 'ios-badge-blue',
-                  badge: 'Нумерація',
-                  metric: 'Перфорація',
-                  onClick: () => { setMainCategoryTab('digital'); setDigitalSubTab('felling'); }
-                },
-                {
-                  title: 'Кольорові плівки',
-                  desc: 'Аплікаційні кольорові плівки ORACAL 641, плотерна порізка, вибірка та монтажка.',
-                  icon: <Palette size={30} style={{ color: '#ec4899' }} />,
-                  color: 'rgba(236, 72, 153, 0.1)',
-                  badgeClass: 'ios-badge-purple',
-                  badge: 'ORACAL 641',
-                  metric: 'Плотерна порізка',
-                  onClick: () => setMainCategoryTab('films')
-                },
-                {
-                  title: 'Конверти фірмові',
-                  desc: 'Друк логотипів на конвертах формату DL (євро), С5, С4 з клейовою смужкою.',
-                  icon: <FileText size={30} style={{ color: '#6366f1' }} />,
-                  color: 'rgba(99, 102, 241, 0.1)',
-                  badgeClass: 'ios-badge-blue',
-                  badge: 'Конверти',
-                  metric: 'DL / C5 / C4',
-                  onClick: () => openOffsetProduct({ category: 'Листівки', subCategory: 'Конверти', subTab: 'sheets', preset: '25', w: '220', h: '110', kind: '1' })
-                },
-                {
-                  title: 'Листи для запису',
-                  desc: 'Фірмові кубарики та блоки для запису у пластикових боксах або проклеєні.',
-                  icon: <Bookmark size={30} style={{ color: '#0ea5e9' }} />,
-                  color: 'rgba(14, 165, 233, 0.1)',
-                  badgeClass: 'ios-badge-blue',
-                  badge: 'Кубарики',
-                  metric: 'Блоки для запису',
-                  onClick: () => openOffsetProduct({ category: 'Листівки', subCategory: 'Кубарики', subTab: 'sheets', preset: '38', w: '90', h: '90', kind: '1' })
-                },
-                {
-                  title: 'Листівки, Запрошення',
-                  desc: 'Рекламні та святкові листівки А6, А5, А4 на крейдованому або дизайнерському папері.',
-                  icon: <Image size={30} style={{ color: '#0ea5e9' }} />,
-                  color: 'rgba(14, 165, 233, 0.1)',
-                  badgeClass: 'ios-badge-blue',
-                  badge: 'Листівки',
-                  metric: 'А-формати',
-                  onClick: () => handleSelectCategory('Листівки')
-                },
-                {
-                  title: 'Листівки, Флаєри',
-                  desc: 'Єврофлаєри (99х210мм), подвійні флаєри повноколірного 4+4 або 4+0 друку.',
-                  icon: <Zap size={30} style={{ color: '#ff9500' }} />,
-                  color: 'rgba(255, 149, 0, 0.1)',
-                  badgeClass: 'ios-badge-orange',
-                  badge: 'Флаєри',
-                  metric: 'Євроформат',
-                  onClick: () => handleSelectCategory('Флаєри')
-                },
-                {
-                  title: 'Магніти сувенірні',
-                  desc: 'Вінілові магніти з повноколірним друком, глянцевою ламінацією та фігурною висічкою.',
-                  icon: <Sparkles size={30} style={{ color: '#ec4899' }} />,
-                  color: 'rgba(236, 72, 153, 0.1)',
-                  badgeClass: 'ios-badge-purple',
-                  badge: 'Сувенірка',
-                  metric: 'Магнітний вініл',
-                  onClick: () => { setMainCategoryTab('digital'); setDigitalSubTab('felling'); }
-                },
-                {
-                  title: 'Меню для ресторанів',
-                  desc: 'Меню HoReCa з цупкою пакетною ламінацією, скріпленням пружиною або болтами.',
-                  icon: <Utensils size={30} style={{ color: '#af52de' }} />,
-                  color: 'rgba(175, 82, 222, 0.1)',
-                  badgeClass: 'ios-badge-purple',
-                  badge: 'HoReCa',
-                  metric: 'Пакетна ламінація',
-                  onClick: () => handleSelectCategory('Меню')
-                },
-                {
-                  title: 'Мобільні стенди',
-                  desc: 'Виставкові стенди Roll-Up, X-Banner (павук), банери для презентацій та промо.',
-                  icon: <Layout size={30} style={{ color: 'var(--primary)' }} />,
-                  color: 'rgba(0, 122, 255, 0.1)',
-                  badgeClass: 'ios-badge-blue',
-                  badge: 'Стенди',
-                  metric: 'Roll-Up / X-Banner',
-                  onClick: () => { setMainCategoryTab('wide'); setWideSubTab('stands'); }
-                },
-                {
-                  title: 'Наліпки, Стікери',
-                  desc: 'Самоклеючі наклейки з плотерною надсічкою на аркушах Raflatac або Ritrama.',
-                  icon: <Tag size={30} style={{ color: '#ff9500' }} />,
-                  color: 'rgba(255, 149, 0, 0.1)',
-                  badgeClass: 'ios-badge-orange',
-                  badge: 'Самоклейка',
-                  metric: 'Raflatac / плотер',
-                  onClick: () => handleSelectCategory('Наклейки')
-                },
-                {
-                  title: 'Папки з кишенею',
-                  desc: 'Корпоративні фірмові папки формату А4 з висічним замком або вклеєною кишенею.',
-                  icon: <FolderOpen size={30} style={{ color: 'var(--primary)' }} />,
-                  color: 'rgba(0, 122, 255, 0.1)',
-                  badgeClass: 'ios-badge-blue',
-                  badge: 'Папки',
-                  metric: 'Висічний замок',
-                  onClick: () => handleSelectCategory('Папки')
-                },
-                {
-                  title: 'Плакати, Афіші',
-                  desc: 'Великоформатний друк афіш А3, А2, А1, сітілайтів, бігбордів для реклами.',
-                  icon: <Layout size={30} style={{ color: 'var(--primary)' }} />,
-                  color: 'rgba(0, 122, 255, 0.1)',
-                  badgeClass: 'ios-badge-blue',
-                  badge: 'Плакати',
-                  metric: 'Великий формат',
-                  onClick: () => handleSelectCategory('Плакати')
-                },
-                {
-                  title: 'Пластикові карти',
-                  desc: 'Дисконтні та клубні картки, магнітна смуга, ембосування, штрих-код.',
-                  icon: <CreditCard size={30} style={{ color: '#6366f1' }} />,
-                  color: 'rgba(99, 102, 241, 0.1)',
-                  badgeClass: 'ios-badge-blue',
-                  badge: 'Пластик',
-                  metric: 'Магнітна смуга',
-                  onClick: () => { setMainCategoryTab('digital'); setDigitalSubTab('felling'); }
-                },
-                {
-                  title: 'Полотна, Картини',
-                  desc: 'Інтер\'єрний друк на натуральному художньому полотні з натяжкою на підрамник.',
-                  icon: <Image size={30} style={{ color: '#0ea5e9' }} />,
-                  color: 'rgba(14, 165, 233, 0.1)',
-                  badgeClass: 'ios-badge-blue',
-                  badge: 'Полотно',
-                  metric: 'Галерейна натяжка',
-                  onClick: () => { setMainCategoryTab('wide'); setWideSubTab('canvas'); }
-                },
-                {
-                  title: 'Постери',
-                  desc: 'Якісні інтер\'єрні постери та плакати на преміальному матовому або фотопапері.',
-                  icon: <Image size={30} style={{ color: '#3b82f6' }} />,
-                  color: 'rgba(59, 130, 246, 0.1)',
-                  badgeClass: 'ios-badge-blue',
-                  badge: 'Постери',
-                  metric: 'Фотоякість',
-                  onClick: () => { setMainCategoryTab('wide'); setWideSubTab('paper'); }
+                  title: 'Календарні сітки',
+                  desc: 'Готові стандартні квартальні блоки 297×140 мм на крейдованому або офсетному папері для оперативної збірки календаря.',
+                  icon: <Calendar size={30} style={{ color: '#34c759' }} />,
+                  color: 'rgba(52, 199, 89, 0.1)',
+                  badgeClass: 'ios-badge-green',
+                  badge: '✓ Погоджено',
+                  metric: 'Квартальні блоки',
+                  isApproved: true,
+                  group: 'calendars',
+                  keywords: ['сітка', 'сітки', 'календарні блоки'],
+                  onClick: () => openOffsetProduct({ category: 'Календарі', subCategory: 'Календарні сітки', subTab: 'sheets', preset: '34', w: '297', h: '140', kind: '1' })
                 },
                 {
                   title: 'Рулонна етикетка',
-                  desc: 'Флексодрук та цифровий друк самоклеючих етикеток у рулонах для автоматів.',
+                  desc: 'Промислові самоклейні етикетки у рулонах на втулках 76/40/25 мм під автоматичні аплікатори (папір напівглянець, PP, термо).',
                   icon: <Tag size={30} style={{ color: '#f59e0b' }} />,
                   color: 'rgba(245, 158, 11, 0.1)',
                   badgeClass: 'ios-badge-orange',
-                  badge: 'Рулон',
-                  metric: 'Флексодрук',
+                  badge: '✓ Погоджено',
+                  metric: 'Рулонний друк / Аплікатор',
+                  isApproved: true,
+                  group: 'labels',
+                  keywords: ['рулонна', 'етикетка', 'аплікатор', 'бобіна', 'втулка', 'термотоп'],
                   onClick: () => setMainCategoryTab('roll')
                 },
                 {
-                  title: 'Самоклеюча плівка',
-                  desc: 'Друк на плівках ORACAL, Ritrama, прозорій, матовій, перфорованій One Way Vision.',
+                  title: 'Аркушева етикетка',
+                  desc: 'Самоклейні наліпки на аркушах А4, А3, SRA3 (Raflatac, Ritrama, Fasson) для ручного наклеювання, тестерів та середніх партій.',
                   icon: <Tag size={30} style={{ color: '#ff9500' }} />,
                   color: 'rgba(255, 149, 0, 0.1)',
                   badgeClass: 'ios-badge-orange',
-                  badge: 'Плівка',
-                  metric: 'ORACAL / Ritrama',
-                  onClick: () => { setMainCategoryTab('wide'); setWideSubTab('film'); }
+                  badge: '✓ Погоджено',
+                  metric: 'Raflatac / SRA3',
+                  isApproved: true,
+                  group: 'labels',
+                  keywords: ['аркушева', 'самоклейка', 'рафлатак', 'ritrama', 'наліпка'],
+                  onClick: () => handleSelectCategory('Наклейки')
                 },
                 {
-                  title: 'Скретч-карти, Лотереї',
-                  desc: 'Купони та акційні картки зі захисним скретч-шаром, що стирається монеткою.',
-                  icon: <Sparkles size={30} style={{ color: '#ec4899' }} />,
-                  color: 'rgba(236, 72, 153, 0.1)',
-                  badgeClass: 'ios-badge-purple',
-                  badge: 'Скретч',
-                  metric: 'Стирання монетою',
+                  title: 'Стікери та Наліпки поштучні',
+                  desc: 'Індивідуальні фігурні наліпки та стікерпаки з надточною контурною плотерною порізкою будь-якої складності на папері чи плівці.',
+                  icon: <Scissors size={30} style={{ color: '#ff9500' }} />,
+                  color: 'rgba(255, 149, 0, 0.1)',
+                  badgeClass: 'ios-badge-orange',
+                  badge: '✓ Погоджено',
+                  metric: 'Контурна порізка',
+                  isApproved: true,
+                  group: 'labels',
+                  keywords: ['стікер', 'стікери', 'стікерпак', 'плотер', 'контурна порізка'],
+                  onClick: () => handleSelectCategory('Наклейки')
+                },
+                {
+                  title: 'Бирки та Товарні ярлики',
+                  desc: 'Навісні бирки для одягу, взуття та маркування упаковки з круглим отвором 3–5 мм, люверсом або фігурною висічкою.',
+                  icon: <Tag size={30} style={{ color: '#0ea5e9' }} />,
+                  color: 'rgba(14, 165, 233, 0.1)',
+                  badgeClass: 'ios-badge-blue',
+                  badge: '✓ Погоджено',
+                  metric: 'Отвори / Люверси',
+                  isApproved: true,
+                  group: 'labels',
+                  keywords: ['бирка', 'бирки', 'ярлик', 'ярлики', 'люверс'],
                   onClick: () => { setMainCategoryTab('digital'); setDigitalSubTab('felling'); }
                 },
                 {
-                  title: 'Таблички, Вивіски',
-                  desc: 'Рекламні та навігаційні таблички з ПВХ-пластику, оргскла, алюмінієвого композиту.',
+                  title: 'Картонні коробки та Упаковка',
+                  desc: 'Товарне та подарункове пакування: самозбірні коробки, шубери, обічайки, жорсткий палітурний картон із кашируванням.',
+                  icon: <Package size={30} style={{ color: '#f59e0b' }} />,
+                  color: 'rgba(245, 158, 11, 0.1)',
+                  badgeClass: 'ios-badge-orange',
+                  badge: '✓ Погоджено',
+                  metric: 'Каширування / Шубери',
+                  isApproved: true,
+                  group: 'labels',
+                  keywords: ['коробка', 'коробки', 'упаковка', 'пакування', 'шубер', 'каширування'],
+                  onClick: () => { setMainCategoryTab('digital'); setDigitalSubTab('mounted'); }
+                },
+                {
+                  title: 'Брендовані паперові пакети',
+                  desc: 'Паперові пакети з ручками (мотузкові або стрічкові) на білому крафті чи крейдованому папері з ламінацією та посиленим дном.',
+                  icon: <Package size={30} style={{ color: '#10b981' }} />,
+                  color: 'rgba(16, 185, 129, 0.1)',
+                  badgeClass: 'ios-badge-green',
+                  badge: '✓ Погоджено',
+                  metric: 'Крафт / Крейда з ручками',
+                  isApproved: true,
+                  group: 'labels',
+                  keywords: ['пакет', 'пакети', 'паперовий пакет', 'ручки', 'крафт'],
+                  onClick: () => { setMainCategoryTab('digital'); setDigitalSubTab('felling'); }
+                },
+                {
+                  title: 'Меню для ресторанів (HoReCa)',
+                  desc: 'Меню-папки на металевих болтах або пружині, плейсмати та меню з міцною вологостійкою пакетною ламінацією 125–250 мкм.',
+                  icon: <Utensils size={30} style={{ color: '#af52de' }} />,
+                  color: 'rgba(175, 82, 222, 0.1)',
+                  badgeClass: 'ios-badge-purple',
+                  badge: '✓ Погоджено',
+                  metric: 'Пакетна ламінація / Болти',
+                  isApproved: true,
+                  group: 'print',
+                  keywords: ['меню', 'ресторан', 'кафе', 'horeca', 'плейсмат', 'пакетна ламінація'],
+                  onClick: () => handleSelectCategory('Меню')
+                },
+                {
+                  title: 'Плакати, Постери та Афіші',
+                  desc: 'Великоформатний та інтер’єрний друк плакатів А3, А2, А1, А0 на папері Citylight 150г або фотопапері для реклами та виставок.',
                   icon: <Layout size={30} style={{ color: 'var(--primary)' }} />,
                   color: 'rgba(0, 122, 255, 0.1)',
                   badgeClass: 'ios-badge-blue',
-                  badge: 'ПВХ / Композит',
-                  metric: 'Прямий УФ-друк',
+                  badge: '✓ Погоджено',
+                  metric: 'А3–А0 / Citylight',
+                  isApproved: true,
+                  group: 'wide',
+                  keywords: ['плакат', 'плакати', 'постер', 'постери', 'афіша', 'citylight'],
+                  onClick: () => handleSelectCategory('Плакати')
+                },
+                {
+                  title: 'Банери та Сітілайти',
+                  desc: 'Широкоформатний друк на банерній тканині Frontlit, сітці Mesh з підворотом по периметру та металевими люверсами через 30–50 см.',
+                  icon: <Layout size={30} style={{ color: 'var(--primary)' }} />,
+                  color: 'rgba(0, 122, 255, 0.1)',
+                  badgeClass: 'ios-badge-blue',
+                  badge: '✓ Погоджено',
+                  metric: 'Frontlit / Mesh / Люверси',
+                  isApproved: true,
+                  group: 'wide',
+                  keywords: ['банер', 'банери', 'сітка mesh', 'люверси', 'frontlit', 'сітілайт'],
+                  onClick: () => { setMainCategoryTab('wide'); setWideSubTab('banner'); }
+                },
+
+                // -------------------------------------------------------------
+                // КАТЕГОРІЯ «ІНШЕ» (Позиції на окремому узгодженні виробництва)
+                // -------------------------------------------------------------
+                {
+                  title: 'Пластикові карти (ПВХ)',
+                  desc: 'Пластикові картки товщиною 0.76 мм, магнітна смуга HiCo, ембосування, штрих-код (потребує узгодження щодо виготовлення).',
+                  icon: <CreditCard size={30} style={{ color: '#d97706' }} />,
+                  color: 'rgba(217, 119, 6, 0.1)',
+                  badgeClass: 'ios-badge-orange',
+                  badge: '⚠️ На погодженні',
+                  metric: 'Пластик 0.76 мм / Інше',
+                  isApproved: false,
+                  group: 'other',
+                  keywords: ['пластикова карта', 'пвх', 'дисконт', 'магнітна смуга'],
+                  onClick: () => { setMainCategoryTab('digital'); setDigitalSubTab('felling'); }
+                },
+                {
+                  title: 'Скретч-карти та Лотереї',
+                  desc: 'Промо-картки та купони із захисним шаром срібної скретч-фарби, що стирається монеткою (потребує узгодження щодо виготовлення).',
+                  icon: <Sparkles size={30} style={{ color: '#d97706' }} />,
+                  color: 'rgba(217, 119, 6, 0.1)',
+                  badgeClass: 'ios-badge-orange',
+                  badge: '⚠️ На погодженні',
+                  metric: 'Скретч-шар / Інше',
+                  isApproved: false,
+                  group: 'other',
+                  keywords: ['скретч', 'лотерея', 'купон', 'стерти монеткою'],
+                  onClick: () => { setMainCategoryTab('digital'); setDigitalSubTab('felling'); }
+                },
+                {
+                  title: 'Таблички та Фасадні вивіски',
+                  desc: 'Інформаційні та навігаційні таблички з ПВХ-пластику 3–5 мм, композиту, оргскла (потребує узгодження щодо виготовлення).',
+                  icon: <Layout size={30} style={{ color: '#d97706' }} />,
+                  color: 'rgba(217, 119, 6, 0.1)',
+                  badgeClass: 'ios-badge-orange',
+                  badge: '⚠️ На погодженні',
+                  metric: 'ПВХ / Композит / Інше',
+                  isApproved: false,
+                  group: 'other',
+                  keywords: ['табличка', 'вивіска', 'пвх', 'композит', 'акрил'],
                   onClick: () => { setMainCategoryTab('wide'); setWideSubTab('pvc'); }
                 },
                 {
-                  title: 'Дипломи і палітурка',
-                  desc: 'Тверда палітурка дипломних робіт, дисертацій з тисненням золотою фольгою.',
-                  icon: <Sparkles size={30} style={{ color: '#34c759' }} />,
-                  color: 'rgba(52, 199, 89, 0.1)',
-                  badgeClass: 'ios-badge-green',
-                  badge: 'Палітурка',
-                  metric: 'Тиснення фольгою',
-                  onClick: () => handleSelectCategory('Дипломи і палітурка')
+                  title: 'Полотна та Картини на підрамнику',
+                  desc: 'Інтер’єрний друк на бавовняному полотні з подальшою галерейною натяжкою на підрамник (потребує узгодження щодо виготовлення).',
+                  icon: <Image size={30} style={{ color: '#d97706' }} />,
+                  color: 'rgba(217, 119, 6, 0.1)',
+                  badgeClass: 'ios-badge-orange',
+                  badge: '⚠️ На погодженні',
+                  metric: 'Полотно / Інше',
+                  isApproved: false,
+                  group: 'other',
+                  keywords: ['полотно', 'картина', 'підрамник', 'галерейна натяжка'],
+                  onClick: () => { setMainCategoryTab('wide'); setWideSubTab('canvas'); }
                 },
                 {
-                  title: 'Нотаріальні книги',
-                  desc: 'Спеціалізовані нотаріальні реєстри у твердій прошивній палітурці за стандартами.',
-                  icon: <BookOpen size={30} style={{ color: '#64748b' }} />,
-                  color: 'rgba(100, 116, 139, 0.1)',
-                  badgeClass: 'ios-badge-blue',
-                  badge: 'Реєстри',
-                  metric: 'Тверда палітурка',
-                  onClick: () => handleSelectCategory('Нотаріальні книги')
+                  title: 'Мобільні стенди (Roll-Up / Павук)',
+                  desc: 'Алюмінієві виставкові касети Roll-Up (80×200, 100×200 см) та X-Banner у чохлах (потребує узгодження щодо виготовлення).',
+                  icon: <Layout size={30} style={{ color: '#d97706' }} />,
+                  color: 'rgba(217, 119, 6, 0.1)',
+                  badgeClass: 'ios-badge-orange',
+                  badge: '⚠️ На погодженні',
+                  metric: 'Roll-Up / Інше',
+                  isApproved: false,
+                  group: 'other',
+                  keywords: ['roll-up', 'павук', 'ролап', 'мобільний стенд'],
+                  onClick: () => { setMainCategoryTab('wide'); setWideSubTab('stands'); }
                 },
                 {
-                  title: 'Шкільні журнали',
-                  desc: 'Класні журнали успішності та шкільні облікові відомості у твердій палітурці.',
-                  icon: <BookOpen size={30} style={{ color: '#ff3b30' }} />,
-                  color: 'rgba(255, 59, 48, 0.1)',
-                  badgeClass: 'ios-badge-red',
-                  badge: 'Журнали',
-                  metric: 'Шкільні реєстри',
-                  keywords: ['журнал', 'журнали', 'класний', 'школа', 'облік', 'реєстр'],
-                  onClick: () => handleSelectCategory('Шкільні журнали')
+                  title: 'Магніти сувенірні',
+                  desc: 'Сувенірні магніти на магнітному вінілі 0.4–0.7 мм з ламінацією та фігурною висічкою (потребує узгодження щодо виготовлення).',
+                  icon: <Sparkles size={30} style={{ color: '#d97706' }} />,
+                  color: 'rgba(217, 119, 6, 0.1)',
+                  badgeClass: 'ios-badge-orange',
+                  badge: '⚠️ На погодженні',
+                  metric: 'Магнітний вініл / Інше',
+                  isApproved: false,
+                  group: 'other',
+                  keywords: ['магніт', 'магніти', 'сувенірний'],
+                  onClick: () => { setMainCategoryTab('digital'); setDigitalSubTab('felling'); }
+                },
+                {
+                  title: 'Кольорові плівки ORACAL 641',
+                  desc: 'Аплікаційна плотерна порізка кольорових самоклейних вінілових плівок для вітрин (потребує узгодження щодо виготовлення).',
+                  icon: <Scissors size={30} style={{ color: '#d97706' }} />,
+                  color: 'rgba(217, 119, 6, 0.1)',
+                  badgeClass: 'ios-badge-orange',
+                  badge: '⚠️ На погодженні',
+                  metric: 'ORACAL 641 / Інше',
+                  isApproved: false,
+                  group: 'other',
+                  keywords: ['oracal', 'оракал', 'плівка', 'монтажка'],
+                  onClick: () => setMainCategoryTab('films')
+                },
+                {
+                  title: 'Сувенірна продукція (Ручки, Брелоки)',
+                  desc: 'Брендовані кулькові ручки та металеві брелоки з нанесенням логотипу або написів (потребує узгодження щодо виготовлення).',
+                  icon: <Tag size={30} style={{ color: '#d97706' }} />,
+                  color: 'rgba(217, 119, 6, 0.1)',
+                  badgeClass: 'ios-badge-orange',
+                  badge: '⚠️ На погодженні',
+                  metric: 'Ручки / Брелоки / Інше',
+                  isApproved: false,
+                  group: 'other',
+                  keywords: ['ручка', 'ручки', 'брелок', 'брелоки', 'сувенірка'],
+                  onClick: () => alert('Сувенірна продукція (ручки, брелоки) знаходиться на стадії погодження постачальників та технології брендування.')
+                },
+                {
+                  title: 'Зразки матеріалів',
+                  desc: 'Віяла зразків паперів, дизайнерських картонів, плівок та видів оздоблення (довідковий каталог зразків).',
+                  icon: <Palette size={30} style={{ color: '#8b5cf6' }} />,
+                  color: 'rgba(139, 92, 246, 0.1)',
+                  badgeClass: 'ios-badge-purple',
+                  badge: 'Зразки',
+                  metric: 'Віяла зразків / Інше',
+                  isApproved: false,
+                  group: 'other',
+                  keywords: ['зразки', 'віяло', 'дизайнерський картон', 'матеріали'],
+                  onClick: () => setActiveInfoModal('samples')
                 }
               ];
 
               const q = productSearchQuery.trim().toLowerCase();
-              const filteredProducts = q
-                ? allProducts.filter(item => 
+              const filteredProducts = allProducts.filter(item => {
+                if (catalogFilter === 'approved' && !item.isApproved) return false;
+                if (catalogFilter === 'other' && item.isApproved) return false;
+                if (q) {
+                  return (
                     item.title.toLowerCase().includes(q) ||
                     item.desc.toLowerCase().includes(q) ||
                     item.badge.toLowerCase().includes(q) ||
                     item.metric.toLowerCase().includes(q) ||
                     (item.keywords && item.keywords.some((k: string) => k.toLowerCase().includes(q)))
-                  )
-                : allProducts;
+                  );
+                }
+                return true;
+              });
+
+              const approvedCount = allProducts.filter(p => p.isApproved).length;
+              const otherCount = allProducts.filter(p => !p.isApproved).length;
 
               return (
                 <div className="flex flex-col gap-4">
+                  {/* Filter Pills Bar */}
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '10px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                      <button
+                        type="button"
+                        onClick={() => setCatalogFilter('all')}
+                        style={{
+                          padding: '6px 14px',
+                          borderRadius: '20px',
+                          fontSize: '12px',
+                          fontWeight: '700',
+                          border: catalogFilter === 'all' ? '1px solid var(--primary)' : '1px solid var(--border-light)',
+                          backgroundColor: catalogFilter === 'all' ? 'var(--primary)' : '#ffffff',
+                          color: catalogFilter === 'all' ? '#ffffff' : 'var(--text-dark)',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          transition: 'all 0.15s ease'
+                        }}
+                      >
+                        <span>Всі вироби</span>
+                        <span style={{ fontSize: '10px', opacity: 0.85 }}>({allProducts.length})</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setCatalogFilter('approved')}
+                        style={{
+                          padding: '6px 14px',
+                          borderRadius: '20px',
+                          fontSize: '12px',
+                          fontWeight: '700',
+                          border: catalogFilter === 'approved' ? '1px solid #16a34a' : '1px solid #bbf7d0',
+                          backgroundColor: catalogFilter === 'approved' ? '#16a34a' : '#f0fdf4',
+                          color: catalogFilter === 'approved' ? '#ffffff' : '#15803d',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          transition: 'all 0.15s ease'
+                        }}
+                      >
+                        <span>✓ Погоджене виробництво</span>
+                        <span style={{ fontSize: '10px', opacity: 0.85 }}>({approvedCount})</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => setCatalogFilter('other')}
+                        style={{
+                          padding: '6px 14px',
+                          borderRadius: '20px',
+                          fontSize: '12px',
+                          fontWeight: '700',
+                          border: catalogFilter === 'other' ? '1px solid #d97706' : '1px solid #fde68a',
+                          backgroundColor: catalogFilter === 'other' ? '#d97706' : '#fffbeb',
+                          color: catalogFilter === 'other' ? '#ffffff' : '#b45309',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '6px',
+                          transition: 'all 0.15s ease'
+                        }}
+                      >
+                        <span>⚠️ Категорія «Інше» (На погодженні)</span>
+                        <span style={{ fontSize: '10px', opacity: 0.85 }}>({otherCount})</span>
+                      </button>
+                    </div>
+
+                    <span style={{ fontSize: '11.5px', color: 'var(--text-medium)' }}>
+                      Відображається: <strong>{filteredProducts.length}</strong> з {allProducts.length}
+                    </span>
+                  </div>
+
                   {productSearchQuery && (
                     <div className="flex items-center justify-between px-1">
                       <span className="text-xs font-bold text-slate-700">
@@ -8596,7 +8915,7 @@ export const Calculator: React.FC = () => {
                         onClick={() => setProductSearchQuery('')}
                         className="text-xs text-blue-600 hover:underline font-semibold"
                       >
-                        Скинути фільтр
+                        Скинути пошук
                       </button>
                     </div>
                   )}
@@ -8604,10 +8923,10 @@ export const Calculator: React.FC = () => {
                   {filteredProducts.length === 0 ? (
                     <div className="ios-card bg-white p-12 text-center rounded-2xl border border-slate-200 flex flex-col items-center gap-3">
                       <Search size={32} className="text-slate-400" />
-                      <p className="text-sm font-bold text-slate-700 m-0">Нічого не знайдено за запитом "{productSearchQuery}"</p>
+                      <p className="text-sm font-bold text-slate-700 m-0">Нічого не знайдено за вибраними фільтрами</p>
                       <button
                         type="button"
-                        onClick={() => setProductSearchQuery('')}
+                        onClick={() => { setProductSearchQuery(''); setCatalogFilter('all'); }}
                         className="text-xs font-bold text-blue-600 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-200 hover:bg-blue-100"
                       >
                         Показати всі вироби
@@ -8632,7 +8951,8 @@ export const Calculator: React.FC = () => {
                             cursor: 'pointer',
                             transition: 'all 0.2s ease',
                             minHeight: '200px',
-                            position: 'relative'
+                            position: 'relative',
+                            border: !item.isApproved ? '1px dashed #fcd34d' : '1px solid var(--border-light)'
                           }}
                           onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
                           onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; }}
@@ -8674,7 +8994,7 @@ export const Calculator: React.FC = () => {
                             <span style={{ fontSize: '11px', fontWeight: '600', color: 'var(--text-medium)' }}>
                               {item.metric}
                             </span>
-                            <span style={{ color: 'var(--primary)', display: 'flex', alignItems: 'center', fontSize: '12px', fontWeight: '700' }}>
+                            <span style={{ color: !item.isApproved ? '#d97706' : 'var(--primary)', display: 'flex', alignItems: 'center', fontSize: '12px', fontWeight: '700' }}>
                               Відкрити <ChevronRight size={14} />
                             </span>
                           </div>
@@ -18659,6 +18979,196 @@ export const Calculator: React.FC = () => {
                   </div>
                 </div>
               ))}
+            </div>
+          )}
+
+          {/* TAB 7: OTHER (КА ТЕГОРІЯ «ІНШЕ» — ПРОДУКЦІЯ НА ПОГОДЖЕННІ) */}
+          {mainCategoryTab === 'other' && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+              <div 
+                className="ios-card bg-white" 
+                style={{ 
+                  padding: '20px 24px', 
+                  border: '1px solid #fcd34d', 
+                  backgroundColor: '#fffbeb', 
+                  borderRadius: '16px',
+                  display: 'flex',
+                  alignItems: 'flex-start',
+                  gap: '14px'
+                }}
+              >
+                <div style={{ width: '40px', height: '40px', borderRadius: '10px', backgroundColor: '#fef3c7', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <AlertTriangle size={22} style={{ color: '#d97706' }} />
+                </div>
+                <div>
+                  <h3 style={{ fontSize: '16px', fontWeight: '800', color: '#92400e', margin: '0 0 6px 0' }}>
+                    Категорія «Інше» (Продукція на стадії узгодження виробництва)
+                  </h3>
+                  <p style={{ fontSize: '12.5px', color: '#78350f', margin: 0, lineHeight: '1.5' }}>
+                    Відповідно до погодженого переліку (документ <em>«Продукція Альфа та Омега.docx»</em>), наведені нижче 9 позицій тимчасово винесено в категорію «Інше». Вони очікують окремого підтвердження щодо можливості власного виготовлення на устаткуванні «Едельвейс і К» або передачі на партнерський підряд (аутсорс).
+                  </p>
+                </div>
+              </div>
+
+              <div style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+                gap: '20px'
+              }}>
+                {[
+                  {
+                    title: 'Пластикові карти (ПВХ)',
+                    desc: 'Пластикові дисконтні, клубні та VIP картки 0.76 мм, магнітна смуга HiCo, ембосування, штрих-код.',
+                    icon: <CreditCard size={30} style={{ color: '#d97706' }} />,
+                    color: 'rgba(217, 119, 6, 0.1)',
+                    badgeClass: 'ios-badge-orange',
+                    badge: '⚠️ На погодженні',
+                    metric: 'Пластик 0.76 мм',
+                    onClick: () => { setMainCategoryTab('digital'); setDigitalSubTab('felling'); }
+                  },
+                  {
+                    title: 'Скретч-карти та Лотереї',
+                    desc: 'Промо-картки та лотерейні квитки з нанесенням захисного шару срібної скретч-фарби, що стирається монеткою.',
+                    icon: <Sparkles size={30} style={{ color: '#d97706' }} />,
+                    color: 'rgba(217, 119, 6, 0.1)',
+                    badgeClass: 'ios-badge-orange',
+                    badge: '⚠️ На погодженні',
+                    metric: 'Скретч-шар',
+                    onClick: () => { setMainCategoryTab('digital'); setDigitalSubTab('felling'); }
+                  },
+                  {
+                    title: 'Таблички та Фасадні вивіски',
+                    desc: 'Інформаційні та навігаційні таблички з ПВХ пластику 3–5 мм, композиту, оргскла з дистанційними тримачами.',
+                    icon: <Layout size={30} style={{ color: '#d97706' }} />,
+                    color: 'rgba(217, 119, 6, 0.1)',
+                    badgeClass: 'ios-badge-orange',
+                    badge: '⚠️ На погодженні',
+                    metric: 'ПВХ / Композит',
+                    onClick: () => { setMainCategoryTab('wide'); setWideSubTab('pvc'); }
+                  },
+                  {
+                    title: 'Полотна та Картини на підрамнику',
+                    desc: 'Інтер’єрний друк на бавовняному художньому полотні з подальшою галерейною натяжкою на підрамник.',
+                    icon: <Image size={30} style={{ color: '#d97706' }} />,
+                    color: 'rgba(217, 119, 6, 0.1)',
+                    badgeClass: 'ios-badge-orange',
+                    badge: '⚠️ На погодженні',
+                    metric: 'Художнє полотно',
+                    onClick: () => { setMainCategoryTab('wide'); setWideSubTab('canvas'); }
+                  },
+                  {
+                    title: 'Мобільні стенди (Roll-Up / Павук)',
+                    desc: 'Алюмінієві виставкові касети Roll-Up (80×200, 100×200 см) та X-Banner у транспортувальних чохлах.',
+                    icon: <Layout size={30} style={{ color: '#d97706' }} />,
+                    color: 'rgba(217, 119, 6, 0.1)',
+                    badgeClass: 'ios-badge-orange',
+                    badge: '⚠️ На погодженні',
+                    metric: 'Roll-Up / Павук',
+                    onClick: () => { setMainCategoryTab('wide'); setWideSubTab('stands'); }
+                  },
+                  {
+                    title: 'Магніти сувенірні',
+                    desc: 'Плоскі сувенірні магніти на магнітному вінілі 0.4–0.7 мм з глянцевою ламінацією та фігурною висічкою.',
+                    icon: <Sparkles size={30} style={{ color: '#d97706' }} />,
+                    color: 'rgba(217, 119, 6, 0.1)',
+                    badgeClass: 'ios-badge-orange',
+                    badge: '⚠️ На погодженні',
+                    metric: 'Магнітний вініл',
+                    onClick: () => { setMainCategoryTab('digital'); setDigitalSubTab('felling'); }
+                  },
+                  {
+                    title: 'Кольорові плівки ORACAL 641',
+                    desc: 'Аплікаційна плотерна порізка кольорових самоклейних вінілових плівок для вітрин та автотранспорту.',
+                    icon: <Scissors size={30} style={{ color: '#d97706' }} />,
+                    color: 'rgba(217, 119, 6, 0.1)',
+                    badgeClass: 'ios-badge-orange',
+                    badge: '⚠️ На погодженні',
+                    metric: 'ORACAL 641',
+                    onClick: () => setMainCategoryTab('films')
+                  },
+                  {
+                    title: 'Сувенірна продукція (Ручки, Брелоки)',
+                    desc: 'Брендовані кулькові ручки та металеві брелоки з нанесенням логотипу або написів замовника.',
+                    icon: <Tag size={30} style={{ color: '#d97706' }} />,
+                    color: 'rgba(217, 119, 6, 0.1)',
+                    badgeClass: 'ios-badge-orange',
+                    badge: '⚠️ На погодженні',
+                    metric: 'Ручки / Брелоки',
+                    onClick: () => alert('Сувенірна продукція (ручки, брелоки) знаходиться на стадії погодження постачальників та технології брендування.')
+                  },
+                  {
+                    title: 'Зразки матеріалів',
+                    desc: 'Віяла зразків паперів, дизайнерських картонів, плівок та прикладів післядрукарського оздоблення.',
+                    icon: <Palette size={30} style={{ color: '#8b5cf6' }} />,
+                    color: 'rgba(139, 92, 246, 0.1)',
+                    badgeClass: 'ios-badge-purple',
+                    badge: 'Зразки',
+                    metric: 'Віяла матеріалів',
+                    onClick: () => setActiveInfoModal('samples')
+                  }
+                ].map(item => (
+                  <div
+                    key={item.title}
+                    onClick={item.onClick}
+                    className="ios-card bg-white"
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      justifyContent: 'space-between',
+                      padding: '24px',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                      minHeight: '200px',
+                      position: 'relative',
+                      border: '1px dashed #fcd34d'
+                    }}
+                    onMouseEnter={(e) => { e.currentTarget.style.transform = 'translateY(-2px)'; }}
+                    onMouseLeave={(e) => { e.currentTarget.style.transform = 'translateY(0)'; }}
+                  >
+                    <div>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                        <div style={{
+                          width: '56px',
+                          height: '56px',
+                          borderRadius: '16px',
+                          backgroundColor: item.color,
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}>
+                          {item.icon}
+                        </div>
+                        <span className={`ios-badge ${item.badgeClass}`} style={{ fontSize: '11px', padding: '3px 8px' }}>
+                          {item.badge}
+                        </span>
+                      </div>
+
+                      <h4 style={{ fontSize: '15px', fontWeight: '800', marginBottom: '6px', color: 'var(--text-dark)' }}>
+                        {item.title}
+                      </h4>
+                      <p style={{ fontSize: '12px', color: 'var(--text-medium)', lineHeight: '1.4' }}>
+                        {item.desc}
+                      </p>
+                    </div>
+
+                    <div style={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      alignItems: 'center',
+                      borderTop: '0.5px solid var(--border-light)',
+                      paddingTop: '12px',
+                      marginTop: '16px'
+                    }}>
+                      <span style={{ fontSize: '11px', fontWeight: '600', color: 'var(--text-medium)' }}>
+                        {item.metric}
+                      </span>
+                      <span style={{ color: '#d97706', display: 'flex', alignItems: 'center', fontSize: '12px', fontWeight: '700' }}>
+                        Відкрити <ChevronRight size={14} />
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
 
